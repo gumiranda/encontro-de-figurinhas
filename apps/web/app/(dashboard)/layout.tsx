@@ -17,6 +17,7 @@ import {
   UserCog,
   Users,
   Menu,
+  MapPin,
 } from "lucide-react";
 import { RoleBadge } from "@/components/role-badge";
 import Link from "next/link";
@@ -41,6 +42,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const navItems = useMemo(() => [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    { label: "Mapa", href: "/mapa", icon: MapPin },
     ...(isSuperadminOrCeo ? [
       { label: "Users", href: "/admin/users", icon: UserCog },
       { label: "Pending Users", href: "/admin/pending-users", icon: Users },
@@ -65,7 +67,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
       <div className="p-6">
-        <h1 className="text-xl font-bold">Template App</h1>
+        <h1 className="text-xl font-bold">Encontro de Figurinhas</h1>
       </div>
       <nav className="px-4 space-y-1">
         {navItems.map((item) => {

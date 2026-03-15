@@ -17,4 +17,30 @@ export default defineSchema({
     .index("by_clerk_id", ["clerkId"])
     .index("by_role", ["role"])
     .index("by_status", ["status"]),
+
+  spots: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    latitude: v.float64(),
+    longitude: v.float64(),
+    createdBy: v.id("users"),
+    createdByName: v.string(),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+    upvotes: v.number(),
+    downvotes: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_expires", ["expiresAt"])
+    .index("by_created_by", ["createdBy"]),
+
+  votes: defineTable({
+    spotId: v.id("spots"),
+    userId: v.id("users"),
+    value: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_spot", ["spotId"])
+    .index("by_user_spot", ["userId", "spotId"]),
 });

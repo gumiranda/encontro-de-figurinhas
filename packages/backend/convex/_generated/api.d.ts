@@ -8,11 +8,15 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_types from "../lib/types.js";
 import type * as permissions from "../permissions.js";
+import type * as seed from "../seed.js";
+import type * as spots from "../spots.js";
 import type * as users from "../users.js";
+import type * as votes from "../votes.js";
 
 import type {
   ApiFromModules,
@@ -29,11 +33,15 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
   http: typeof http;
   "lib/auth": typeof lib_auth;
   "lib/types": typeof lib_types;
   permissions: typeof permissions;
+  seed: typeof seed;
+  spots: typeof spots;
   users: typeof users;
+  votes: typeof votes;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
