@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
       if (isSuperadmin && selectedRole !== editingUser.role) {
         await updateUserRole({
           userId: editingUser.id,
-          role: selectedRole,
+          role: selectedRole as "superadmin" | "ceo" | "user",
         });
       }
 
@@ -110,7 +110,7 @@ export default function AdminUsersPage() {
       ) {
         await updateUserSector({
           userId: editingUser.id,
-          sector: selectedSector,
+          sector: selectedSector as "general",
         });
       }
 

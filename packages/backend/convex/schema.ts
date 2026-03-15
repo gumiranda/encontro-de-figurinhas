@@ -5,9 +5,9 @@ export default defineSchema({
   users: defineTable({
     name: v.string(),
     clerkId: v.string(),
-    role: v.optional(v.string()),
-    sector: v.optional(v.string()),
-    status: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("superadmin"), v.literal("ceo"), v.literal("user"))),
+    sector: v.optional(v.union(v.literal("general"))),
+    status: v.optional(v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected"))),
     approvedBy: v.optional(v.id("users")),
     approvedAt: v.optional(v.number()),
     rejectedBy: v.optional(v.id("users")),
@@ -37,7 +37,7 @@ export default defineSchema({
   votes: defineTable({
     spotId: v.id("spots"),
     userId: v.id("users"),
-    value: v.number(),
+    value: v.union(v.literal(1), v.literal(-1)),
     createdAt: v.number(),
   })
     .index("by_spot", ["spotId"])

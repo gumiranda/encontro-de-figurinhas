@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getAuthenticatedUser } from "./lib/auth";
-import { TWENTY_FOUR_HOURS } from "./lib/types";
+import { UserStatus, TWENTY_FOUR_HOURS, MAX_SPOT_LIFETIME } from "./lib/types";
 const DOWNVOTE_THRESHOLD = 3;
 const MAX_VOTES_PER_MINUTE = 30;
 const ONE_MINUTE = 60_000;
@@ -15,11 +15,15 @@ const ONE_MINUTE = 60_000;
 export const castVote = mutation({
   args: {
     spotId: v.id("spots"),
-    value: v.number(),
+    value: v.union(v.literal(1), v.literal(-1)),
   },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) throw new Error("Não autenticado");
+
+    if (user.status !== UserStatus.APPROVED) {
+      throw new Error("Sua conta precisa ser aprovada para votar");
+    }
 
     if (args.value !== 1 && args.value !== -1) {
       throw new Error("Voto inválido");
@@ -41,6 +45,10 @@ export const castVote = mutation({
 
     if (!spot.isActive || spot.expiresAt <= Date.now()) {
       throw new Error("Este ponto já expirou");
+    }
+
+    if (spot.createdBy === user._id) {
+      throw new Error("Você não pode votar no seu próprio ponto");
     }
 
     const existingVote = await ctx.db
@@ -101,9 +109,10 @@ export const castVote = mutation({
       downvotes: newDownvotes,
     };
 
-    // Upvote extends life by 24h
+    // Upvote extends life by 24h, capped at 72h from creation
     if (args.value === 1 && upvoteDelta > 0) {
-      patchData.expiresAt = Date.now() + TWENTY_FOUR_HOURS;
+      const maxExpiry = freshSpot.createdAt + MAX_SPOT_LIFETIME;
+      patchData.expiresAt = Math.min(Date.now() + TWENTY_FOUR_HOURS, maxExpiry);
     }
 
     // 3+ downvotes deactivates spot

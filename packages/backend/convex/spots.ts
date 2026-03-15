@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation, internalMutation } from "./_generated/server";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
-import { UserStatus, TWENTY_FOUR_HOURS } from "./lib/types";
+import { UserStatus, TWENTY_FOUR_HOURS, sanitizeText } from "./lib/types";
 const MAX_SPOTS_PER_DAY = 10;
 const MAX_TITLE_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -69,6 +69,14 @@ export const create = mutation({
       throw new Error("Descrição deve ter no máximo 500 caracteres");
     }
 
+    // Coordinate validation
+    if (args.latitude < -90 || args.latitude > 90) {
+      throw new Error("Latitude inválida");
+    }
+    if (args.longitude < -180 || args.longitude > 180) {
+      throw new Error("Longitude inválida");
+    }
+
     // Rate limit: max 10 spots per 24h
     const oneDayAgo = Date.now() - TWENTY_FOUR_HOURS;
     const recentSpots = await ctx.db
@@ -82,10 +90,13 @@ export const create = mutation({
       );
     }
 
+    const title = sanitizeText(args.title);
+    const description = args.description ? sanitizeText(args.description) : undefined;
+
     const now = Date.now();
     return await ctx.db.insert("spots", {
-      title: args.title,
-      description: args.description,
+      title,
+      description,
       latitude: args.latitude,
       longitude: args.longitude,
       createdBy: user._id,
@@ -108,6 +119,10 @@ export const remove = mutation({
     const spot = await ctx.db.get(args.spotId);
     if (!spot) throw new Error("Ponto não encontrado");
 
+    if (!isAdmin(user.role) && user.status !== UserStatus.APPROVED) {
+      throw new Error("Sua conta precisa ser aprovada para remover pontos");
+    }
+
     if (spot.createdBy !== user._id && !isAdmin(user.role)) {
       throw new Error("Sem permissão para remover este ponto");
     }
@@ -119,10 +134,12 @@ export const remove = mutation({
   },
 });
 
+const VOTES_CLEANUP_LIMIT = 100;
+
 export const expireStale = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const BATCH_SIZE = 250;
+    const BATCH_SIZE = 50;
     const now = Date.now();
     const expiredSpots = await ctx.db
       .query("spots")
@@ -131,10 +148,17 @@ export const expireStale = internalMutation({
       )
       .take(BATCH_SIZE);
 
-    // FIXME: Votes órfãos — mesma dívida técnica do `remove`.
-    // Spots expirados deixam votes na tabela. Considerar cleanup em batch aqui.
     for (const spot of expiredSpots) {
       await ctx.db.patch(spot._id, { isActive: false });
+
+      // Cleanup orphaned votes for this spot
+      const orphanedVotes = await ctx.db
+        .query("votes")
+        .withIndex("by_spot", (q) => q.eq("spotId", spot._id))
+        .take(VOTES_CLEANUP_LIMIT);
+      for (const vote of orphanedVotes) {
+        await ctx.db.delete(vote._id);
+      }
     }
     return {
       expiredCount: expiredSpots.length,

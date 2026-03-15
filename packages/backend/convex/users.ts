@@ -33,6 +33,9 @@ export const getCurrentUser = query({
 export const hasSuperadmin = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return true;
+
     const superadmin = await ctx.db
       .query("users")
       .withIndex("by_role", (q) => q.eq("role", Role.SUPERADMIN))
@@ -44,6 +47,9 @@ export const hasSuperadmin = query({
 export const hasAnyUsers = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return true;
+
     const user = await ctx.db.query("users").first();
     return user !== null;
   },
@@ -106,13 +112,25 @@ export const bootstrap = mutation({
     if (existingUser) {
       throw new Error("User already exists");
     }
-    return await ctx.db.insert("users", {
+    const userId = await ctx.db.insert("users", {
       name: identity.name ?? "Superadmin",
       clerkId: clerkId,
       role: Role.SUPERADMIN,
       status: UserStatus.APPROVED,
       approvedAt: Date.now(),
     });
+
+    // Post-insert guard: if another bootstrap raced us, rollback
+    const allSuperadmins = await ctx.db
+      .query("users")
+      .withIndex("by_role", (q) => q.eq("role", Role.SUPERADMIN))
+      .collect();
+    if (allSuperadmins.length > 1) {
+      await ctx.db.delete(userId);
+      throw new Error("Superadmin already exists");
+    }
+
+    return userId;
   },
 });
 
@@ -129,7 +147,7 @@ export const getAllUsers = query({
 export const updateUserRole = mutation({
   args: {
     userId: v.id("users"),
-    role: v.string(),
+    role: v.union(v.literal("superadmin"), v.literal("ceo"), v.literal("user")),
   },
   handler: async (ctx, args) => {
     const currentUser = await getAuthenticatedUser(ctx);
@@ -164,7 +182,7 @@ export const updateUserRole = mutation({
 export const updateUserSector = mutation({
   args: {
     userId: v.id("users"),
-    sector: v.string(),
+    sector: v.union(v.literal("general")),
   },
   handler: async (ctx, args) => {
     const currentUser = await getAuthenticatedUser(ctx);
@@ -186,11 +204,7 @@ export const updateUserSector = mutation({
     }
 
     if (isAdmin(targetUser.role)) {
-      throw new Error(
-        currentUser.role === Role.CEO
-          ? "CEO cannot modify superadmin or other CEO users"
-          : "Cannot assign sector to superadmin or CEO"
-      );
+      throw new Error("Operação não permitida");
     }
 
     await ctx.db.patch(args.userId, { sector: args.sector });
@@ -221,7 +235,7 @@ export const getPendingUsersCount = query({
 export const approveUser = mutation({
   args: {
     userId: v.id("users"),
-    sector: v.string(),
+    sector: v.union(v.literal("general")),
   },
   handler: async (ctx, args) => {
     const currentUser = await getAuthenticatedUser(ctx);

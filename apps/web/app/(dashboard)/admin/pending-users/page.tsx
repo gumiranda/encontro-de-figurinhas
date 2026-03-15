@@ -84,7 +84,7 @@ export default function PendingUsersPage() {
     try {
       await approveUser({
         userId: approveDialog.userId,
-        sector: selectedSector,
+        sector: selectedSector as "general",
       });
       toast.success(`User ${approveDialog.name} approved successfully!`);
       setApproveDialog(null);
