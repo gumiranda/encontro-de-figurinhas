@@ -3,6 +3,8 @@ import convexServer from "@/lib/convex-server";
 import { api } from "@workspace/backend/_generated/api";
 import { SpotDetailClient } from "./spot-detail-client";
 
+export const revalidate = 60;
+
 type Props = {
   params: Promise<{ id: string }>;
 };

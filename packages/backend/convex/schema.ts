@@ -32,6 +32,7 @@ export default defineSchema({
     isActive: v.boolean(),
   })
     .index("by_active", ["isActive"])
+    .index("by_active_expiresAt", ["isActive", "expiresAt"])
     .index("by_expires", ["expiresAt"])
     .index("by_created_by", ["createdBy"]),
 

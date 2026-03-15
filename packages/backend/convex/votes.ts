@@ -95,14 +95,18 @@ export const castVote = mutation({
   },
 });
 
+const MAX_SPOT_IDS_PER_QUERY = 50;
+
 export const getMyVotes = query({
   args: { spotIds: v.array(v.id("spots")) },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) return [];
 
+    const spotIds = args.spotIds.slice(0, MAX_SPOT_IDS_PER_QUERY);
+
     const votes = [];
-    for (const spotId of args.spotIds) {
+    for (const spotId of spotIds) {
       const vote = await ctx.db
         .query("votes")
         .withIndex("by_user_spot", (q) =>

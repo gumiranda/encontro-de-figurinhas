@@ -16,7 +16,8 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
-  const activeCount = useQuery(api.spots.getActiveCount);
+  const activeSpots = useQuery(api.spots.listActive);
+  const activeCount = activeSpots?.length;
 
   const isAdmin =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";

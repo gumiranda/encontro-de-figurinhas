@@ -8,11 +8,12 @@ export const listActive = query({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
-    const spots = await ctx.db
+    return await ctx.db
       .query("spots")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active_expiresAt", (q) =>
+        q.eq("isActive", true).gt("expiresAt", now)
+      )
       .collect();
-    return spots.filter((spot) => spot.expiresAt > now);
   },
 });
 
@@ -30,18 +31,6 @@ export const getById = query({
   },
 });
 
-export const getActiveCount = query({
-  args: {},
-  handler: async (ctx) => {
-    const now = Date.now();
-    const spots = await ctx.db
-      .query("spots")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
-      .collect();
-    return spots.filter((spot) => spot.expiresAt > now).length;
-  },
-});
-
 export const create = mutation({
   args: {
     title: v.string(),
@@ -56,15 +45,22 @@ export const create = mutation({
       throw new Error("Sua conta precisa ser aprovada para criar pontos");
     }
 
+    // String length validation
+    if (args.title.length > 100) {
+      throw new Error("Título deve ter no máximo 100 caracteres");
+    }
+    if (args.description && args.description.length > 500) {
+      throw new Error("Descrição deve ter no máximo 500 caracteres");
+    }
+
     // Rate limit: max 10 spots per 24h
     const oneDayAgo = Date.now() - TWENTY_FOUR_HOURS;
     const recentSpots = await ctx.db
       .query("spots")
       .withIndex("by_created_by", (q) => q.eq("createdBy", user._id))
+      .filter((q) => q.gt(q.field("createdAt"), oneDayAgo))
       .collect();
-    const spotsInLast24h = recentSpots.filter(
-      (s) => s.createdAt > oneDayAgo
-    ).length;
+    const spotsInLast24h = recentSpots.length;
     if (spotsInLast24h >= MAX_SPOTS_PER_DAY) {
       throw new Error(
         "Limite de pontos atingido. Você pode criar no máximo 10 pontos por dia."
@@ -109,19 +105,17 @@ export const expireStale = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
-    const activeSpots = await ctx.db
+    const expiredSpots = await ctx.db
       .query("spots")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active_expiresAt", (q) =>
+        q.eq("isActive", true).lt("expiresAt", now)
+      )
       .collect();
 
-    let expiredCount = 0;
-    for (const spot of activeSpots) {
-      if (spot.expiresAt < now) {
-        await ctx.db.patch(spot._id, { isActive: false });
-        expiredCount++;
-      }
+    for (const spot of expiredSpots) {
+      await ctx.db.patch(spot._id, { isActive: false });
     }
-    return { expiredCount };
+    return { expiredCount: expiredSpots.length };
   },
 });
 
@@ -134,10 +128,14 @@ export const getStats = query({
     const now = Date.now();
     const oneDayAgo = now - TWENTY_FOUR_HOURS;
 
+    const activeSpots = await ctx.db
+      .query("spots")
+      .withIndex("by_active_expiresAt", (q) =>
+        q.eq("isActive", true).gt("expiresAt", now)
+      )
+      .collect();
+
     const allSpots = await ctx.db.query("spots").collect();
-    const activeSpots = allSpots.filter(
-      (s) => s.isActive && s.expiresAt > now
-    );
     const spotsCreatedToday = allSpots.filter(
       (s) => s.createdAt > oneDayAgo
     );
