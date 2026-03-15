@@ -97,6 +97,9 @@ export const remove = mutation({
       throw new Error("Sem permissão para remover este ponto");
     }
 
+    // FIXME: Votes órfãos — ao desativar um spot, seus votes permanecem na tabela `votes`.
+    // A tabela `votes` cresce monotonicamente e impacta getMyVotes (mais entries no index).
+    // Implementar cleanup de votes ao desativar, ou batch cleanup periódico via cron.
     await ctx.db.patch(args.spotId, { isActive: false });
   },
 });
@@ -112,6 +115,8 @@ export const expireStale = internalMutation({
       )
       .collect();
 
+    // FIXME: Votes órfãos — mesma dívida técnica do `remove`.
+    // Spots expirados deixam votes na tabela. Considerar cleanup em batch aqui.
     for (const spot of expiredSpots) {
       await ctx.db.patch(spot._id, { isActive: false });
     }
@@ -135,17 +140,21 @@ export const getStats = query({
       )
       .collect();
 
+    // Full scan de spots ainda necessário para totalSpots + spotsCreatedToday.
+    // Votes derivados dos contadores denormalizados nos spots (evita scan da tabela votes).
     const allSpots = await ctx.db.query("spots").collect();
     const spotsCreatedToday = allSpots.filter(
       (s) => s.createdAt > oneDayAgo
     );
-
-    const totalVotes = await ctx.db.query("votes").collect();
+    const totalVotes = allSpots.reduce(
+      (sum, s) => sum + s.upvotes + s.downvotes,
+      0
+    );
 
     return {
       activeSpots: activeSpots.length,
       totalSpots: allSpots.length,
-      totalVotes: totalVotes.length,
+      totalVotes,
       spotsCreatedToday: spotsCreatedToday.length,
     };
   },

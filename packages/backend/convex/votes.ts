@@ -3,6 +3,14 @@ import { query, mutation } from "./_generated/server";
 import { getAuthenticatedUser } from "./lib/auth";
 import { TWENTY_FOUR_HOURS } from "./lib/types";
 const DOWNVOTE_THRESHOLD = 3;
+const MAX_VOTES_PER_MINUTE = 30;
+const ONE_MINUTE = 60_000;
+
+// Custo por chamada:
+// - Melhor caso (novo voto): 2R (auth + spot) + 1R (existing vote) + 1W (insert vote) + 1W (patch spot) = 3R + 2W
+// - Pior caso (trocar voto up→down): 2R (auth + spot) + 1R (existing vote) + 1W (patch vote) + 1R (fresh spot) + 1W (patch spot counters + expiresAt) = 3R + 2W
+// - Pior caso com deactivation: mesmo + isActive=false no patch = 3R + 2W
+// TODO: Rate limit futuro mais granular (por IP ou sliding window)
 
 export const castVote = mutation({
   args: {
@@ -15,6 +23,17 @@ export const castVote = mutation({
 
     if (args.value !== 1 && args.value !== -1) {
       throw new Error("Voto inválido");
+    }
+
+    // Rate limit: max 30 votes per minute per user
+    const oneMinuteAgo = Date.now() - ONE_MINUTE;
+    const recentVotes = await ctx.db
+      .query("votes")
+      .withIndex("by_user_spot", (q) => q.eq("userId", user._id))
+      .filter((q) => q.gt(q.field("createdAt"), oneMinuteAgo))
+      .collect();
+    if (recentVotes.length >= MAX_VOTES_PER_MINUTE) {
+      throw new Error("Muitos votos em pouco tempo. Aguarde um momento.");
     }
 
     const spot = await ctx.db.get(args.spotId);
