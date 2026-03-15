@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
@@ -35,14 +35,14 @@ export default function BootstrapPage() {
     };
     autoBootstrap();
   }, [isSignedIn, hasAnyUsers, bootstrap, router]);
-  useEffect(() => {
-    if (currentUser) {
-      router.push("/");
-    }
-  }, [currentUser, router]);
 
   if (!isLoaded || hasAnyUsers === undefined) {
     return <FullPageLoader />;
+  }
+
+  if (currentUser) {
+    router.push("/");
+    return null;
   }
 
   if (!isSignedIn) {

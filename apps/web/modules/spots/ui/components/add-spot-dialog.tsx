@@ -18,7 +18,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const spotSchema = z.object({
   title: z
@@ -56,19 +56,10 @@ export function AddSpotDialog({
     defaultValues: {
       title: "",
       description: "",
-      latitude: undefined,
-      longitude: undefined,
+      latitude: pickedLocation?.latitude,
+      longitude: pickedLocation?.longitude,
     },
   });
-
-  // Update location when picked from map
-  useEffect(() => {
-    if (pickedLocation) {
-      form.setValue("latitude", pickedLocation.latitude);
-      form.setValue("longitude", pickedLocation.longitude);
-      form.clearErrors("latitude");
-    }
-  }, [pickedLocation, form]);
 
   const handleUseMyLocation = () => {
     if (userLocation) {
