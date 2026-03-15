@@ -16,12 +16,17 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
-  const activeSpots = useQuery(api.spots.listActive);
-  const activeCount = activeSpots?.length;
 
   const isAdmin =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";
   const stats = useQuery(api.spots.getStats, isAdmin ? {} : "skip");
+
+  // Non-admin: lightweight count query. Admin: derive from stats (already subscribed).
+  const lightweightCount = useQuery(
+    api.spots.getActiveCount,
+    isAdmin ? "skip" : {}
+  );
+  const activeCount = isAdmin ? stats?.activeSpots : lightweightCount;
 
   return (
     <div className="space-y-6">

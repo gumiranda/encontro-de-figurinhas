@@ -9,15 +9,27 @@ import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Doc } from "@workspace/backend/_generated/dataModel";
 
-export function SpotActions({ spot }: { spot: Doc<"spots"> }) {
+export function SpotActions({
+  spot,
+  myVote: myVoteProp,
+}: {
+  spot: Doc<"spots">;
+  myVote?: number;
+}) {
   const { isSignedIn } = useUser();
   const router = useRouter();
   const castVote = useMutation(api.votes.castVote);
 
-  const myVotes = useQuery(api.votes.getMyVotes, {
-    spotIds: [spot._id],
-  });
-  const myVote = myVotes?.find((v) => v.spotId === spot._id)?.value ?? 0;
+  // When myVote is provided via prop (from SpotsMap batch query), skip self-fetch.
+  // When undefined (spot detail page), self-fetch as before.
+  const selfVotes = useQuery(
+    api.votes.getMyVotes,
+    myVoteProp !== undefined ? "skip" : { spotIds: [spot._id] }
+  );
+  const myVote =
+    myVoteProp !== undefined
+      ? myVoteProp
+      : (selfVotes?.find((v) => v.spotId === spot._id)?.value ?? 0);
 
   const handleVote = async (value: 1 | -1) => {
     if (!isSignedIn) {

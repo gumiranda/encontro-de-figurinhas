@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import Map, { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import MapGL, { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { useUser } from "@clerk/nextjs";
@@ -29,6 +29,22 @@ export function SpotsMap() {
   const [viewState, setViewState] = useState({ ...DEFAULT_CENTER, zoom: 12 });
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const geolocateAttempted = useRef(false);
+
+  // Batch getMyVotes for all visible spots
+  const spotIds = useMemo(() => spots?.map((s) => s._id) ?? [], [spots]);
+  const myVotes = useQuery(
+    api.votes.getMyVotes,
+    isSignedIn && spotIds.length > 0 ? { spotIds } : "skip"
+  );
+  const voteBySpotId = useMemo(() => {
+    const map = new Map<Id<"spots">, number>();
+    if (myVotes) {
+      for (const v of myVotes) {
+        map.set(v.spotId, v.value);
+      }
+    }
+    return map;
+  }, [myVotes]);
 
   useEffect(() => {
     if (geolocateAttempted.current) return;
@@ -59,6 +75,10 @@ export function SpotsMap() {
     [pickingLocation]
   );
 
+  const handleSelectSpot = useCallback((id: Id<"spots">) => {
+    setSelectedSpotId(id);
+  }, []);
+
   const handleFabClick = () => {
     if (!isLoaded) return;
     if (!isSignedIn) { router.push("/sign-in?redirect_url=/mapa"); return; }
@@ -70,7 +90,10 @@ export function SpotsMap() {
     setAddDialogOpen(true);
   };
 
-  const selectedSpot = spots?.find((s) => s._id === selectedSpotId) ?? null;
+  const selectedSpot = useMemo(
+    () => spots?.find((s) => s._id === selectedSpotId) ?? null,
+    [spots, selectedSpotId]
+  );
 
   if (spots === undefined) {
     return (
@@ -82,7 +105,7 @@ export function SpotsMap() {
 
   return (
     <>
-      <Map
+      <MapGL
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
         onClick={handleMapClick}
@@ -95,13 +118,17 @@ export function SpotsMap() {
         <GeolocateControl position="top-right" trackUserLocation />
 
         {spots.map((spot) => (
-          <SpotMarker key={spot._id} spot={spot} onClick={() => setSelectedSpotId(spot._id)} />
+          <SpotMarker key={spot._id} spot={spot} onSelect={handleSelectSpot} />
         ))}
 
         {selectedSpot && (
-          <SpotPopup spot={selectedSpot} onClose={() => setSelectedSpotId(null)} />
+          <SpotPopup
+            spot={selectedSpot}
+            onClose={() => setSelectedSpotId(null)}
+            myVote={voteBySpotId.get(selectedSpot._id) ?? 0}
+          />
         )}
-      </Map>
+      </MapGL>
 
       {spots.length === 0 && (
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-md flex items-center gap-2 text-sm text-muted-foreground">

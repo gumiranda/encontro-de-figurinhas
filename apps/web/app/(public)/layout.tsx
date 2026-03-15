@@ -14,8 +14,7 @@ export default function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const activeSpots = useQuery(api.spots.listActive);
-  const activeCount = activeSpots?.length;
+  const activeCount = useQuery(api.spots.getActiveCount);
 
   return (
     <div className="relative h-dvh w-full">

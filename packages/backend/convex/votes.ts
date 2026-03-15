@@ -116,6 +116,9 @@ export const castVote = mutation({
 
 const MAX_SPOT_IDS_PER_QUERY = 50;
 
+// N individual index lookups (O(1) each), capped at MAX_SPOT_IDS_PER_QUERY (50).
+// Convex doesn't support batch/IN queries, so sequential indexed reads are the
+// standard pattern. At 50 spots this is well within Convex's query budget.
 export const getMyVotes = query({
   args: { spotIds: v.array(v.id("spots")) },
   handler: async (ctx, args) => {

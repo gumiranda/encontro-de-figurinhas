@@ -17,9 +17,11 @@ export function formatTimeRemaining(expiresAt: number): string {
 export function SpotPopup({
   spot,
   onClose,
+  myVote,
 }: {
   spot: Doc<"spots">;
   onClose: () => void;
+  myVote?: number;
 }) {
   const ageMinutes = (Date.now() - spot.createdAt) / (1000 * 60);
   const freshness =
@@ -63,7 +65,7 @@ export function SpotPopup({
         </div>
 
         <div className="border-t pt-2">
-          <SpotActions spot={spot} />
+          <SpotActions spot={spot} myVote={myVote} />
         </div>
       </div>
     </Popup>

@@ -17,6 +17,20 @@ export const listActive = query({
   },
 });
 
+export const getActiveCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const activeSpots = await ctx.db
+      .query("spots")
+      .withIndex("by_active_expiresAt", (q) =>
+        q.eq("isActive", true).gt("expiresAt", now)
+      )
+      .collect();
+    return activeSpots.length;
+  },
+});
+
 export const getById = query({
   args: { id: v.string() },
   handler: async (ctx, args) => {
@@ -107,20 +121,24 @@ export const remove = mutation({
 export const expireStale = internalMutation({
   args: {},
   handler: async (ctx) => {
+    const BATCH_SIZE = 250;
     const now = Date.now();
     const expiredSpots = await ctx.db
       .query("spots")
       .withIndex("by_active_expiresAt", (q) =>
         q.eq("isActive", true).lt("expiresAt", now)
       )
-      .collect();
+      .take(BATCH_SIZE);
 
     // FIXME: Votes órfãos — mesma dívida técnica do `remove`.
     // Spots expirados deixam votes na tabela. Considerar cleanup em batch aqui.
     for (const spot of expiredSpots) {
       await ctx.db.patch(spot._id, { isActive: false });
     }
-    return { expiredCount: expiredSpots.length };
+    return {
+      expiredCount: expiredSpots.length,
+      hasMore: expiredSpots.length === BATCH_SIZE,
+    };
   },
 });
 

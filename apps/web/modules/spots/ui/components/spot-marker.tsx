@@ -1,8 +1,9 @@
 "use client";
 
+import { memo } from "react";
 import { Marker } from "react-map-gl/mapbox";
 import { MapPin } from "lucide-react";
-import type { Doc } from "@workspace/backend/_generated/dataModel";
+import type { Doc, Id } from "@workspace/backend/_generated/dataModel";
 
 function getMarkerColor(spot: Doc<"spots">): string {
   const ageMs = Date.now() - spot.createdAt;
@@ -19,12 +20,12 @@ function getMarkerSize(spot: Doc<"spots">): string {
   return "h-6 w-6";
 }
 
-export function SpotMarker({
+export const SpotMarker = memo(function SpotMarker({
   spot,
-  onClick,
+  onSelect,
 }: {
   spot: Doc<"spots">;
-  onClick: () => void;
+  onSelect: (id: Id<"spots">) => void;
 }) {
   return (
     <Marker
@@ -33,7 +34,7 @@ export function SpotMarker({
       anchor="bottom"
       onClick={(e) => {
         e.originalEvent.stopPropagation();
-        onClick();
+        onSelect(spot._id);
       }}
     >
       <button
@@ -47,4 +48,4 @@ export function SpotMarker({
       </button>
     </Marker>
   );
-}
+});
