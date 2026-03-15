@@ -26,6 +26,47 @@ import { cn } from "@workspace/ui/lib/utils";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 
+function SidebarContent({
+  navItems,
+  pathname,
+  onNavigate,
+}: {
+  navItems: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[];
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      <div className="p-6">
+        <h1 className="text-xl font-bold">Encontro de Figurinhas</h1>
+      </div>
+      <nav className="px-4 space-y-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href));
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+}
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,44 +102,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  const isSuperadmin = currentUser.role === "superadmin";
-  const isCeo = currentUser.role === "ceo";
-
-  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <>
-      <div className="p-6">
-        <h1 className="text-xl font-bold">Encontro de Figurinhas</h1>
-      </div>
-      <nav className="px-4 space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-    </>
-  );
-
   return (
     <div className="flex min-h-screen">
       <aside className="hidden md:block w-64 border-r bg-muted/40">
-        <SidebarContent />
+        <SidebarContent navItems={navItems} pathname={pathname} />
       </aside>
 
       <div className="flex-1">
@@ -112,16 +119,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
-                <SidebarContent onNavigate={() => setSidebarOpen(false)} />
+                <SidebarContent navItems={navItems} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
               </SheetContent>
             </Sheet>
 
-            {(isSuperadmin || isCeo) && (
+            {isSuperadminOrCeo && (
               <RoleBadge role={currentUser.role} />
             )}
           </div>
           <div className="flex items-center gap-4">
-            {(isSuperadmin || isCeo) && pendingUsersCount && pendingUsersCount > 0 && (
+            {isSuperadminOrCeo && pendingUsersCount && pendingUsersCount > 0 && (
               <Link href="/admin/pending-users">
                 <Button variant="ghost" size="icon" className="relative">
                   <UserPlus className="h-5 w-5" />

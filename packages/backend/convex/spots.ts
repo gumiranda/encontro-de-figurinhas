@@ -3,6 +3,8 @@ import { query, mutation, internalMutation } from "./_generated/server";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
 import { UserStatus, TWENTY_FOUR_HOURS } from "./lib/types";
 const MAX_SPOTS_PER_DAY = 10;
+const MAX_TITLE_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 500;
 
 export const listActive = query({
   args: {},
@@ -60,10 +62,10 @@ export const create = mutation({
     }
 
     // String length validation
-    if (args.title.length > 100) {
+    if (args.title.length > MAX_TITLE_LENGTH) {
       throw new Error("Título deve ter no máximo 100 caracteres");
     }
-    if (args.description && args.description.length > 500) {
+    if (args.description && args.description.length > MAX_DESCRIPTION_LENGTH) {
       throw new Error("Descrição deve ter no máximo 500 caracteres");
     }
 
@@ -74,8 +76,7 @@ export const create = mutation({
       .withIndex("by_created_by", (q) => q.eq("createdBy", user._id))
       .filter((q) => q.gt(q.field("createdAt"), oneDayAgo))
       .collect();
-    const spotsInLast24h = recentSpots.length;
-    if (spotsInLast24h >= MAX_SPOTS_PER_DAY) {
+    if (recentSpots.length >= MAX_SPOTS_PER_DAY) {
       throw new Error(
         "Limite de pontos atingido. Você pode criar no máximo 10 pontos por dia."
       );

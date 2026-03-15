@@ -19,6 +19,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
 import { useState } from "react";
+import type { Coordinates } from "@workspace/backend/lib/types";
 
 const spotSchema = z.object({
   title: z
@@ -42,8 +43,8 @@ export function AddSpotDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pickedLocation: { latitude: number; longitude: number } | null;
-  userLocation: { latitude: number; longitude: number } | null;
+  pickedLocation: Coordinates | null;
+  userLocation: Coordinates | null;
   onPickLocation: () => void;
   onSpotCreated: () => void;
 }) {
@@ -61,11 +62,15 @@ export function AddSpotDialog({
     },
   });
 
+  const setFormLocation = (lat: number, lng: number) => {
+    form.setValue("latitude", lat);
+    form.setValue("longitude", lng);
+    form.clearErrors("latitude");
+  };
+
   const handleUseMyLocation = () => {
     if (userLocation) {
-      form.setValue("latitude", userLocation.latitude);
-      form.setValue("longitude", userLocation.longitude);
-      form.clearErrors("latitude");
+      setFormLocation(userLocation.latitude, userLocation.longitude);
       toast.success("Localização capturada!");
       return;
     }
@@ -73,9 +78,7 @@ export function AddSpotDialog({
     setGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        form.setValue("latitude", pos.coords.latitude);
-        form.setValue("longitude", pos.coords.longitude);
-        form.clearErrors("latitude");
+        setFormLocation(pos.coords.latitude, pos.coords.longitude);
         toast.success("Localização capturada!");
         setGettingLocation(false);
       },
@@ -113,9 +116,8 @@ export function AddSpotDialog({
     }
   };
 
-  const hasLocation =
-    form.watch("latitude") !== undefined &&
-    form.watch("longitude") !== undefined;
+  const [watchLat, watchLng] = form.watch(["latitude", "longitude"]);
+  const hasLocation = watchLat !== undefined && watchLng !== undefined;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -191,8 +193,8 @@ export function AddSpotDialog({
             </div>
             {hasLocation && (
               <p className="text-xs text-green-600">
-                Localização definida ({form.watch("latitude")?.toFixed(4)},{" "}
-                {form.watch("longitude")?.toFixed(4)})
+                Localização definida ({watchLat?.toFixed(4)},{" "}
+                {watchLng?.toFixed(4)})
               </p>
             )}
             {form.formState.errors.latitude && !hasLocation && (

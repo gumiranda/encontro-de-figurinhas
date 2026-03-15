@@ -1,7 +1,27 @@
 import { v } from "convex/values";
+import type { QueryCtx } from "./_generated/server";
 import { query, mutation } from "./_generated/server";
-import { Sector, Role, UserStatus } from "./lib/types";
+import { Sector, Role, UserStatus, isValidValue } from "./lib/types";
+import type { RoleValue, SectorValue } from "./lib/types";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
+
+async function queryPendingUsers(ctx: QueryCtx) {
+  const pending = await ctx.db
+    .query("users")
+    .withIndex("by_status", (q) => q.eq("status", UserStatus.PENDING))
+    .collect();
+  const noStatus = await ctx.db
+    .query("users")
+    .withIndex("by_status", (q) => q.eq("status", undefined))
+    .collect();
+  return [...pending, ...noStatus];
+}
+
+function assertPendingStatus(user: { status?: string }): void {
+  if (user.status !== UserStatus.PENDING && user.status !== undefined) {
+    throw new Error("User is not pending approval");
+  }
+}
 
 export const getCurrentUser = query({
   args: {},
@@ -117,8 +137,7 @@ export const updateUserRole = mutation({
       throw new Error("Only superadmin can change user roles");
     }
 
-    const validRoles = Object.values(Role) as string[];
-    if (!validRoles.includes(args.role)) {
+    if (!isValidValue(Object.values(Role), args.role)) {
       throw new Error("Invalid role");
     }
 
@@ -131,7 +150,7 @@ export const updateUserRole = mutation({
       throw new Error("Cannot change your own role");
     }
 
-    const updateData: { role: string; sector?: string } = { role: args.role };
+    const updateData: { role: RoleValue; sector?: SectorValue } = { role: args.role };
 
     if (args.role === Role.SUPERADMIN || args.role === Role.CEO) {
       updateData.sector = undefined;
@@ -157,8 +176,7 @@ export const updateUserSector = mutation({
       throw new Error("Only superadmin or CEO can change user sectors");
     }
 
-    const validSectors = Object.values(Sector) as string[];
-    if (!validSectors.includes(args.sector)) {
+    if (!isValidValue(Object.values(Sector), args.sector)) {
       throw new Error("Invalid sector");
     }
 
@@ -167,12 +185,12 @@ export const updateUserSector = mutation({
       throw new Error("User not found");
     }
 
-    if (currentUser.role === Role.CEO && isAdmin(targetUser.role)) {
-      throw new Error("CEO cannot modify superadmin or other CEO users");
-    }
-
     if (isAdmin(targetUser.role)) {
-      throw new Error("Cannot assign sector to superadmin or CEO");
+      throw new Error(
+        currentUser.role === Role.CEO
+          ? "CEO cannot modify superadmin or other CEO users"
+          : "Cannot assign sector to superadmin or CEO"
+      );
     }
 
     await ctx.db.patch(args.userId, { sector: args.sector });
@@ -186,15 +204,7 @@ export const getPendingUsers = query({
     const currentUser = await getAuthenticatedUser(ctx);
     if (!currentUser || !isAdmin(currentUser.role)) return [];
 
-    const pendingUsers = await ctx.db
-      .query("users")
-      .withIndex("by_status", (q) => q.eq("status", UserStatus.PENDING))
-      .collect();
-    const noStatusUsers = await ctx.db
-      .query("users")
-      .withIndex("by_status", (q) => q.eq("status", undefined))
-      .collect();
-    return [...pendingUsers, ...noStatusUsers];
+    return queryPendingUsers(ctx);
   },
 });
 
@@ -204,15 +214,7 @@ export const getPendingUsersCount = query({
     const currentUser = await getAuthenticatedUser(ctx);
     if (!currentUser || !isAdmin(currentUser.role)) return 0;
 
-    const pendingUsers = await ctx.db
-      .query("users")
-      .withIndex("by_status", (q) => q.eq("status", UserStatus.PENDING))
-      .collect();
-    const noStatusUsers = await ctx.db
-      .query("users")
-      .withIndex("by_status", (q) => q.eq("status", undefined))
-      .collect();
-    return pendingUsers.length + noStatusUsers.length;
+    return (await queryPendingUsers(ctx)).length;
   },
 });
 
@@ -231,8 +233,7 @@ export const approveUser = mutation({
       throw new Error("Not authorized to approve users");
     }
 
-    const validSectors = Object.values(Sector) as string[];
-    if (!validSectors.includes(args.sector)) {
+    if (!isValidValue(Object.values(Sector), args.sector)) {
       throw new Error("Invalid sector");
     }
 
@@ -241,10 +242,7 @@ export const approveUser = mutation({
       throw new Error("Target user not found");
     }
 
-    const isPending = targetUser.status === UserStatus.PENDING || targetUser.status === undefined;
-    if (!isPending) {
-      throw new Error("User is not pending approval");
-    }
+    assertPendingStatus(targetUser);
 
     await ctx.db.patch(args.userId, {
       status: UserStatus.APPROVED,
@@ -277,10 +275,7 @@ export const rejectUser = mutation({
       throw new Error("Target user not found");
     }
 
-    const isPending = targetUser.status === UserStatus.PENDING || targetUser.status === undefined;
-    if (!isPending) {
-      throw new Error("User is not pending approval");
-    }
+    assertPendingStatus(targetUser);
 
     await ctx.db.patch(args.userId, {
       status: UserStatus.REJECTED,

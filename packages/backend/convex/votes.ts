@@ -86,7 +86,8 @@ export const castVote = mutation({
     }
 
     // Read fresh counters from DB
-    const freshSpot = (await ctx.db.get(args.spotId))!;
+    const freshSpot = await ctx.db.get(args.spotId);
+    if (!freshSpot) throw new Error("Spot not found after vote");
     const newUpvotes = freshSpot.upvotes + upvoteDelta;
     const newDownvotes = freshSpot.downvotes + downvoteDelta;
 

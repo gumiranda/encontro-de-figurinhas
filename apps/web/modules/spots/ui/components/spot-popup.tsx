@@ -14,6 +14,9 @@ export function formatTimeRemaining(expiresAt: number): string {
   return `${minutes}min restantes`;
 }
 
+const FRESHNESS_NEW_MINUTES = 30;
+const FRESHNESS_RECENT_MINUTES = 120;
+
 export function SpotPopup({
   spot,
   onClose,
@@ -25,7 +28,7 @@ export function SpotPopup({
 }) {
   const ageMinutes = (Date.now() - spot.createdAt) / (1000 * 60);
   const freshness =
-    ageMinutes < 30 ? "Acabou de ser criado" : ageMinutes < 120 ? "Recente" : "";
+    ageMinutes < FRESHNESS_NEW_MINUTES ? "Acabou de ser criado" : ageMinutes < FRESHNESS_RECENT_MINUTES ? "Recente" : "";
 
   return (
     <Popup

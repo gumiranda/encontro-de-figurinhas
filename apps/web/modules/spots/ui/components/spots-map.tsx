@@ -1,5 +1,6 @@
 "use client";
 
+import type { Coordinates } from "@workspace/backend/lib/types";
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import MapGL, { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import { useQuery } from "convex/react";
@@ -24,10 +25,10 @@ export function SpotsMap() {
 
   const [selectedSpotId, setSelectedSpotId] = useState<Id<"spots"> | null>(null);
   const [pickingLocation, setPickingLocation] = useState(false);
-  const [pickedLocation, setPickedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [pickedLocation, setPickedLocation] = useState<Coordinates | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [viewState, setViewState] = useState({ ...DEFAULT_CENTER, zoom: 12 });
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const geolocateAttempted = useRef(false);
 
   // Batch getMyVotes for all visible spots
@@ -90,6 +91,11 @@ export function SpotsMap() {
     setAddDialogOpen(true);
   };
 
+  const handleMove = useCallback(
+    (evt: { viewState: typeof viewState }) => setViewState(evt.viewState),
+    [],
+  );
+
   const selectedSpot = useMemo(
     () => spots?.find((s) => s._id === selectedSpotId) ?? null,
     [spots, selectedSpotId]
@@ -107,7 +113,7 @@ export function SpotsMap() {
     <>
       <MapGL
         {...viewState}
-        onMove={(evt) => setViewState(evt.viewState)}
+        onMove={handleMove}
         onClick={handleMapClick}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"

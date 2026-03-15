@@ -5,19 +5,12 @@ import { Marker } from "react-map-gl/mapbox";
 import { MapPin } from "lucide-react";
 import type { Doc, Id } from "@workspace/backend/_generated/dataModel";
 
-function getMarkerColor(spot: Doc<"spots">): string {
-  const ageMs = Date.now() - spot.createdAt;
-  const ageHours = ageMs / (1000 * 60 * 60);
-
-  if (spot.upvotes >= 3) return "text-green-500"; // Popular
-  if (ageHours < 2) return "text-orange-500"; // New
-  return "text-yellow-500"; // Regular
-}
-
-function getMarkerSize(spot: Doc<"spots">): string {
-  if (spot.upvotes >= 5) return "h-8 w-8";
-  if (spot.upvotes >= 2) return "h-7 w-7";
-  return "h-6 w-6";
+function getMarkerStyle(spot: Doc<"spots">) {
+  const ageHours = (Date.now() - spot.createdAt) / (1000 * 60 * 60);
+  return {
+    color: spot.upvotes >= 3 ? "text-green-500" : ageHours < 2 ? "text-orange-500" : "text-yellow-500",
+    size: spot.upvotes >= 5 ? "h-8 w-8" : spot.upvotes >= 2 ? "h-7 w-7" : "h-6 w-6",
+  };
 }
 
 export const SpotMarker = memo(function SpotMarker({
@@ -27,6 +20,7 @@ export const SpotMarker = memo(function SpotMarker({
   spot: Doc<"spots">;
   onSelect: (id: Id<"spots">) => void;
 }) {
+  const style = getMarkerStyle(spot);
   return (
     <Marker
       latitude={spot.latitude}
@@ -42,7 +36,7 @@ export const SpotMarker = memo(function SpotMarker({
         aria-label={`Ponto: ${spot.title}`}
       >
         <MapPin
-          className={`${getMarkerColor(spot)} ${getMarkerSize(spot)} fill-current`}
+          className={`${style.color} ${style.size} fill-current`}
           strokeWidth={1.5}
         />
       </button>
