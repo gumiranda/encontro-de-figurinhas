@@ -32,7 +32,9 @@ export default defineSchema({
     isActive: v.boolean(),
   })
     .index("by_active_expiresAt", ["isActive", "expiresAt"])
-    .index("by_created_by", ["createdBy"]),
+    .index("by_created_by", ["createdBy"])
+    .index("by_createdBy_and_createdAt", ["createdBy", "createdAt"])
+    .index("by_createdAt", ["createdAt"]),
 
   votes: defineTable({
     spotId: v.id("spots"),
@@ -41,5 +43,6 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_spot", ["spotId"])
-    .index("by_user_spot", ["userId", "spotId"]),
+    .index("by_user_spot", ["userId", "spotId"])
+    .index("by_userId_and_createdAt", ["userId", "createdAt"]),
 });

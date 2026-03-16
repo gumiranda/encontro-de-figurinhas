@@ -7,9 +7,9 @@ const MAX_VOTES_PER_MINUTE = 30;
 const ONE_MINUTE = 60_000;
 
 // Custo por chamada:
-// - Melhor caso (novo voto): 2R (auth + spot) + 1R (existing vote) + 1W (insert vote) + 1W (patch spot) = 3R + 2W
-// - Pior caso (trocar voto up→down): 2R (auth + spot) + 1R (existing vote) + 1W (patch vote) + 1R (fresh spot) + 1W (patch spot counters + expiresAt) = 3R + 2W
-// - Pior caso com deactivation: mesmo + isActive=false no patch = 3R + 2W
+// - Melhor caso (novo voto): 1R (auth) + 1R (spot) + 1R (existing vote) + 1W (insert vote) + 1W (patch spot) = 3R + 2W
+// - Pior caso (trocar voto up→down): 1R (auth) + 1R (spot) + 1R (existing vote) + 1W (patch vote) + 1W (patch spot) = 3R + 2W
+// - Pior caso com deactivation: mesmo = 3R + 2W
 // TODO: Rate limit futuro mais granular (por IP ou sliding window)
 
 export const castVote = mutation({
@@ -33,8 +33,9 @@ export const castVote = mutation({
     const oneMinuteAgo = Date.now() - ONE_MINUTE;
     const recentVotes = await ctx.db
       .query("votes")
-      .withIndex("by_user_spot", (q) => q.eq("userId", user._id))
-      .filter((q) => q.gt(q.field("createdAt"), oneMinuteAgo))
+      .withIndex("by_userId_and_createdAt", (q) =>
+        q.eq("userId", user._id).gt("createdAt", oneMinuteAgo)
+      )
       .collect();
     if (recentVotes.length >= MAX_VOTES_PER_MINUTE) {
       throw new Error("Muitos votos em pouco tempo. Aguarde um momento.");
@@ -93,11 +94,10 @@ export const castVote = mutation({
       else downvoteDelta = 1;
     }
 
-    // Read fresh counters from DB
-    const freshSpot = await ctx.db.get(args.spotId);
-    if (!freshSpot) throw new Error("Spot not found after vote");
-    const newUpvotes = freshSpot.upvotes + upvoteDelta;
-    const newDownvotes = freshSpot.downvotes + downvoteDelta;
+    // Convex mutations are serializable (OCC) — spot hasn't been patched yet,
+    // so spot.upvotes/downvotes are the consistent snapshot values.
+    const newUpvotes = spot.upvotes + upvoteDelta;
+    const newDownvotes = spot.downvotes + downvoteDelta;
 
     const patchData: {
       upvotes: number;
@@ -111,7 +111,7 @@ export const castVote = mutation({
 
     // Upvote extends life by 24h, capped at 72h from creation
     if (args.value === 1 && upvoteDelta > 0) {
-      const maxExpiry = freshSpot.createdAt + MAX_SPOT_LIFETIME;
+      const maxExpiry = spot.createdAt + MAX_SPOT_LIFETIME;
       patchData.expiresAt = Math.min(Date.now() + TWENTY_FOUR_HOURS, maxExpiry);
     }
 

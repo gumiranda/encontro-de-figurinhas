@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
 import { UserStatus, TWENTY_FOUR_HOURS, sanitizeText } from "./lib/types";
 const MAX_SPOTS_PER_DAY = 10;
@@ -34,6 +35,7 @@ export const getActiveCount = query({
 });
 
 export const getById = query({
+  // v.string() instead of v.id("spots") because this is called from URL path params
   args: { id: v.string() },
   handler: async (ctx, args) => {
     const normalizedId = ctx.db.normalizeId("spots", args.id);
@@ -81,8 +83,9 @@ export const create = mutation({
     const oneDayAgo = Date.now() - TWENTY_FOUR_HOURS;
     const recentSpots = await ctx.db
       .query("spots")
-      .withIndex("by_created_by", (q) => q.eq("createdBy", user._id))
-      .filter((q) => q.gt(q.field("createdAt"), oneDayAgo))
+      .withIndex("by_createdBy_and_createdAt", (q) =>
+        q.eq("createdBy", user._id).gt("createdAt", oneDayAgo)
+      )
       .collect();
     if (recentSpots.length >= MAX_SPOTS_PER_DAY) {
       throw new Error(
@@ -127,10 +130,16 @@ export const remove = mutation({
       throw new Error("Sem permissão para remover este ponto");
     }
 
-    // FIXME: Votes órfãos — ao desativar um spot, seus votes permanecem na tabela `votes`.
-    // A tabela `votes` cresce monotonicamente e impacta getMyVotes (mais entries no index).
-    // Implementar cleanup de votes ao desativar, ou batch cleanup periódico via cron.
     await ctx.db.patch(args.spotId, { isActive: false });
+
+    // Cleanup orphaned votes (partial — cron picks up the rest if > VOTES_CLEANUP_LIMIT)
+    const orphanedVotes = await ctx.db
+      .query("votes")
+      .withIndex("by_spot", (q) => q.eq("spotId", args.spotId))
+      .take(VOTES_CLEANUP_LIMIT);
+    for (const vote of orphanedVotes) {
+      await ctx.db.delete(vote._id);
+    }
   },
 });
 
@@ -160,6 +169,11 @@ export const expireStale = internalMutation({
         await ctx.db.delete(vote._id);
       }
     }
+    // Self-reschedule if there's a backlog, avoiding 15-min wait for next cron tick
+    if (expiredSpots.length === BATCH_SIZE) {
+      await ctx.scheduler.runAfter(10_000, internal.spots.expireStale);
+    }
+
     return {
       expiredCount: expiredSpots.length,
       hasMore: expiredSpots.length === BATCH_SIZE,
@@ -183,12 +197,15 @@ export const getStats = query({
       )
       .collect();
 
-    // Full scan de spots ainda necessário para totalSpots + spotsCreatedToday.
-    // Votes derivados dos contadores denormalizados nos spots (evita scan da tabela votes).
+    const spotsCreatedToday = await ctx.db
+      .query("spots")
+      .withIndex("by_createdAt", (q) => q.gt("createdAt", oneDayAgo))
+      .collect();
+
+    // Full scan still needed for totalSpots + totalVotes.
+    // Acceptable at current scale (spots table capped by expiration + deactivation).
+    // Revisit if approaching 10K spots.
     const allSpots = await ctx.db.query("spots").collect();
-    const spotsCreatedToday = allSpots.filter(
-      (s) => s.createdAt > oneDayAgo
-    );
     const totalVotes = allSpots.reduce(
       (sum, s) => sum + s.upvotes + s.downvotes,
       0
@@ -198,7 +215,7 @@ export const getStats = query({
       activeSpots: activeSpots.length,
       totalSpots: allSpots.length,
       totalVotes,
-      spotsCreatedToday: spotsCreatedToday.length,
+      spotsCreatedToday: spotsCreatedToday.length, // indexed query, not from allSpots
     };
   },
 });

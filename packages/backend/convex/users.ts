@@ -1,10 +1,12 @@
 import { v } from "convex/values";
 import type { QueryCtx } from "./_generated/server";
 import { query, mutation } from "./_generated/server";
-import { Sector, Role, UserStatus, isValidValue } from "./lib/types";
+import { Role, UserStatus } from "./lib/types";
 import type { RoleValue, SectorValue } from "./lib/types";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
 
+// Second query handles legacy users created before the `status` field was added.
+// Can be removed once migrateExistingUsers has run in all environments.
 async function queryPendingUsers(ctx: QueryCtx) {
   const pending = await ctx.db
     .query("users")
@@ -155,10 +157,6 @@ export const updateUserRole = mutation({
       throw new Error("Only superadmin can change user roles");
     }
 
-    if (!isValidValue(Object.values(Role), args.role)) {
-      throw new Error("Invalid role");
-    }
-
     const targetUser = await ctx.db.get(args.userId);
     if (!targetUser) {
       throw new Error("User not found");
@@ -192,10 +190,6 @@ export const updateUserSector = mutation({
 
     if (!isAdmin(currentUser.role)) {
       throw new Error("Only superadmin or CEO can change user sectors");
-    }
-
-    if (!isValidValue(Object.values(Sector), args.sector)) {
-      throw new Error("Invalid sector");
     }
 
     const targetUser = await ctx.db.get(args.userId);
@@ -245,10 +239,6 @@ export const approveUser = mutation({
 
     if (!isAdmin(currentUser.role)) {
       throw new Error("Not authorized to approve users");
-    }
-
-    if (!isValidValue(Object.values(Sector), args.sector)) {
-      throw new Error("Invalid sector");
     }
 
     const targetUser = await ctx.db.get(args.userId);
