@@ -19,7 +19,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import { MapPin, Navigation, Loader2 } from "lucide-react";
 import { useState } from "react";
-import type { Coordinates } from "@workspace/backend/lib/types";
+import { useMapContext } from "./map-provider";
 
 const spotSchema = z.object({
   title: z
@@ -33,21 +33,16 @@ const spotSchema = z.object({
 
 type SpotFormData = z.infer<typeof spotSchema>;
 
-export function AddSpotDialog({
-  open,
-  onOpenChange,
-  pickedLocation,
-  userLocation,
-  onPickLocation,
-  onSpotCreated,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  pickedLocation: Coordinates | null;
-  userLocation: Coordinates | null;
-  onPickLocation: () => void;
-  onSpotCreated: () => void;
-}) {
+export function AddSpotDialog() {
+  const {
+    addDialogOpen,
+    setAddDialogOpen,
+    pickedLocation,
+    userLocation,
+    setPickingLocation,
+    setPickedLocation,
+  } = useMapContext();
+
   const createSpot = useMutation(api.spots.create);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -91,8 +86,8 @@ export function AddSpotDialog({
   };
 
   const handlePickOnMap = () => {
-    onOpenChange(false);
-    onPickLocation();
+    setAddDialogOpen(false);
+    setPickingLocation(true);
   };
 
   const onSubmit = async (data: SpotFormData) => {
@@ -106,7 +101,8 @@ export function AddSpotDialog({
       });
       toast.success("Ponto criado com sucesso!");
       form.reset();
-      onSpotCreated();
+      setPickedLocation(null);
+      setAddDialogOpen(false);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Erro ao criar ponto"
@@ -120,7 +116,7 @@ export function AddSpotDialog({
   const hasLocation = watchLat !== undefined && watchLng !== undefined;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -208,7 +204,7 @@ export function AddSpotDialog({
             <Button
               type="button"
               variant="ghost"
-              onClick={() => onOpenChange(false)}
+              onClick={() => setAddDialogOpen(false)}
             >
               Cancelar
             </Button>

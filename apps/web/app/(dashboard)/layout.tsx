@@ -25,6 +25,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@workspace/ui/lib/utils";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
+import { usePermissions } from "@/hooks/use-permissions";
 
 function SidebarContent({
   navItems,
@@ -74,21 +75,21 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const { currentUser, hasSuperadmin, isLoading } = useAuthRedirect({
     whenApproved: undefined,
   });
+  const { canManageUsers } = usePermissions();
 
-  const isSuperadminOrCeo = currentUser?.role === "superadmin" || currentUser?.role === "ceo";
   const pendingUsersCount = useQuery(
     api.users.getPendingUsersCount,
-    isSuperadminOrCeo ? {} : "skip"
+    canManageUsers ? {} : "skip"
   );
 
   const navItems = useMemo(() => [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
     { label: "Mapa", href: "/mapa", icon: MapPin },
-    ...(isSuperadminOrCeo ? [
+    ...(canManageUsers ? [
       { label: "Users", href: "/admin/users", icon: UserCog },
       { label: "Pending Users", href: "/admin/pending-users", icon: Users },
     ] : []),
-  ], [isSuperadminOrCeo]);
+  ], [canManageUsers]);
 
   if (isLoading) {
     return <FullPageLoader />;
@@ -123,12 +124,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               </SheetContent>
             </Sheet>
 
-            {isSuperadminOrCeo && (
+            {canManageUsers && (
               <RoleBadge role={currentUser.role} />
             )}
           </div>
           <div className="flex items-center gap-4">
-            {isSuperadminOrCeo && pendingUsersCount && pendingUsersCount > 0 && (
+            {canManageUsers && pendingUsersCount && pendingUsersCount > 0 && (
               <Link href="/admin/pending-users">
                 <Button variant="ghost" size="icon" className="relative">
                   <UserPlus className="h-5 w-5" />

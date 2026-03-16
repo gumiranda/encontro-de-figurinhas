@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@workspace/ui/lib/utils";
 import type { Doc } from "@workspace/backend/_generated/dataModel";
 
 export function SpotActions({
@@ -73,7 +74,7 @@ export function SpotActions({
         <Button
           variant="ghost"
           size="sm"
-          className={`h-7 px-2 gap-1 ${myVote === 1 ? "text-green-600 bg-green-50" : ""}`}
+          className={cn("h-7 px-2 gap-1", myVote === 1 && "text-green-600 bg-green-50")}
           onClick={(e) => { e.stopPropagation(); handleVote(1); }}
         >
           <ThumbsUp className="h-3.5 w-3.5" />
@@ -82,7 +83,7 @@ export function SpotActions({
         <Button
           variant="ghost"
           size="sm"
-          className={`h-7 px-2 gap-1 ${myVote === -1 ? "text-red-600 bg-red-50" : ""}`}
+          className={cn("h-7 px-2 gap-1", myVote === -1 && "text-red-600 bg-red-50")}
           onClick={(e) => { e.stopPropagation(); handleVote(-1); }}
         >
           <ThumbsDown className="h-3.5 w-3.5" />
