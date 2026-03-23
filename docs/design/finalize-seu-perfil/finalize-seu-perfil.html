@@ -1,0 +1,262 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Finalize seu Perfil - Arena</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-dim": "#3766ff",
+              tertiary: "#ffc965",
+              "tertiary-dim": "#ecaa00",
+              "surface-bright": "#242b43",
+              "on-secondary": "#105500",
+              "primary-fixed": "#829bff",
+              "on-secondary-fixed": "#0a4000",
+              "secondary-container": "#176e00",
+              "on-background": "#e1e4fa",
+              "on-primary": "#00247e",
+              secondary: "#4ff325",
+              "on-secondary-container": "#e7ffd8",
+              "on-tertiary-fixed-variant": "#5f4200",
+              "primary-container": "#829bff",
+              "on-tertiary-fixed": "#392700",
+              "secondary-dim": "#3ee40c",
+              "secondary-fixed": "#4ff325",
+              "on-surface-variant": "#a6aabf",
+              "surface-container-highest": "#1e253b",
+              "on-primary-fixed": "#000000",
+              "tertiary-fixed": "#feb700",
+              background: "#090e1c",
+              "surface-container-lowest": "#000000",
+              "surface-container-high": "#181f33",
+              "on-secondary-fixed-variant": "#136000",
+              "inverse-on-surface": "#505466",
+              "outline-variant": "#434759",
+              "on-tertiary": "#5f4200",
+              "inverse-surface": "#faf8ff",
+              "primary-fixed-dim": "#6e8cff",
+              "on-error": "#490013",
+              "error-dim": "#d73357",
+              "surface-tint": "#95aaff",
+              error: "#ff6e84",
+              "surface-dim": "#090e1c",
+              "surface-container-low": "#0d1323",
+              "tertiary-container": "#feb700",
+              "on-primary-container": "#001a63",
+              "on-tertiary-container": "#533a00",
+              surface: "#090e1c",
+              primary: "#95aaff",
+              "surface-container": "#13192b",
+              "inverse-primary": "#004cef",
+              "surface-variant": "#1e253b",
+              "on-surface": "#e1e4fa",
+              "on-error-container": "#ffb2b9",
+              outline: "#707588",
+              "secondary-fixed-dim": "#3ee40c",
+              "tertiary-fixed-dim": "#ecaa00",
+              "error-container": "#a70138",
+              "on-primary-fixed-variant": "#002278",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .stadium-gradient {
+        background:
+          radial-gradient(circle at top right, rgba(149, 170, 255, 0.15), transparent),
+          radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background font-body min-h-screen antialiased">
+    <!-- Focused View: Exclude Shared Nav -->
+    <main class="relative flex flex-col min-h-screen stadium-gradient">
+      <!-- Minimal Header -->
+      <header class="flex items-center px-6 py-8">
+        <button
+          class="text-on-surface hover:text-primary transition-colors flex items-center gap-2 group"
+        >
+          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+          <span class="font-label text-sm font-medium">Voltar</span>
+        </button>
+      </header>
+      <section class="flex flex-1 flex-col px-6 pb-12 max-w-[480px] mx-auto w-full">
+        <!-- Hero Title -->
+        <div class="mb-10">
+          <h1
+            class="font-headline text-4xl font-bold leading-tight tracking-tight text-on-surface uppercase italic"
+          >
+            Finalize seu <br />
+            <span class="text-primary">Perfil</span>
+          </h1>
+          <p class="text-on-surface-variant mt-3 text-base">
+            Crie sua identidade na arena digital e comece a trocar.
+          </p>
+        </div>
+        <!-- Profile Completion Form -->
+        <form class="space-y-8">
+          <!-- Nickname Section -->
+          <div class="space-y-2">
+            <label
+              class="font-label text-sm font-semibold uppercase tracking-wider text-on-surface-variant block"
+              >Apelido (Nickname)</label
+            >
+            <div class="relative group">
+              <input
+                class="w-full h-14 bg-surface-container-highest border-none rounded text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 transition-all font-body px-4 pr-12"
+                placeholder="Ex: Artilheiro2026"
+                type="text"
+              />
+              <div class="absolute inset-y-0 right-4 flex items-center text-secondary">
+                <span
+                  class="material-symbols-outlined"
+                  style="font-variation-settings: &quot;FILL&quot; 1"
+                  >check_circle</span
+                >
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mt-2 px-1">
+              <span class="material-symbols-outlined text-[18px] text-secondary"
+                >verified</span
+              >
+              <p class="text-secondary text-xs font-medium">
+                Apelido disponível para uso
+              </p>
+            </div>
+          </div>
+          <!-- Birth Date Section -->
+          <div class="space-y-2">
+            <label
+              class="font-label text-sm font-semibold uppercase tracking-wider text-on-surface-variant block"
+              >Data de Nascimento</label
+            >
+            <div class="relative">
+              <input
+                class="w-full h-14 bg-surface-container-highest border-none rounded text-on-surface focus:ring-2 focus:ring-primary/40 transition-all font-body px-4 appearance-none"
+                type="date"
+              />
+              <div
+                class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-on-surface-variant"
+              >
+                <span class="material-symbols-outlined">calendar_today</span>
+              </div>
+            </div>
+            <p class="text-outline text-xs mt-1 px-1">Apenas para maiores de 18 anos.</p>
+          </div>
+          <!-- City Autocomplete -->
+          <div class="space-y-2">
+            <label
+              class="font-label text-sm font-semibold uppercase tracking-wider text-on-surface-variant block"
+              >Cidade</label
+            >
+            <div class="relative">
+              <input
+                class="w-full h-14 bg-surface-container-highest border-none rounded text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 transition-all font-body px-4 pr-12"
+                placeholder="Selecione sua cidade..."
+                type="text"
+              />
+              <div
+                class="absolute inset-y-0 right-4 flex items-center text-on-surface-variant"
+              >
+                <span class="material-symbols-outlined">location_on</span>
+              </div>
+            </div>
+          </div>
+          <!-- Checkbox / Terms (Implicit validation) -->
+          <div class="pt-4">
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <div class="relative flex items-center mt-1">
+                <input
+                  class="peer h-5 w-5 rounded border-outline-variant bg-surface-container-high text-primary focus:ring-primary focus:ring-offset-background"
+                  type="checkbox"
+                />
+              </div>
+              <span class="text-sm text-on-surface-variant leading-relaxed">
+                Concordo com os
+                <span class="text-primary underline cursor-pointer">Termos da Arena</span>
+                e confirmo que meus dados estão corretos para trocas seguras.
+              </span>
+            </label>
+          </div>
+          <!-- Primary Action Button -->
+          <div class="pt-8">
+            <button
+              class="w-full h-16 bg-gradient-to-r from-primary to-primary-dim text-on-primary font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              type="submit"
+            >
+              Entrar na Arena
+              <span class="material-symbols-outlined text-[24px]">bolt</span>
+            </button>
+            <div class="flex items-center justify-center mt-6 gap-2">
+              <div class="h-[1px] w-8 bg-outline-variant/30"></div>
+              <p class="text-[10px] text-outline uppercase tracking-widest font-bold">
+                Protocolo de Segurança Ativo
+              </p>
+              <div class="h-[1px] w-8 bg-outline-variant/30"></div>
+            </div>
+          </div>
+        </form>
+      </section>
+      <!-- Stadium Visual Accent (Bottom) -->
+      <div class="mt-auto overflow-hidden opacity-30 select-none pointer-events-none">
+        <div class="flex justify-between items-end px-4 gap-1 h-24">
+          <div class="w-8 bg-surface-container-high h-[20%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[40%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[60%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[30%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[80%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[50%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[90%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[40%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[100%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[70%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[50%] rounded-t-sm"></div>
+          <div class="w-8 bg-surface-container-high h-[30%] rounded-t-sm"></div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
