@@ -17,7 +17,6 @@ import {
   UserCog,
   Users,
   Menu,
-  MapPin,
 } from "lucide-react";
 import { RoleBadge } from "@/components/role-badge";
 import Link from "next/link";
@@ -25,21 +24,48 @@ import { usePathname } from "next/navigation";
 import { cn } from "@workspace/ui/lib/utils";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
-import { usePermissions } from "@/hooks/use-permissions";
 
-function SidebarContent({
-  navItems,
-  pathname,
-  onNavigate,
-}: {
-  navItems: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[];
-  pathname: string;
-  onNavigate?: () => void;
-}) {
-  return (
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { currentUser, hasSuperadmin, isLoading } = useAuthRedirect({
+    whenApproved: undefined,
+  });
+
+  const isSuperadminOrCeo = currentUser?.role === "superadmin" || currentUser?.role === "ceo";
+  const pendingUsersCount = useQuery(
+    api.users.getPendingUsersCount,
+    isSuperadminOrCeo ? {} : "skip"
+  );
+
+  const navItems = useMemo(() => [
+    { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    ...(isSuperadminOrCeo ? [
+      { label: "Users", href: "/admin/users", icon: UserCog },
+      { label: "Pending Users", href: "/admin/pending-users", icon: Users },
+    ] : []),
+  ], [isSuperadminOrCeo]);
+
+  if (isLoading) {
+    return <FullPageLoader />;
+  }
+
+  if (hasSuperadmin === false || !currentUser) {
+    return null;
+  }
+
+  if (currentUser.status !== "approved") {
+    return null;
+  }
+
+  const isSuperadmin = currentUser.role === "superadmin";
+  const isCeo = currentUser.role === "ceo";
+
+  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
       <div className="p-6">
-        <h1 className="text-xl font-bold">Encontro de Figurinhas</h1>
+        <h1 className="text-xl font-bold">Template App</h1>
       </div>
       <nav className="px-4 space-y-1">
         {navItems.map((item) => {
@@ -66,47 +92,11 @@ function SidebarContent({
       </nav>
     </>
   );
-}
-
-const Layout = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const { currentUser, hasSuperadmin, isLoading } = useAuthRedirect({
-    whenApproved: undefined,
-  });
-  const { canManageUsers } = usePermissions();
-
-  const pendingUsersCount = useQuery(
-    api.users.getPendingUsersCount,
-    canManageUsers ? {} : "skip"
-  );
-
-  const navItems = useMemo(() => [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "Mapa", href: "/mapa", icon: MapPin },
-    ...(canManageUsers ? [
-      { label: "Users", href: "/admin/users", icon: UserCog },
-      { label: "Pending Users", href: "/admin/pending-users", icon: Users },
-    ] : []),
-  ], [canManageUsers]);
-
-  if (isLoading) {
-    return <FullPageLoader />;
-  }
-
-  if (hasSuperadmin === false || !currentUser) {
-    return null;
-  }
-
-  if (currentUser.status !== "approved") {
-    return null;
-  }
 
   return (
     <div className="flex min-h-screen">
       <aside className="hidden md:block w-64 border-r bg-muted/40">
-        <SidebarContent navItems={navItems} pathname={pathname} />
+        <SidebarContent />
       </aside>
 
       <div className="flex-1">
@@ -120,16 +110,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
-                <SidebarContent navItems={navItems} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+                <SidebarContent onNavigate={() => setSidebarOpen(false)} />
               </SheetContent>
             </Sheet>
 
-            {canManageUsers && (
+            {(isSuperadmin || isCeo) && (
               <RoleBadge role={currentUser.role} />
             )}
           </div>
           <div className="flex items-center gap-4">
-            {canManageUsers && pendingUsersCount && pendingUsersCount > 0 && (
+            {(isSuperadmin || isCeo) && pendingUsersCount && pendingUsersCount > 0 && (
               <Link href="/admin/pending-users">
                 <Button variant="ghost" size="icon" className="relative">
                   <UserPlus className="h-5 w-5" />

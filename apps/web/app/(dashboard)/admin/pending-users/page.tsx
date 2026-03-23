@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import type { Id } from "@workspace/backend/_generated/dataModel";
+import { Id } from "@workspace/backend/_generated/dataModel";
 import {
   Card,
   CardContent,
@@ -20,15 +20,37 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
+import { Textarea } from "@workspace/ui/components/textarea";
 import { Badge } from "@workspace/ui/components/badge";
-import { Check, X, Clock } from "lucide-react";
-import { usePermissions } from "@/hooks/use-permissions";
-import { ApproveUserDialog } from "./approve-user-dialog";
-import { RejectUserDialog } from "./reject-user-dialog";
+import {
+  Check,
+  X,
+  Loader2,
+  Clock,
+} from "lucide-react";
+import { toast } from "sonner";
+import { SECTORS } from "@/lib/constants";
 
 export default function PendingUsersPage() {
-  const { currentUser, canManageUsers } = usePermissions();
+  const currentUser = useQuery(api.users.getCurrentUser);
   const pendingUsers = useQuery(api.users.getPendingUsers);
+  const approveUser = useMutation(api.users.approveUser);
+  const rejectUser = useMutation(api.users.rejectUser);
 
   const [approveDialog, setApproveDialog] = useState<{
     userId: Id<"users">;
@@ -38,8 +60,14 @@ export default function PendingUsersPage() {
     userId: Id<"users">;
     name: string;
   } | null>(null);
+  const [selectedSector, setSelectedSector] = useState<string>("general");
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (!currentUser || !canManageUsers) {
+  const isSuperadmin = currentUser?.role === "superadmin";
+  const isCeo = currentUser?.role === "ceo";
+
+  if (!currentUser || (!isSuperadmin && !isCeo)) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-muted-foreground">
@@ -48,6 +76,48 @@ export default function PendingUsersPage() {
       </div>
     );
   }
+
+  const handleApprove = async () => {
+    if (!approveDialog || !selectedSector) return;
+
+    setIsLoading(true);
+    try {
+      await approveUser({
+        userId: approveDialog.userId,
+        sector: selectedSector,
+      });
+      toast.success(`User ${approveDialog.name} approved successfully!`);
+      setApproveDialog(null);
+      setSelectedSector("general");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Error approving user"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectDialog) return;
+
+    setIsLoading(true);
+    try {
+      await rejectUser({
+        userId: rejectDialog.userId,
+        reason: rejectionReason || undefined,
+      });
+      toast.success(`User ${rejectDialog.name} rejected.`);
+      setRejectDialog(null);
+      setRejectionReason("");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Error rejecting user"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -127,14 +197,116 @@ export default function PendingUsersPage() {
         </CardContent>
       </Card>
 
-      <ApproveUserDialog
-        user={approveDialog}
-        onClose={() => setApproveDialog(null)}
-      />
-      <RejectUserDialog
-        user={rejectDialog}
-        onClose={() => setRejectDialog(null)}
-      />
+      <Dialog open={!!approveDialog} onOpenChange={() => setApproveDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Approve User</DialogTitle>
+            <DialogDescription>
+              Select the sector for {approveDialog?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sector</label>
+              <Select value={selectedSector} onValueChange={setSelectedSector}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a sector" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SECTORS.map((sector) => {
+                    const Icon = sector.icon;
+                    return (
+                      <SelectItem key={sector.id} value={sector.id}>
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          {sector.name}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setApproveDialog(null)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleApprove}
+              disabled={isLoading || !selectedSector}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Approve
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!rejectDialog} onOpenChange={() => setRejectDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject User</DialogTitle>
+            <DialogDescription>
+              Reject access for {rejectDialog?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Reason (optional)</label>
+              <Textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Enter the reason for rejection..."
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRejectDialog(null)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReject}
+              disabled={isLoading}
+              variant="destructive"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Rejecting...
+                </>
+              ) : (
+                <>
+                  <X className="mr-2 h-4 w-4" />
+                  Reject
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
