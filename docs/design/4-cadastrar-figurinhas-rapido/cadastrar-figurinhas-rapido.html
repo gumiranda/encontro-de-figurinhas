@@ -1,0 +1,364 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Quick Entry - Figurinhas</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#090e1c",
+              "on-secondary-fixed-variant": "#136000",
+              "primary-fixed-dim": "#6e8cff",
+              surface: "#090e1c",
+              "error-dim": "#d73357",
+              "on-tertiary-container": "#533a00",
+              "surface-container-highest": "#1e253b",
+              "primary-container": "#829bff",
+              "surface-variant": "#1e253b",
+              "inverse-primary": "#004cef",
+              "tertiary-fixed-dim": "#ecaa00",
+              "on-secondary": "#105500",
+              tertiary: "#ffc965",
+              "secondary-fixed": "#4ff325",
+              "on-surface-variant": "#a6aabf",
+              outline: "#707588",
+              "on-primary-fixed-variant": "#002278",
+              "surface-bright": "#242b43",
+              "inverse-surface": "#faf8ff",
+              "secondary-container": "#176e00",
+              "primary-dim": "#3766ff",
+              background: "#090e1c",
+              "inverse-on-surface": "#505466",
+              "on-error-container": "#ffb2b9",
+              "secondary-dim": "#3ee40c",
+              "surface-container-lowest": "#000000",
+              secondary: "#4ff325",
+              "on-error": "#490013",
+              error: "#ff6e84",
+              "on-secondary-container": "#e7ffd8",
+              "surface-container-high": "#181f33",
+              "primary-fixed": "#829bff",
+              "tertiary-container": "#feb700",
+              "on-secondary-fixed": "#0a4000",
+              "tertiary-dim": "#ecaa00",
+              "error-container": "#a70138",
+              "on-surface": "#e1e4fa",
+              "on-primary-fixed": "#000000",
+              "outline-variant": "#434759",
+              "on-tertiary-fixed-variant": "#5f4200",
+              "on-primary-container": "#001a63",
+              "on-tertiary-fixed": "#392700",
+              "tertiary-fixed": "#feb700",
+              primary: "#95aaff",
+              "on-primary": "#00247e",
+              "surface-container-low": "#0d1323",
+              "on-tertiary": "#5f4200",
+              "surface-tint": "#95aaff",
+              "secondary-fixed-dim": "#3ee40c",
+              "on-background": "#e1e4fa",
+              "surface-container": "#13192b",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      body {
+        background-color: #090e1c;
+        color: #e1e4fa;
+        font-family: "Manrope", sans-serif;
+      }
+      .glass-effect {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .stadium-shadow {
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col pb-24">
+    <!-- TopAppBar -->
+    <header
+      class="bg-[#090e1c] dark:bg-[#090e1c] docked full-width top-0 z-50 flex items-center justify-between w-full px-6 h-16 sticky"
+    >
+      <div class="flex items-center gap-4">
+        <button
+          class="text-[#95aaff] dark:text-[#95aaff] hover:opacity-80 transition-opacity active:scale-95 duration-150"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1
+          class="font-['Space_Grotesk'] font-bold text-xl uppercase tracking-tighter text-[#95aaff]"
+        >
+          Cadastrar Figurinhas
+        </h1>
+      </div>
+      <button
+        class="text-[#95aaff] dark:text-[#95aaff] hover:opacity-80 transition-opacity active:scale-95 duration-150"
+      >
+        <span class="material-symbols-outlined">settings</span>
+      </button>
+    </header>
+    <main class="flex-1 px-6 pt-6 max-w-2xl mx-auto w-full">
+      <!-- Toggle Switch Dinâmico -->
+      <section class="mb-8">
+        <div
+          class="bg-surface-container-low p-1.5 rounded-full flex items-center stadium-shadow"
+        >
+          <button
+            class="flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 bg-secondary/10 text-secondary"
+          >
+            <span
+              class="material-symbols-outlined text-lg"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >style</span
+            >
+            TENHO REPETIDAS
+          </button>
+          <button
+            class="flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 text-on-surface-variant hover:text-on-surface"
+          >
+            <span class="material-symbols-outlined text-lg">swap_horizontal_circle</span>
+            PRECISO
+          </button>
+        </div>
+      </section>
+      <!-- Campo de Entrada Inteligente -->
+      <section class="mb-10">
+        <div class="relative group">
+          <div
+            class="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-30 group-focus-within:opacity-100 transition duration-500"
+          ></div>
+          <div
+            class="relative bg-surface-container-highest rounded-xl p-5 border border-outline-variant/15"
+          >
+            <label
+              class="block text-xs font-bold uppercase tracking-widest text-primary mb-3 font-label"
+              >Entrada Rápida</label
+            >
+            <textarea
+              class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline font-body text-lg resize-none h-24"
+              placeholder="Digite os códigos (ex: BRA 12, FRA 14, ARG 10)"
+            ></textarea>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span
+                class="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-3 py-1.5 rounded-full text-xs font-bold font-label"
+              >
+                BRA 12
+                <button class="hover:text-white">
+                  <span class="material-symbols-outlined text-xs">close</span>
+                </button>
+              </span>
+              <span
+                class="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-3 py-1.5 rounded-full text-xs font-bold font-label"
+              >
+                FRA 14
+                <button class="hover:text-white">
+                  <span class="material-symbols-outlined text-xs">close</span>
+                </button>
+              </span>
+              <span
+                class="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-3 py-1.5 rounded-full text-xs font-bold font-label"
+              >
+                ARG 10
+                <button class="hover:text-white">
+                  <span class="material-symbols-outlined text-xs">close</span>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Resumo -->
+      <section class="flex items-center justify-between mb-6">
+        <h2 class="font-headline font-bold text-lg tracking-tight">Suas Figurinhas</h2>
+        <div class="bg-secondary-container/30 px-3 py-1 rounded-full">
+          <span class="text-secondary font-bold text-xs uppercase tracking-widest"
+            >Total: 15 figurinhas</span
+          >
+        </div>
+      </section>
+      <!-- Lista de Figurinhas Agrupadas -->
+      <section class="space-y-8 pb-12">
+        <!-- Brasil Group -->
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-green-500 to-yellow-400 opacity-80"
+                data-alt="Bandeira do Brasil estilizada"
+              ></div>
+            </div>
+            <h3
+              class="font-headline font-bold text-base uppercase tracking-widest text-on-surface-variant"
+            >
+              Brasil
+            </h3>
+            <div class="flex-1 h-[1px] bg-outline-variant/10 ml-2"></div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors"
+            >
+              <span class="font-headline font-bold text-primary">BRA 12</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors"
+            >
+              <span class="font-headline font-bold text-primary">BRA 05</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors border-l-4 border-tertiary"
+            >
+              <span class="font-headline font-bold text-tertiary">BRA 10</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- França Group -->
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-blue-700 via-white to-red-600 opacity-80"
+                data-alt="Bandeira da França estilizada"
+              ></div>
+            </div>
+            <h3
+              class="font-headline font-bold text-base uppercase tracking-widest text-on-surface-variant"
+            >
+              França
+            </h3>
+            <div class="flex-1 h-[1px] bg-outline-variant/10 ml-2"></div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors"
+            >
+              <span class="font-headline font-bold text-primary">FRA 14</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors"
+            >
+              <span class="font-headline font-bold text-primary">FRA 07</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Argentina Group -->
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-b from-blue-300 via-white to-blue-300 opacity-80"
+                data-alt="Bandeira da Argentina estilizada"
+              ></div>
+            </div>
+            <h3
+              class="font-headline font-bold text-base uppercase tracking-widest text-on-surface-variant"
+            >
+              Argentina
+            </h3>
+            <div class="flex-1 h-[1px] bg-outline-variant/10 ml-2"></div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div
+              class="bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors border-l-4 border-tertiary"
+            >
+              <span class="font-headline font-bold text-tertiary">ARG 10</span>
+              <button
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-error/60 hover:text-error"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Floating Bottom Action Button (Custom Design for Context) -->
+    <div class="fixed bottom-0 left-0 right-0 p-6 glass-effect bg-surface-dim/80 z-40">
+      <div class="max-w-2xl mx-auto">
+        <button
+          class="w-full bg-gradient-to-r from-primary to-primary-dim text-on-primary py-4 rounded-xl font-headline font-bold text-lg uppercase tracking-widest active:scale-[0.98] transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3"
+        >
+          CONTINUAR PARA O MAPA
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+    <!-- BottomNavBar (Hidden on this specific task-focused screen per mandate) -->
+    <!-- Navigation shell suppressed for transactional entry flow -->
+  </body>
+</html>

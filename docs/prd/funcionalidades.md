@@ -4,11 +4,11 @@
 
 **F01 — Landing e seleção de cidade.** Hero section com proposta de valor clara ("Encontre quem tem as figurinhas que você precisa. Troque perto de você.") + busca autocomplete de cidades (~300 com 100k+ hab, seed IBGE). Card de cidade: nome, UF, pontos de troca ativos, participantes. Páginas de cidade são públicas e indexáveis (SEO).
 
-**F02 — Cadastro via Clerk.** Botão "Entrar com Google" ou email/senha. Pós-auth, tela de completar perfil: apelido (validação de unicidade em tempo real), data de nascimento, cidade. Se menor de 12 → fluxo de consentimento parental. Se 12-15 → campo obrigatório "nome do responsável" + badge automático. Se 16-17 → badge opcional.
+**F02 — Cadastro via Clerk.** Botão "Entrar com Google" ou email/senha. Pós-auth, tela de completar perfil: apelido (validação de unicidade em tempo real), data de nascimento, cidade.
 
-**F03 — Entrada rápida de figurinhas (primeiro valor).** Imediatamente após cadastro, antes de pedir GPS. Tela com: "Modo Rápido" — campo de texto onde digita números separados por vírgula ("12, 45, 78, 102") + botão toggle "Tenho repetidas" / "Preciso". Também aceita faixas: "de 001 até 020". Objetivo: usuário cadastra figurinhas em <2 minutos e já vê contadores.
+**F03 — Entrada rápida de figurinhas (primeiro valor).** Imediatamente após cadastro, antes de pedir GPS. Tela com: "Modo Rápido" — campo de texto onde digita números separados por vírgula ("BRA 12, FRA 14 ING 15") + botão toggle "Tenho repetidas" / "Preciso". AGRUPADAS POR PAÍS. Objetivo: usuário cadastra figurinhas em <2 minutos e já vê contadores.
 
-**F04 — Geolocalização (adiada, após primeiro valor).** Estratégia double opt-in obrigatória: (1) pre-prompt customizado do app explicando "Pra mostrar pontos de troca perto de você" com botão "Ativar localização" e link "Agora não, quero buscar manualmente". (2) Se aceitar no pre-prompt → dispara prompt do SO. Se recusar no pre-prompt → NÃO disparar prompt do SO (preserva chance futura). Se recusar no SO (`denied`) → NUNCA pedir novamente. Fallback completo: campo de busca por CEP/bairro/cidade, seletor de cidade, mapa clicável. Todas as features funcionam com localização manual. Fallback IP-based para localização aproximada (nível cidade) como última opção.
+**F04 — Geolocalização (adiada, após primeiro valor).** Estratégia double opt-in obrigatória: (1) pre-prompt customizado do app explicando "Pra mostrar pontos de troca perto de você" com botão "Ativar localização" e link "Agora não, quero buscar manualmente". (2) Se aceitar no pre-prompt → dispara prompt do SO. Se recusar no pre-prompt → NÃO disparar prompt do SO (preserva chance futura). Se recusar no SO (`denied`) → NUNCA pedir novamente. Fallback completo: campo de busca por CEP/bairro/cidade, seletor de cidade. Todas as features funcionam com localização manual. Fallback IP-based para localização aproximada (nível cidade) como última opção.
 
 ### 4.2 Pontos de Troca
 
