@@ -11,6 +11,7 @@ type AuthRedirectOptions = {
   whenRejected?: string;
   whenNoUser?: string;
   whenNoSuperadmin?: string;
+  whenNeedsOnboarding?: string;
 };
 
 const defaultOptions: AuthRedirectOptions = {
@@ -19,6 +20,7 @@ const defaultOptions: AuthRedirectOptions = {
   whenRejected: "/rejected",
   whenNoUser: "/register",
   whenNoSuperadmin: "/bootstrap",
+  whenNeedsOnboarding: "/complete-profile",
 };
 
 export function useAuthRedirect(options: AuthRedirectOptions = {}) {
@@ -28,7 +30,7 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
 
   const opts = useMemo(
     () => ({ ...defaultOptions, ...options }),
-    [options.whenApproved, options.whenPending, options.whenRejected, options.whenNoUser, options.whenNoSuperadmin]
+    [options.whenApproved, options.whenPending, options.whenRejected, options.whenNoUser, options.whenNoSuperadmin, options.whenNeedsOnboarding]
   );
 
   useEffect(() => {
@@ -52,7 +54,13 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
       return;
     }
 
-    if (currentUser?.status === "approved" && opts.whenApproved) {
+    // Check if approved user needs to complete onboarding
+    if (currentUser?.status === "approved" && !currentUser.hasCompletedOnboarding && opts.whenNeedsOnboarding) {
+      router.push(opts.whenNeedsOnboarding);
+      return;
+    }
+
+    if (currentUser?.status === "approved" && currentUser.hasCompletedOnboarding && opts.whenApproved) {
       router.push(opts.whenApproved);
     }
   }, [currentUser, hasSuperadmin, router, opts]);

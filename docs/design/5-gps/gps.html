@@ -1,0 +1,296 @@
+<!doctype html>
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#95aaff",
+              "on-primary-fixed": "#000000",
+              "primary-fixed": "#829bff",
+              "on-primary-fixed-variant": "#002278",
+              "on-secondary-container": "#e7ffd8",
+              "inverse-surface": "#faf8ff",
+              "on-primary": "#00247e",
+              "on-tertiary-container": "#533a00",
+              "surface-container-low": "#0d1323",
+              "on-tertiary": "#5f4200",
+              "error-container": "#a70138",
+              "surface-container-high": "#181f33",
+              "surface-bright": "#242b43",
+              "on-surface": "#e1e4fa",
+              "surface-container": "#13192b",
+              "tertiary-container": "#feb700",
+              "on-primary-container": "#001a63",
+              "inverse-on-surface": "#505466",
+              error: "#ff6e84",
+              "surface-container-highest": "#1e253b",
+              "on-surface-variant": "#a6aabf",
+              "surface-dim": "#090e1c",
+              "on-background": "#e1e4fa",
+              surface: "#090e1c",
+              "secondary-dim": "#3ee40c",
+              tertiary: "#ffc965",
+              "tertiary-dim": "#ecaa00",
+              "surface-container-lowest": "#000000",
+              "secondary-fixed-dim": "#3ee40c",
+              "inverse-primary": "#004cef",
+              "secondary-fixed": "#4ff325",
+              "primary-fixed-dim": "#6e8cff",
+              secondary: "#4ff325",
+              "on-tertiary-fixed": "#392700",
+              "on-secondary-fixed-variant": "#136000",
+              "on-error": "#490013",
+              "outline-variant": "#434759",
+              outline: "#707588",
+              "on-error-container": "#ffb2b9",
+              "tertiary-fixed": "#feb700",
+              "secondary-container": "#176e00",
+              "primary-dim": "#3766ff",
+              "error-dim": "#d73357",
+              "primary-container": "#829bff",
+              "on-tertiary-fixed-variant": "#5f4200",
+              background: "#090e1c",
+              "surface-variant": "#1e253b",
+              "tertiary-fixed-dim": "#ecaa00",
+              "surface-tint": "#95aaff",
+              "on-secondary-fixed": "#0a4000",
+              "on-secondary": "#105500",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .stadium-gradient {
+        background:
+          radial-gradient(circle at top right, rgba(0, 82, 255, 0.15), transparent 60%),
+          radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent 50%);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background text-on-background font-body min-h-screen selection:bg-primary/30"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 w-full bg-[#090e1c] dark:bg-[#090e1c] backdrop-blur-xl bg-opacity-80 shadow-2xl shadow-blue-900/20"
+    >
+      <div class="flex items-center gap-4">
+        <button
+          class="material-symbols-outlined text-[#95aaff] hover:bg-[#181f33] p-2 rounded-xl transition-all duration-300 active:scale-95"
+          style=""
+        >
+          arrow_back
+        </button>
+        <h1
+          class="font-['Space_Grotesk'] font-bold tracking-tighter uppercase text-lg text-[#95aaff]"
+          style=""
+        >
+          figurinha fácil
+        </h1>
+      </div>
+      <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+        <img
+          alt="User Profile"
+          class="w-full h-full object-cover"
+          data-alt="User profile avatar with blue neon background"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIT9rFnCiWwlzxPm_lpvSqBcZW4ZQQ9hF9M81JEMLa97VK89mQTNakd6hSvr0wFXaYW0eWmQ9m9-lVdjmKN-FWBle4ntxuw9lcGNheZypwvKIYiE9cvEIJM0oeUFKbTxMf3hBlgOrSRphZgu0HSVqXNl0IVFf3ymwACNNyuVLSE1b_VMkFkrLiov0FN3fKr_wi6pvEFDe5fV3j3_0LC9uHO10SPraRCM6d4O_jVCvj0ZeXQwWS9yCTnD7oKnOHNRQbHIyZOlYHnxV9"
+          style=""
+        />
+      </div>
+    </header>
+    <main class="pt-24 pb-32 px-6 max-w-xl mx-auto min-h-screen stadium-gradient">
+      <!-- Hero Section -->
+      <section class="mb-12">
+        <h2
+          class="font-headline font-bold text-3xl leading-tight mb-4 tracking-tight"
+          style=""
+        >
+          BUSCAR ARENA MANUALMENTE
+        </h2>
+        <p class="text-on-surface-variant font-medium text-base" style="">
+          Digite seu CEP, bairro ou cidade para ver quem está trocando perto de você.
+        </p>
+      </section>
+      <!-- Search Input Section -->
+      <section class="mb-10">
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <span
+              class="material-symbols-outlined text-primary group-focus-within:text-secondary transition-colors"
+              style=""
+              >search</span
+            >
+          </div>
+          <input
+            class="w-full bg-surface-container-highest border-none rounded-xl py-5 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 font-medium transition-all shadow-lg shadow-black/20"
+            placeholder="Ex: 01310-200 ou Vila Madalena"
+            type="text"
+          />
+        </div>
+      </section>
+      <!-- Suggestions Section -->
+      <section class="mb-12">
+        <div class="flex items-center gap-2 mb-4">
+          <span
+            class="material-symbols-outlined text-secondary text-sm"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >electric_bolt</span
+          >
+          <h3
+            class="font-headline font-bold text-xs uppercase tracking-widest text-secondary"
+            style=""
+          >
+            Cidades Ativas
+          </h3>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button
+            class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-2.5 rounded-full border border-outline-variant/20 transition-all active:scale-95"
+            style=""
+          >
+            <span class="text-sm font-bold text-on-surface" style="">São Paulo, SP</span>
+          </button>
+          <button
+            class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-2.5 rounded-full border border-outline-variant/20 transition-all active:scale-95"
+            style=""
+          >
+            <span class="text-sm font-bold text-on-surface" style=""
+              >Rio de Janeiro, RJ</span
+            >
+          </button>
+          <button
+            class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-2.5 rounded-full border border-outline-variant/20 transition-all active:scale-95"
+            style=""
+          >
+            <span class="text-sm font-bold text-on-surface" style=""
+              >Belo Horizonte, MG</span
+            >
+          </button>
+        </div>
+      </section>
+      <!-- Visual Divider -->
+      <div class="flex items-center gap-4 mb-10 opacity-30">
+        <div class="h-[1px] flex-1 bg-outline-variant"></div>
+        <span class="text-[10px] font-black tracking-widest uppercase" style=""
+          >Ou selecione sua cidade abaixo</span
+        >
+        <div class="h-[1px] flex-1 bg-outline-variant"></div>
+      </div>
+      <!-- Custom Selector Section -->
+      <section class="mb-16">
+        <div
+          class="bg-surface-container-low rounded-2xl overflow-hidden shadow-inner shadow-black/40"
+        >
+          <div class="p-4 flex items-center justify-between border-b border-white/5">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary" style=""
+                >location_on</span
+              >
+              <span class="font-bold text-sm" style="">Estado Selecionado</span>
+            </div>
+            <span class="text-primary font-bold text-xs" style="">BRASIL</span>
+          </div>
+          <div class="grid grid-cols-1 divide-y divide-white/5">
+            <div
+              class="p-5 flex items-center justify-between hover:bg-surface-container-high cursor-pointer transition-colors group"
+            >
+              <span
+                class="text-on-surface-variant group-hover:text-on-surface transition-colors"
+                style=""
+                >Selecione o Estado</span
+              >
+              <span
+                class="material-symbols-outlined text-outline group-hover:text-primary transition-colors"
+                style=""
+                >expand_more</span
+              >
+            </div>
+            <div
+              class="p-5 flex items-center justify-between hover:bg-surface-container-high cursor-pointer transition-colors group"
+            >
+              <span
+                class="text-on-surface-variant group-hover:text-on-surface transition-colors"
+                style=""
+                >Selecione a Cidade</span
+              >
+              <span
+                class="material-symbols-outlined text-outline group-hover:text-primary transition-colors"
+                style=""
+                >expand_more</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Primary Action -->
+      <button
+        class="w-full bg-gradient-to-r from-primary-dim to-primary text-on-primary-fixed font-headline font-bold py-5 rounded-xl text-lg shadow-xl shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 uppercase tracking-tighter italic"
+        style=""
+      >
+        CONFIRMAR LOCALIZAÇÃO
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >check_circle</span
+        >
+      </button>
+    </main>
+    <!-- Bottom Navigation Bar (Hidden for Focus, but kept structure as requested) -->
+    <!-- Suppressed on this focused task page per "Shell Visibility & Relevance" rule -->
+    <!-- Manual Map Visual Element (Asymmetric Decoration) -->
+    <div
+      class="fixed bottom-0 right-0 w-64 h-64 -mb-12 -mr-12 opacity-10 pointer-events-none"
+    >
+      <img
+        alt="Abstract Map Graphic"
+        class="w-full h-full object-contain grayscale"
+        data-alt="Abstract blueprint of a futuristic city map"
+        data-location="São Paulo"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKK5PvrvMKHRfoQCHAv2EsS3himzx9LfivCZdfGhP5zCIK8aCG5CPTL_IITBASEo5qXfMPKDUW8-dyFo4FZBWTZ25r3TGgHx7Gj8XcMF_xpYmFEKIwYpap_EmENln9CzdJ142O40LAcy7eUN3hCDzfncMPBekeFpCy9nHwmSWEfJYOU5m1-BLCS5yMKI_hdz-HhUCkoW_hT0bj6ypcglxqYKiOgKitTz0ZSCeLUjBMukQ_j5mDP-5eWO3JWmRLx56VufjI-mB7-ZSz"
+        style=""
+      />
+    </div>
+  </body>
+</html>

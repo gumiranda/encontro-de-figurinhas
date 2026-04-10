@@ -1,0 +1,322 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#00247e",
+              "on-secondary-fixed-variant": "#136000",
+              "primary-fixed-dim": "#6e8cff",
+              background: "#090e1c",
+              primary: "#95aaff",
+              "surface-tint": "#95aaff",
+              "inverse-primary": "#004cef",
+              "tertiary-dim": "#ecaa00",
+              "secondary-fixed-dim": "#3ee40c",
+              "primary-dim": "#3766ff",
+              "on-background": "#e1e4fa",
+              secondary: "#4ff325",
+              "error-dim": "#d73357",
+              "tertiary-fixed-dim": "#ecaa00",
+              "surface-bright": "#242b43",
+              "surface-dim": "#090e1c",
+              "outline-variant": "#434759",
+              "on-error": "#490013",
+              "on-primary-fixed-variant": "#002278",
+              "on-surface-variant": "#a6aabf",
+              "on-primary-container": "#001a63",
+              "secondary-container": "#176e00",
+              "tertiary-fixed": "#feb700",
+              "primary-container": "#829bff",
+              "on-secondary-container": "#e7ffd8",
+              "on-secondary": "#105500",
+              "tertiary-container": "#feb700",
+              "surface-container-highest": "#1e253b",
+              outline: "#707588",
+              tertiary: "#ffc965",
+              "secondary-fixed": "#4ff325",
+              "error-container": "#a70138",
+              error: "#ff6e84",
+              "on-tertiary-container": "#533a00",
+              "primary-fixed": "#829bff",
+              "inverse-surface": "#faf8ff",
+              "inverse-on-surface": "#505466",
+              "on-tertiary-fixed": "#392700",
+              "surface-container-high": "#181f33",
+              surface: "#090e1c",
+              "on-tertiary": "#5f4200",
+              "surface-container-low": "#0d1323",
+              "on-error-container": "#ffb2b9",
+              "surface-container": "#13192b",
+              "on-tertiary-fixed-variant": "#5f4200",
+              "on-primary-fixed": "#000000",
+              "surface-container-lowest": "#000000",
+              "surface-variant": "#1e253b",
+              "on-secondary-fixed": "#0a4000",
+              "on-surface": "#e1e4fa",
+              "secondary-dim": "#3ee40c",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-effect {
+        backdrop-filter: blur(16px);
+        background: rgba(13, 19, 35, 0.7);
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background font-body selection:bg-secondary/30">
+    <!-- TopAppBar -->
+    <header class="w-full top-0 sticky z-[60] bg-[#090e1c] shadow-none">
+      <div class="flex items-center px-6 h-16 w-full max-w-5xl mx-auto">
+        <button
+          class="active:scale-95 duration-150 hover:opacity-80 transition-opacity text-[#95aaff] mr-4"
+        >
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1
+          class="font-['Space_Grotesk'] font-bold text-xl tracking-tight text-[#95aaff]"
+        >
+          Sugerir Arena
+        </h1>
+      </div>
+    </header>
+    <main class="pb-32 px-6 max-w-2xl mx-auto space-y-12 mt-8">
+      <!-- Hero Header -->
+      <section class="space-y-4">
+        <h2
+          class="font-headline font-bold text-4xl md:text-5xl tracking-tight leading-none text-primary"
+        >
+          Amplie o Campo de Jogo.
+        </h2>
+        <p class="text-on-surface-variant text-lg font-medium leading-relaxed max-w-md">
+          Ajude a comunidade a encontrar novos pontos de troca seguros e movimentados.
+        </p>
+      </section>
+      <!-- Safety Card (Stadium Alert style) -->
+      <section
+        class="bg-surface-container-high rounded-xl p-6 border-l-4 border-secondary/50 shadow-2xl"
+      >
+        <div class="flex items-start gap-4">
+          <div class="bg-secondary/10 p-2 rounded-full">
+            <span
+              class="material-symbols-outlined text-secondary"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >warning</span
+            >
+          </div>
+          <div>
+            <h3
+              class="font-headline font-bold text-sm tracking-widest uppercase text-secondary mb-1"
+            >
+              ORIENTAÇÃO DE SEGURANÇA
+            </h3>
+            <p class="text-on-surface text-sm leading-snug">
+              Escolha apenas locais públicos e movimentados como shoppings ou praças de
+              alimentação.
+            </p>
+          </div>
+        </div>
+      </section>
+      <!-- Form Section -->
+      <form class="space-y-8">
+        <!-- Location Name -->
+        <div class="space-y-3">
+          <label
+            class="font-headline font-bold text-xs tracking-widest text-primary-dim uppercase ml-1"
+            >NOME DO LOCAL</label
+          >
+          <input
+            class="w-full bg-surface-container-highest border-none rounded-xl h-14 px-5 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 transition-all font-medium"
+            placeholder="Ex: Shopping Arena Central"
+            type="text"
+          />
+        </div>
+        <!-- Address with Geocoding Icon -->
+        <div class="space-y-3">
+          <label
+            class="font-headline font-bold text-xs tracking-widest text-primary-dim uppercase ml-1"
+            >ENDEREÇO</label
+          >
+          <div class="relative group">
+            <input
+              class="w-full bg-surface-container-highest border-none rounded-xl h-14 pl-5 pr-12 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 transition-all font-medium"
+              placeholder="Rua, Número, Bairro, Cidade"
+              type="text"
+            />
+            <button
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-secondary transition-colors"
+              type="button"
+            >
+              <span class="material-symbols-outlined">my_location</span>
+            </button>
+          </div>
+        </div>
+        <!-- Description Textarea -->
+        <div class="space-y-3">
+          <label
+            class="font-headline font-bold text-xs tracking-widest text-primary-dim uppercase ml-1"
+            >POR QUE ESTE É UM BOM PONTO?</label
+          >
+          <textarea
+            class="w-full bg-surface-container-highest border-none rounded-xl p-5 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 transition-all font-medium resize-none"
+            placeholder="Descreva o local, acessibilidade e por que os colecionadores devem ir até lá..."
+            rows="4"
+          ></textarea>
+        </div>
+        <!-- Reliability Score Bento Card -->
+        <section
+          class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/10"
+        >
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="material-symbols-outlined text-secondary"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >verified_user</span
+            >
+            <h3 class="font-headline font-bold text-lg text-on-surface">
+              Reliability Score
+            </h3>
+          </div>
+          <div class="space-y-4">
+            <div
+              class="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden"
+            >
+              <div
+                class="h-full bg-gradient-to-r from-primary-dim to-secondary w-[65%] rounded-full shadow-[0_0_15px_rgba(79,243,37,0.3)]"
+              ></div>
+            </div>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+              Sua sugestão passará por avaliação administrativa. Contribuir com bons
+              pontos aumenta seu nível de confiança na arena.
+            </p>
+          </div>
+        </section>
+        <!-- Primary CTA -->
+        <div class="pt-4">
+          <button
+            class="w-full bg-gradient-to-r from-primary to-primary-dim text-on-primary font-headline font-extrabold text-lg h-16 rounded-xl active:scale-[0.98] transition-all shadow-lg shadow-primary/20 uppercase tracking-tight"
+            type="submit"
+          >
+            ENVIAR SUGESTÃO
+          </button>
+          <p
+            class="text-center mt-6 text-outline font-headline font-bold text-[10px] tracking-[0.2em] uppercase"
+          >
+            TEMPO ESTIMADO DE ANÁLISE: 24H - 48H
+          </p>
+        </div>
+      </form>
+      <!-- Decorative Element: Arena Map Preview (Asymmetric) -->
+      <section
+        class="relative h-48 w-full rounded-3xl overflow-hidden grayscale contrast-125 opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+      >
+        <img
+          alt="Dark aerial map of a modern urban landscape at night with neon lights"
+          class="w-full h-full object-cover"
+          data-alt="Cinematic night aerial view of a neon-lit city grid with deep blue shadows and glowing green traffic arteries"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLhfjVMmg4gNngQTAONCvcVcinzMBCQq5pmGjyxjGw5GEvGzBKI3HPD5RoKK9cMV1DHvYtkM7mrJ9RbQUvr2280vH0u72oTsf-t9mQXNC6iPGplkY-yaUiSkOW_shC6zwcsJ4OptkSCdpVrYcKK-wa1t-TxKIv_fwzg8LR-ZPApQfrePwgaVrVpKlgCIgF59Whe9QOlMfUtNpx60EMBs0BfsdzI_kQT9LErKLeVfEFn5nzH9RcR2MuVaM685doe97VUSCgG0DhQDAx"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"
+        ></div>
+      </section>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+      class="fixed bottom-0 w-full z-50 rounded-t-3xl bg-[#0d1323]/80 backdrop-blur-xl shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+    >
+      <div class="flex justify-around items-center h-20 px-4 pb-2">
+        <a
+          class="flex flex-col items-center justify-center text-slate-500 opacity-60 hover:text-[#95aaff] transition-colors active:scale-90 duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">storefront</span>
+          <span
+            class="font-['Manrope'] font-semibold text-[10px] uppercase tracking-wider mt-1"
+            >Market</span
+          >
+        </a>
+        <a
+          class="flex flex-col items-center justify-center text-slate-500 opacity-60 hover:text-[#95aaff] transition-colors active:scale-90 duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">swap_horizontal_circle</span>
+          <span
+            class="font-['Manrope'] font-semibold text-[10px] uppercase tracking-wider mt-1"
+            >Swaps</span
+          >
+        </a>
+        <!-- Active Tab: Hubs (Nearest to suggesting an Arena/Hub) -->
+        <a
+          class="flex flex-col items-center justify-center text-[#4ff325] bg-[#4ff325]/10 rounded-xl px-3 py-1 active:scale-90 duration-200"
+          href="#"
+        >
+          <span
+            class="material-symbols-outlined"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >groups</span
+          >
+          <span
+            class="font-['Manrope'] font-semibold text-[10px] uppercase tracking-wider mt-1"
+            >Hubs</span
+          >
+        </a>
+        <a
+          class="flex flex-col items-center justify-center text-slate-500 opacity-60 hover:text-[#95aaff] transition-colors active:scale-90 duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">person</span>
+          <span
+            class="font-['Manrope'] font-semibold text-[10px] uppercase tracking-wider mt-1"
+            >Profile</span
+          >
+        </a>
+      </div>
+    </nav>
+  </body>
+</html>

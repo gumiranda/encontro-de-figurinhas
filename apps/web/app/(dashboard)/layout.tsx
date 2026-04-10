@@ -40,7 +40,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   );
 
   const navItems = useMemo(() => [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     ...(isSuperadminOrCeo ? [
       { label: "Users", href: "/admin/users", icon: UserCog },
       { label: "Pending Users", href: "/admin/pending-users", icon: Users },
@@ -59,6 +59,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
+  // Redirect to complete profile if onboarding not done
+  if (!currentUser.hasCompletedOnboarding) {
+    return null;
+  }
+
   const isSuperadmin = currentUser.role === "superadmin";
   const isCeo = currentUser.role === "ceo";
 
@@ -71,7 +76,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href));
+            (item.href !== "/dashboard" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}

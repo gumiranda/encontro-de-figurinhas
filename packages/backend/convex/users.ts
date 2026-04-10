@@ -318,3 +318,91 @@ export const migrateExistingUsers = mutation({
     return { migratedCount };
   },
 });
+
+// Helper to normalize nickname (remove accents + lowercase)
+function normalizeNickname(nickname: string): string {
+  return nickname
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+export const checkNicknameAvailable = query({
+  args: { nickname: v.string() },
+  handler: async (ctx, { nickname }) => {
+    const normalized = normalizeNickname(nickname);
+    if (normalized.length < 3) return { available: false };
+
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_nickname", (q) => q.eq("nickname", normalized))
+      .first();
+    return { available: !existing };
+  },
+});
+
+export const completeProfile = mutation({
+  args: {
+    nickname: v.string(),
+    birthDate: v.number(),
+    cityId: v.id("cities"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("User not found");
+    if (user.hasCompletedOnboarding) throw new Error("Profile already completed");
+
+    // Validate birthDate (server-side)
+    const birthDate = new Date(args.birthDate);
+    const today = new Date();
+    const minDate = new Date("1900-01-01");
+    if (birthDate > today) throw new Error("Birth date cannot be in the future");
+    if (birthDate < minDate) throw new Error("Birth date cannot be before 1900");
+
+    // Validate nickname uniqueness (normalized to avoid collisions)
+    const nicknameLower = normalizeNickname(args.nickname);
+    if (nicknameLower.length < 3) throw new Error("Nickname must be at least 3 characters");
+    if (nicknameLower.length > 20) throw new Error("Nickname must be at most 20 characters");
+
+    const existingNickname = await ctx.db
+      .query("users")
+      .withIndex("by_nickname", (q) => q.eq("nickname", nicknameLower))
+      .first();
+    if (existingNickname && existingNickname._id !== user._id) {
+      throw new Error("Nickname already taken");
+    }
+
+    // Validate city exists
+    const city = await ctx.db.get(args.cityId);
+    if (!city) throw new Error("City not found");
+
+    const now = Date.now();
+
+    await ctx.db.patch(user._id, {
+      nickname: nicknameLower,
+      displayNickname: args.nickname,
+      birthDate: args.birthDate,
+      cityId: args.cityId,
+      hasCompletedOnboarding: true,
+      reliabilityScore: 3,
+      totalTrades: 0,
+      isShadowBanned: false,
+      duplicates: [],
+      missing: [],
+      hasSeenSafetyTips: false,
+      isPremium: false,
+      lastActiveAt: now,
+      createdAt: user.createdAt ?? now,
+    });
+
+    return { success: true };
+  },
+});

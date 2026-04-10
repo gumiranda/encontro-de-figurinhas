@@ -1,0 +1,54 @@
+.landing-theme {
+  --landing-primary: #95aaff;
+  --landing-primary-dim: #3766ff;
+  --landing-secondary: #4ff325;
+  --landing-secondary-container: #176e00;
+  --landing-tertiary: #ffc965;
+  --landing-tertiary-container: #feb700;
+  --landing-background: #090e1c;
+  --landing-surface: #090e1c;
+  --landing-surface-dim: #090e1c;
+  --landing-surface-bright: #242b43;
+  --landing-surface-container: #13192b;
+  --landing-surface-container-low: #0d1323;
+  --landing-surface-container-high: #181f33;
+  --landing-surface-container-highest: #1e253b;
+  --landing-surface-variant: #1e253b;
+  --landing-on-surface: #e1e4fa;
+  --landing-on-surface-variant: #a6aabf;
+  --landing-on-primary: #00247e;
+  --landing-on-primary-container: #001a63;
+  --landing-on-secondary: #105500;
+  --landing-on-secondary-container: #e7ffd8;
+  --landing-on-tertiary: #5f4200;
+  --landing-on-tertiary-container: #533a00;
+  /* Ajustado para WCAG AA (ratio 5:1 sobre #090e1c) */
+  --landing-outline: #9499ad;
+  --landing-outline-variant: #434759;
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(30, 37, 59, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Stadium gradient background */
+.stadium-gradient {
+  background: radial-gradient(circle at top right, rgba(0, 82, 255, 0.15), transparent),
+              radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent);
+}
+
+/* Text gradient for primary effect */
+.text-gradient-primary {
+  background: linear-gradient(
+    to right,
+    var(--landing-primary),
+    var(--landing-primary-dim),
+    var(--landing-secondary)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

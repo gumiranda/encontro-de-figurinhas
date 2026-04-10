@@ -2,8 +2,15 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
+  "/",              // Landing page
   "/sign-in(.*)",
   "/sign-up(.*)",
+]);
+
+// Routes that require auth but allow incomplete onboarding
+// Onboarding redirect is handled client-side via useProfileRedirect hook
+const isOnboardingRoute = createRouteMatcher([
+  "/complete-profile",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

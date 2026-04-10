@@ -1,0 +1,277 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#1e253b",
+              primary: "#95aaff",
+              error: "#ff6e84",
+              background: "#090e1c",
+              "on-secondary-fixed": "#0a4000",
+              "surface-bright": "#242b43",
+              "inverse-primary": "#004cef",
+              "on-primary": "#00247e",
+              "tertiary-container": "#feb700",
+              "primary-dim": "#3766ff",
+              "on-error": "#490013",
+              "surface-container-low": "#0d1323",
+              outline: "#707588",
+              tertiary: "#ffc965",
+              "surface-container-lowest": "#000000",
+              secondary: "#4ff325",
+              "on-tertiary-fixed": "#392700",
+              "on-error-container": "#ffb2b9",
+              "error-container": "#a70138",
+              surface: "#090e1c",
+              "on-tertiary": "#5f4200",
+              "secondary-container": "#176e00",
+              "on-surface": "#e1e4fa",
+              "on-tertiary-container": "#533a00",
+              "primary-fixed": "#829bff",
+              "surface-dim": "#090e1c",
+              "surface-variant": "#1e253b",
+              "on-secondary-fixed-variant": "#136000",
+              "on-background": "#e1e4fa",
+              "inverse-surface": "#faf8ff",
+              "tertiary-dim": "#ecaa00",
+              "outline-variant": "#434759",
+              "on-primary-fixed-variant": "#002278",
+              "tertiary-fixed": "#feb700",
+              "on-primary-container": "#001a63",
+              "secondary-dim": "#3ee40c",
+              "surface-container-high": "#181f33",
+              "surface-tint": "#95aaff",
+              "surface-container": "#13192b",
+              "error-dim": "#d73357",
+              "inverse-on-surface": "#505466",
+              "primary-container": "#829bff",
+              "tertiary-fixed-dim": "#ecaa00",
+              "on-secondary": "#105500",
+              "secondary-fixed-dim": "#3ee40c",
+              "on-tertiary-fixed-variant": "#5f4200",
+              "on-secondary-container": "#e7ffd8",
+              "on-surface-variant": "#a6aabf",
+              "secondary-fixed": "#4ff325",
+              "on-primary-fixed": "#000000",
+              "primary-fixed-dim": "#6e8cff",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-panel {
+        background: rgba(30, 37, 59, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .stadium-gradient {
+        background:
+          radial-gradient(circle at top right, #3766ff33 0%, transparent 70%),
+          radial-gradient(circle at bottom left, #090e1c 0%, #000000 100%);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background text-on-surface font-body min-h-screen selection:bg-primary-dim selection:text-white"
+  >
+    <div
+      class="relative min-h-screen flex flex-col items-center justify-center p-6 stadium-gradient overflow-hidden"
+    >
+      <!-- Background Architectural Element -->
+      <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+        <div
+          class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary-dim blur-[120px]"
+        ></div>
+        <div
+          class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary blur-[150px]"
+        ></div>
+      </div>
+      <!-- Back Button (Minimal Header for Focused View) -->
+      <div class="absolute top-8 left-6">
+        <button
+          class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group"
+        >
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+          <span class="text-sm font-label font-bold uppercase tracking-widest"
+            >Voltar</span
+          >
+        </button>
+      </div>
+      <!-- Main Card -->
+      <div class="w-full max-w-md glass-panel p-8 rounded-xl shadow-2xl relative z-10">
+        <!-- Logo Section -->
+        <div class="flex flex-col items-center mb-10">
+          <div
+            class="w-16 h-16 bg-primary-dim rounded-lg flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(55,102,255,0.4)]"
+          >
+            <span class="material-symbols-outlined text-white text-4xl" data-weight="fill"
+              >bolt</span
+            >
+          </div>
+          <h1 class="font-headline text-3xl font-bold tracking-tight text-white mb-2">
+            FIGURINHA FÁCIL
+          </h1>
+          <p
+            class="text-on-surface-variant text-sm font-label uppercase tracking-[0.2em] text-center"
+          >
+            Acesse a Arena Digital
+          </p>
+        </div>
+        <!-- Social Login -->
+        <div class="space-y-4">
+          <button
+            class="w-full flex h-14 items-center justify-center gap-3 bg-white text-black rounded-lg hover:bg-on-surface-variant transition-all font-bold text-sm shadow-lg"
+          >
+            <svg
+              height="20"
+              viewbox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              ></path>
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              ></path>
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                fill="#FBBC05"
+              ></path>
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z"
+                fill="#EA4335"
+              ></path>
+            </svg>
+            ENTRAR COM GOOGLE
+          </button>
+        </div>
+        <!-- Divider -->
+        <div class="flex items-center gap-4 my-8">
+          <div class="h-[1px] flex-1 bg-outline-variant opacity-30"></div>
+          <span
+            class="text-xs font-label text-on-surface-variant uppercase tracking-widest"
+            >ou use seu e-mail</span
+          >
+          <div class="h-[1px] flex-1 bg-outline-variant opacity-30"></div>
+        </div>
+        <!-- Form -->
+        <form class="space-y-6">
+          <div>
+            <label
+              class="block text-xs font-bold font-label text-on-surface-variant uppercase tracking-widest mb-2 px-1"
+              >E-mail Profissional</label
+            >
+            <input
+              class="w-full h-12 bg-surface-container-highest border-none rounded-lg px-4 text-on-surface focus:ring-2 focus:ring-primary-dim transition-all placeholder:text-outline"
+              placeholder="nome@exemplo.com"
+              type="email"
+            />
+          </div>
+          <div>
+            <div class="flex justify-between items-center mb-2 px-1">
+              <label
+                class="block text-xs font-bold font-label text-on-surface-variant uppercase tracking-widest"
+                >Senha de Acesso</label
+              >
+              <a
+                class="text-[10px] font-bold text-primary-dim uppercase tracking-widest hover:text-primary"
+                href="#"
+                >Esqueceu?</a
+              >
+            </div>
+            <input
+              class="w-full h-12 bg-surface-container-highest border-none rounded-lg px-4 text-on-surface focus:ring-2 focus:ring-primary-dim transition-all placeholder:text-outline"
+              placeholder="••••••••"
+              type="password"
+            />
+          </div>
+          <button
+            class="w-full h-14 bg-gradient-to-r from-primary-dim to-primary text-white rounded-lg font-headline font-bold text-base tracking-widest shadow-[0_4px_20px_rgba(55,102,255,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase"
+          >
+            ACESSAR ARENA
+          </button>
+        </form>
+        <!-- Footer Link -->
+        <div class="mt-8 text-center">
+          <p class="text-sm text-on-surface-variant font-label">
+            Não tem uma conta?
+            <a
+              class="text-primary-dim font-bold hover:text-primary transition-colors ml-1 underline underline-offset-4 decoration-primary-dim/30"
+              href="#"
+              >Cadastre-se agora</a
+            >
+          </p>
+        </div>
+      </div>
+      <!-- Security Badge -->
+      <div class="mt-10 flex items-center gap-2 opacity-50">
+        <span class="material-symbols-outlined text-sm">lock</span>
+        <span class="text-[10px] font-label uppercase tracking-widest"
+          >Conexão segura via Clerk Identity</span
+        >
+      </div>
+    </div>
+    <!-- Background Decorative Stickers (Staggered/Asymmetric) -->
+    <div
+      class="fixed top-20 -left-10 w-40 h-56 bg-surface-container-high rounded-xl rotate-[-12deg] opacity-20 border border-outline-variant pointer-events-none"
+    >
+      <div class="w-full h-full p-3 flex flex-col justify-between">
+        <div
+          class="w-10 h-10 bg-primary-dim rounded-full flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-white text-xs">star</span>
+        </div>
+        <div class="h-4 bg-outline-variant w-1/2 rounded"></div>
+      </div>
+    </div>
+    <div
+      class="fixed bottom-20 -right-10 w-48 h-64 bg-surface-container-high rounded-xl rotate-[15deg] opacity-10 border border-outline-variant pointer-events-none"
+    >
+      <div class="w-full h-full flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary-dim text-6xl opacity-30"
+          >shield</span
+        >
+      </div>
+    </div>
+  </body>
+</html>
