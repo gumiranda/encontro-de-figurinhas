@@ -59,6 +59,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
+  // Redirect to complete profile if onboarding not done
+  if (!currentUser.hasCompletedOnboarding) {
+    return null;
+  }
+
   const isSuperadmin = currentUser.role === "superadmin";
   const isCeo = currentUser.role === "ceo";
 

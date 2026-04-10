@@ -16,7 +16,19 @@ export function useProfileRedirect() {
       return;
     }
 
-    if (currentUser.hasCompletedOnboarding) {
+    // Respect existing approval flow
+    if (currentUser.status === "pending") {
+      router.push("/pending-approval");
+      return;
+    }
+
+    if (currentUser.status === "rejected") {
+      router.push("/rejected");
+      return;
+    }
+
+    // Only check onboarding for approved users
+    if (currentUser.status === "approved" && currentUser.hasCompletedOnboarding) {
       router.push("/dashboard");
       return;
     }
