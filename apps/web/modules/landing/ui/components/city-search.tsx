@@ -22,7 +22,7 @@ export function CitySearch() {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          onBlur={() => setIsFocused(false)}
           aria-label="Buscar cidade"
           aria-describedby="search-hint"
         />
@@ -52,6 +52,7 @@ export function CitySearch() {
               }`}
               role="option"
               aria-selected="false"
+              onMouseDown={(e) => e.preventDefault()}
             >
               <div>
                 <p className="font-bold text-[var(--landing-on-surface)]">{city.name}</p>
