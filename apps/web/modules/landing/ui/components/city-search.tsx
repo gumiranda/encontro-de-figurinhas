@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
 import { CITY_SUGGESTIONS } from "../../lib/landing-data";
 
 export function CitySearch() {
@@ -11,27 +13,33 @@ export function CitySearch() {
   const showSuggestions = isFocused && searchValue.length === 0;
 
   return (
-    <div className="relative group max-w-xl">
+    <div className="relative group w-full max-w-xl">
       <div className="absolute -inset-1 bg-gradient-to-r from-[var(--landing-primary)]/20 to-[var(--landing-secondary)]/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-      <div className="relative flex items-center bg-[var(--landing-surface-container-highest)] rounded-xl p-2 border border-[var(--landing-outline-variant)]/15">
-        <Search className="ml-4 text-[var(--landing-outline)] w-5 h-5" aria-hidden="true" />
-        <input
-          type="text"
-          className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] py-4 px-4 font-[var(--font-body)]"
-          placeholder="Digite sua cidade (ex: Sao Paulo, Rio...)"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          aria-label="Buscar cidade"
-          aria-describedby="search-hint"
-        />
-        <button
+      <div className="relative flex flex-col gap-2 rounded-xl border border-[var(--landing-outline-variant)]/15 bg-[var(--landing-surface-container-highest)] p-2 sm:flex-row sm:items-center sm:gap-0">
+        <div className="flex min-w-0 flex-1 items-center">
+          <Search
+            className="ml-2 shrink-0 text-[var(--landing-outline)] sm:ml-4"
+            aria-hidden="true"
+            size={20}
+          />
+          <Input
+            type="text"
+            className="h-auto min-w-0 flex-1 border-0 bg-transparent py-3 pl-3 pr-2 text-base text-[var(--landing-on-surface)] shadow-none placeholder:text-[var(--landing-outline)] focus-visible:ring-0 md:text-sm font-[var(--font-body)]"
+            placeholder="Digite sua cidade (ex: Sao Paulo, Rio...)"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            aria-label="Buscar cidade"
+            aria-describedby="search-hint"
+          />
+        </div>
+        <Button
           type="button"
-          className="bg-[var(--landing-primary)] text-[var(--landing-on-primary)] font-bold px-8 py-4 rounded-lg hover:bg-[var(--landing-primary-dim)] transition-all active:scale-95"
+          className="w-full shrink-0 rounded-lg bg-[var(--landing-primary)] px-6 py-4 font-bold text-[var(--landing-on-primary)] hover:bg-[var(--landing-primary-dim)] active:scale-95 sm:w-auto sm:px-8"
         >
           BUSCAR
-        </button>
+        </Button>
       </div>
       <span id="search-hint" className="sr-only">
         Digite o nome da sua cidade para encontrar pontos de troca proximos

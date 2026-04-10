@@ -11,7 +11,7 @@ interface HeroSectionProps {
 export function HeroSection({ totalTrocas }: HeroSectionProps) {
   return (
     <section
-      className="relative px-6 py-16 md:py-32 max-w-7xl mx-auto overflow-hidden"
+      className="relative mx-auto max-w-7xl overflow-hidden px-4 py-16 sm:px-6 md:py-32"
       aria-labelledby="hero-heading"
     >
       <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -28,7 +28,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
 
           <h1
             id="hero-heading"
-            className="font-[var(--font-headline)] font-black text-4xl md:text-5xl lg:text-7xl leading-tight tracking-tighter text-[var(--landing-on-surface)]"
+            className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tighter text-[var(--landing-on-surface)] sm:text-4xl md:text-5xl lg:text-7xl"
           >
             Encontre quem tem as figurinhas que{" "}
             <span className="text-gradient-primary">voce precisa.</span>
