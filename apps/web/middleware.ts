@@ -7,6 +7,12 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
 ]);
 
+// Routes that require auth but allow incomplete onboarding
+// Onboarding redirect is handled client-side via useProfileRedirect hook
+const isOnboardingRoute = createRouteMatcher([
+  "/complete-profile",
+]);
+
 export default clerkMiddleware(async (auth, req) => {
   if (req.nextUrl.pathname.startsWith('/org-selection')) {
     return NextResponse.redirect(new URL('/', req.url));
