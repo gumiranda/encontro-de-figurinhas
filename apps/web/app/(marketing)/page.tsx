@@ -1,5 +1,9 @@
 import { Metadata } from "next";
-import { LandingView } from "@/modules/landing/ui/views/landing-view";
+import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
+import { HeroSection } from "@/modules/landing/ui/components/hero-section";
+import { CitiesSection } from "@/modules/landing/ui/components/cities-section";
+import { FeaturesSection } from "@/modules/landing/ui/components/features-section";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://figurinhafacil.com.br"),
@@ -19,10 +23,7 @@ export const metadata: Metadata = {
     title: "Figurinha Facil",
     description: "A maior rede de troca de figurinhas",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 const structuredData = {
@@ -34,8 +35,6 @@ const structuredData = {
 };
 
 export default function LandingPage() {
-  // TODO: Fetch real stats from Convex when available
-  // const stats = await fetchStats();
   const totalTrocas = null; // Will show "Milhares" instead of fake numbers
 
   return (
@@ -44,7 +43,13 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <LandingView totalTrocas={totalTrocas} />
+      <LandingHeader />
+      <main id="main-content" className="pt-24 min-h-screen">
+        <HeroSection totalTrocas={totalTrocas} />
+        <CitiesSection />
+        <FeaturesSection />
+      </main>
+      <LandingFooter />
     </>
   );
 }

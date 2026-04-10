@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Rocket } from "lucide-react";
-import { FeatureItem } from "./feature-item";
+import { Rocket, Shield, Map, Zap } from "lucide-react";
 import { FEATURES } from "../../lib/landing-data";
+
+const ICON_MAP = { shield: Shield, map: Map, zap: Zap } as const;
 
 export function FeaturesSection() {
   return (
@@ -17,15 +18,24 @@ export function FeaturesSection() {
               <div className="absolute -inset-4 bg-gradient-to-br from-[var(--landing-secondary)]/30 to-[var(--landing-primary)]/30 blur-2xl opacity-20" />
               <div className="relative bg-[var(--landing-surface-container-high)] rounded-3xl p-8 border border-[var(--landing-outline-variant)]/10">
                 <div className="space-y-6">
-                  {FEATURES.map((feature) => (
-                    <FeatureItem
-                      key={feature.id}
-                      icon={feature.icon as "shield" | "map" | "zap"}
-                      title={feature.title}
-                      description={feature.description}
-                      colorClass={feature.colorClass}
-                    />
-                  ))}
+                  {FEATURES.map((feature) => {
+                    const Icon = ICON_MAP[feature.icon as keyof typeof ICON_MAP];
+                    return (
+                      <div key={feature.id} className="flex gap-4 items-start">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${feature.colorClass}`}>
+                          <Icon className="w-6 h-6" aria-hidden="true" />
+                        </div>
+                        <div>
+                          <h4 className="font-[var(--font-headline)] font-bold text-xl mb-1 text-[var(--landing-on-surface)]">
+                            {feature.title}
+                          </h4>
+                          <p className="text-[var(--landing-on-surface-variant)] text-sm font-[var(--font-body)]">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
