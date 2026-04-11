@@ -36,7 +36,7 @@
 
 /* Stadium gradient background */
 .stadium-gradient {
-  background: radial-gradient(circle at top right, rgba(0, 82, 255, 0.15), transparent),
+  background: radial-gradient(circle at top right, rgba(149, 170, 255, 0.15), transparent),
               radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent);
 }
 

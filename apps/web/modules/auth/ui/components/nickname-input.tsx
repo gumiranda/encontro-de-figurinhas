@@ -84,7 +84,7 @@ export function NicknameInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Ex: Artilheiro2026"
-          className="w-full h-14 bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 pr-12"
+          className="w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent font-body pr-12"
           aria-invalid={!!error}
         />
         <div className="absolute inset-y-0 right-4 flex items-center">
@@ -95,7 +95,7 @@ export function NicknameInput({
         <div className="flex items-center gap-2 px-1">
           <CheckCircle2 className="h-4 w-4 text-[var(--landing-secondary)]" />
           <p className="text-[var(--landing-secondary)] text-xs font-medium">
-            Apelido disponivel para uso
+            Apelido disponível para uso
           </p>
         </div>
       )}
@@ -103,7 +103,7 @@ export function NicknameInput({
         <div className="flex items-center gap-2 px-1">
           <XCircle className="h-4 w-4 text-destructive" />
           <p className="text-destructive text-xs font-medium">
-            Este apelido ja esta em uso
+            Este apelido já está em uso
           </p>
         </div>
       )}

@@ -37,13 +37,13 @@ import { Id } from "@workspace/backend/_generated/dataModel";
 const completeProfileSchema = z.object({
   nickname: z
     .string()
-    .min(3, "Minimo 3 caracteres")
-    .max(20, "Maximo 20 caracteres")
-    .regex(/^[\p{L}\p{N}_]+$/u, "Apenas letras, numeros e underscore"),
-  birthDate: z.date({ required_error: "Data de nascimento obrigatoria" }),
+    .min(3, "Mínimo 3 caracteres")
+    .max(20, "Máximo 20 caracteres")
+    .regex(/^[\p{L}\p{N}_]+$/u, "Apenas letras, números e underscore"),
+  birthDate: z.date({ required_error: "Data de nascimento obrigatória" }),
   cityId: z.string().min(1, "Selecione sua cidade"),
   terms: z.literal(true, {
-    errorMap: () => ({ message: "Voce deve aceitar os termos" }),
+    errorMap: () => ({ message: "Você deve aceitar os termos" }),
   }),
 });
 
@@ -66,7 +66,7 @@ export function CompleteProfileForm() {
 
   const onSubmit = async (data: CompleteProfileFormData) => {
     if (isNicknameAvailable === false) {
-      toast.error("Este apelido ja esta em uso. Escolha outro.");
+      toast.error("Este apelido já está em uso. Escolha outro.");
       return;
     }
 
@@ -78,16 +78,16 @@ export function CompleteProfileForm() {
         cityId: data.cityId as Id<"cities">,
       });
 
-      toast.success("Perfil completo! Bem-vindo a Arena.");
+      toast.success("Perfil completo! Bem-vindo à Arena.");
       router.push("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "Nickname already taken") {
-          toast.error("Este apelido ja esta em uso. Escolha outro.");
-          form.setError("nickname", { message: "Apelido indisponivel" });
+          toast.error("Este apelido já está em uso. Escolha outro.");
+          form.setError("nickname", { message: "Apelido indisponível" });
         } else if (error.message === "City not found") {
-          toast.error("Cidade nao encontrada. Selecione novamente.");
-          form.setError("cityId", { message: "Cidade invalida" });
+          toast.error("Cidade não encontrada. Selecione novamente.");
+          form.setError("cityId", { message: "Cidade inválida" });
         } else {
           toast.error("Erro ao salvar perfil. Tente novamente.");
         }
@@ -135,7 +135,7 @@ export function CompleteProfileForm() {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full h-14 bg-[var(--landing-surface-container-highest)] border-none rounded text-left font-normal px-4 justify-between hover:bg-[var(--landing-surface-container-highest)]",
+                        "w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-left font-body font-normal px-4 justify-between hover:bg-[var(--landing-surface-container-highest)] hover:text-[var(--landing-on-surface)] dark:hover:bg-[var(--landing-surface-container-highest)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent",
                         !field.value && "text-[var(--landing-outline)]"
                       )}
                     >
@@ -203,7 +203,7 @@ export function CompleteProfileForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="mt-1 border-[var(--landing-outline-variant)] data-[state=checked]:bg-[var(--landing-primary)] data-[state=checked]:border-[var(--landing-primary)]"
+                    className="mt-1 h-5 w-5 border-[var(--landing-outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--landing-primary)] data-[state=checked]:border-[var(--landing-primary)] dark:data-[state=checked]:bg-[var(--landing-primary)] focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-[var(--landing-primary)]"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
@@ -212,7 +212,7 @@ export function CompleteProfileForm() {
                     <span className="text-[var(--landing-primary)] underline cursor-pointer">
                       Termos da Arena
                     </span>{" "}
-                    e confirmo que meus dados estao corretos para trocas seguras.
+                    e confirmo que meus dados estão corretos para trocas seguras.
                   </FormLabel>
                   <FormMessage />
                 </div>
@@ -242,7 +242,7 @@ export function CompleteProfileForm() {
           <div className="flex items-center justify-center mt-6 gap-2">
             <div className="h-[1px] w-8 bg-[var(--landing-outline-variant)]/30" />
             <p className="text-[10px] text-[var(--landing-outline)] uppercase tracking-widest font-bold">
-              Protocolo de Seguranca Ativo
+              Protocolo de Segurança Ativo
             </p>
             <div className="h-[1px] w-8 bg-[var(--landing-outline-variant)]/30" />
           </div>

@@ -71,7 +71,7 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           placeholder="Selecione sua cidade..."
-          className="w-full h-14 bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 pr-12"
+          className="w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent font-body pr-12"
           aria-invalid={!!error}
         />
         <div className="absolute inset-y-0 right-4 flex items-center text-[var(--landing-on-surface-variant)]">
