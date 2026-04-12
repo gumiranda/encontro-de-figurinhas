@@ -97,12 +97,16 @@ export const bootstrap = mutation({
 });
 
 export const getAllUsers = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
     const currentUser = await getAuthenticatedUser(ctx);
     if (!currentUser || !isAdmin(currentUser.role)) return [];
 
-    return await ctx.db.query("users").collect();
+    // Limite padrão de 100, máximo 500
+    const limit = Math.min(args.limit ?? 100, 500);
+    return await ctx.db.query("users").take(limit);
   },
 });
 
@@ -290,32 +294,6 @@ export const rejectUser = mutation({
     });
 
     return true;
-  },
-});
-
-export const migrateExistingUsers = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const currentUser = await getAuthenticatedUser(ctx);
-    if (!currentUser || currentUser.role !== Role.SUPERADMIN) {
-      throw new Error("Only superadmin can run migration");
-    }
-
-    const usersWithoutStatus = await ctx.db
-      .query("users")
-      .withIndex("by_status", (q) => q.eq("status", undefined))
-      .collect();
-    let migratedCount = 0;
-
-    for (const user of usersWithoutStatus) {
-      await ctx.db.patch(user._id, {
-        status: UserStatus.APPROVED,
-        approvedAt: Date.now(),
-      });
-      migratedCount++;
-    }
-
-    return { migratedCount };
   },
 });
 
