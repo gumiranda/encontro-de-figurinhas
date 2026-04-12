@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -10,9 +10,10 @@ import {
   Settings,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import { useStickers } from "../../lib/use-stickers";
 import { StickerQuickInput } from "../components/sticker-quick-input";
-import { StickerListGrouped } from "../components/sticker-list-grouped";
+import { SectionAccordion } from "../components/section-accordion";
 
 type Tab = "duplicates" | "missing";
 
@@ -24,7 +25,37 @@ export function QuickRegisterView() {
     duplicates, missing, sections, totalStickers,
     isLoading, isSaving, error, canFinalize,
     addDuplicates, removeDuplicate, addMissing, removeMissing, finalize,
+    markAllInSection, clearSection, invertSection,
+    markAll, clearAll,
   } = useStickers();
+
+  // Toggle individual para o grid
+  const handleToggle = useCallback(
+    (num: number, action: "add" | "remove") => {
+      if (activeTab === "duplicates") {
+        if (action === "add") addDuplicates([num]);
+        else removeDuplicate(num);
+      } else {
+        if (action === "add") addMissing([num]);
+        else removeMissing(num);
+      }
+    },
+    [activeTab, addDuplicates, removeDuplicate, addMissing, removeMissing]
+  );
+
+  // Bulk actions
+  const handleBulkAction = useCallback(
+    (sectionCode: string, action: "all" | "none" | "invert") => {
+      if (action === "all") {
+        markAllInSection(sectionCode, activeTab);
+      } else if (action === "none") {
+        clearSection(sectionCode, activeTab);
+      } else {
+        invertSection(sectionCode, activeTab);
+      }
+    },
+    [activeTab, markAllInSection, clearSection, invertSection]
+  );
 
   const handleFinalize = async () => {
     try {
@@ -147,13 +178,55 @@ export function QuickRegisterView() {
           </div>
         </section>
 
-        {/* Lista Agrupada */}
+        {/* Checkbox Global */}
+        <section className="mb-6">
+          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/20">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="select-all"
+                checked={
+                  activeTab === "duplicates"
+                    ? duplicates.length === totalStickers
+                    : missing.length === totalStickers
+                }
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    markAll(activeTab);
+                  } else {
+                    clearAll(activeTab);
+                  }
+                }}
+                className="h-5 w-5"
+              />
+              <label
+                htmlFor="select-all"
+                className="text-sm font-bold text-on-surface cursor-pointer"
+              >
+                {activeTab === "duplicates"
+                  ? "Tenho TODAS as figurinhas"
+                  : "Preciso de TODAS as figurinhas"}
+              </label>
+            </div>
+            <span className="text-xs text-on-surface-variant">
+              {activeTab === "duplicates" ? duplicates.length : missing.length}/{totalStickers}
+            </span>
+          </div>
+          <p className="text-xs text-on-surface-variant mt-2 px-1">
+            {activeTab === "duplicates"
+              ? "Marque todas e depois desmarque as que voce NAO tem repetida"
+              : "Marque todas e depois desmarque as que voce JA tem"}
+          </p>
+        </section>
+
+        {/* Grid por Seção */}
         <section className="pb-12">
-          <StickerListGrouped
-            numbers={activeTab === "duplicates" ? duplicates : missing}
+          <SectionAccordion
             sections={sections}
-            onRemove={activeTab === "duplicates" ? removeDuplicate : removeMissing}
-            variant={activeTab}
+            mode={activeTab}
+            duplicates={duplicates}
+            missing={missing}
+            onToggle={handleToggle}
+            onBulkAction={handleBulkAction}
           />
         </section>
       </main>

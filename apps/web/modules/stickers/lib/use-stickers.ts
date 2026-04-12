@@ -4,10 +4,18 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 
+type Section = {
+  name: string;
+  code: string;
+  startNumber: number;
+  endNumber: number;
+  isExtra?: boolean;
+};
+
 export function useStickers(debounceMs = 300) {
   // Inline do antigo use-album-config
   const data = useQuery(api.stickers.getUserStickers);
-  const sections = data?.sections ?? [];
+  const sections: Section[] = data?.sections ?? [];
   const totalStickers = data?.totalStickers ?? 980;
   const serverDuplicates = data?.duplicates ?? [];
   const serverMissing = data?.missing ?? [];
@@ -182,6 +190,166 @@ export function useStickers(debounceMs = 300) {
     };
   }, []);
 
+  // === BULK ACTIONS ===
+
+  // Encontra seção pelo código
+  const findSection = useCallback(
+    (sectionCode: string): Section | undefined => {
+      return sections.find((s) => s.code === sectionCode);
+    },
+    [sections]
+  );
+
+  // Gera array de números para uma seção
+  const getSectionNumbers = useCallback(
+    (sectionCode: string): number[] => {
+      const section = findSection(sectionCode);
+      if (!section) return [];
+      const numbers: number[] = [];
+      for (let i = section.startNumber; i <= section.endNumber; i++) {
+        numbers.push(i);
+      }
+      return numbers;
+    },
+    [findSection]
+  );
+
+  // Marca todas figurinhas da seção
+  const markAllInSection = useCallback(
+    (sectionCode: string, mode: "duplicates" | "missing") => {
+      const sectionNumbers = getSectionNumbers(sectionCode);
+      if (sectionNumbers.length === 0) return;
+
+      if (mode === "duplicates") {
+        setLocalDuplicates((prev) => {
+          const newSet = new Set([...prev, ...sectionNumbers]);
+          const newArray = Array.from(newSet).sort((a, b) => a - b);
+          saveWithDebounce(newArray, localMissing);
+          return newArray;
+        });
+      } else {
+        setLocalMissing((prev) => {
+          const newSet = new Set([...prev, ...sectionNumbers]);
+          const newArray = Array.from(newSet).sort((a, b) => a - b);
+          saveWithDebounce(localDuplicates, newArray);
+          return newArray;
+        });
+      }
+    },
+    [getSectionNumbers, localDuplicates, localMissing, saveWithDebounce]
+  );
+
+  // Desmarca todas figurinhas da seção
+  const clearSection = useCallback(
+    (sectionCode: string, mode: "duplicates" | "missing") => {
+      const section = findSection(sectionCode);
+      if (!section) return;
+
+      if (mode === "duplicates") {
+        setLocalDuplicates((prev) => {
+          const newArray = prev.filter(
+            (n) => n < section.startNumber || n > section.endNumber
+          );
+          saveWithDebounce(newArray, localMissing);
+          return newArray;
+        });
+      } else {
+        setLocalMissing((prev) => {
+          const newArray = prev.filter(
+            (n) => n < section.startNumber || n > section.endNumber
+          );
+          saveWithDebounce(localDuplicates, newArray);
+          return newArray;
+        });
+      }
+    },
+    [findSection, localDuplicates, localMissing, saveWithDebounce]
+  );
+
+  // Inverte seleção da seção
+  const invertSection = useCallback(
+    (sectionCode: string, mode: "duplicates" | "missing") => {
+      const section = findSection(sectionCode);
+      if (!section) return;
+
+      const sectionNumbers = getSectionNumbers(sectionCode);
+      const currentList = mode === "duplicates" ? localDuplicates : localMissing;
+      const currentSet = new Set(currentList);
+
+      // Toggle cada número: se está na lista remove, se não está adiciona
+      const newList = currentList.filter(
+        (n) => n < section.startNumber || n > section.endNumber
+      );
+      for (const num of sectionNumbers) {
+        if (!currentSet.has(num)) {
+          newList.push(num);
+        }
+      }
+      newList.sort((a, b) => a - b);
+
+      if (mode === "duplicates") {
+        setLocalDuplicates(newList);
+        saveWithDebounce(newList, localMissing);
+      } else {
+        setLocalMissing(newList);
+        saveWithDebounce(localDuplicates, newList);
+      }
+    },
+    [findSection, getSectionNumbers, localDuplicates, localMissing, saveWithDebounce]
+  );
+
+  // SET completo para o grid (substitui array inteiro)
+  const setDuplicates = useCallback(
+    (numbers: number[]) => {
+      const sorted = [...numbers].sort((a, b) => a - b);
+      setLocalDuplicates(sorted);
+      saveWithDebounce(sorted, localMissing);
+    },
+    [localMissing, saveWithDebounce]
+  );
+
+  const setMissing = useCallback(
+    (numbers: number[]) => {
+      const sorted = [...numbers].sort((a, b) => a - b);
+      setLocalMissing(sorted);
+      saveWithDebounce(localDuplicates, sorted);
+    },
+    [localDuplicates, saveWithDebounce]
+  );
+
+  // Marca TODAS as figurinhas do álbum
+  const markAll = useCallback(
+    (mode: "duplicates" | "missing") => {
+      const allNumbers: number[] = [];
+      for (let i = 1; i <= totalStickers; i++) {
+        allNumbers.push(i);
+      }
+
+      if (mode === "duplicates") {
+        setLocalDuplicates(allNumbers);
+        saveWithDebounce(allNumbers, localMissing);
+      } else {
+        setLocalMissing(allNumbers);
+        saveWithDebounce(localDuplicates, allNumbers);
+      }
+    },
+    [totalStickers, localDuplicates, localMissing, saveWithDebounce]
+  );
+
+  // Desmarca TODAS as figurinhas do álbum
+  const clearAll = useCallback(
+    (mode: "duplicates" | "missing") => {
+      if (mode === "duplicates") {
+        setLocalDuplicates([]);
+        saveWithDebounce([], localMissing);
+      } else {
+        setLocalMissing([]);
+        saveWithDebounce(localDuplicates, []);
+      }
+    },
+    [localDuplicates, localMissing, saveWithDebounce]
+  );
+
   return {
     // State
     duplicates: localDuplicates,
@@ -193,11 +361,24 @@ export function useStickers(debounceMs = 300) {
     error,
     canFinalize,
 
-    // Actions
+    // Actions - Individual
     addDuplicates,
     removeDuplicate,
     addMissing,
     removeMissing,
     finalize,
+
+    // Actions - Bulk
+    markAllInSection,
+    clearSection,
+    invertSection,
+
+    // Actions - Global
+    markAll,
+    clearAll,
+
+    // Actions - Set (for grid)
+    setDuplicates,
+    setMissing,
   };
 }
