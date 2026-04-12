@@ -54,7 +54,7 @@ export default function BootstrapPage() {
     if (bootstrapAttempted.current) return;
     bootstrapAttempted.current = true;
     try {
-      await bootstrap();
+      await bootstrap({});
       router.push("/");
     } catch (err) {
       setError(
