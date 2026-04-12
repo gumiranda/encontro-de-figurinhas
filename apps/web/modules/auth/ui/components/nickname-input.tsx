@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { Input } from "@workspace/ui/components/input";
@@ -50,7 +50,6 @@ export function NicknameInput({
   onAvailabilityChange,
   error,
 }: NicknameInputProps) {
-  const [isChecking, setIsChecking] = useState(false);
   const debouncedValue = useDebounce(value, 500);
   const lastCheckedRef = useRef<string>("");
 
@@ -60,27 +59,23 @@ export function NicknameInput({
     shouldCheck ? { nickname: debouncedValue } : "skip"
   );
 
+  // Derive checking state with query staleness awareness - no useState needed
+  const isQueryStale = debouncedValue !== lastCheckedRef.current;
+  const isChecking = value.length >= 3 && (value !== debouncedValue || isQueryStale);
+
+  // Single effect for parent notification (side effect)
   useEffect(() => {
     if (value.length < 3) {
       onAvailabilityChange(null);
-      setIsChecking(false);
+      lastCheckedRef.current = "";
       return;
     }
 
-    if (value !== debouncedValue) {
-      setIsChecking(true);
+    if (nicknameCheck !== undefined && lastCheckedRef.current !== debouncedValue) {
+      lastCheckedRef.current = debouncedValue;
+      onAvailabilityChange(nicknameCheck.available);
     }
-  }, [value, debouncedValue, onAvailabilityChange]);
-
-  useEffect(() => {
-    if (nicknameCheck !== undefined && debouncedValue.length >= 3) {
-      if (lastCheckedRef.current !== debouncedValue) {
-        lastCheckedRef.current = debouncedValue;
-        onAvailabilityChange(nicknameCheck.available);
-      }
-      setIsChecking(false);
-    }
-  }, [nicknameCheck, debouncedValue, onAvailabilityChange]);
+  }, [value.length, nicknameCheck, debouncedValue, onAvailabilityChange]);
 
   return (
     <div className="space-y-2">
