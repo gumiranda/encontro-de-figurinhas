@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AuthLayout } from "@/modules/auth/ui/layouts/auth-layout";
+import "@workspace/ui/styles/landing-theme.css";
 
 export const metadata: Metadata = {
   robots: {
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  return <AuthLayout>{children}</AuthLayout>;
+  return <>{children}</>;
 };
 export default Layout;

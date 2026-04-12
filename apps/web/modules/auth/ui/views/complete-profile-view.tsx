@@ -4,12 +4,21 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { CompleteProfileForm } from "../components/complete-profile-form";
-import { useProfileRedirect } from "@/hooks/use-profile-redirect";
+import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { FullPageLoader } from "@/components/full-page-loader";
 
 export function CompleteProfileView() {
   const router = useRouter();
-  const { isLoading, currentUser } = useProfileRedirect();
+  // User stays on this page if approved but hasn't completed onboarding
+  // Redirect elsewhere for other states
+  const { isLoading, currentUser } = useAuthRedirect({
+    whenNoUser: "/sign-in",
+    whenPending: "/pending-approval",
+    whenRejected: "/rejected",
+    whenApproved: "/dashboard", // Only triggers if hasCompletedOnboarding + hasCompletedStickerSetup
+    whenNeedsOnboarding: undefined, // Stay here
+    whenNeedsStickerSetup: "/cadastrar-figurinhas",
+  });
 
   if (isLoading || !currentUser) {
     return <FullPageLoader />;

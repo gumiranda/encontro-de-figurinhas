@@ -12,3 +12,29 @@ export async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx) {
 
 export const isAdmin = (role?: string) =>
   role === Role.SUPERADMIN || role === Role.CEO;
+
+/**
+ * Require authenticated user. Throws if not authenticated.
+ * Returns user with isShadowBanned for downstream filtering.
+ *
+ * Note: This is for queries/mutations only. Actions (ActionCtx) must use
+ * ctx.runQuery(api.users.getCurrentUser) pattern.
+ *
+ * TODO: Add isBanned check when ban feature is implemented in schema.
+ */
+export async function requireAuth(ctx: QueryCtx | MutationCtx) {
+  const user = await getAuthenticatedUser(ctx);
+  if (!user) throw new Error("Not authenticated");
+  return user;
+}
+
+/**
+ * Require admin user (superadmin or ceo).
+ */
+export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
+  const user = await requireAuth(ctx);
+  if (user.role !== Role.SUPERADMIN && user.role !== Role.CEO) {
+    throw new Error("Not authorized");
+  }
+  return user;
+}
