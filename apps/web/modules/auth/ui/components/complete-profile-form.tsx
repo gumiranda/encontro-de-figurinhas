@@ -198,16 +198,16 @@ export function CompleteProfileForm() {
             control={form.control}
             name="terms"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
+              <FormItem className="flex flex-row items-start gap-3 space-y-0">
+                <FormControl className="shrink-0">
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
                     className="mt-1 h-5 w-5 border-[var(--landing-outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--landing-primary)] data-[state=checked]:border-[var(--landing-primary)] dark:data-[state=checked]:bg-[var(--landing-primary)] focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-[var(--landing-primary)]"
                   />
                 </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm text-[var(--landing-on-surface-variant)] leading-relaxed font-normal cursor-pointer">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <FormLabel className="block w-full cursor-pointer text-sm font-normal leading-relaxed text-[var(--landing-on-surface-variant)]">
                     Concordo com os{" "}
                     <span className="text-[var(--landing-primary)] underline cursor-pointer">
                       Termos da Arena
