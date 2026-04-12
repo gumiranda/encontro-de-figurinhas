@@ -118,11 +118,9 @@ export function QuickRegisterView() {
         <section className="mb-10">
           <StickerQuickInput
             mode={activeTab}
-            chips={activeTab === "duplicates" ? duplicates : missing}
             sections={sections}
             totalStickers={totalStickers}
             onAdd={activeTab === "duplicates" ? addDuplicates : addMissing}
-            onRemove={activeTab === "duplicates" ? removeDuplicate : removeMissing}
           />
         </section>
 

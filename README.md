@@ -1,5 +1,6 @@
 # CrazyTemplate - Shadcn/UI Monorepo Template
 
+RODAR COMANDO npx convex run seedAlbumConfig:seedAlbumConfig pra cadastrar os paises/figurinha
 ![Next.js](https://img.shields.io/badge/Next.js-15.4-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
@@ -10,6 +11,7 @@
 
 Template SaaS full-stack moderno com autenticacao, backend real-time, sistema de aprovacao de usuarios e biblioteca de componentes UI.
 fdfd
+
 ---
 
 ## Funcionalidades Principais
@@ -26,37 +28,41 @@ fdfd
 ## Tech Stack Completo
 
 ### Frontend
-| Tecnologia | Versao | Descricao |
-|------------|--------|-----------|
-| Next.js | 15.4.10 | Framework React com App Router |
-| React | 19.1.1 | Biblioteca UI |
-| TypeScript | 5.9.2 | Tipagem estatica |
-| Tailwind CSS | 4.1.11 | Framework CSS utility-first |
-| Framer Motion | 12.23.24 | Animacoes |
+
+| Tecnologia    | Versao   | Descricao                      |
+| ------------- | -------- | ------------------------------ |
+| Next.js       | 15.4.10  | Framework React com App Router |
+| React         | 19.1.1   | Biblioteca UI                  |
+| TypeScript    | 5.9.2    | Tipagem estatica               |
+| Tailwind CSS  | 4.1.11   | Framework CSS utility-first    |
+| Framer Motion | 12.23.24 | Animacoes                      |
 
 ### Backend
-| Tecnologia | Versao | Descricao |
-|------------|--------|-----------|
-| Convex | 1.25.4 | Backend serverless real-time |
-| Clerk | 6.36.0 | Autenticacao e gerenciamento de usuarios |
-| Zod | 3.25.76 | Validacao de schemas |
+
+| Tecnologia | Versao  | Descricao                                |
+| ---------- | ------- | ---------------------------------------- |
+| Convex     | 1.25.4  | Backend serverless real-time             |
+| Clerk      | 6.36.0  | Autenticacao e gerenciamento de usuarios |
+| Zod        | 3.25.76 | Validacao de schemas                     |
 
 ### UI Components
-| Tecnologia | Descricao |
-|------------|-----------|
-| shadcn/ui | Componentes base |
-| Radix UI | Primitivos acessiveis |
-| Lucide React | Icones |
-| Recharts | Graficos |
-| Sonner | Notificacoes toast |
+
+| Tecnologia   | Descricao             |
+| ------------ | --------------------- |
+| shadcn/ui    | Componentes base      |
+| Radix UI     | Primitivos acessiveis |
+| Lucide React | Icones                |
+| Recharts     | Graficos              |
+| Sonner       | Notificacoes toast    |
 
 ### Monorepo & Tooling
-| Tecnologia | Versao | Descricao |
-|------------|--------|-----------|
-| pnpm | 10.17.0 | Gerenciador de pacotes |
-| Turborepo | 2.5.5 | Build system para monorepos |
-| ESLint | - | Linting |
-| Prettier | 3.6.2 | Formatacao de codigo |
+
+| Tecnologia | Versao  | Descricao                   |
+| ---------- | ------- | --------------------------- |
+| pnpm       | 10.17.0 | Gerenciador de pacotes      |
+| Turborepo  | 2.5.5   | Build system para monorepos |
+| ESLint     | -       | Linting                     |
+| Prettier   | 3.6.2   | Formatacao de codigo        |
 
 ---
 
@@ -70,6 +76,7 @@ Antes de comecar, certifique-se de ter instalado:
 - **Conta no Convex** (gratuita) - [convex.dev](https://convex.dev)
 
 Opcional para producao:
+
 - **Conta no Stripe** - [stripe.com](https://stripe.com)
 - **Conta na Vercel** - [vercel.com](https://vercel.com)
 
@@ -144,6 +151,7 @@ pnpm install
 ### 3. Configurar o Convex
 
 1. Na pasta do backend, execute o setup:
+
 ```bash
 cd packages/backend
 pnpm setup
@@ -156,10 +164,10 @@ pnpm setup
 5. Va em **Settings > Environment Variables**
 6. Adicione as seguintes variaveis:
 
-| Variavel | Valor |
-|----------|-------|
+| Variavel                  | Valor                                      |
+| ------------------------- | ------------------------------------------ |
 | `CLERK_JWT_ISSUER_DOMAIN` | `https://sua-instancia.clerk.accounts.dev` |
-| `CLERK_SECRET_KEY` | Sua Secret Key do Clerk |
+| `CLERK_SECRET_KEY`        | Sua Secret Key do Clerk                    |
 
 ### 4. Configurar Variaveis de Ambiente
 
@@ -181,7 +189,7 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
 NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/select-sector
- 
+
 ```
 
 #### Backend (packages/backend/.env.local)
@@ -206,6 +214,7 @@ pnpm dev
 ```
 
 Isso iniciara:
+
 - **Frontend Next.js** em http://localhost:3002
 - **Backend Convex** em modo watch
 
@@ -215,35 +224,35 @@ Isso iniciara:
 
 ### Scripts Principais (raiz)
 
-| Comando | Descricao |
-|---------|-----------|
-| `pnpm dev` | Inicia todos os apps em modo desenvolvimento |
-| `pnpm build` | Build de producao de todos os apps |
-| `pnpm lint` | Executa linting em todos os packages |
-| `pnpm format` | Formata codigo com Prettier |
+| Comando       | Descricao                                    |
+| ------------- | -------------------------------------------- |
+| `pnpm dev`    | Inicia todos os apps em modo desenvolvimento |
+| `pnpm build`  | Build de producao de todos os apps           |
+| `pnpm lint`   | Executa linting em todos os packages         |
+| `pnpm format` | Formata codigo com Prettier                  |
 
 ### Scripts de Ambiente
 
-| Comando | Descricao |
-|---------|-----------|
-| `pnpm env:dev` | Copia .env.dev para .env.local (DEV) |
-| `pnpm env:prod` | Copia .env.prod para .env.local (PROD) |
-| `pnpm dev:local` | Configura DEV e inicia o projeto |
-| `pnpm dev:prod` | Configura PROD e inicia o projeto |
+| Comando          | Descricao                              |
+| ---------------- | -------------------------------------- |
+| `pnpm env:dev`   | Copia .env.dev para .env.local (DEV)   |
+| `pnpm env:prod`  | Copia .env.prod para .env.local (PROD) |
+| `pnpm dev:local` | Configura DEV e inicia o projeto       |
+| `pnpm dev:prod`  | Configura PROD e inicia o projeto      |
 
 ### Scripts de Backend
 
-| Comando | Descricao |
-|---------|-----------|
-| `pnpm backend:dev` | Inicia backend com ambiente DEV |
+| Comando             | Descricao                        |
+| ------------------- | -------------------------------- |
+| `pnpm backend:dev`  | Inicia backend com ambiente DEV  |
 | `pnpm backend:prod` | Inicia backend com ambiente PROD |
 
 ### Scripts do Frontend (apps/web)
 
-| Comando | Descricao |
-|---------|-----------|
-| `pnpm -F web dev` | Inicia apenas o frontend |
-| `pnpm -F web build` | Build do frontend |
+| Comando                 | Descricao                 |
+| ----------------------- | ------------------------- |
+| `pnpm -F web dev`       | Inicia apenas o frontend  |
+| `pnpm -F web build`     | Build do frontend         |
 | `pnpm -F web typecheck` | Verifica tipos TypeScript |
 
 ---
@@ -283,18 +292,18 @@ Os demais usuarios seguem este fluxo:
 
 ### Tabela: users
 
-| Campo | Tipo | Descricao |
-|-------|------|-----------|
-| `name` | string | Nome do usuario |
-| `clerkId` | string | ID do usuario no Clerk |
-| `role` | string? | Role do usuario (SUPERADMIN, CEO, USER) |
-| `sector` | string? | Setor do usuario |
-| `status` | string? | Status (pending, approved, rejected) |
-| `approvedBy` | Id<users>? | Referencia ao usuario que aprovou |
-| `approvedAt` | number? | Timestamp da aprovacao |
-| `rejectedBy` | Id<users>? | Referencia ao usuario que rejeitou |
-| `rejectedAt` | number? | Timestamp da rejeicao |
-| `rejectionReason` | string? | Motivo da rejeicao |
+| Campo             | Tipo       | Descricao                               |
+| ----------------- | ---------- | --------------------------------------- |
+| `name`            | string     | Nome do usuario                         |
+| `clerkId`         | string     | ID do usuario no Clerk                  |
+| `role`            | string?    | Role do usuario (SUPERADMIN, CEO, USER) |
+| `sector`          | string?    | Setor do usuario                        |
+| `status`          | string?    | Status (pending, approved, rejected)    |
+| `approvedBy`      | Id<users>? | Referencia ao usuario que aprovou       |
+| `approvedAt`      | number?    | Timestamp da aprovacao                  |
+| `rejectedBy`      | Id<users>? | Referencia ao usuario que rejeitou      |
+| `rejectedAt`      | number?    | Timestamp da rejeicao                   |
+| `rejectionReason` | string?    | Motivo da rejeicao                      |
 
 ### Indices
 
@@ -308,11 +317,11 @@ Os demais usuarios seguem este fluxo:
 
 ### Roles Disponiveis
 
-| Role | Permissoes |
-|------|------------|
+| Role           | Permissoes                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
 | **SUPERADMIN** | Acesso total ao sistema. Pode aprovar/rejeitar usuarios, gerenciar roles, acessar todas as funcionalidades |
-| **CEO** | Gerencia sua organizacao. Pode aprovar usuarios do seu setor, visualizar relatorios |
-| **USER** | Acesso basico. Pode usar funcionalidades padrao apos aprovacao |
+| **CEO**        | Gerencia sua organizacao. Pode aprovar usuarios do seu setor, visualizar relatorios                        |
+| **USER**       | Acesso basico. Pode usar funcionalidades padrao apos aprovacao                                             |
 
 ### Fluxo de Aprovacao
 
@@ -344,56 +353,56 @@ O package `@workspace/ui` inclui todos os componentes shadcn/ui:
 <details>
 <summary>Ver lista completa de componentes</summary>
 
-| Componente | Descricao |
-|------------|-----------|
-| Accordion | Paineis expansiveis |
-| Alert | Mensagens de alerta |
-| Alert Dialog | Dialogo de confirmacao |
-| Aspect Ratio | Controle de proporcao |
-| Avatar | Imagem de perfil |
-| Badge | Etiquetas/tags |
-| Breadcrumb | Navegacao hierarquica |
-| Button | Botoes |
-| Calendar | Seletor de data |
-| Card | Container com sombra |
-| Carousel | Slider de conteudo |
-| Chart | Graficos (Recharts) |
-| Checkbox | Caixa de selecao |
-| Collapsible | Conteudo colapsavel |
-| Command | Paleta de comandos |
-| Context Menu | Menu de contexto |
-| Dialog | Modal/dialog |
-| Drawer | Painel lateral deslizante |
-| Dropdown Menu | Menu suspenso |
-| Dropzone | Upload drag-and-drop |
-| Form | Formularios com validacao |
-| Hint | Dicas/tooltips |
-| Hover Card | Card ao passar mouse |
-| Input | Campo de texto |
-| Input OTP | Codigo de verificacao |
-| Label | Rotulos de campo |
-| Menubar | Barra de menu |
-| Navigation Menu | Menu de navegacao |
-| Pagination | Paginacao |
-| Popover | Popup flutuante |
-| Progress | Barra de progresso |
-| Radio Group | Botoes de radio |
-| Resizable | Paineis redimensionaveis |
-| Scroll Area | Area de rolagem estilizada |
-| Select | Seletor dropdown |
-| Separator | Linha divisoria |
-| Sheet | Painel lateral |
-| Sidebar | Barra lateral de navegacao |
-| Skeleton | Placeholder de carregamento |
-| Slider | Controle deslizante |
-| Sonner | Notificacoes toast |
-| Switch | Toggle on/off |
-| Table | Tabelas |
-| Tabs | Abas |
-| Textarea | Area de texto |
-| Toggle | Botao toggle |
-| Toggle Group | Grupo de toggles |
-| Tooltip | Dicas ao passar mouse |
+| Componente      | Descricao                   |
+| --------------- | --------------------------- |
+| Accordion       | Paineis expansiveis         |
+| Alert           | Mensagens de alerta         |
+| Alert Dialog    | Dialogo de confirmacao      |
+| Aspect Ratio    | Controle de proporcao       |
+| Avatar          | Imagem de perfil            |
+| Badge           | Etiquetas/tags              |
+| Breadcrumb      | Navegacao hierarquica       |
+| Button          | Botoes                      |
+| Calendar        | Seletor de data             |
+| Card            | Container com sombra        |
+| Carousel        | Slider de conteudo          |
+| Chart           | Graficos (Recharts)         |
+| Checkbox        | Caixa de selecao            |
+| Collapsible     | Conteudo colapsavel         |
+| Command         | Paleta de comandos          |
+| Context Menu    | Menu de contexto            |
+| Dialog          | Modal/dialog                |
+| Drawer          | Painel lateral deslizante   |
+| Dropdown Menu   | Menu suspenso               |
+| Dropzone        | Upload drag-and-drop        |
+| Form            | Formularios com validacao   |
+| Hint            | Dicas/tooltips              |
+| Hover Card      | Card ao passar mouse        |
+| Input           | Campo de texto              |
+| Input OTP       | Codigo de verificacao       |
+| Label           | Rotulos de campo            |
+| Menubar         | Barra de menu               |
+| Navigation Menu | Menu de navegacao           |
+| Pagination      | Paginacao                   |
+| Popover         | Popup flutuante             |
+| Progress        | Barra de progresso          |
+| Radio Group     | Botoes de radio             |
+| Resizable       | Paineis redimensionaveis    |
+| Scroll Area     | Area de rolagem estilizada  |
+| Select          | Seletor dropdown            |
+| Separator       | Linha divisoria             |
+| Sheet           | Painel lateral              |
+| Sidebar         | Barra lateral de navegacao  |
+| Skeleton        | Placeholder de carregamento |
+| Slider          | Controle deslizante         |
+| Sonner          | Notificacoes toast          |
+| Switch          | Toggle on/off               |
+| Table           | Tabelas                     |
+| Tabs            | Abas                        |
+| Textarea        | Area de texto               |
+| Toggle          | Botao toggle                |
+| Toggle Group    | Grupo de toggles            |
+| Tooltip         | Dicas ao passar mouse       |
 
 </details>
 
@@ -429,7 +438,7 @@ pnpm dlx shadcn@latest add <componente>
 Os componentes serao adicionados em `packages/ui/src/components/`.
 
 ---
- 
+
 ## Deploy
 
 ### Frontend (Vercel)
@@ -453,8 +462,9 @@ CONVEX_DEPLOY_KEY="prod:sua-chave" npx convex deploy --env-file .env.prod
 ### Variaveis de Producao
 
 Certifique-se de atualizar:
+
 - URLs do Clerk para producao (pk_live_xxx, sk_live_xxx)
-- URL do Convex de producao 
+- URL do Convex de producao
 
 ---
 
@@ -465,6 +475,7 @@ Certifique-se de atualizar:
 **Causa:** O Convex nao consegue validar o token JWT do Clerk.
 
 **Solucoes:**
+
 1. Verifique se `CLERK_JWT_ISSUER_DOMAIN` esta configurado no **Convex Dashboard**
 2. Verifique se o JWT Template "convex" existe no **Clerk Dashboard**
 3. Confirme que a URL do Clerk e identica no frontend e backend
@@ -475,6 +486,7 @@ Certifique-se de atualizar:
 **Causa:** URL do Convex incorreta ou deployment inexistente.
 
 **Solucoes:**
+
 1. Verifique se `NEXT_PUBLIC_CONVEX_URL` esta correto
 2. Execute `npx convex dev --once` no backend para criar/atualizar o deployment
 3. Confirme que o deployment existe no Convex Dashboard
@@ -484,6 +496,7 @@ Certifique-se de atualizar:
 **Causa:** Usuario autenticado no Clerk mas sem registro no Convex.
 
 **Solucoes:**
+
 1. Se for o primeiro usuario, acesse `/bootstrap`
 2. Se nao for o primeiro, acesse `/select-sector`
 3. Verifique o console do navegador para erros
@@ -493,6 +506,7 @@ Certifique-se de atualizar:
 **Causa:** Funcoes do Convex nao foram deployadas.
 
 **Solucao:**
+
 ```bash
 cd packages/backend
 npx convex dev --once
@@ -503,6 +517,7 @@ npx convex dev --once
 **Causa:** O comando `convex dev` sobrescreve automaticamente o `.env.local`.
 
 **Solucao:** Use a flag `--env-file`:
+
 ```bash
 # Usar ambiente DEV
 cd packages/backend
@@ -513,6 +528,7 @@ npx convex dev --env-file .env.prod
 ```
 
 Ou use os scripts configurados:
+
 ```bash
 pnpm backend:dev   # Ambiente DEV
 pnpm backend:prod  # Ambiente PROD
@@ -521,12 +537,14 @@ pnpm backend:prod  # Ambiente PROD
 ### Porta 3002 ja em uso
 
 **Solucao (Linux/Mac):**
+
 ```bash
 lsof -i :3002
 kill -9 <PID>
 ```
 
 **Solucao (Windows):**
+
 ```bash
 netstat -ano | findstr :3002
 taskkill /PID <PID> /F
@@ -535,11 +553,13 @@ taskkill /PID <PID> /F
 ### Erro de tipos TypeScript
 
 **Solucao:**
+
 ```bash
 pnpm -F web typecheck
 ```
 
 Corrija os erros indicados ou regenere os tipos do Convex:
+
 ```bash
 cd packages/backend
 npx convex dev --once
@@ -551,11 +571,11 @@ npx convex dev --once
 
 O projeto suporta multiplos ambientes:
 
-| Ambiente | Arquivo Frontend | Arquivo Backend | Uso |
-|----------|-----------------|-----------------|-----|
-| Local | `.env.local` | `.env.local` | Desenvolvimento |
-| DEV | `.env.dev` | `.env.dev` | Ambiente de testes |
-| PROD | `.env.prod` | `.env.prod` | Producao |
+| Ambiente | Arquivo Frontend | Arquivo Backend | Uso                |
+| -------- | ---------------- | --------------- | ------------------ |
+| Local    | `.env.local`     | `.env.local`    | Desenvolvimento    |
+| DEV      | `.env.dev`       | `.env.dev`      | Ambiente de testes |
+| PROD     | `.env.prod`      | `.env.prod`     | Producao           |
 
 ### Alternando Ambientes
 
@@ -607,12 +627,12 @@ Tipos: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 ## Arquivos de Referencia
 
-| Arquivo | Proposito |
-|---------|-----------|
+| Arquivo                                  | Proposito                       |
+| ---------------------------------------- | ------------------------------- |
 | `packages/backend/convex/auth.config.ts` | Configuracao do Clerk no Convex |
-| `packages/backend/convex/schema.ts` | Definicao das tabelas do banco |
-| `apps/web/components/providers.tsx` | Providers Clerk + Convex |
-| `packages/ui/src/lib/utils.ts` | Funcao `cn()` para classes |
+| `packages/backend/convex/schema.ts`      | Definicao das tabelas do banco  |
+| `apps/web/components/providers.tsx`      | Providers Clerk + Convex        |
+| `packages/ui/src/lib/utils.ts`           | Funcao `cn()` para classes      |
 
 ---
 

@@ -1,157 +1,211 @@
 export type Section = {
   name: string;
+  code: string; // Código FIFA (ex: BRA, ARG, ENG)
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
 };
 
 export type ParseResult = {
-  valid: number[];
-  invalid: string[];
+  valid: number[]; // Números absolutos adicionados
+  invalid: string[]; // Entradas não reconhecidas
+  formatted: string[]; // Exibição amigável (ex: "BRA-10", "ARG-1 a ARG-15")
 };
 
-// Cria um mapeamento de prefixo curto para secao
-// Ex: "EUA" -> { startNumber: 1, endNumber: 20 }
-function buildPrefixMap(sections: Section[]): Map<string, Section> {
+// Regex para formato estrito
+// Singular: BRA-10 (código de 2-4 letras + hífen + número de 1-2 dígitos)
+const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
+// Range: BRA-1-15 (código + hífen + início + hífen + fim)
+const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
+
+// Sanitiza input removendo tags HTML/scripts
+function sanitize(input: string): string {
+  return input.replace(/<[^>]*>/g, "").trim();
+}
+
+// Cria mapeamento de código FIFA para seção
+function buildCodeMap(sections: Section[]): Map<string, Section> {
   const map = new Map<string, Section>();
-
   for (const section of sections) {
-    // Extrair prefixo do nome (primeiras 3 letras em uppercase)
-    // Ex: "EUA" -> "EUA", "Canada" -> "CAN", "Grupo A - Selecao 4" -> "GRU"
-    const prefix = section.name
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-      .substring(0, 3)
-      .toUpperCase();
-    map.set(prefix, section);
-
-    // Tambem mapear nome completo normalizado
-    const fullName = section.name
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toUpperCase();
-    map.set(fullName, section);
+    map.set(section.code.toUpperCase(), section);
   }
-
   return map;
 }
 
-// Extrai o prefixo e numero de uma entrada
-// Ex: "BRA 12" -> { prefix: "BRA", num: 12 }
-// Ex: "bra12" -> { prefix: "BRA", num: 12 }
-// Ex: "BRA-12" -> { prefix: "BRA", num: 12 }
-// Ex: "12" -> { prefix: null, num: 12 }
-function parseEntry(entry: string): { prefix: string | null; num: number | null } {
-  const trimmed = entry.trim();
-  if (!trimmed) return { prefix: null, num: null };
-
-  // Tentar numero direto primeiro
-  const directNum = parseInt(trimmed, 10);
-  if (!isNaN(directNum) && trimmed === String(directNum)) {
-    return { prefix: null, num: directNum };
+// Parseia uma entrada singular (ex: BRA-10)
+function parseSingle(
+  code: string,
+  num: number,
+  codeMap: Map<string, Section>
+): { valid: number | null; error: string | null; formatted: string | null } {
+  const section = codeMap.get(code);
+  if (!section) {
+    return { valid: null, error: `${code}-${num}`, formatted: null };
   }
 
-  // Tentar formato com prefixo: "BRA 12", "BRA12", "BRA-12"
-  const match = trimmed.match(/^([A-Za-z]+)[\s\-]?(\d+)$/);
-  if (match && match[1] && match[2]) {
-    const prefix = match[1].toUpperCase();
-    const num = parseInt(match[2], 10);
-    return { prefix, num };
+  const sectionSize = section.endNumber - section.startNumber + 1;
+  if (num < 1 || num > sectionSize) {
+    return { valid: null, error: `${code}-${num}`, formatted: null };
   }
 
-  return { prefix: null, num: null };
+  const absoluteNum = section.startNumber + num - 1;
+  return {
+    valid: absoluteNum,
+    error: null,
+    formatted: `${code}-${num}`,
+  };
+}
+
+// Parseia uma entrada de range (ex: BRA-1-15)
+function parseRange(
+  code: string,
+  start: number,
+  end: number,
+  codeMap: Map<string, Section>
+): { valid: number[]; error: string | null; formatted: string | null } {
+  const section = codeMap.get(code);
+  if (!section) {
+    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+  }
+
+  // Validar range invertido
+  if (start > end) {
+    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+  }
+
+  const sectionSize = section.endNumber - section.startNumber + 1;
+  if (start < 1 || end > sectionSize) {
+    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+  }
+
+  const numbers: number[] = [];
+  for (let i = start; i <= end; i++) {
+    numbers.push(section.startNumber + i - 1);
+  }
+
+  const formatted =
+    start === end ? `${code}-${start}` : `${code}-${start} a ${code}-${end}`;
+
+  return { valid: numbers, error: null, formatted };
+}
+
+// Parseia uma única entrada (detecta se é singular ou range)
+function parseEntry(
+  entry: string,
+  codeMap: Map<string, Section>
+): { valid: number[]; error: string | null; formatted: string | null } {
+  const normalized = sanitize(entry).toUpperCase();
+  if (!normalized) {
+    return { valid: [], error: null, formatted: null };
+  }
+
+  // Tentar range primeiro (2 hífens)
+  const rangeMatch = normalized.match(RANGE_PATTERN);
+  if (rangeMatch) {
+    const [, code, startStr, endStr] = rangeMatch;
+    if (code && startStr && endStr) {
+      return parseRange(
+        code,
+        parseInt(startStr, 10),
+        parseInt(endStr, 10),
+        codeMap
+      );
+    }
+  }
+
+  // Tentar singular (1 hífen)
+  const singleMatch = normalized.match(SINGLE_PATTERN);
+  if (singleMatch) {
+    const [, code, numStr] = singleMatch;
+    if (code && numStr) {
+      const result = parseSingle(code, parseInt(numStr, 10), codeMap);
+      return {
+        valid: result.valid !== null ? [result.valid] : [],
+        error: result.error,
+        formatted: result.formatted,
+      };
+    }
+  }
+
+  // Formato inválido
+  return { valid: [], error: entry.trim(), formatted: null };
 }
 
 export function parseStickers(
   input: string,
   sections: Section[],
-  maxSticker: number = 980
+  _maxSticker: number = 980 // Mantido para compatibilidade, mas não usado
 ): ParseResult {
   const valid: number[] = [];
   const invalid: string[] = [];
+  const formatted: string[] = [];
   const seen = new Set<number>();
 
-  const prefixMap = buildPrefixMap(sections);
+  const codeMap = buildCodeMap(sections);
 
-  // Dividir por virgula, espaco ou quebra de linha
+  // Dividir por vírgula, espaço ou quebra de linha
   const entries = input
     .split(/[,\s\n]+/)
     .map((e) => e.trim())
     .filter((e) => e.length > 0);
 
   for (const entry of entries) {
-    const { prefix, num } = parseEntry(entry);
+    const result = parseEntry(entry, codeMap);
 
-    if (num === null) {
-      invalid.push(entry);
+    if (result.error) {
+      invalid.push(result.error);
       continue;
     }
 
-    let finalNum: number;
-
-    if (prefix === null) {
-      // Numero direto - usar como esta
-      finalNum = num;
-    } else {
-      // Com prefixo - tentar mapear para numero absoluto
-      const section = prefixMap.get(prefix);
-      if (section) {
-        // Numero relativo dentro da secao
-        // Ex: "EUA 5" com section { startNumber: 1, endNumber: 20 }
-        // -> startNumber + num - 1 = 1 + 5 - 1 = 5
-        finalNum = section.startNumber + num - 1;
-
-        // Validar que esta dentro do range da secao
-        if (finalNum > section.endNumber) {
-          invalid.push(entry);
-          continue;
-        }
-      } else {
-        // Prefixo desconhecido - tentar usar numero direto
-        finalNum = num;
+    for (const num of result.valid) {
+      if (!seen.has(num)) {
+        seen.add(num);
+        valid.push(num);
       }
     }
 
-    // Validar range e duplicatas
-    if (finalNum < 1 || finalNum > maxSticker) {
-      invalid.push(entry);
-      continue;
+    if (result.formatted) {
+      formatted.push(result.formatted);
     }
-
-    if (seen.has(finalNum)) {
-      continue; // Ignorar duplicatas silenciosamente
-    }
-
-    seen.add(finalNum);
-    valid.push(finalNum);
   }
 
-  // Ordenar para consistencia
+  // Ordenar para consistência
   valid.sort((a, b) => a - b);
 
-  return { valid, invalid };
+  return { valid, invalid, formatted };
 }
 
-// Formatar numero para exibicao com prefixo da secao
+// Formatar número para exibição com código da seção
 export function formatStickerNumber(
   num: number,
   sections: Section[]
-): { display: string; sectionName: string } {
+): {
+  code: string;
+  relativeNum: number;
+  fullName: string;
+  display: string;
+} {
   for (const section of sections) {
     if (num >= section.startNumber && num <= section.endNumber) {
       const relativeNum = num - section.startNumber + 1;
-      const prefix = section.name.substring(0, 3).toUpperCase();
       return {
-        display: `${prefix} ${relativeNum}`,
-        sectionName: section.name,
+        code: section.code,
+        relativeNum,
+        fullName: section.name,
+        display: `${section.code}-${relativeNum}`,
       };
     }
   }
 
-  return { display: String(num), sectionName: "Desconhecido" };
+  return {
+    code: "???",
+    relativeNum: num,
+    fullName: "Desconhecido",
+    display: String(num),
+  };
 }
 
-// Agrupar numeros por secao
+// Agrupar números por seção
 export function groupBySections(
   numbers: number[],
   sections: Section[]
@@ -160,15 +214,15 @@ export function groupBySections(
 
   // Inicializar grupos vazios
   for (const section of sections) {
-    groups.set(section.name, []);
+    groups.set(section.code, []);
   }
 
   for (const num of numbers) {
     for (const section of sections) {
       if (num >= section.startNumber && num <= section.endNumber) {
-        const group = groups.get(section.name) ?? [];
+        const group = groups.get(section.code) ?? [];
         group.push(num);
-        groups.set(section.name, group);
+        groups.set(section.code, group);
         break;
       }
     }

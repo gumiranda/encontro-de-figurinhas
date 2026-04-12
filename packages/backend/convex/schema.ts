@@ -61,6 +61,7 @@ export default defineSchema({
     sections: v.array(
       v.object({
         name: v.string(),
+        code: v.string(), // Código FIFA (ex: BRA, ARG, ENG)
         startNumber: v.number(),
         endNumber: v.number(),
         isExtra: v.optional(v.boolean()),

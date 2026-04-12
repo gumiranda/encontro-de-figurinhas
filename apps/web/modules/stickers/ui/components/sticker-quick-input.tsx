@@ -1,80 +1,82 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { X } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
-import { parseStickers, formatStickerNumber, type Section } from "../../lib/sticker-parser";
+import { parseStickers, type Section } from "../../lib/sticker-parser";
 
 type StickerQuickInputProps = {
   mode: "duplicates" | "missing";
-  chips: number[];
   sections: Section[];
   totalStickers: number;
   onAdd: (numbers: number[]) => void;
-  onRemove: (num: number) => void;
 };
+
+type FeedbackState = {
+  added: number;
+  formatted: string[];
+  invalid: string[];
+} | null;
 
 export function StickerQuickInput({
   mode,
-  chips,
   sections,
   totalStickers,
   onAdd,
-  onRemove,
 }: StickerQuickInputProps) {
   const [inputValue, setInputValue] = useState("");
-  const [invalidEntries, setInvalidEntries] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value;
-      setInputValue(value);
+  // Limpar feedback após 3 segundos
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
 
-      if (value.trim()) {
-        const result = parseStickers(value, sections, totalStickers);
-        setInvalidEntries(result.invalid);
+  const handleSubmit = useCallback(() => {
+    if (!inputValue.trim()) return;
 
-        if (result.valid.length > 0) {
-          onAdd(result.valid);
-        }
-      } else {
-        setInvalidEntries([]);
-      }
-    },
-    [onAdd, sections, totalStickers]
-  );
+    const result = parseStickers(inputValue, sections, totalStickers);
+
+    if (result.valid.length > 0) {
+      onAdd(result.valid);
+      setFeedback({
+        added: result.valid.length,
+        formatted: result.formatted,
+        invalid: result.invalid,
+      });
+      setInputValue(""); // Fire-and-forget: limpa após parse
+    } else if (result.invalid.length > 0) {
+      setFeedback({
+        added: 0,
+        formatted: [],
+        invalid: result.invalid,
+      });
+    }
+  }, [inputValue, onAdd, sections, totalStickers]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        if (inputValue.trim()) {
-          const result = parseStickers(inputValue, sections, totalStickers);
-          if (result.valid.length > 0) {
-            onAdd(result.valid);
-            setInputValue("");
-            setInvalidEntries([]);
-          }
-        }
+        handleSubmit();
       }
     },
-    [inputValue, onAdd, sections, totalStickers]
+    [handleSubmit]
   );
 
-  const chipColor = mode === "duplicates"
-    ? "bg-secondary/10 border-secondary/20 text-secondary"
-    : "bg-primary/10 border-primary/20 text-primary";
+  const borderGradient =
+    mode === "duplicates"
+      ? "bg-gradient-to-r from-secondary/20 to-primary/20"
+      : "bg-gradient-to-r from-primary/20 to-secondary/20";
 
   return (
     <div className="relative group">
       {/* Gradient border blur effect */}
       <div
-        className={`absolute -inset-0.5 rounded-xl blur opacity-30 group-focus-within:opacity-100 transition duration-500 ${
-          mode === "duplicates"
-            ? "bg-gradient-to-r from-secondary/20 to-primary/20"
-            : "bg-gradient-to-r from-primary/20 to-secondary/20"
-        }`}
+        className={`absolute -inset-0.5 rounded-xl blur opacity-30 group-focus-within:opacity-100 transition duration-500 ${borderGradient}`}
       />
 
       <div className="relative bg-surface-container-highest rounded-xl p-5 border border-outline-variant/15">
@@ -84,48 +86,36 @@ export function StickerQuickInput({
 
         <Textarea
           value={inputValue}
-          onChange={handleInputChange}
+          onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Digite os codigos (ex: BRA 12, FRA 14, ARG 10)"
+          placeholder="BRA-10, ARG-1-15, ENG-5 (codigos FIFA)"
           className="w-full bg-transparent border-none focus:ring-0 focus-visible:ring-0 text-on-surface placeholder:text-outline font-body text-lg resize-none h-24"
         />
 
-        {/* Erro de entradas invalidas */}
-        {invalidEntries.length > 0 && (
-          <p className="text-destructive text-xs mt-2">
-            Entradas invalidas: {invalidEntries.join(", ")}
-          </p>
-        )}
-
-        {/* Chips */}
-        {chips.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {chips.slice(0, 20).map((num) => {
-              const { display } = formatStickerNumber(num, sections);
-              return (
-                <span
-                  key={num}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold font-label border ${chipColor}`}
-                >
-                  {display}
-                  <button
-                    type="button"
-                    onClick={() => onRemove(num)}
-                    className="hover:text-white transition-colors"
-                    aria-label={`Remover ${display}`}
-                  >
-                    <X className="size-3.5" strokeWidth={2.5} />
-                  </button>
-                </span>
-              );
-            })}
-            {chips.length > 20 && (
-              <span className="text-on-surface-variant text-xs self-center">
-                +{chips.length - 20} mais
-              </span>
+        {/* Feedback visual */}
+        {feedback && (
+          <div className="mt-3 space-y-1">
+            {feedback.added > 0 && (
+              <p className="text-emerald-600 text-xs">
+                {feedback.added} adicionada{feedback.added !== 1 ? "s" : ""}
+                {feedback.formatted.length > 0 && feedback.formatted.length <= 5 && (
+                  <span className="text-emerald-500">
+                    {" "}({feedback.formatted.join(", ")})
+                  </span>
+                )}
+              </p>
+            )}
+            {feedback.invalid.length > 0 && (
+              <p className="text-destructive text-xs">
+                Codigos invalidos: {feedback.invalid.join(", ")}
+              </p>
             )}
           </div>
         )}
+
+        <p className="text-xs text-on-surface-variant mt-3">
+          Pressione Enter para adicionar. Use hifen: BRA-10, BRA-1-15 (range)
+        </p>
       </div>
     </div>
   );

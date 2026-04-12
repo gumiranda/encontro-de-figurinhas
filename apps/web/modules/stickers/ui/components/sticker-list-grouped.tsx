@@ -8,74 +8,74 @@ import {
   type Section,
 } from "../../lib/sticker-parser";
 
-// Flag gradients for known countries
+// Flag gradients by FIFA code
 const FLAG_GRADIENTS: Record<string, string> = {
   // Hosts
-  EUA: "bg-gradient-to-br from-blue-900 via-red-500 to-white",
-  Canadá: "bg-gradient-to-r from-red-600 via-white to-red-600",
-  México: "bg-gradient-to-r from-green-600 via-white to-red-600",
+  USA: "bg-gradient-to-br from-blue-900 via-red-500 to-white",
+  CAN: "bg-gradient-to-r from-red-600 via-white to-red-600",
+  MEX: "bg-gradient-to-r from-green-600 via-white to-red-600",
   // Grupo A
-  "África do Sul": "bg-gradient-to-br from-green-600 via-yellow-400 to-blue-700",
-  "Coreia do Sul": "bg-gradient-to-br from-white via-red-500 to-blue-700",
-  Tchéquia: "bg-gradient-to-r from-blue-700 via-white to-red-600",
+  RSA: "bg-gradient-to-br from-green-600 via-yellow-400 to-blue-700",
+  KOR: "bg-gradient-to-br from-white via-red-500 to-blue-700",
+  CZE: "bg-gradient-to-r from-blue-700 via-white to-red-600",
   // Grupo B
-  "Bósnia e Herzegovina": "bg-gradient-to-br from-blue-700 to-yellow-400",
-  Catar: "bg-gradient-to-r from-white to-rose-800",
-  Suíça: "bg-gradient-to-br from-red-600 to-red-700",
+  BIH: "bg-gradient-to-br from-blue-700 to-yellow-400",
+  QAT: "bg-gradient-to-r from-white to-rose-800",
+  SUI: "bg-gradient-to-br from-red-600 to-red-700",
   // Grupo C
-  Brasil: "bg-gradient-to-br from-green-500 to-yellow-400",
-  Marrocos: "bg-gradient-to-b from-red-600 via-red-700 to-green-700",
-  Haiti: "bg-gradient-to-b from-blue-800 to-red-600",
-  Escócia: "bg-gradient-to-br from-blue-700 to-blue-900",
+  BRA: "bg-gradient-to-br from-green-500 to-yellow-400",
+  MAR: "bg-gradient-to-b from-red-600 via-red-700 to-green-700",
+  HAI: "bg-gradient-to-b from-blue-800 to-red-600",
+  SCO: "bg-gradient-to-br from-blue-700 to-blue-900",
   // Grupo D
-  Paraguai: "bg-gradient-to-b from-red-600 via-white to-blue-700",
-  Austrália: "bg-gradient-to-br from-blue-800 to-yellow-400",
-  Turquia: "bg-gradient-to-br from-red-600 to-red-700",
+  PAR: "bg-gradient-to-b from-red-600 via-white to-blue-700",
+  AUS: "bg-gradient-to-br from-blue-800 to-yellow-400",
+  TUR: "bg-gradient-to-br from-red-600 to-red-700",
   // Grupo E
-  Alemanha: "bg-gradient-to-b from-black via-red-600 to-yellow-400",
-  Curaçao: "bg-gradient-to-br from-blue-700 to-yellow-400",
-  "Costa do Marfim": "bg-gradient-to-r from-orange-500 via-white to-green-600",
-  Equador: "bg-gradient-to-b from-yellow-400 via-blue-700 to-red-600",
+  GER: "bg-gradient-to-b from-black via-red-600 to-yellow-400",
+  CUW: "bg-gradient-to-br from-blue-700 to-yellow-400",
+  CIV: "bg-gradient-to-r from-orange-500 via-white to-green-600",
+  ECU: "bg-gradient-to-b from-yellow-400 via-blue-700 to-red-600",
   // Grupo F
-  Holanda: "bg-gradient-to-b from-red-500 via-white to-blue-600",
-  Japão: "bg-gradient-to-br from-white to-red-600",
-  Suécia: "bg-gradient-to-br from-blue-600 to-yellow-400",
-  Tunísia: "bg-gradient-to-br from-red-600 to-red-700",
+  NED: "bg-gradient-to-b from-red-500 via-white to-blue-600",
+  JPN: "bg-gradient-to-br from-white to-red-600",
+  SWE: "bg-gradient-to-br from-blue-600 to-yellow-400",
+  TUN: "bg-gradient-to-br from-red-600 to-red-700",
   // Grupo G
-  Bélgica: "bg-gradient-to-r from-black via-yellow-400 to-red-600",
-  Egito: "bg-gradient-to-b from-red-600 via-white to-black",
-  Irã: "bg-gradient-to-b from-green-600 via-white to-red-600",
-  "Nova Zelândia": "bg-gradient-to-br from-blue-900 to-red-600",
+  BEL: "bg-gradient-to-r from-black via-yellow-400 to-red-600",
+  EGY: "bg-gradient-to-b from-red-600 via-white to-black",
+  IRN: "bg-gradient-to-b from-green-600 via-white to-red-600",
+  NZL: "bg-gradient-to-br from-blue-900 to-red-600",
   // Grupo H
-  Espanha: "bg-gradient-to-b from-red-600 via-yellow-400 to-red-600",
-  "Cabo Verde": "bg-gradient-to-br from-blue-800 via-white to-red-600",
-  "Arábia Saudita": "bg-gradient-to-br from-green-700 to-green-600",
-  Uruguai: "bg-gradient-to-br from-white via-blue-400 to-blue-600",
+  ESP: "bg-gradient-to-b from-red-600 via-yellow-400 to-red-600",
+  CPV: "bg-gradient-to-br from-blue-800 via-white to-red-600",
+  KSA: "bg-gradient-to-br from-green-700 to-green-600",
+  URU: "bg-gradient-to-br from-white via-blue-400 to-blue-600",
   // Grupo I
-  França: "bg-gradient-to-r from-blue-700 via-white to-red-600",
-  Senegal: "bg-gradient-to-r from-green-600 via-yellow-400 to-red-600",
-  Iraque: "bg-gradient-to-b from-red-600 via-white to-black",
-  Noruega: "bg-gradient-to-br from-red-600 via-white to-blue-800",
+  FRA: "bg-gradient-to-r from-blue-700 via-white to-red-600",
+  SEN: "bg-gradient-to-r from-green-600 via-yellow-400 to-red-600",
+  IRQ: "bg-gradient-to-b from-red-600 via-white to-black",
+  NOR: "bg-gradient-to-br from-red-600 via-white to-blue-800",
   // Grupo J
-  Argentina: "bg-gradient-to-b from-blue-300 via-white to-blue-300",
-  Argélia: "bg-gradient-to-r from-green-600 to-white",
-  Áustria: "bg-gradient-to-b from-red-600 via-white to-red-600",
-  Jordânia: "bg-gradient-to-r from-black via-green-600 to-red-600",
+  ARG: "bg-gradient-to-b from-blue-300 via-white to-blue-300",
+  ALG: "bg-gradient-to-r from-green-600 to-white",
+  AUT: "bg-gradient-to-b from-red-600 via-white to-red-600",
+  JOR: "bg-gradient-to-r from-black via-green-600 to-red-600",
   // Grupo K
-  Portugal: "bg-gradient-to-r from-green-600 to-red-600",
-  "RD Congo": "bg-gradient-to-br from-blue-600 via-yellow-400 to-red-600",
-  Uzbequistão: "bg-gradient-to-b from-blue-500 via-white to-green-600",
-  Colômbia: "bg-gradient-to-b from-yellow-400 via-blue-700 to-red-600",
+  POR: "bg-gradient-to-r from-green-600 to-red-600",
+  COD: "bg-gradient-to-br from-blue-600 via-yellow-400 to-red-600",
+  UZB: "bg-gradient-to-b from-blue-500 via-white to-green-600",
+  COL: "bg-gradient-to-b from-yellow-400 via-blue-700 to-red-600",
   // Grupo L
-  Inglaterra: "bg-gradient-to-br from-white to-red-600",
-  Croácia: "bg-gradient-to-b from-red-600 via-white to-blue-700",
-  Gana: "bg-gradient-to-b from-red-600 via-yellow-400 to-green-700",
-  Panamá: "bg-gradient-to-br from-blue-600 via-white to-red-600",
+  ENG: "bg-gradient-to-br from-white to-red-600",
+  CRO: "bg-gradient-to-b from-red-600 via-white to-blue-700",
+  GHA: "bg-gradient-to-b from-red-600 via-yellow-400 to-green-700",
+  PAN: "bg-gradient-to-br from-blue-600 via-white to-red-600",
   // Extras
-  Extras: "bg-gradient-to-br from-yellow-400 to-orange-500",
+  EXT: "bg-gradient-to-br from-yellow-400 to-orange-500",
 };
-const getFlagGradient = (name: string) =>
-  FLAG_GRADIENTS[name] ?? "bg-gradient-to-br from-gray-500 to-gray-600";
+const getFlagGradient = (code: string) =>
+  FLAG_GRADIENTS[code] ?? "bg-gradient-to-br from-gray-500 to-gray-600";
 
 type Props = {
   numbers: number[];
@@ -107,24 +107,28 @@ export function StickerListGrouped({
 
   return (
     <div className="space-y-8">
-      {Array.from(grouped.entries()).map(([sectionName, sectionNumbers]) => {
-        const section = sections.find((s) => s.name === sectionName);
+      {Array.from(grouped.entries()).map(([sectionCode, sectionNumbers]) => {
+        const section = sections.find((s) => s.code === sectionCode);
+        const sectionName = section?.name ?? sectionCode;
         const isExtra = section?.isExtra ?? false;
 
         return (
-          <div key={sectionName} className="relative">
+          <div key={sectionCode} className="relative">
             {/* Section header with flag */}
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative">
                 <div
-                  className={`absolute inset-0 ${getFlagGradient(sectionName)} opacity-80`}
+                  className={`absolute inset-0 ${getFlagGradient(sectionCode)} opacity-80`}
                 />
               </div>
               <h3 className="font-headline font-bold text-base uppercase tracking-widest text-on-surface-variant">
                 {sectionName}
               </h3>
+              <span className="text-xs text-on-surface-variant font-mono">
+                ({sectionCode})
+              </span>
               <span className="text-xs text-on-surface-variant">
-                ({sectionNumbers.length})
+                {sectionNumbers.length}
               </span>
               <div className="flex-1 h-[1px] bg-outline-variant/10 ml-2" />
             </div>
