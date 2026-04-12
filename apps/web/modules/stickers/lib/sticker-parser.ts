@@ -6,11 +6,43 @@ export type Section = {
   isExtra?: boolean;
 };
 
+export type SectionLookup = {
+  byCode: Map<string, Section>;
+  byIndex: Section[]; // sorted by startNumber for index lookup
+};
+
 export type ParseResult = {
   valid: number[]; // Números absolutos adicionados
   invalid: string[]; // Entradas não reconhecidas
   formatted: string[]; // Exibição amigável (ex: "BRA-10", "ARG-1 a ARG-15")
 };
+
+// Build a lookup structure for O(1) code access and sorted number lookup
+export function buildSectionLookup(sections: Section[]): SectionLookup {
+  const byCode = new Map<string, Section>();
+  const byIndex = [...sections].sort((a, b) => a.startNumber - b.startNumber);
+
+  for (const section of sections) {
+    if (byCode.has(section.code) && process.env.NODE_ENV === "development") {
+      console.warn(`Duplicate section code: ${section.code}`);
+    }
+    byCode.set(section.code, section);
+  }
+
+  return { byCode, byIndex };
+}
+
+// Find section for a given absolute number using sorted linear scan with early exit
+export function findSectionForNumber(
+  num: number,
+  lookup: SectionLookup
+): Section | undefined {
+  for (const section of lookup.byIndex) {
+    if (num < section.startNumber) return undefined;
+    if (num <= section.endNumber) return section;
+  }
+  return undefined;
+}
 
 // Regex para formato estrito
 // Singular: BRA-10 (código de 2-4 letras + hífen + número de 1-2 dígitos)
@@ -178,23 +210,28 @@ export function parseStickers(
 // Formatar número para exibição com código da seção
 export function formatStickerNumber(
   num: number,
-  sections: Section[]
+  lookupOrSections: SectionLookup | Section[]
 ): {
   code: string;
   relativeNum: number;
   fullName: string;
   display: string;
 } {
-  for (const section of sections) {
-    if (num >= section.startNumber && num <= section.endNumber) {
-      const relativeNum = num - section.startNumber + 1;
-      return {
-        code: section.code,
-        relativeNum,
-        fullName: section.name,
-        display: `${section.code}-${relativeNum}`,
-      };
-    }
+  // Support both SectionLookup and Section[] for backwards compatibility
+  const lookup = Array.isArray(lookupOrSections)
+    ? buildSectionLookup(lookupOrSections)
+    : lookupOrSections;
+
+  const section = findSectionForNumber(num, lookup);
+
+  if (section) {
+    const relativeNum = num - section.startNumber + 1;
+    return {
+      code: section.code,
+      relativeNum,
+      fullName: section.name,
+      display: `${section.code}-${relativeNum}`,
+    };
   }
 
   return {
@@ -205,33 +242,27 @@ export function formatStickerNumber(
   };
 }
 
-// Agrupar números por seção
+// Agrupar números por seção - O(n) instead of O(n*m)
 export function groupBySections(
   numbers: number[],
-  sections: Section[]
+  lookupOrSections: SectionLookup | Section[]
 ): Map<string, number[]> {
+  // Support both SectionLookup and Section[] for backwards compatibility
+  const lookup = Array.isArray(lookupOrSections)
+    ? buildSectionLookup(lookupOrSections)
+    : lookupOrSections;
+
   const groups = new Map<string, number[]>();
 
-  // Inicializar grupos vazios
-  for (const section of sections) {
-    groups.set(section.code, []);
-  }
-
   for (const num of numbers) {
-    for (const section of sections) {
-      if (num >= section.startNumber && num <= section.endNumber) {
-        const group = groups.get(section.code) ?? [];
-        group.push(num);
-        groups.set(section.code, group);
-        break;
+    const section = findSectionForNumber(num, lookup);
+    if (section) {
+      const existing = groups.get(section.code);
+      if (existing) {
+        existing.push(num);
+      } else {
+        groups.set(section.code, [num]);
       }
-    }
-  }
-
-  // Remover grupos vazios
-  for (const [key, value] of groups) {
-    if (value.length === 0) {
-      groups.delete(key);
     }
   }
 

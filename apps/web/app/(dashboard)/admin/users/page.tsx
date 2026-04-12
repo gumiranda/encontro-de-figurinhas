@@ -48,7 +48,7 @@ function getSectorName(sector: string | undefined) {
 
 export default function AdminUsersPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
-  const users = useQuery(api.users.getAllUsers);
+  const users = useQuery(api.users.getAllUsers, {});
   const updateUserRole = useMutation(api.users.updateUserRole);
   const updateUserSector = useMutation(api.users.updateUserSector);
 

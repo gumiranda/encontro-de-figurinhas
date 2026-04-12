@@ -13,6 +13,7 @@ export default function BootstrapPage() {
   const { isLoading: convexAuthLoading, isAuthenticated } = useConvexAuth();
   const [error, setError] = useState<string | null>(null);
   const bootstrapAttempted = useRef(false);
+  const redirected = useRef(false);
 
   const convexReady =
     isSignedIn && !convexAuthLoading && isAuthenticated;
@@ -24,16 +25,20 @@ export default function BootstrapPage() {
   );
   const bootstrap = useMutation(api.users.bootstrap);
 
+  // Effect 1: Not signed in -> sign-in (Clerk lifecycle)
   useEffect(() => {
-    if (!isLoaded || isSignedIn) return;
+    if (!isLoaded || isSignedIn || redirected.current) return;
+    redirected.current = true;
     router.push("/sign-in");
   }, [isLoaded, isSignedIn, router]);
 
+  // Effect 2: Has user -> home (query lifecycle)
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+    if (!isLoaded || !isSignedIn || redirected.current) return;
     if (convexAuthLoading || !isAuthenticated) return;
     if (currentUser === undefined) return;
     if (currentUser) {
+      redirected.current = true;
       router.push("/");
     }
   }, [

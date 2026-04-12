@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { useAuthReady } from "./use-auth-ready";
 
 /**
  * When a superadmin exists but the signed-in Clerk user has no Convex row yet,
@@ -12,10 +12,7 @@ import { api } from "@workspace/backend/_generated/api";
  */
 export function useEnsureAppUser() {
   const router = useRouter();
-  const { isSignedIn, isLoaded } = useAuth();
-  const { isLoading: convexAuthLoading, isAuthenticated } = useConvexAuth();
-  const convexReady =
-    isLoaded && isSignedIn && !convexAuthLoading && isAuthenticated;
+  const { isReady: convexReady } = useAuthReady();
 
   const currentUser = useQuery(
     api.users.getCurrentUser,

@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-
-type Section = {
-  name: string;
-  code: string;
-  startNumber: number;
-  endNumber: number;
-  isExtra?: boolean;
-};
+import { toast } from "sonner";
+import { buildSectionLookup, type Section, type SectionLookup } from "./sticker-parser";
 
 export function useStickers(debounceMs = 300) {
   // Inline do antigo use-album-config
@@ -21,24 +15,32 @@ export function useStickers(debounceMs = 300) {
   const serverMissing = data?.missing ?? [];
   const isLoading = data === undefined;
 
+  // SectionLookup memoizado para O(1) lookups
+  const sectionLookup = useMemo(
+    () => buildSectionLookup(sections),
+    [sections]
+  );
+
   // State local para edicao
   const [localDuplicates, setLocalDuplicates] = useState<number[]>([]);
   const [localMissing, setLocalMissing] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   const updateStickerList = useMutation(api.stickers.updateStickerList);
 
-  // Timer ref para debounce
+  // Timer ref para debounce e edit counter para race conditions
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const editCountRef = useRef(0);
 
-  // Sincronizar state local com servidor na primeira carga
+  // Sincronizar state local com servidor quando idle
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isDirty) {
       setLocalDuplicates(serverDuplicates);
       setLocalMissing(serverMissing);
     }
-  }, [isLoading, serverDuplicates, serverMissing]);
+  }, [isLoading, serverDuplicates, serverMissing, isDirty]);
 
   // Validacao client-side: arrays disjuntos
   const validateDisjoint = useCallback(
@@ -53,12 +55,23 @@ export function useStickers(debounceMs = 300) {
     []
   );
 
-  // Salvar com debounce
+  // Salvar com debounce e isDirty tracking
   const saveWithDebounce = useCallback(
     (dups: number[], miss: number[], finalize: boolean = false) => {
+      // Marcar como dirty e capturar edit ID
+      setIsDirty(true);
+      editCountRef.current++;
+      const editId = editCountRef.current;
+
       // Limpar timer anterior
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
+      }
+
+      // Validar tamanho (rate limit)
+      if (dups.length > 980 || miss.length > 980) {
+        setError("Limite de figurinhas excedido");
+        return;
       }
 
       // Validar antes de salvar
@@ -73,7 +86,15 @@ export function useStickers(debounceMs = 300) {
       if (finalize) {
         setIsSaving(true);
         updateStickerList({ duplicates: dups, missing: miss, finalize: true })
-          .catch((e) => setError(e.message))
+          .then(() => {
+            if (editCountRef.current === editId) {
+              setIsDirty(false);
+            }
+          })
+          .catch((e) => {
+            setError(e.message);
+            toast.error("Erro ao salvar. Tente novamente.");
+          })
           .finally(() => setIsSaving(false));
         return;
       }
@@ -82,7 +103,15 @@ export function useStickers(debounceMs = 300) {
       debounceRef.current = setTimeout(() => {
         setIsSaving(true);
         updateStickerList({ duplicates: dups, missing: miss, finalize: false })
-          .catch((e) => setError(e.message))
+          .then(() => {
+            if (editCountRef.current === editId) {
+              setIsDirty(false);
+            }
+          })
+          .catch((e) => {
+            setError(e.message);
+            toast.error("Erro ao salvar. Tente novamente.");
+          })
           .finally(() => setIsSaving(false));
       }, debounceMs);
     },
@@ -192,12 +221,12 @@ export function useStickers(debounceMs = 300) {
 
   // === BULK ACTIONS ===
 
-  // Encontra seção pelo código
+  // Encontra seção pelo código - O(1) com Map
   const findSection = useCallback(
     (sectionCode: string): Section | undefined => {
-      return sections.find((s) => s.code === sectionCode);
+      return sectionLookup.byCode.get(sectionCode);
     },
-    [sections]
+    [sectionLookup]
   );
 
   // Gera array de números para uma seção

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useRouter, usePathname } from "next/navigation";
+import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { useAuthReady } from "./use-auth-ready";
 
 type AuthRedirectOptions = {
   whenApproved?: string;
@@ -28,11 +28,8 @@ const defaultOptions: AuthRedirectOptions = {
 
 export function useAuthRedirect(options: AuthRedirectOptions = {}) {
   const router = useRouter();
-  const { isSignedIn, isLoaded: clerkLoaded } = useAuth();
-  const { isLoading: convexAuthLoading, isAuthenticated } = useConvexAuth();
-
-  const convexReady =
-    clerkLoaded && isSignedIn && !convexAuthLoading && isAuthenticated;
+  const pathname = usePathname();
+  const { isReady: convexReady, isLoading: authLoading, isSignedIn } = useAuthReady();
 
   const currentUser = useQuery(
     api.users.getCurrentUser,
@@ -60,57 +57,59 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
     if (!convexReady) return;
     if (currentUser === undefined || hasSuperadmin === undefined) return;
 
+    let destination: string | null = null;
+
     if (hasSuperadmin === false && opts.whenNoSuperadmin) {
-      router.push(opts.whenNoSuperadmin);
-      return;
-    }
-
-    if (currentUser === null && hasSuperadmin === true && opts.whenNoUser) {
-      router.push(opts.whenNoUser);
-      return;
-    }
-
-    if (currentUser?.status === "pending" && opts.whenPending) {
-      router.push(opts.whenPending);
-      return;
-    }
-
-    if (currentUser?.status === "rejected" && opts.whenRejected) {
-      router.push(opts.whenRejected);
-      return;
-    }
-
-    if (
+      destination = opts.whenNoSuperadmin;
+    } else if (currentUser === null && hasSuperadmin === true && opts.whenNoUser) {
+      destination = opts.whenNoUser;
+    } else if (currentUser?.status === "pending" && opts.whenPending) {
+      destination = opts.whenPending;
+    } else if (currentUser?.status === "rejected" && opts.whenRejected) {
+      destination = opts.whenRejected;
+    } else if (
       currentUser?.status === "approved" &&
       !currentUser.hasCompletedOnboarding &&
       opts.whenNeedsOnboarding
     ) {
-      router.push(opts.whenNeedsOnboarding);
-      return;
-    }
-
-    if (
+      destination = opts.whenNeedsOnboarding;
+    } else if (
       currentUser?.status === "approved" &&
       currentUser.hasCompletedOnboarding &&
       !currentUser.hasCompletedStickerSetup &&
       opts.whenNeedsStickerSetup
     ) {
-      router.push(opts.whenNeedsStickerSetup);
-      return;
-    }
-
-    if (
+      destination = opts.whenNeedsStickerSetup;
+    } else if (
       currentUser?.status === "approved" &&
       currentUser.hasCompletedOnboarding &&
       currentUser.hasCompletedStickerSetup &&
       opts.whenApproved
     ) {
-      router.push(opts.whenApproved);
+      destination = opts.whenApproved;
     }
-  }, [convexReady, currentUser, hasSuperadmin, router, opts]);
+
+    // Idempotent: only redirect if not already there
+    if (destination && pathname !== destination) {
+      router.replace(destination);
+    }
+  }, [
+    convexReady,
+    currentUser,
+    hasSuperadmin,
+    router,
+    pathname,
+    opts.whenNoSuperadmin,
+    opts.whenNoUser,
+    opts.whenPending,
+    opts.whenRejected,
+    opts.whenNeedsOnboarding,
+    opts.whenNeedsStickerSetup,
+    opts.whenApproved,
+  ]);
 
   const isLoading =
-    !clerkLoaded ||
+    authLoading ||
     (isSignedIn &&
       (!convexReady ||
         currentUser === undefined ||
