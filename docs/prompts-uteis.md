@@ -10,13 +10,19 @@ pesquise em @packages/backend/ se eu nao escrevi nenhum ataque de custo ao conve
 
 @packages/backend/ @apps/web/ Thoroughly investigate the current feature for complexity problems. any code with complexity 0(n+1) or O(n)2 will be refactored.(usar serena mcp)
 
-@packages/backend/ @apps/web/ remover codigo desnecessario usando /reducing-entropy (usar serena mcp)
+@packages/backend/ @apps/web/ aplicar filosofia da skill /reducing-entropy (usar serena mcp)
 
 remover useeffects desnecessarios em @apps/web/ usando /react-useeffect (usar serena mcp)
 
-@packages/backend/ @apps/web/ Readability: Is the logic clear? Anything that should be extracted or simplified? use /modern-javascript-patterns and /typescript-advanced-types (usar serena mcp)
+auditar todo codigo presente em @apps/web/ usando /react-doctor e deixar o score em 100 (usar serena mcp)
 
 @packages/backend/ @apps/web/ Thoroughly investigate the current feature for security problems, permission gaps. Act like a red-team pen-tester. Suggest fixes. use /security-review (usar serena mcp)
+
+review my code in @packages/backend/ using /convex-actions-general /convex-queries /convex-mutations (usar serena mcp) no Convex, joins não existem nativamente, então desnormalizar referências em tabelas filhas permite buscar todos os dados permite buscar todos os dados mensais de uma tabela com uma única query indexada em vez de fazer N queries por tabela relacionada. O limite de 8.192 elementos por array no Convex torna inviável armazenar os registros como array dentro da tabela relacionada para dados com muitos arrays
+
+review my code in @apps/web/ . Styling: Consistent with the design system? Any duplicated or unused styles? (usar serena mcp)
+
+@packages/backend/ @apps/web/ Readability: Is the logic clear? Anything that should be extracted or simplified? use /modern-javascript-patterns and /typescript-advanced-types (usar serena mcp)
 
 review my code in @apps/web/ @packages/backend/. Dead code: Any dead or unused code that should be removed after the new changes? (usar serena mcp)
 
@@ -30,13 +36,9 @@ review my code in @apps/web/ using /tailwind-patterns (usar serena mcp)
 
 review my code in @apps/web/ using /next-best-practices (usar serena mcp)
 
-review my code in @packages/backend/ using /convex-actions-general /convex-queries /convex-mutations (usar serena mcp) no Convex, joins não existem nativamente, então desnormalizar referências em tabelas filhas permite buscar todos os dados permite buscar todos os dados mensais de uma tabela com uma única query indexada em vez de fazer N queries por tabela relacionada. O limite de 8.192 elementos por array no Convex torna inviável armazenar os registros como array dentro da tabela relacionada para dados com muitos arrays
-
 review my code in @packages/backend/ using /convex-actions-general /convex-queries /convex-mutations (usar serena mcp)
 
 review my code in @packages/backend/ @apps/web/ using /convex-actions-general /convex-queries /convex-mutations (usar serena mcp)
-
-review my code in @apps/web/ . Styling: Consistent with the design system? Any duplicated or unused styles? (usar serena mcp)
 
 review my code in @apps/web/ @packages/backend/ . Code repetition: Any duplicated logic that should be refactored? (usar serena mcp)
 
