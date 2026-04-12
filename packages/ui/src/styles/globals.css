@@ -15,9 +15,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.3211 0 0);
   --primary: oklch(0.6231 0.188 259.8145);
+  --primary-dim: oklch(0.5 0.2 259.8);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.967 0.0029 264.5419);
-  --secondary-foreground: oklch(0.4461 0.0263 256.8018) a;
+  --secondary-container: oklch(0.9 0.01 264);
+  --secondary-foreground: oklch(0.4461 0.0263 256.8018);
+  --tertiary: oklch(0.85 0.12 85);
+  --tertiary-foreground: oklch(0.3 0.08 85);
   --muted: oklch(0.9846 0.0017 247.8389);
   --muted-foreground: oklch(0.551 0.0234 264.3637);
   --accent: oklch(0.97 0 0);
@@ -44,6 +48,18 @@
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.475rem;
+
+  /* MD3 Surface Colors (light mode fallbacks) */
+  --surface-dim: oklch(0.95 0 0);
+  --surface-container-low: oklch(0.97 0 0);
+  --surface-container: oklch(0.96 0 0);
+  --surface-container-high: oklch(0.94 0 0);
+  --surface-container-highest: oklch(0.92 0 0);
+  --on-surface: oklch(0.2 0 0);
+  --on-surface-variant: oklch(0.45 0 0);
+  --outline: oklch(0.5 0 0);
+  --outline-variant: oklch(0.75 0 0);
+
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm:
@@ -56,43 +72,71 @@
   --shadow-xl:
     0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --shadow-stadium: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
 
 .dark {
-  --background: oklch(0.2046 0 0);
-  --foreground: oklch(0.9219 0 0);
-  --card: oklch(0.2686 0 0);
-  --card-foreground: oklch(0.9219 0 0);
-  --popover: oklch(0.2686 0 0);
-  --popover-foreground: oklch(0.9219 0 0);
-  --primary: oklch(0.6231 0.188 259.8145);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.2686 0 0);
-  --secondary-foreground: oklch(0.9219 0 0);
-  --muted: oklch(0.2686 0 0);
-  --muted-foreground: oklch(0.7155 0 0);
-  --accent: oklch(0.3791 0.1378 265.5222);
-  --accent-foreground: oklch(0.8823 0.0571 254.1284);
-  --destructive: oklch(0.6368 0.2078 25.3313);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.3715 0 0);
-  --input: oklch(0.3715 0 0);
-  --ring: oklch(0.6231 0.188 259.8145);
+  /* Material Design 3 Surface Colors */
+  --background: #090e1c;
+  --foreground: #e1e4fa;
+  --card: #181f33;
+  --card-foreground: #e1e4fa;
+  --popover: #1e253b;
+  --popover-foreground: #e1e4fa;
+
+  /* MD3 Primary (Blue) */
+  --primary: #95aaff;
+  --primary-dim: #3766ff;
+  --primary-foreground: #00247e;
+
+  /* MD3 Secondary (Green - for duplicates) */
+  --secondary: #4ff325;
+  --secondary-container: #176e00;
+  --secondary-foreground: #105500;
+
+  /* MD3 Tertiary (Yellow/Gold - for extras) */
+  --tertiary: #ffc965;
+  --tertiary-foreground: #5f4200;
+
+  /* MD3 Surface variants */
+  --surface-dim: #090e1c;
+  --surface-container-low: #0d1323;
+  --surface-container: #13192b;
+  --surface-container-high: #181f33;
+  --surface-container-highest: #1e253b;
+
+  /* MD3 On-Surface */
+  --on-surface: #e1e4fa;
+  --on-surface-variant: #a6aabf;
+
+  /* MD3 Outline */
+  --outline: #707588;
+  --outline-variant: #434759;
+
+  --muted: #1e253b;
+  --muted-foreground: #a6aabf;
+  --accent: #3766ff;
+  --accent-foreground: #e1e4fa;
+  --destructive: #ff6e84;
+  --destructive-foreground: #490013;
+  --border: #434759;
+  --input: #1e253b;
+  --ring: #95aaff;
   --chart-1: oklch(0.7137 0.1434 254.624);
   --chart-2: oklch(0.6231 0.188 259.8145);
   --chart-3: oklch(0.5461 0.2152 262.8809);
   --chart-4: oklch(0.4882 0.2172 264.3763);
   --chart-5: oklch(0.4244 0.1809 265.6377);
-  --sidebar: oklch(0.2046 0 0);
-  --sidebar-foreground: oklch(0.9219 0 0);
-  --sidebar-primary: oklch(0.6231 0.188 259.8145);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.3791 0.1378 265.5222);
-  --sidebar-accent-foreground: oklch(0.8823 0.0571 254.1284);
-  --sidebar-border: oklch(0.3715 0 0);
-  --sidebar-ring: oklch(0.6231 0.188 259.8145);
+  --sidebar: #090e1c;
+  --sidebar-foreground: #e1e4fa;
+  --sidebar-primary: #95aaff;
+  --sidebar-primary-foreground: #00247e;
+  --sidebar-accent: #3766ff;
+  --sidebar-accent-foreground: #e1e4fa;
+  --sidebar-border: #434759;
+  --sidebar-ring: #95aaff;
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
@@ -109,6 +153,7 @@
   --shadow-xl:
     0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --shadow-stadium: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
@@ -119,9 +164,13 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -145,6 +194,17 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* MD3 Surface Colors */
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
@@ -165,6 +225,7 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+  --shadow-stadium: var(--shadow-stadium);
 }
 
 @layer base {
@@ -182,6 +243,18 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
     font-weight: 500;
+  }
+}
+
+/* Custom utility classes for MD3 design */
+@layer utilities {
+  .glass-effect {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .stadium-shadow {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
 }
 

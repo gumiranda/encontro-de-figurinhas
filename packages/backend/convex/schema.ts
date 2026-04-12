@@ -29,6 +29,9 @@ export default defineSchema({
     // Sticker fields (PRD §4.3)
     duplicates: v.optional(v.array(v.number())),
     missing: v.optional(v.array(v.number())),
+    albumProgress: v.optional(v.number()),
+    totalStickersOwned: v.optional(v.number()),
+    hasCompletedStickerSetup: v.optional(v.boolean()),
 
     // Additional PRD fields
     hasSeenSafetyTips: v.optional(v.boolean()),
@@ -52,4 +55,18 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .searchIndex("search_name", { searchField: "name" }),
+
+  albumConfig: defineTable({
+    totalStickers: v.number(),
+    sections: v.array(
+      v.object({
+        name: v.string(),
+        startNumber: v.number(),
+        endNumber: v.number(),
+        isExtra: v.optional(v.boolean()),
+      })
+    ),
+    version: v.number(),
+    year: v.number(),
+  }),
 });

@@ -14,6 +14,7 @@ type AuthRedirectOptions = {
   whenNoUser?: string;
   whenNoSuperadmin?: string;
   whenNeedsOnboarding?: string;
+  whenNeedsStickerSetup?: string;
 };
 
 const defaultOptions: AuthRedirectOptions = {
@@ -22,6 +23,7 @@ const defaultOptions: AuthRedirectOptions = {
   whenRejected: "/rejected",
   whenNoSuperadmin: "/bootstrap",
   whenNeedsOnboarding: "/complete-profile",
+  whenNeedsStickerSetup: "/cadastrar-figurinhas",
 };
 
 export function useAuthRedirect(options: AuthRedirectOptions = {}) {
@@ -50,6 +52,7 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
       options.whenNoUser,
       options.whenNoSuperadmin,
       options.whenNeedsOnboarding,
+      options.whenNeedsStickerSetup,
     ],
   );
 
@@ -89,6 +92,17 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
     if (
       currentUser?.status === "approved" &&
       currentUser.hasCompletedOnboarding &&
+      !currentUser.hasCompletedStickerSetup &&
+      opts.whenNeedsStickerSetup
+    ) {
+      router.push(opts.whenNeedsStickerSetup);
+      return;
+    }
+
+    if (
+      currentUser?.status === "approved" &&
+      currentUser.hasCompletedOnboarding &&
+      currentUser.hasCompletedStickerSetup &&
       opts.whenApproved
     ) {
       router.push(opts.whenApproved);
