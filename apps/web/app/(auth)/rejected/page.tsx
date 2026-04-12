@@ -20,7 +20,6 @@ export default function RejectedPage() {
     whenApproved: "/",
     whenPending: "/pending-approval",
     whenRejected: undefined,
-    whenNoUser: undefined,
     whenNoSuperadmin: undefined,
   });
 

@@ -47,25 +47,25 @@ export function FeaturesSection() {
               className="font-[var(--font-headline)] font-black text-4xl md:text-6xl leading-tight text-[var(--landing-on-surface)]"
             >
               Preparado para completar seu{" "}
-              <span className="text-[var(--landing-secondary)]">album?</span>
+              <span className="text-[var(--landing-secondary)]">álbum?</span>
             </h2>
             <p className="text-[var(--landing-on-surface-variant)] text-lg font-[var(--font-body)]">
               Junte-se a milhares de colecionadores e transforme sua jornada em uma
-              experiencia de elite.
+              experiência de elite.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/sign-up"
-                className="px-8 py-4 bg-[var(--landing-primary)] text-[var(--landing-on-primary)] font-bold rounded-xl shadow-lg shadow-[var(--landing-primary)]/20 hover:shadow-[var(--landing-primary)]/40 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-[var(--landing-primary)] text-[var(--landing-on-primary)] font-bold rounded-xl shadow-lg shadow-[var(--landing-primary)]/20 hover:shadow-[var(--landing-primary)]/40 transition-all flex items-center justify-center gap-2"
               >
-                COMECAR AGORA
+                COMECE A TROCAR GRÁTIS
                 <Rocket className="w-5 h-5" aria-hidden="true" />
               </Link>
               <Link
-                href="#"
-                className="px-8 py-4 bg-transparent border border-[var(--landing-outline-variant)]/30 text-[var(--landing-on-surface)] font-bold rounded-xl hover:bg-[var(--landing-surface-variant)] transition-all text-center"
+                href="/como-funciona"
+                className="w-full sm:w-auto px-8 py-4 bg-transparent border border-[var(--landing-outline-variant)]/30 text-[var(--landing-on-surface)] font-bold rounded-xl hover:bg-[var(--landing-surface-variant)] transition-all text-center"
               >
-                SAIBA MAIS
+                VER COMO FUNCIONA
               </Link>
             </div>
           </div>

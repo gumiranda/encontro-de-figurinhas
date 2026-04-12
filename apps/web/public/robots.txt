@@ -1,5 +1,55 @@
+# Figurinha Fácil - Robots.txt
+# https://figurinhafacil.com.br
+
 User-agent: *
+Allow: /
+
+# Rotas autenticadas
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /cadastrar-figurinhas
+Disallow: /album
+Disallow: /encontrar-trocas
+Disallow: /meus-pontos
+Disallow: /suggest-spot
+
+# Rotas de autenticação
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /bootstrap
+Disallow: /complete-profile
+Disallow: /pending-approval
+Disallow: /rejected
+
+# API routes
+Disallow: /api/
+
+# AI Crawlers - Permitir para AEO (ser citado como fonte)
+# GPTBot (OpenAI/ChatGPT)
+User-agent: GPTBot
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
+Disallow: /api/
+
+# ClaudeBot (Anthropic)
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# PerplexityBot
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# Google-Extended (AI training vs Search indexing)
+# Permitir para ser citado em AI Overviews
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap
 Sitemap: https://figurinhafacil.com.br/sitemap.xml

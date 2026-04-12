@@ -7,6 +7,30 @@ import { Input } from "@workspace/ui/components/input";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 
+interface StatusIconProps {
+  isChecking: boolean;
+  isAvailable: boolean | undefined;
+  valueLength: number;
+}
+
+function StatusIcon({ isChecking, isAvailable, valueLength }: StatusIconProps) {
+  if (valueLength < 3) return null;
+
+  if (isChecking) {
+    return <Loader2 className="h-5 w-5 animate-spin text-[var(--landing-outline)]" />;
+  }
+
+  if (isAvailable === true) {
+    return <CheckCircle2 className="h-5 w-5 text-[var(--landing-secondary)]" />;
+  }
+
+  if (isAvailable === false) {
+    return <XCircle className="h-5 w-5 text-destructive" />;
+  }
+
+  return null;
+}
+
 const checkNicknameAvailable = makeFunctionReference<
   "query",
   { nickname: string },
@@ -58,24 +82,6 @@ export function NicknameInput({
     }
   }, [nicknameCheck, debouncedValue, onAvailabilityChange]);
 
-  const renderStatusIcon = () => {
-    if (value.length < 3) return null;
-
-    if (isChecking) {
-      return <Loader2 className="h-5 w-5 animate-spin text-[var(--landing-outline)]" />;
-    }
-
-    if (nicknameCheck?.available === true) {
-      return <CheckCircle2 className="h-5 w-5 text-[var(--landing-secondary)]" />;
-    }
-
-    if (nicknameCheck?.available === false) {
-      return <XCircle className="h-5 w-5 text-destructive" />;
-    }
-
-    return null;
-  };
-
   return (
     <div className="space-y-2">
       <div className="relative">
@@ -88,7 +94,11 @@ export function NicknameInput({
           aria-invalid={!!error}
         />
         <div className="absolute inset-y-0 right-4 flex items-center">
-          {renderStatusIcon()}
+          <StatusIcon
+            isChecking={isChecking}
+            isAvailable={nicknameCheck?.available}
+            valueLength={value.length}
+          />
         </div>
       </div>
       {value.length >= 3 && nicknameCheck?.available === true && !isChecking && (

@@ -1,53 +1,121 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { HeroSection } from "@/modules/landing/ui/components/hero-section";
-import { CitiesSection } from "@/modules/landing/ui/components/cities-section";
+import { SocialProofSection } from "@/modules/landing/ui/components/social-proof-section";
 import { FeaturesSection } from "@/modules/landing/ui/components/features-section";
+import { HowItWorksSection } from "@/modules/landing/ui/components/how-it-works-section";
+import { CitiesSection } from "@/modules/landing/ui/components/cities-section";
+import { FAQSection } from "@/modules/landing/ui/components/faq-section";
+import { FinalCTASection } from "@/modules/landing/ui/components/final-cta-section";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import {
+  generateOrganizationSchema,
+  generateWebSiteSchema,
+  generateFAQSchema,
+  generateHowToSchema,
+  generateCombinedSchema,
+  BASE_URL,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://figurinhafacil.com.br"),
-  title: "Figurinha Facil | Troque suas figurinhas perto de voce",
+  title: "Figurinha Fácil - Troca de Figurinhas Copa 2026",
   description:
-    "A maior rede de troca de figurinhas do Brasil. Encontre colecionadores e pontos de troca em Sao Paulo, Rio de Janeiro, Belo Horizonte e mais.",
-  keywords: ["figurinhas", "troca de figurinhas", "album", "colecionadores"],
-  openGraph: {
-    title: "Figurinha Facil",
-    description: "Encontre quem tem as figurinhas que voce precisa",
-    type: "website",
-    locale: "pt_BR",
-    images: ["/og-image.png"],
+    "A maior rede de troca de figurinhas do Brasil. Encontre colecionadores perto de você, troque figurinhas repetidas e complete seu álbum da Copa 2026.",
+  alternates: {
+    canonical: BASE_URL,
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Figurinha Facil",
-    description: "A maior rede de troca de figurinhas",
+  other: {
+    "article:published_time": "2025-01-01T00:00:00Z",
+    "article:modified_time": new Date().toISOString(),
   },
-  robots: { index: true, follow: true },
 };
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Figurinha Facil",
-  description: "Plataforma de troca de figurinhas",
-  url: "https://figurinhafacil.com.br",
-};
+const FAQ_DATA = [
+  {
+    question: "Como funciona a troca de figurinhas no Figurinha Fácil?",
+    answer:
+      "Cadastre suas figurinhas repetidas e as que você precisa. Nossa plataforma conecta você com outros colecionadores na sua cidade que têm as figurinhas que você procura.",
+  },
+  {
+    question: "O Figurinha Fácil é gratuito?",
+    answer:
+      "Sim! O cadastro e uso básico da plataforma são totalmente gratuitos. Você pode cadastrar suas figurinhas, encontrar colecionadores e combinar trocas sem custo.",
+  },
+  {
+    question: "Em quais cidades posso trocar figurinhas?",
+    answer:
+      "O Figurinha Fácil está disponível em todas as capitais brasileiras e principais cidades como São Paulo, Rio de Janeiro, Belo Horizonte, Brasília, Salvador, Curitiba, entre outras.",
+  },
+  {
+    question: "Quais álbuns de figurinhas posso trocar?",
+    answer:
+      "Você pode trocar figurinhas de qualquer álbum, incluindo Copa do Mundo 2026, álbuns Panini, e outras coleções populares.",
+  },
+  {
+    question: "Como encontro pontos de troca presenciais?",
+    answer:
+      "Use nosso mapa interativo para encontrar pontos de troca na sua cidade. São locais públicos onde colecionadores se encontram para realizar trocas de forma segura.",
+  },
+];
+
+const HOW_TO_STEPS = [
+  {
+    title: "Cadastre-se grátis",
+    description:
+      "Crie sua conta em segundos e informe quais figurinhas você tem repetidas e quais precisa.",
+  },
+  {
+    title: "Encontre matches",
+    description:
+      "Nossa plataforma conecta você automaticamente com colecionadores que têm o que você precisa.",
+  },
+  {
+    title: "Troque e complete",
+    description:
+      "Combine um ponto de encontro seguro na sua cidade e realize a troca presencialmente.",
+  },
+];
+
+const organizationSchema = generateOrganizationSchema();
+const webSiteSchema = generateWebSiteSchema();
+const faqSchema = generateFAQSchema(FAQ_DATA);
+const howToSchema = generateHowToSchema(
+  "Como trocar figurinhas no Figurinha Fácil",
+  "Aprenda a trocar figurinhas em 3 passos simples e complete seu álbum da Copa 2026.",
+  HOW_TO_STEPS
+);
+
+// Combined schema with @graph pattern for better AEO
+const combinedSchema = generateCombinedSchema([
+  organizationSchema,
+  webSiteSchema,
+  faqSchema,
+  howToSchema,
+]);
 
 export default function LandingPage() {
   const totalTrocas = null; // Will show "Milhares" instead of fake numbers
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main id="main-content" className="pt-24 min-h-screen">
+        {/* 1. Hero - Core value proposition */}
         <HeroSection totalTrocas={totalTrocas} />
-        <CitiesSection />
+        {/* 2. Social Proof - Build trust */}
+        <SocialProofSection />
+        {/* 3. Features/Solution - How we solve it */}
         <FeaturesSection />
+        {/* 4. How It Works - Reduce complexity */}
+        <HowItWorksSection />
+        {/* 5. Cities - Show where it works */}
+        <CitiesSection />
+        {/* 6. FAQ - Handle objections */}
+        <FAQSection faqs={FAQ_DATA} />
+        {/* 7. Final CTA - Capture remainders */}
+        <FinalCTASection />
       </main>
       <LandingFooter />
     </>

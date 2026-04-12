@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-muted-foreground">
-          You don't have permission to access this page.
+          Voce nao tem permissao para acessar esta pagina.
         </p>
       </div>
     );
@@ -205,9 +205,9 @@ export default function AdminUsersPage() {
           <div className="space-y-4 py-4">
             {isSuperadmin && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Role</label>
+                <label htmlFor="role-select" className="text-sm font-medium">Role</label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger>
+                  <SelectTrigger id="role-select">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,12 +229,12 @@ export default function AdminUsersPage() {
 
             {selectedRole === "user" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Sector</label>
+                <label htmlFor="user-sector-select" className="text-sm font-medium">Sector</label>
                 <Select
                   value={selectedSector}
                   onValueChange={setSelectedSector}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="user-sector-select">
                     <SelectValue placeholder="Select a sector" />
                   </SelectTrigger>
                   <SelectContent>
@@ -256,7 +256,7 @@ export default function AdminUsersPage() {
 
             {(selectedRole === "superadmin" || selectedRole === "ceo") && (
               <p className="text-sm text-muted-foreground">
-                Superadmins and CEOs don't have an associated sector.
+                Superadmins e CEOs nao possuem setor associado.
               </p>
             )}
           </div>

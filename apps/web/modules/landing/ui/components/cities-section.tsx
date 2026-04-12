@@ -36,6 +36,7 @@ export function CitiesSection() {
             <CityCard
               key={city.id}
               name={city.name}
+              slug={city.slug}
               state={city.state}
               activePoints={city.activePoints}
               participants={city.participants}

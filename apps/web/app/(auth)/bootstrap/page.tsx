@@ -1,53 +1,93 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { FullPageLoader } from "@/components/full-page-loader";
 
 export default function BootstrapPage() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
+  const { isLoading: convexAuthLoading, isAuthenticated } = useConvexAuth();
   const [error, setError] = useState<string | null>(null);
   const bootstrapAttempted = useRef(false);
 
-  const hasAnyUsers = useQuery(api.users.hasAnyUsers, isSignedIn ? {} : "skip");
+  const convexReady =
+    isSignedIn && !convexAuthLoading && isAuthenticated;
+
+  const hasAnyUsers = useQuery(api.users.hasAnyUsers, convexReady ? {} : "skip");
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    isSignedIn ? {} : "skip",
+    convexReady ? {} : "skip",
   );
   const bootstrap = useMutation(api.users.bootstrap);
+
   useEffect(() => {
-    const autoBootstrap = async () => {
-      if (isSignedIn && hasAnyUsers === false && !bootstrapAttempted.current) {
-        bootstrapAttempted.current = true;
-        try {
-          await bootstrap();
-          router.push("/");
-        } catch (err) {
-          setError(
-            err instanceof Error ? err.message : "Error creating superadmin",
-          );
-        }
-      }
-    };
-    autoBootstrap();
-  }, [isSignedIn, hasAnyUsers, bootstrap, router]);
+    if (!isLoaded || isSignedIn) return;
+    router.push("/sign-in");
+  }, [isLoaded, isSignedIn, router]);
+
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    if (convexAuthLoading || !isAuthenticated) return;
+    if (currentUser === undefined) return;
     if (currentUser) {
       router.push("/");
     }
-  }, [currentUser, router]);
+  }, [
+    isLoaded,
+    isSignedIn,
+    convexAuthLoading,
+    isAuthenticated,
+    currentUser,
+    router,
+  ]);
+
+  const handleAutoBootstrap = useCallback(async () => {
+    if (bootstrapAttempted.current) return;
+    bootstrapAttempted.current = true;
+    try {
+      await bootstrap();
+      router.push("/");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error creating superadmin",
+      );
+    }
+  }, [bootstrap, router]);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    if (convexAuthLoading || !isAuthenticated) return;
+    if (hasAnyUsers !== false) return;
+    if (currentUser === undefined) return;
+    if (currentUser) return;
+    if (error) return;
+    if (bootstrapAttempted.current) return;
+    void handleAutoBootstrap();
+  }, [
+    isLoaded,
+    isSignedIn,
+    convexAuthLoading,
+    isAuthenticated,
+    hasAnyUsers,
+    currentUser,
+    error,
+    handleAutoBootstrap,
+  ]);
 
   if (!isLoaded || hasAnyUsers === undefined) {
     return <FullPageLoader />;
   }
 
   if (!isSignedIn) {
-    router.push("/sign-in");
-    return null;
+    return <FullPageLoader />;
+  }
+
+  if (currentUser) {
+    return <FullPageLoader />;
   }
 
   if (hasAnyUsers === false && !error) {

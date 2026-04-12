@@ -2,10 +2,19 @@ import Link from "next/link";
 import { Landmark, Share2, Globe } from "lucide-react";
 
 const FOOTER_LINKS = [
-  { label: "Termos de Servico", href: "#" },
-  { label: "Politica de Privacidade", href: "#" },
-  { label: "Suporte", href: "#" },
-  { label: "Regras de Troca", href: "#" },
+  { label: "Como Funciona", href: "/como-funciona" },
+  { label: "Sobre", href: "/sobre" },
+  { label: "Termos de Uso", href: "/termos" },
+  { label: "Privacidade", href: "/privacidade" },
+  { label: "Contato", href: "/contato" },
+];
+
+const CITY_LINKS = [
+  { label: "São Paulo", href: "/cidade/sao-paulo" },
+  { label: "Rio de Janeiro", href: "/cidade/rio-de-janeiro" },
+  { label: "Belo Horizonte", href: "/cidade/belo-horizonte" },
+  { label: "Curitiba", href: "/cidade/curitiba" },
+  { label: "Porto Alegre", href: "/cidade/porto-alegre" },
 ];
 
 export function LandingFooter() {
@@ -18,24 +27,37 @@ export function LandingFooter() {
         <div className="flex flex-col items-center md:items-start gap-4">
           <Link href="/" className="flex items-center gap-2">
             <Landmark className="text-[var(--landing-primary)] w-6 h-6" aria-hidden="true" />
-            <span className="text-[#0052FF] font-bold text-xl">Figurinha Facil</span>
+            <span className="text-[#0052FF] font-bold text-xl">Figurinha Fácil</span>
           </Link>
           <p className="font-[var(--font-body)] text-sm uppercase tracking-widest text-slate-500">
-            &copy; 2024 Figurinha Facil. The Digital Arena.
+            &copy; {new Date().getFullYear()} Figurinha Fácil
           </p>
         </div>
 
-        <nav aria-label="Links do rodape" className="flex flex-wrap justify-center gap-8">
-          {FOOTER_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="font-[var(--font-body)] text-sm uppercase tracking-widest text-slate-500 hover:text-white transition-all"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex flex-col md:flex-row gap-8">
+          <nav aria-label="Links do rodape" className="flex flex-wrap justify-center gap-6">
+            {FOOTER_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="font-[var(--font-body)] text-sm uppercase tracking-widest text-slate-500 hover:text-white transition-all"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <nav aria-label="Cidades populares" className="flex flex-wrap justify-center gap-4">
+            {CITY_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="font-[var(--font-body)] text-xs text-slate-600 hover:text-slate-400 transition-all"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         <div className="flex gap-4">
           <button

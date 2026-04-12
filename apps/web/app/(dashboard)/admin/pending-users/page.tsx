@@ -1,9 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
+
+interface DialogState {
+  approveDialog: { userId: Id<"users">; name: string } | null;
+  rejectDialog: { userId: Id<"users">; name: string } | null;
+  selectedSector: string;
+  rejectionReason: string;
+  isLoading: boolean;
+}
+
+type DialogAction =
+  | { type: "OPEN_APPROVE"; userId: Id<"users">; name: string }
+  | { type: "CLOSE_APPROVE" }
+  | { type: "OPEN_REJECT"; userId: Id<"users">; name: string }
+  | { type: "CLOSE_REJECT" }
+  | { type: "SET_SECTOR"; sector: string }
+  | { type: "SET_REJECTION_REASON"; reason: string }
+  | { type: "SET_LOADING"; loading: boolean }
+  | { type: "RESET_APPROVE" }
+  | { type: "RESET_REJECT" };
+
+function dialogReducer(state: DialogState, action: DialogAction): DialogState {
+  switch (action.type) {
+    case "OPEN_APPROVE":
+      return { ...state, approveDialog: { userId: action.userId, name: action.name } };
+    case "CLOSE_APPROVE":
+      return { ...state, approveDialog: null };
+    case "OPEN_REJECT":
+      return { ...state, rejectDialog: { userId: action.userId, name: action.name } };
+    case "CLOSE_REJECT":
+      return { ...state, rejectDialog: null };
+    case "SET_SECTOR":
+      return { ...state, selectedSector: action.sector };
+    case "SET_REJECTION_REASON":
+      return { ...state, rejectionReason: action.reason };
+    case "SET_LOADING":
+      return { ...state, isLoading: action.loading };
+    case "RESET_APPROVE":
+      return { ...state, approveDialog: null, selectedSector: "general", isLoading: false };
+    case "RESET_REJECT":
+      return { ...state, rejectDialog: null, rejectionReason: "", isLoading: false };
+    default:
+      return state;
+  }
+}
+
+const initialState: DialogState = {
+  approveDialog: null,
+  rejectDialog: null,
+  selectedSector: "general",
+  rejectionReason: "",
+  isLoading: false,
+};
 import {
   Card,
   CardContent,
@@ -52,17 +104,8 @@ export default function PendingUsersPage() {
   const approveUser = useMutation(api.users.approveUser);
   const rejectUser = useMutation(api.users.rejectUser);
 
-  const [approveDialog, setApproveDialog] = useState<{
-    userId: Id<"users">;
-    name: string;
-  } | null>(null);
-  const [rejectDialog, setRejectDialog] = useState<{
-    userId: Id<"users">;
-    name: string;
-  } | null>(null);
-  const [selectedSector, setSelectedSector] = useState<string>("general");
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, dispatch] = useReducer(dialogReducer, initialState);
+  const { approveDialog, rejectDialog, selectedSector, rejectionReason, isLoading } = state;
 
   const isSuperadmin = currentUser?.role === "superadmin";
   const isCeo = currentUser?.role === "ceo";
@@ -71,7 +114,7 @@ export default function PendingUsersPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-muted-foreground">
-          You don't have permission to access this page.
+          Voce nao tem permissao para acessar esta pagina.
         </p>
       </div>
     );
@@ -80,42 +123,39 @@ export default function PendingUsersPage() {
   const handleApprove = async () => {
     if (!approveDialog || !selectedSector) return;
 
-    setIsLoading(true);
+    dispatch({ type: "SET_LOADING", loading: true });
     try {
       await approveUser({
         userId: approveDialog.userId,
         sector: selectedSector,
       });
       toast.success(`User ${approveDialog.name} approved successfully!`);
-      setApproveDialog(null);
-      setSelectedSector("general");
+      dispatch({ type: "RESET_APPROVE" });
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Error approving user"
       );
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "SET_LOADING", loading: false });
     }
   };
 
   const handleReject = async () => {
     if (!rejectDialog) return;
 
-    setIsLoading(true);
+    dispatch({ type: "SET_LOADING", loading: true });
     try {
       await rejectUser({
         userId: rejectDialog.userId,
         reason: rejectionReason || undefined,
       });
       toast.success(`User ${rejectDialog.name} rejected.`);
-      setRejectDialog(null);
-      setRejectionReason("");
+      dispatch({ type: "RESET_REJECT" });
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Error rejecting user"
       );
     } finally {
-      setIsLoading(false);
+      dispatch({ type: "SET_LOADING", loading: false });
     }
   };
 
@@ -171,7 +211,7 @@ export default function PendingUsersPage() {
                         size="sm"
                         className="text-green-600 hover:text-green-700"
                         onClick={() =>
-                          setApproveDialog({ userId: user._id, name: user.name })
+                          dispatch({ type: "OPEN_APPROVE", userId: user._id, name: user.name })
                         }
                       >
                         <Check className="mr-1 h-4 w-4" />
@@ -182,7 +222,7 @@ export default function PendingUsersPage() {
                         size="sm"
                         className="text-red-600 hover:text-red-700"
                         onClick={() =>
-                          setRejectDialog({ userId: user._id, name: user.name })
+                          dispatch({ type: "OPEN_REJECT", userId: user._id, name: user.name })
                         }
                       >
                         <X className="mr-1 h-4 w-4" />
@@ -197,7 +237,7 @@ export default function PendingUsersPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!approveDialog} onOpenChange={() => setApproveDialog(null)}>
+      <Dialog open={!!approveDialog} onOpenChange={() => dispatch({ type: "CLOSE_APPROVE" })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Approve User</DialogTitle>
@@ -208,9 +248,9 @@ export default function PendingUsersPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Sector</label>
-              <Select value={selectedSector} onValueChange={setSelectedSector}>
-                <SelectTrigger>
+              <label htmlFor="sector-select" className="text-sm font-medium">Sector</label>
+              <Select value={selectedSector} onValueChange={(v) => dispatch({ type: "SET_SECTOR", sector: v })}>
+                <SelectTrigger id="sector-select">
                   <SelectValue placeholder="Select a sector" />
                 </SelectTrigger>
                 <SelectContent>
@@ -233,7 +273,7 @@ export default function PendingUsersPage() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setApproveDialog(null)}
+              onClick={() => dispatch({ type: "CLOSE_APPROVE" })}
               disabled={isLoading}
             >
               Cancel
@@ -259,7 +299,7 @@ export default function PendingUsersPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!rejectDialog} onOpenChange={() => setRejectDialog(null)}>
+      <Dialog open={!!rejectDialog} onOpenChange={() => dispatch({ type: "CLOSE_REJECT" })}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject User</DialogTitle>
@@ -270,10 +310,11 @@ export default function PendingUsersPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Reason (optional)</label>
+              <label htmlFor="rejection-reason" className="text-sm font-medium">Reason (optional)</label>
               <Textarea
+                id="rejection-reason"
                 value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
+                onChange={(e) => dispatch({ type: "SET_REJECTION_REASON", reason: e.target.value })}
                 placeholder="Enter the reason for rejection..."
               />
             </div>
@@ -282,7 +323,7 @@ export default function PendingUsersPage() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setRejectDialog(null)}
+              onClick={() => dispatch({ type: "CLOSE_REJECT" })}
               disabled={isLoading}
             >
               Cancel

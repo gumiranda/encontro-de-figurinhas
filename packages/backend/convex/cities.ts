@@ -26,3 +26,20 @@ export const getById = query({
     return await ctx.db.get(cityId);
   },
 });
+
+export const getBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    return await ctx.db
+      .query("cities")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+  },
+});
+
+export const getAll = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("cities").collect();
+  },
+});

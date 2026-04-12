@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useAuth } from "@clerk/nextjs";
+import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 
 type AuthRedirectOptions = {
   whenApproved?: string;
   whenPending?: string;
   whenRejected?: string;
+  /** Optional redirect when there is no Convex user row (default: none; use EnsureAppUser for creation). */
   whenNoUser?: string;
   whenNoSuperadmin?: string;
   whenNeedsOnboarding?: string;
@@ -18,22 +20,43 @@ const defaultOptions: AuthRedirectOptions = {
   whenApproved: "/",
   whenPending: "/pending-approval",
   whenRejected: "/rejected",
-  whenNoUser: "/register",
   whenNoSuperadmin: "/bootstrap",
   whenNeedsOnboarding: "/complete-profile",
 };
 
 export function useAuthRedirect(options: AuthRedirectOptions = {}) {
   const router = useRouter();
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const hasSuperadmin = useQuery(api.users.hasSuperadmin);
+  const { isSignedIn, isLoaded: clerkLoaded } = useAuth();
+  const { isLoading: convexAuthLoading, isAuthenticated } = useConvexAuth();
+
+  const convexReady =
+    clerkLoaded && isSignedIn && !convexAuthLoading && isAuthenticated;
+
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    convexReady ? {} : "skip",
+  );
+  const hasSuperadmin = useQuery(
+    api.users.hasSuperadmin,
+    convexReady ? {} : "skip",
+  );
 
   const opts = useMemo(
     () => ({ ...defaultOptions, ...options }),
-    [options.whenApproved, options.whenPending, options.whenRejected, options.whenNoUser, options.whenNoSuperadmin, options.whenNeedsOnboarding]
+    [
+      options.whenApproved,
+      options.whenPending,
+      options.whenRejected,
+      options.whenNoUser,
+      options.whenNoSuperadmin,
+      options.whenNeedsOnboarding,
+    ],
   );
 
   useEffect(() => {
+    if (!convexReady) return;
+    if (currentUser === undefined || hasSuperadmin === undefined) return;
+
     if (hasSuperadmin === false && opts.whenNoSuperadmin) {
       router.push(opts.whenNoSuperadmin);
       return;
@@ -54,18 +77,30 @@ export function useAuthRedirect(options: AuthRedirectOptions = {}) {
       return;
     }
 
-    // Check if approved user needs to complete onboarding
-    if (currentUser?.status === "approved" && !currentUser.hasCompletedOnboarding && opts.whenNeedsOnboarding) {
+    if (
+      currentUser?.status === "approved" &&
+      !currentUser.hasCompletedOnboarding &&
+      opts.whenNeedsOnboarding
+    ) {
       router.push(opts.whenNeedsOnboarding);
       return;
     }
 
-    if (currentUser?.status === "approved" && currentUser.hasCompletedOnboarding && opts.whenApproved) {
+    if (
+      currentUser?.status === "approved" &&
+      currentUser.hasCompletedOnboarding &&
+      opts.whenApproved
+    ) {
       router.push(opts.whenApproved);
     }
-  }, [currentUser, hasSuperadmin, router, opts]);
+  }, [convexReady, currentUser, hasSuperadmin, router, opts]);
 
-  const isLoading = currentUser === undefined || hasSuperadmin === undefined;
+  const isLoading =
+    !clerkLoaded ||
+    (isSignedIn &&
+      (!convexReady ||
+        currentUser === undefined ||
+        hasSuperadmin === undefined));
 
   return {
     currentUser,

@@ -28,7 +28,7 @@ export function LandingHeader() {
             aria-hidden="true"
           />
           <span className="font-[var(--font-headline)] font-bold tracking-tight text-lg text-[var(--landing-primary)] sm:text-xl md:text-2xl truncate">
-            Figurinha Facil
+            Figurinha Fácil
           </span>
         </Link>
 
@@ -79,7 +79,7 @@ export function LandingHeader() {
                 <Link href="/" className="flex items-center gap-2">
                   <Landmark className="text-[var(--landing-primary)] w-6 h-6" />
                   <span className="font-[var(--font-headline)] font-bold text-lg text-[var(--landing-primary)]">
-                    Figurinha Facil
+                    Figurinha Fácil
                   </span>
                 </Link>
               </div>

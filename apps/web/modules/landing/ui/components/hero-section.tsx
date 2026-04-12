@@ -31,11 +31,11 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
             className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tighter text-[var(--landing-on-surface)] sm:text-4xl md:text-5xl lg:text-7xl"
           >
             Encontre quem tem as figurinhas que{" "}
-            <span className="text-gradient-primary">voce precisa.</span>
+            <span className="text-gradient-primary">você precisa.</span>
           </h1>
 
           <p className="text-[var(--landing-on-surface-variant)] text-lg md:text-xl max-w-lg leading-relaxed font-[var(--font-body)]">
-            A maior rede de trocas do Brasil. Troque perto de voce com seguranca, rapidez
+            A maior rede de trocas do Brasil. Troque perto de você com segurança, rapidez
             e conecte-se com outros colecionadores.
           </p>
 
@@ -44,9 +44,15 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link
               href="/sign-up"
-              className="px-8 py-4 bg-[var(--landing-primary)] text-[var(--landing-on-primary)] font-bold rounded-xl shadow-lg shadow-[var(--landing-primary)]/20 hover:shadow-[var(--landing-primary)]/40 transition-all flex items-center justify-center gap-2 text-center"
+              className="w-full sm:w-auto px-8 py-4 bg-[var(--landing-primary)] text-[var(--landing-on-primary)] font-bold rounded-xl shadow-lg shadow-[var(--landing-primary)]/20 hover:shadow-[var(--landing-primary)]/40 transition-all flex items-center justify-center gap-2 text-center"
             >
-              COMECAR AGORA
+              COMECE A TROCAR GRÁTIS
+            </Link>
+            <Link
+              href="/como-funciona"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent border border-[var(--landing-outline-variant)]/30 text-[var(--landing-on-surface)] font-bold rounded-xl hover:bg-[var(--landing-surface-variant)] transition-all text-center"
+            >
+              VER COMO FUNCIONA
             </Link>
           </div>
         </div>
@@ -84,12 +90,12 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
               <div className="col-span-12 h-40 glass-card rounded-2xl border border-white/5 p-6 flex items-center justify-around">
                 <div className="text-center">
                   <p className="text-[var(--landing-primary)] font-bold text-2xl">98%</p>
-                  <p className="text-[var(--landing-outline)] text-[10px] uppercase tracking-tighter">Seguranca</p>
+                  <p className="text-[var(--landing-outline)] text-[10px] uppercase tracking-tighter">Segurança</p>
                 </div>
                 <div className="w-px h-12 bg-[var(--landing-outline-variant)]/20" aria-hidden="true" />
                 <div className="text-center">
                   <p className="text-[var(--landing-secondary)] font-bold text-2xl">5min</p>
-                  <p className="text-[var(--landing-outline)] text-[10px] uppercase tracking-tighter">Match Medio</p>
+                  <p className="text-[var(--landing-outline)] text-[10px] uppercase tracking-tighter">Match Médio</p>
                 </div>
                 <div className="w-px h-12 bg-[var(--landing-outline-variant)]/20" aria-hidden="true" />
                 <div className="text-center">
