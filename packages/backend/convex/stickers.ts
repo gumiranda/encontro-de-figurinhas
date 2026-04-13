@@ -1,12 +1,30 @@
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthenticatedUser } from "./lib/auth";
+import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import { setsEqual } from "./lib/utils";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
 
-// Query - busca figurinhas e albumConfig juntos
+/** Mínimo entre atualizações que alteram dados (mitiga alternância A↔B + recompute). */
+const RATE_LIMIT_MS = 5000;
+
+type UserPatch = Partial<
+  Pick<
+    Doc<"users">,
+    | "duplicates"
+    | "missing"
+    | "albumProgress"
+    | "totalStickersOwned"
+    | "lastActiveAt"
+    | "hasCompletedStickerSetup"
+  >
+>;
+
+// Query
 export const getUserStickers = query({
   args: {},
   handler: async (ctx) => {
@@ -18,12 +36,12 @@ export const getUserStickers = query({
       duplicates: user.duplicates ?? [],
       missing: user.missing ?? [],
       sections: albumConfig?.sections ?? [],
-      totalStickers: albumConfig?.totalStickers ?? 980,
+      totalStickers: albumConfig?.totalStickers ?? DEFAULT_TOTAL_STICKERS,
     };
   },
 });
 
-// Mutation UNICA - atualiza ambos atomicamente + agenda recompute
+// Mutation
 export const updateStickerList = mutation({
   args: {
     duplicates: v.array(v.number()),
@@ -43,14 +61,13 @@ export const updateStickerList = mutation({
       );
     }
 
-    // Buscar config do DB (nao hardcoded)
     const config = await ctx.db.query("albumConfig").first();
-    const maxSticker = config?.totalStickers ?? 980;
+    const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const newDup = new Set<number>(args.duplicates);
     const newMiss = new Set<number>(args.missing);
 
-    // 1. Validacao: arrays disjuntos
+    // 1. Arrays disjuntos
     const intersection = args.missing.filter((n) => newDup.has(n));
     if (intersection.length > 0) {
       throw new Error(
@@ -58,7 +75,7 @@ export const updateStickerList = mutation({
       );
     }
 
-    // 2. Validacao: inteiros no range (1-maxSticker, dinamico do DB)
+    // 2. Range 1..maxSticker
     const allNumbers = [...args.duplicates, ...args.missing];
     const invalid = allNumbers.filter(
       (n) =>
@@ -71,22 +88,24 @@ export const updateStickerList = mutation({
       throw new Error(`Numeros invalidos (1-${maxSticker}): ${invalid.join(", ")}`);
     }
 
-    // 3. Skip se arrays iguais (rate limiting server-side)
+    // 3. Skip se iguais
     const currentDup = new Set<number>(user.duplicates ?? []);
     const currentMiss = new Set<number>(user.missing ?? []);
-
-    const setsEqual = (a: Set<number>, b: Set<number>) =>
-      a.size === b.size && [...a].every((x) => b.has(x));
 
     if (
       setsEqual(currentDup, newDup) &&
       setsEqual(currentMiss, newMiss) &&
       !args.finalize
     ) {
-      return; // Nada mudou e nao eh finalizacao, skip
+      return;
     }
 
-    // 4. Validar preenchimento minimo (so em finalize)
+    const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
+    if (timeSinceLastUpdate < RATE_LIMIT_MS && !args.finalize) {
+      throw new Error("Aguarde alguns segundos antes de atualizar novamente");
+    }
+
+    // 4. Finalize: listas não vazias
     if (
       args.finalize &&
       (args.duplicates.length === 0 || args.missing.length === 0)
@@ -96,12 +115,12 @@ export const updateStickerList = mutation({
       );
     }
 
-    // 5. Calcular contadores PRD F11 (usando maxSticker do DB)
+    // 5. Contadores
     const totalStickersOwned = maxSticker - args.missing.length;
     const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
 
-    // 6. Patch atomico - hasCompletedStickerSetup SO se finalize=true
-    const patch: Record<string, unknown> = {
+    // 6. Patch
+    const patch: UserPatch = {
       duplicates: args.duplicates,
       missing: args.missing,
       albumProgress,
@@ -115,7 +134,7 @@ export const updateStickerList = mutation({
 
     await ctx.db.patch(user._id, patch);
 
-    // 7. Agendar recomputacao de matches (action com timeout 10min)
+    // 7. recomputeMatches
     await ctx.scheduler.runAfter(0, internal.matches.recomputeMatches, {
       userId: user._id,
     });

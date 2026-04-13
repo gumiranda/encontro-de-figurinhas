@@ -11,7 +11,9 @@
 import type * as cities from "../cities.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_constants from "../lib/constants.js";
 import type * as lib_types from "../lib/types.js";
+import type * as lib_utils from "../lib/utils.js";
 import type * as matches from "../matches.js";
 import type * as permissions from "../permissions.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
@@ -37,7 +39,9 @@ declare const fullApi: ApiFromModules<{
   cities: typeof cities;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  "lib/constants": typeof lib_constants;
   "lib/types": typeof lib_types;
+  "lib/utils": typeof lib_utils;
   matches: typeof matches;
   permissions: typeof permissions;
   seedAlbumConfig: typeof seedAlbumConfig;
