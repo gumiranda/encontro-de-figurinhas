@@ -220,42 +220,56 @@ export function useStickers(debounceMs = 300) {
     [saveWithDebounce]
   );
 
+  const addNumbers = useCallback(
+    (kind: ListKind, numbers: number[]) => {
+      const valid = filterValidStickerNumbers(numbers, totalStickers);
+      if (!valid.length) return;
+      applyListUpdate(kind, (prev) =>
+        normalizeStickerList([...prev, ...valid])
+      );
+    },
+    [applyListUpdate, totalStickers]
+  );
+
+  const removeNumber = useCallback(
+    (kind: ListKind, num: number) => {
+      if (!Number.isInteger(num) || num < 1 || num > totalStickers) return;
+      applyListUpdate(kind, (prev) => prev.filter((n) => n !== num));
+    },
+    [applyListUpdate, totalStickers]
+  );
+
+  const setList = useCallback(
+    (kind: ListKind, numbers: number[]) => {
+      const valid = filterValidStickerNumbers(numbers, totalStickers);
+      applyListUpdate(kind, () => normalizeStickerList(valid));
+    },
+    [applyListUpdate, totalStickers]
+  );
+
   const addDuplicates = useCallback(
-    (numbers: number[]) => {
-      const valid = filterValidStickerNumbers(numbers, totalStickers);
-      if (!valid.length) return;
-      applyListUpdate("duplicates", (prev) =>
-        normalizeStickerList([...prev, ...valid])
-      );
-    },
-    [applyListUpdate, totalStickers]
+    (numbers: number[]) => addNumbers("duplicates", numbers),
+    [addNumbers]
   );
-
-  const removeDuplicate = useCallback(
-    (num: number) => {
-      if (!Number.isInteger(num) || num < 1 || num > totalStickers) return;
-      applyListUpdate("duplicates", (prev) => prev.filter((n) => n !== num));
-    },
-    [applyListUpdate, totalStickers]
-  );
-
   const addMissing = useCallback(
-    (numbers: number[]) => {
-      const valid = filterValidStickerNumbers(numbers, totalStickers);
-      if (!valid.length) return;
-      applyListUpdate("missing", (prev) =>
-        normalizeStickerList([...prev, ...valid])
-      );
-    },
-    [applyListUpdate, totalStickers]
+    (numbers: number[]) => addNumbers("missing", numbers),
+    [addNumbers]
   );
-
+  const removeDuplicate = useCallback(
+    (num: number) => removeNumber("duplicates", num),
+    [removeNumber]
+  );
   const removeMissing = useCallback(
-    (num: number) => {
-      if (!Number.isInteger(num) || num < 1 || num > totalStickers) return;
-      applyListUpdate("missing", (prev) => prev.filter((n) => n !== num));
-    },
-    [applyListUpdate, totalStickers]
+    (num: number) => removeNumber("missing", num),
+    [removeNumber]
+  );
+  const setDuplicates = useCallback(
+    (numbers: number[]) => setList("duplicates", numbers),
+    [setList]
+  );
+  const setMissing = useCallback(
+    (numbers: number[]) => setList("missing", numbers),
+    [setList]
   );
 
   const finalize = useCallback(async () => {
@@ -307,25 +321,19 @@ export function useStickers(debounceMs = 300) {
     };
   }, []);
 
-  const findSection = useCallback(
-    (sectionCode: string): Section | undefined => {
-      return sectionLookup.byCode.get(sectionCode.toUpperCase());
-    },
-    [sectionLookup]
-  );
+  function findSection(sectionCode: string): Section | undefined {
+    return sectionLookup.byCode.get(sectionCode.toUpperCase());
+  }
 
-  const getSectionNumbers = useCallback(
-    (sectionCode: string): number[] => {
-      const section = findSection(sectionCode);
-      if (!section) return [];
-      const numbers: number[] = [];
-      for (let i = section.startNumber; i <= section.endNumber; i++) {
-        numbers.push(i);
-      }
-      return numbers;
-    },
-    [findSection]
-  );
+  function getSectionNumbers(sectionCode: string): number[] {
+    const section = findSection(sectionCode);
+    if (!section) return [];
+    const numbers: number[] = [];
+    for (let i = section.startNumber; i <= section.endNumber; i++) {
+      numbers.push(i);
+    }
+    return numbers;
+  }
 
   const markAllInSection = useCallback(
     (sectionCode: string, mode: ListKind) => {
@@ -336,7 +344,7 @@ export function useStickers(debounceMs = 300) {
         normalizeStickerList([...prev, ...sectionNumbers])
       );
     },
-    [getSectionNumbers, applyListUpdate]
+    [sectionLookup, applyListUpdate]
   );
 
   const clearSection = useCallback(
@@ -348,7 +356,7 @@ export function useStickers(debounceMs = 300) {
         prev.filter((n) => n < section.startNumber || n > section.endNumber)
       );
     },
-    [findSection, applyListUpdate]
+    [sectionLookup, applyListUpdate]
   );
 
   const invertSection = useCallback(
@@ -370,23 +378,7 @@ export function useStickers(debounceMs = 300) {
         return normalizeStickerList(newList);
       });
     },
-    [findSection, getSectionNumbers, applyListUpdate]
-  );
-
-  const setDuplicates = useCallback(
-    (numbers: number[]) => {
-      const valid = filterValidStickerNumbers(numbers, totalStickers);
-      applyListUpdate("duplicates", () => normalizeStickerList(valid));
-    },
-    [applyListUpdate, totalStickers]
-  );
-
-  const setMissing = useCallback(
-    (numbers: number[]) => {
-      const valid = filterValidStickerNumbers(numbers, totalStickers);
-      applyListUpdate("missing", () => normalizeStickerList(valid));
-    },
-    [applyListUpdate, totalStickers]
+    [sectionLookup, applyListUpdate]
   );
 
   const markAll = useCallback(
