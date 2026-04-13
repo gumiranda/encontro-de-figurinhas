@@ -57,28 +57,34 @@ const MAX_PARSE_ENTRIES = 500;
 const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
 const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
 
+type ParseSegmentResult = {
+  valid: number[];
+  error: string | null;
+  formatted: string | null;
+};
+
 function parseSingle(
   code: string,
   num: number,
   codeMap: Map<string, Section>
-): { valid: number | null; error: string | null; formatted: string | null } {
+): ParseSegmentResult {
   if (!Number.isInteger(num)) {
-    return { valid: null, error: `${code}-${num}`, formatted: null };
+    return { valid: [], error: `${code}-${num}`, formatted: null };
   }
 
   const section = codeMap.get(code);
   if (!section) {
-    return { valid: null, error: `${code}-${num}`, formatted: null };
+    return { valid: [], error: `${code}-${num}`, formatted: null };
   }
 
   const sectionSize = section.endNumber - section.startNumber + 1;
   if (num < 1 || num > sectionSize) {
-    return { valid: null, error: `${code}-${num}`, formatted: null };
+    return { valid: [], error: `${code}-${num}`, formatted: null };
   }
 
   const absoluteNum = section.startNumber + num - 1;
   return {
-    valid: absoluteNum,
+    valid: [absoluteNum],
     error: null,
     formatted: `${code}-${num}`,
   };
@@ -89,7 +95,7 @@ function parseRange(
   start: number,
   end: number,
   codeMap: Map<string, Section>
-): { valid: number[]; error: string | null; formatted: string | null } {
+): ParseSegmentResult {
   if (!Number.isInteger(start) || !Number.isInteger(end)) {
     return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
   }
@@ -119,10 +125,7 @@ function parseRange(
   return { valid: numbers, error: null, formatted };
 }
 
-function parseEntry(
-  entry: string,
-  codeMap: Map<string, Section>
-): { valid: number[]; error: string | null; formatted: string | null } {
+function parseEntry(entry: string, codeMap: Map<string, Section>): ParseSegmentResult {
   const normalized = entry.trim().toUpperCase();
   if (!normalized) {
     return { valid: [], error: null, formatted: null };
@@ -145,12 +148,7 @@ function parseEntry(
   if (singleMatch) {
     const [, code, numStr] = singleMatch;
     if (code && numStr) {
-      const result = parseSingle(code, parseInt(numStr, 10), codeMap);
-      return {
-        valid: result.valid !== null ? [result.valid] : [],
-        error: result.error,
-        formatted: result.formatted,
-      };
+      return parseSingle(code, parseInt(numStr, 10), codeMap);
     }
   }
 
