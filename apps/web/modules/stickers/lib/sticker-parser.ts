@@ -32,14 +32,20 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
   return { byCode, byIndex };
 }
 
-// Find section for a given absolute number using sorted linear scan with early exit
+// Find section for a given absolute number (byIndex sorted by startNumber)
 export function findSectionForNumber(
   num: number,
   lookup: SectionLookup
 ): Section | undefined {
-  for (const section of lookup.byIndex) {
-    if (num < section.startNumber) return undefined;
-    if (num <= section.endNumber) return section;
+  let lo = 0;
+  let hi = lookup.byIndex.length - 1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >>> 1;
+    const s = lookup.byIndex[mid];
+    if (s === undefined) return undefined;
+    if (num < s.startNumber) hi = mid - 1;
+    else if (num > s.endNumber) lo = mid + 1;
+    else return s;
   }
   return undefined;
 }
