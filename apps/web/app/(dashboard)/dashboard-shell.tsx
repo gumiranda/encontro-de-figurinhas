@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { RoleBadge } from "@/components/role-badge";
 import { UserButton } from "@clerk/nextjs";
@@ -12,7 +12,6 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { LayoutDashboard, Menu, UserCog, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
 
 interface NavItem {
   label: string;
@@ -66,35 +65,27 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
 
-  // UX: hide nav links for non-admins. /admin/* is enforced in admin/layout.tsx (server).
   const isSuperadminOrCeo =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";
 
-  const navItems = useMemo(
-    () => [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      ...(isSuperadminOrCeo
-        ? [{ label: "Users", href: "/admin/users", icon: UserCog }]
-        : []),
-    ],
-    [isSuperadminOrCeo]
-  );
+  const navItems = [
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    ...(isSuperadminOrCeo
+      ? [{ label: "Users", href: "/admin/users", icon: UserCog }]
+      : []),
+  ];
 
-  // Needs onboarding - redirect to complete profile
   useEffect(() => {
-    if (currentUser && !currentUser.hasCompletedOnboarding) {
+    if (!isAuthenticated || authLoading || currentUser === undefined) return;
+    if (currentUser === null || !currentUser.hasCompletedOnboarding) {
       router.replace("/complete-profile");
     }
-  }, [currentUser, router]);
+  }, [isAuthenticated, authLoading, currentUser, router]);
 
-  // Middleware handles auth redirect to /sign-in
-  // Wait for auth and user data
-  if (authLoading || !isAuthenticated || currentUser === undefined || !currentUser || !currentUser.hasCompletedOnboarding) {
+  const isLoading = authLoading || !isAuthenticated || currentUser === undefined;
+  if (isLoading || !currentUser || !currentUser.hasCompletedOnboarding) {
     return <FullPageLoader />;
   }
-
-  const isSuperadmin = currentUser.role === "superadmin";
-  const isCeo = currentUser.role === "ceo";
 
   return (
     <div className="flex min-h-screen">
@@ -121,7 +112,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </SheetContent>
             </Sheet>
 
-            {(isSuperadmin || isCeo) && <RoleBadge role={currentUser.role} />}
+            {isSuperadminOrCeo && <RoleBadge role={currentUser.role} />}
           </div>
           <div className="flex items-center gap-4">
             <UserButton />
