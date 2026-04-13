@@ -102,6 +102,7 @@ export function StickerGrid({
               type="button"
               onClick={() => handleClick(num)}
               className={buttonClasses}
+              aria-pressed={state === "duplicate" || state === "missing"}
             >
               {relativeNum}
             </button>
