@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+  useReducer,
+} from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { toast } from "sonner";
@@ -33,6 +40,60 @@ function normalizeStickerList(numbers: number[]): number[] {
   return Array.from(new Set(numbers)).sort((a, b) => a - b);
 }
 
+function clampStickerListsToMax(
+  duplicates: number[],
+  missing: number[],
+  maxSticker: number
+): { duplicates: number[]; missing: number[] } {
+  return {
+    duplicates: normalizeStickerList(
+      filterValidStickerNumbers(duplicates, maxSticker)
+    ),
+    missing: normalizeStickerList(
+      filterValidStickerNumbers(missing, maxSticker)
+    ),
+  };
+}
+
+function listsEqual(a: number[], b: number[]): boolean {
+  return (
+    a.length === b.length && a.every((n, i) => n === b[i])
+  );
+}
+
+type StickersUiState = {
+  isDirty: boolean;
+  isSaving: boolean;
+  error: string | null;
+};
+
+type StickersUiAction =
+  | { type: "setDirty"; dirty: boolean }
+  | { type: "setSaving"; saving: boolean }
+  | { type: "setError"; error: string | null };
+
+function stickersUiReducer(
+  state: StickersUiState,
+  action: StickersUiAction
+): StickersUiState {
+  switch (action.type) {
+    case "setDirty":
+      return { ...state, isDirty: action.dirty };
+    case "setSaving":
+      return { ...state, isSaving: action.saving };
+    case "setError":
+      return { ...state, error: action.error };
+    default:
+      return state;
+  }
+}
+
+const initialStickersUi: StickersUiState = {
+  isDirty: false,
+  isSaving: false,
+  error: null,
+};
+
 export function useStickers(debounceMs = 300) {
   const data = useQuery(api.stickers.getUserStickers);
   const sections: Section[] = data?.sections ?? EMPTY_SECTIONS;
@@ -48,9 +109,10 @@ export function useStickers(debounceMs = 300) {
 
   const [localDuplicates, setLocalDuplicates] = useState<number[]>([]);
   const [localMissing, setLocalMissing] = useState<number[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
+  const [{ isDirty, isSaving, error }, dispatch] = useReducer(
+    stickersUiReducer,
+    initialStickersUi
+  );
 
   const updateStickerList = useMutation(api.stickers.updateStickerList);
 
@@ -69,86 +131,78 @@ export function useStickers(debounceMs = 300) {
     }
   }, [isLoading, serverDuplicates, serverMissing, isDirty]);
 
-  const saveWithDebounce = useCallback(
-    (finalize: boolean = false) => {
-      setIsDirty(true);
-      editCountRef.current++;
-      const editId = editCountRef.current;
+  const saveWithDebounce = useCallback(() => {
+    dispatch({ type: "setDirty", dirty: true });
+    editCountRef.current++;
+    const editId = editCountRef.current;
 
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
 
-      const dups = dupsRef.current;
-      const miss = missRef.current;
+    const dups = dupsRef.current;
+    const miss = missRef.current;
 
-      const lengthExceeded = dups.length > 980 || miss.length > 980;
+    const lengthExceeded = dups.length > 980 || miss.length > 980;
 
-      if (finalize) {
-        if (lengthExceeded) {
-          setError("Limite de figurinhas excedido");
-          return;
-        }
-        const disjointError = validateDisjoint(dups, miss);
-        if (disjointError) {
-          setError(disjointError);
-          return;
-        }
-        setError(null);
-        setIsSaving(true);
-        updateStickerList({ duplicates: dups, missing: miss, finalize: true })
-          .then(() => {
-            if (editCountRef.current === editId) {
-              setIsDirty(false);
-            }
-          })
-          .catch((e) => {
-            setError(e.message);
-            toast.error("Erro ao salvar. Tente novamente.");
-          })
-          .finally(() => setIsSaving(false));
+    if (lengthExceeded) {
+      dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
+      return;
+    }
+
+    debounceRef.current = setTimeout(() => {
+      const dupsAtSave = dupsRef.current;
+      const missAtSave = missRef.current;
+
+      if (dupsAtSave.length > 980 || missAtSave.length > 980) {
+        dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
         return;
       }
-
-      if (lengthExceeded) {
-        setError("Limite de figurinhas excedido");
+      const validationError = validateDisjoint(dupsAtSave, missAtSave);
+      if (validationError) {
+        dispatch({ type: "setError", error: validationError });
+        return;
       }
+      dispatch({ type: "setError", error: null });
 
-      debounceRef.current = setTimeout(() => {
-        const dupsAtSave = dupsRef.current;
-        const missAtSave = missRef.current;
-
-        if (dupsAtSave.length > 980 || missAtSave.length > 980) {
-          setError("Limite de figurinhas excedido");
-          return;
-        }
-        const validationError = validateDisjoint(dupsAtSave, missAtSave);
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
-        setError(null);
-
-        setIsSaving(true);
-        updateStickerList({
-          duplicates: dupsAtSave,
-          missing: missAtSave,
-          finalize: false,
+      dispatch({ type: "setSaving", saving: true });
+      updateStickerList({
+        duplicates: dupsAtSave,
+        missing: missAtSave,
+        finalize: false,
+      })
+        .then(() => {
+          if (editCountRef.current === editId) {
+            dispatch({ type: "setDirty", dirty: false });
+          }
         })
-          .then(() => {
-            if (editCountRef.current === editId) {
-              setIsDirty(false);
-            }
-          })
-          .catch((e) => {
-            setError(e.message);
-            toast.error("Erro ao salvar. Tente novamente.");
-          })
-          .finally(() => setIsSaving(false));
-      }, debounceMs);
-    },
-    [debounceMs, updateStickerList]
-  );
+        .catch((e) => {
+          dispatch({ type: "setError", error: e.message });
+          toast.error("Erro ao salvar. Tente novamente.");
+        })
+        .finally(() => {
+          dispatch({ type: "setSaving", saving: false });
+        });
+    }, debounceMs);
+  }, [debounceMs, updateStickerList]);
+
+  useEffect(() => {
+    const { duplicates: d, missing: m } = clampStickerListsToMax(
+      dupsRef.current,
+      missRef.current,
+      totalStickers
+    );
+    if (listsEqual(d, dupsRef.current) && listsEqual(m, missRef.current)) {
+      return;
+    }
+    dupsRef.current = d;
+    missRef.current = m;
+    setLocalDuplicates(d);
+    setLocalMissing(m);
+    if (isDirty) {
+      saveWithDebounce();
+    }
+  }, [totalStickers, isDirty, saveWithDebounce]);
 
   const applyListUpdate = useCallback(
     (kind: ListKind, computeNext: (prev: number[]) => number[]) => {
@@ -214,18 +268,18 @@ export function useStickers(debounceMs = 300) {
 
     const validationError = validateDisjoint(dups, miss);
     if (validationError) {
-      setError(validationError);
+      dispatch({ type: "setError", error: validationError });
       throw new Error(validationError);
     }
 
     if (dups.length === 0 || miss.length === 0) {
       const msg = "Preencha figurinhas repetidas E faltantes antes de continuar";
-      setError(msg);
+      dispatch({ type: "setError", error: msg });
       throw new Error(msg);
     }
 
-    setError(null);
-    setIsSaving(true);
+    dispatch({ type: "setError", error: null });
+    dispatch({ type: "setSaving", saving: true });
 
     try {
       await updateStickerList({
@@ -235,10 +289,10 @@ export function useStickers(debounceMs = 300) {
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro ao salvar";
-      setError(msg);
+      dispatch({ type: "setError", error: msg });
       throw e;
     } finally {
-      setIsSaving(false);
+      dispatch({ type: "setSaving", saving: false });
     }
   }, [updateStickerList]);
 
