@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@workspace/ui/components/accordion";
+import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { StickerGrid } from "./sticker-grid";
 import { getFlagGradient } from "../../lib/flag-gradients";
 import type { ListKind } from "../../lib/use-stickers";
@@ -62,85 +63,87 @@ export function SectionAccordion({
   const missingSet = useMemo(() => new Set(missing), [missing]);
 
   return (
-    <Accordion type="single" collapsible className="space-y-2">
-      {sections.map((section, idx) => {
-        const counts = sectionCounts[idx];
-        if (!counts) return null;
+    <TooltipProvider delayDuration={300}>
+      <Accordion type="single" collapsible className="space-y-2">
+        {sections.map((section, idx) => {
+          const counts = sectionCounts[idx];
+          if (!counts) return null;
 
-        const flagGradient = getFlagGradient(section.code);
-        const activeCount = mode === "duplicates" ? counts.dupCount : counts.missCount;
-        const countColor = mode === "duplicates" ? "text-emerald-600" : "text-red-500";
+          const flagGradient = getFlagGradient(section.code);
+          const activeCount = mode === "duplicates" ? counts.dupCount : counts.missCount;
+          const countColor = mode === "duplicates" ? "text-emerald-600" : "text-red-500";
 
-        return (
-          <AccordionItem
-            key={section.code}
-            value={section.code}
-            className="border border-outline-variant/20 rounded-xl overflow-hidden bg-surface-container-low"
-          >
-            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-surface-container">
-              <div className="flex items-center gap-3 w-full">
-                {/* Flag */}
-                <div className="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative shrink-0">
-                  <div className={`absolute inset-0 ${flagGradient} opacity-80`} />
+          return (
+            <AccordionItem
+              key={section.code}
+              value={section.code}
+              className="border border-outline-variant/20 rounded-xl overflow-hidden bg-surface-container-low"
+            >
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-surface-container">
+                <div className="flex items-center gap-3 w-full">
+                  {/* Flag */}
+                  <div className="w-8 h-6 rounded-sm overflow-hidden bg-surface-container-high relative shrink-0">
+                    <div className={`absolute inset-0 ${flagGradient} opacity-80`} />
+                  </div>
+
+                  {/* Name + Code */}
+                  <div className="flex-1 text-left">
+                    <span className="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">
+                      {section.name}
+                    </span>
+                    <span className="text-xs text-on-surface-variant font-mono ml-2">
+                      ({section.code})
+                    </span>
+                  </div>
+
+                  {/* Counter */}
+                  <div className={`text-sm font-bold ${countColor}`}>
+                    {activeCount}/{counts.total}
+                  </div>
+                </div>
+              </AccordionTrigger>
+
+              <AccordionContent className="px-4 pb-4">
+                {/* Bulk actions */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => onBulkAction(section.code, "all")}
+                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                  >
+                    Marcar todas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onBulkAction(section.code, "none")}
+                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                  >
+                    Desmarcar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onBulkAction(section.code, "invert")}
+                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                  >
+                    Inverter
+                  </button>
                 </div>
 
-                {/* Name + Code */}
-                <div className="flex-1 text-left">
-                  <span className="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">
-                    {section.name}
-                  </span>
-                  <span className="text-xs text-on-surface-variant font-mono ml-2">
-                    ({section.code})
-                  </span>
-                </div>
-
-                {/* Counter */}
-                <div className={`text-sm font-bold ${countColor}`}>
-                  {activeCount}/{counts.total}
-                </div>
-              </div>
-            </AccordionTrigger>
-
-            <AccordionContent className="px-4 pb-4">
-              {/* Bulk actions */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={() => onBulkAction(section.code, "all")}
-                  className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
-                >
-                  Marcar todas
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onBulkAction(section.code, "none")}
-                  className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
-                >
-                  Desmarcar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onBulkAction(section.code, "invert")}
-                  className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
-                >
-                  Inverter
-                </button>
-              </div>
-
-              {/* Grid - só renderiza quando expandido */}
-              <StickerGrid
-                mode={mode}
-                sectionCode={section.code}
-                sectionStart={section.startNumber}
-                sectionEnd={section.endNumber}
-                duplicates={duplicatesSet}
-                missing={missingSet}
-                onToggle={onToggle}
-              />
-            </AccordionContent>
-          </AccordionItem>
-        );
-      })}
-    </Accordion>
+                {/* Grid - só renderiza quando expandido */}
+                <StickerGrid
+                  mode={mode}
+                  sectionCode={section.code}
+                  sectionStart={section.startNumber}
+                  sectionEnd={section.endNumber}
+                  duplicates={duplicatesSet}
+                  missing={missingSet}
+                  onToggle={onToggle}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+    </TooltipProvider>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type MouseEvent } from "react";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
@@ -56,59 +55,65 @@ export function StickerGrid({
     onToggle(num, isSelected ? "remove" : "add");
   };
 
+  const handleStickerButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    const raw = e.currentTarget.dataset.stickerNum;
+    const num = raw !== undefined ? Number(raw) : NaN;
+    if (!Number.isFinite(num)) return;
+    handleClick(num);
+  };
+
   return (
-    <TooltipProvider delayDuration={300}>
-      <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-        {sectionNumbers.map((num) => {
-          const relativeNum = num - sectionStart + 1;
-          const state = getState(num);
+    <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+      {sectionNumbers.map((num) => {
+        const relativeNum = num - sectionStart + 1;
+        const state = getState(num);
 
-          const buttonClasses = cn(
-            "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95",
-            {
-              "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
-                state === "duplicate",
-              "bg-destructive/20 text-destructive border-2 border-destructive":
-                state === "missing",
-              "bg-muted/50 text-muted-foreground border-2 border-dashed border-muted-foreground/50 opacity-50 cursor-not-allowed":
-                state === "blocked",
-              "bg-surface-container text-on-surface-variant border-2 border-transparent hover:border-outline-variant":
-                state === "none",
-            }
-          );
-
-          if (state === "blocked") {
-            return (
-              <Tooltip key={num}>
-                <TooltipTrigger asChild>
-                  <button type="button" className={buttonClasses} disabled>
-                    {relativeNum}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">
-                    Ja esta em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
-                    <br />
-                    Remova de la primeiro.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            );
+        const buttonClasses = cn(
+          "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95",
+          {
+            "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
+              state === "duplicate",
+            "bg-destructive/20 text-destructive border-2 border-destructive":
+              state === "missing",
+            "bg-muted/50 text-muted-foreground border-2 border-dashed border-muted-foreground/50 opacity-50 cursor-not-allowed":
+              state === "blocked",
+            "bg-surface-container text-on-surface-variant border-2 border-transparent hover:border-outline-variant":
+              state === "none",
           }
+        );
 
+        if (state === "blocked") {
           return (
-            <button
-              key={num}
-              type="button"
-              onClick={() => handleClick(num)}
-              className={buttonClasses}
-              aria-pressed={state === "duplicate" || state === "missing"}
-            >
-              {relativeNum}
-            </button>
+            <Tooltip key={num}>
+              <TooltipTrigger asChild>
+                <button type="button" className={buttonClasses} disabled>
+                  {relativeNum}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">
+                  Ja esta em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
+                  <br />
+                  Remova de la primeiro.
+                </p>
+              </TooltipContent>
+            </Tooltip>
           );
-        })}
-      </div>
-    </TooltipProvider>
+        }
+
+        return (
+          <button
+            key={num}
+            type="button"
+            data-sticker-num={num}
+            onClick={handleStickerButtonClick}
+            className={buttonClasses}
+            aria-pressed={state === "duplicate" || state === "missing"}
+          >
+            {relativeNum}
+          </button>
+        );
+      })}
+    </div>
   );
 }
