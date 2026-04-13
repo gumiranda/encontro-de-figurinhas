@@ -58,6 +58,8 @@ export function findSectionForNumber(
   return undefined;
 }
 
+const MAX_PARSE_ENTRIES = 500;
+
 const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
 const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
 
@@ -174,6 +176,7 @@ export function parseStickers(
 
   const entries = input
     .split(/[,\s]+/)
+    .slice(0, MAX_PARSE_ENTRIES)
     .map((e) => e.trim())
     .filter((e) => e.length > 0);
 
