@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { ArrowLeft } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { CompleteProfileForm } from "../components/complete-profile-form";
@@ -12,6 +13,16 @@ export function CompleteProfileView() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+  const createUser = useMutation(api.users.createUser);
+  const called = useRef(false);
+
+  // Create user if authenticated but doesn't exist in Convex
+  useEffect(() => {
+    if (isAuthenticated && currentUser === null && !called.current) {
+      called.current = true;
+      createUser();
+    }
+  }, [isAuthenticated, currentUser, createUser]);
 
   // Middleware handles auth redirect to /sign-in
   if (authLoading || !isAuthenticated || currentUser === undefined) {
@@ -23,6 +34,7 @@ export function CompleteProfileView() {
     redirect("/dashboard");
   }
 
+  // Wait for user to be created
   if (!currentUser) {
     return <FullPageLoader />;
   }

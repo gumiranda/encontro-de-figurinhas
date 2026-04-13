@@ -25,9 +25,9 @@ export default function BootstrapPage() {
     return <FullPageLoader />;
   }
 
-  // Users already exist - redirect to setup (for regular users)
+  // Users already exist - redirect to complete-profile (creates user there)
   if (hasAnyUsers && currentUser === null) {
-    redirect("/setup");
+    redirect("/complete-profile");
   }
 
   // User exists - redirect based on onboarding status
