@@ -47,9 +47,11 @@ export const updateStickerList = mutation({
     const config = await ctx.db.query("albumConfig").first();
     const maxSticker = config?.totalStickers ?? 980;
 
+    const newDup = new Set<number>(args.duplicates);
+    const newMiss = new Set<number>(args.missing);
+
     // 1. Validacao: arrays disjuntos
-    const dupSet = new Set(args.duplicates);
-    const intersection = args.missing.filter((n) => dupSet.has(n));
+    const intersection = args.missing.filter((n) => newDup.has(n));
     if (intersection.length > 0) {
       throw new Error(
         `Numeros nao podem estar em ambas listas: ${intersection.join(", ")}`
@@ -59,7 +61,11 @@ export const updateStickerList = mutation({
     // 2. Validacao: inteiros no range (1-maxSticker, dinamico do DB)
     const allNumbers = [...args.duplicates, ...args.missing];
     const invalid = allNumbers.filter(
-      (n) => !Number.isInteger(n) || n < 1 || n > maxSticker
+      (n) =>
+        !Number.isInteger(n) ||
+        !Number.isFinite(n) ||
+        n < 1 ||
+        n > maxSticker
     );
     if (invalid.length > 0) {
       throw new Error(`Numeros invalidos (1-${maxSticker}): ${invalid.join(", ")}`);
@@ -68,8 +74,6 @@ export const updateStickerList = mutation({
     // 3. Skip se arrays iguais (rate limiting server-side)
     const currentDup = new Set<number>(user.duplicates ?? []);
     const currentMiss = new Set<number>(user.missing ?? []);
-    const newDup = new Set<number>(args.duplicates);
-    const newMiss = new Set<number>(args.missing);
 
     const setsEqual = (a: Set<number>, b: Set<number>) =>
       a.size === b.size && [...a].every((x) => b.has(x));
