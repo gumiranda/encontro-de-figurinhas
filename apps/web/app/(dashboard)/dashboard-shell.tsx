@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { RoleBadge } from "@/components/role-badge";
 import { UserButton } from "@clerk/nextjs";
@@ -10,7 +11,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import { LayoutDashboard, Menu, UserCog, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 interface NavItem {
@@ -59,6 +60,7 @@ function SidebarContent({ navItems, pathname, onNavigate }: SidebarContentProps)
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
@@ -77,14 +79,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     [isSuperadminOrCeo]
   );
 
-  // Middleware handles auth redirect to /sign-in
-  if (authLoading || !isAuthenticated || currentUser === undefined) {
-    return <FullPageLoader />;
-  }
-
   // Needs onboarding - redirect to complete profile
-  if (!currentUser?.hasCompletedOnboarding) {
-    redirect("/complete-profile");
+  useEffect(() => {
+    if (currentUser && !currentUser.hasCompletedOnboarding) {
+      router.replace("/complete-profile");
+    }
+  }, [currentUser, router]);
+
+  // Middleware handles auth redirect to /sign-in
+  // Wait for auth and user data
+  if (authLoading || !isAuthenticated || currentUser === undefined || !currentUser || !currentUser.hasCompletedOnboarding) {
+    return <FullPageLoader />;
   }
 
   const isSuperadmin = currentUser.role === "superadmin";

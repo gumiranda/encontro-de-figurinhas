@@ -6,7 +6,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { ArrowLeft } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 
 export function CompleteProfileView() {
@@ -24,18 +24,16 @@ export function CompleteProfileView() {
     }
   }, [isAuthenticated, currentUser, createUser]);
 
-  // Middleware handles auth redirect to /sign-in
-  if (authLoading || !isAuthenticated || currentUser === undefined) {
-    return <FullPageLoader />;
-  }
-
   // Already onboarded - redirect to dashboard
-  if (currentUser?.hasCompletedOnboarding) {
-    redirect("/dashboard");
-  }
+  useEffect(() => {
+    if (currentUser?.hasCompletedOnboarding) {
+      router.replace("/dashboard");
+    }
+  }, [currentUser, router]);
 
-  // Wait for user to be created
-  if (!currentUser) {
+  // Middleware handles auth redirect to /sign-in
+  // Wait for auth and user data
+  if (authLoading || !isAuthenticated || currentUser === undefined || !currentUser || currentUser.hasCompletedOnboarding) {
     return <FullPageLoader />;
   }
 

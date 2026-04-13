@@ -3,16 +3,18 @@
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 export default function BootstrapPage() {
+  const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const hasAnyUsers = useQuery(api.users.hasAnyUsers);
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const bootstrapSuperadmin = useMutation(api.users.bootstrapSuperadmin);
   const called = useRef(false);
 
+  // Bootstrap superadmin if no users exist
   useEffect(() => {
     if (isAuthenticated && hasAnyUsers === false && !called.current) {
       called.current = true;
@@ -20,25 +22,26 @@ export default function BootstrapPage() {
     }
   }, [isAuthenticated, hasAnyUsers, bootstrapSuperadmin]);
 
-  // Middleware handles auth redirect
-  if (authLoading || !isAuthenticated || hasAnyUsers === undefined) {
-    return <FullPageLoader />;
-  }
+  // Redirect based on user state
+  useEffect(() => {
+    if (hasAnyUsers === undefined) return;
 
-  // Users already exist - redirect to complete-profile (creates user there)
-  if (hasAnyUsers && currentUser === null) {
-    redirect("/complete-profile");
-  }
-
-  // User exists - redirect based on onboarding status
-  if (currentUser) {
-    if (currentUser.hasCompletedOnboarding) {
-      redirect("/dashboard");
-    } else {
-      redirect("/complete-profile");
+    // Users already exist but current user not in Convex - go to complete-profile
+    if (hasAnyUsers && currentUser === null) {
+      router.replace("/complete-profile");
+      return;
     }
-  }
 
-  // Wait for superadmin to be created
+    // User exists - redirect based on onboarding status
+    if (currentUser) {
+      if (currentUser.hasCompletedOnboarding) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/complete-profile");
+      }
+    }
+  }, [hasAnyUsers, currentUser, router]);
+
+  // Wait for data
   return <FullPageLoader />;
 }
