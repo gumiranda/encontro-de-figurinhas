@@ -29,10 +29,10 @@ export function StickerGrid({
   missing,
   onToggle,
 }: Props) {
-  const sectionNumbers = useMemo(
-    () => Array.from({ length: sectionEnd - sectionStart + 1 }, (_, i) => sectionStart + i),
-    [sectionStart, sectionEnd]
-  );
+  const sectionNumbers = useMemo(() => {
+    const count = Math.max(0, sectionEnd - sectionStart + 1);
+    return Array.from({ length: count }, (_, i) => sectionStart + i);
+  }, [sectionStart, sectionEnd]);
 
   const getState = (
     num: number
