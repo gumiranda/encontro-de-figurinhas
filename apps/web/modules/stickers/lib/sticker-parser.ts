@@ -58,17 +58,16 @@ const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
 // Range: BRA-1-15 (código + hífen + início + hífen + fim)
 const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
 
-// Sanitiza input removendo tags HTML/scripts
-function sanitize(input: string): string {
-  return input.replace(/<[^>]*>/g, "").trim();
-}
-
 // Parseia uma entrada singular (ex: BRA-10)
 function parseSingle(
   code: string,
   num: number,
   codeMap: Map<string, Section>
 ): { valid: number | null; error: string | null; formatted: string | null } {
+  if (!Number.isInteger(num)) {
+    return { valid: null, error: `${code}-${num}`, formatted: null };
+  }
+
   const section = codeMap.get(code);
   if (!section) {
     return { valid: null, error: `${code}-${num}`, formatted: null };
@@ -94,6 +93,10 @@ function parseRange(
   end: number,
   codeMap: Map<string, Section>
 ): { valid: number[]; error: string | null; formatted: string | null } {
+  if (!Number.isInteger(start) || !Number.isInteger(end)) {
+    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+  }
+
   const section = codeMap.get(code);
   if (!section) {
     return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
@@ -125,7 +128,7 @@ function parseEntry(
   entry: string,
   codeMap: Map<string, Section>
 ): { valid: number[]; error: string | null; formatted: string | null } {
-  const normalized = sanitize(entry).toUpperCase();
+  const normalized = entry.trim().toUpperCase();
   if (!normalized) {
     return { valid: [], error: null, formatted: null };
   }
