@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
-import { parseStickers, type Section } from "../../lib/sticker-parser";
+import {
+  buildSectionLookup,
+  parseStickers,
+  type Section,
+} from "../../lib/sticker-parser";
 
 type StickerQuickInputProps = {
   mode: "duplicates" | "missing";
@@ -25,6 +29,11 @@ export function StickerQuickInput({
   const [inputValue, setInputValue] = useState("");
   const [feedback, setFeedback] = useState<FeedbackState>(null);
 
+  const sectionLookup = useMemo(
+    () => buildSectionLookup(sections),
+    [sections]
+  );
+
   // Limpar feedback após 3 segundos
   useEffect(() => {
     if (feedback) {
@@ -36,7 +45,7 @@ export function StickerQuickInput({
   const handleSubmit = useCallback(() => {
     if (!inputValue.trim()) return;
 
-    const result = parseStickers(inputValue, sections);
+    const result = parseStickers(inputValue, sectionLookup);
 
     if (result.valid.length > 0) {
       onAdd(result.valid);
@@ -53,7 +62,7 @@ export function StickerQuickInput({
         invalid: result.invalid,
       });
     }
-  }, [inputValue, onAdd, sections]);
+  }, [inputValue, onAdd, sectionLookup]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

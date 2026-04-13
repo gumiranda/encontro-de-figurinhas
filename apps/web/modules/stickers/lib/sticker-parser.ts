@@ -34,6 +34,12 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
   return { byCode, byIndex };
 }
 
+function resolveLookup(lookupOrSections: SectionLookup | Section[]): SectionLookup {
+  return Array.isArray(lookupOrSections)
+    ? buildSectionLookup(lookupOrSections)
+    : lookupOrSections;
+}
+
 // Find section for a given absolute number (byIndex sorted by startNumber)
 export function findSectionForNumber(
   num: number,
@@ -165,13 +171,16 @@ function parseEntry(
   return { valid: [], error: entry.trim(), formatted: null };
 }
 
-export function parseStickers(input: string, sections: Section[]): ParseResult {
+export function parseStickers(
+  input: string,
+  lookupOrSections: SectionLookup | Section[]
+): ParseResult {
   const valid: number[] = [];
   const invalid: string[] = [];
   const formatted: string[] = [];
   const seen = new Set<number>();
 
-  const { byCode: codeMap } = buildSectionLookup(sections);
+  const codeMap = resolveLookup(lookupOrSections).byCode;
 
   // Dividir por vírgula, espaço ou quebra de linha
   const entries = input
@@ -215,10 +224,7 @@ export function formatStickerNumber(
   fullName: string;
   display: string;
 } {
-  // Support both SectionLookup and Section[] for backwards compatibility
-  const lookup = Array.isArray(lookupOrSections)
-    ? buildSectionLookup(lookupOrSections)
-    : lookupOrSections;
+  const lookup = resolveLookup(lookupOrSections);
 
   const section = findSectionForNumber(num, lookup);
 
@@ -245,10 +251,7 @@ export function groupBySections(
   numbers: number[],
   lookupOrSections: SectionLookup | Section[]
 ): Map<string, number[]> {
-  // Support both SectionLookup and Section[] for backwards compatibility
-  const lookup = Array.isArray(lookupOrSections)
-    ? buildSectionLookup(lookupOrSections)
-    : lookupOrSections;
+  const lookup = resolveLookup(lookupOrSections);
 
   const groups = new Map<string, number[]>();
 
