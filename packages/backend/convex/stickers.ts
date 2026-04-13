@@ -3,6 +3,9 @@ import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { getAuthenticatedUser } from "./lib/auth";
 
+/** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
+const MAX_STICKER_ARRAY_SIZE = 1000;
+
 // Query - busca figurinhas e albumConfig juntos
 export const getUserStickers = query({
   args: {},
@@ -30,6 +33,15 @@ export const updateStickerList = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) throw new Error("Unauthorized");
+
+    if (
+      args.duplicates.length > MAX_STICKER_ARRAY_SIZE ||
+      args.missing.length > MAX_STICKER_ARRAY_SIZE
+    ) {
+      throw new Error(
+        `Cada lista pode ter no máximo ${MAX_STICKER_ARRAY_SIZE} figurinhas`
+      );
+    }
 
     // Buscar config do DB (nao hardcoded)
     const config = await ctx.db.query("albumConfig").first();
