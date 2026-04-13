@@ -28,9 +28,9 @@ function filterValidStickerNumbers(
   );
 }
 
-/** Valid ints only; Set removes duplicate entries callers may send; sort is canonical order. */
-function normalizeStickerList(valid: number[]): number[] {
-  return Array.from(new Set(valid)).sort((a, b) => a - b);
+/** Dedupe + ascending sort (canonical order for sticker ids). */
+function normalizeStickerList(numbers: number[]): number[] {
+  return Array.from(new Set(numbers)).sort((a, b) => a - b);
 }
 
 export function useStickers(debounceMs = 300) {
@@ -82,16 +82,19 @@ export function useStickers(debounceMs = 300) {
       const dups = dupsRef.current;
       const miss = missRef.current;
 
-      const quickError =
-        dups.length > 980 || miss.length > 980
-          ? "Limite de figurinhas excedido"
-          : validateDisjoint(dups, miss);
-      setError(quickError);
+      const lengthExceeded = dups.length > 980 || miss.length > 980;
 
       if (finalize) {
-        if (quickError) {
+        if (lengthExceeded) {
+          setError("Limite de figurinhas excedido");
           return;
         }
+        const disjointError = validateDisjoint(dups, miss);
+        if (disjointError) {
+          setError(disjointError);
+          return;
+        }
+        setError(null);
         setIsSaving(true);
         updateStickerList({ duplicates: dups, missing: miss, finalize: true })
           .then(() => {
@@ -105,6 +108,10 @@ export function useStickers(debounceMs = 300) {
           })
           .finally(() => setIsSaving(false));
         return;
+      }
+
+      if (lengthExceeded) {
+        setError("Limite de figurinhas excedido");
       }
 
       debounceRef.current = setTimeout(() => {
@@ -164,7 +171,7 @@ export function useStickers(debounceMs = 300) {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
       if (!valid.length) return;
       applyListUpdate("duplicates", (prev) =>
-        Array.from(new Set([...prev, ...valid])).sort((a, b) => a - b)
+        normalizeStickerList([...prev, ...valid])
       );
     },
     [applyListUpdate, totalStickers]
@@ -183,7 +190,7 @@ export function useStickers(debounceMs = 300) {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
       if (!valid.length) return;
       applyListUpdate("missing", (prev) =>
-        Array.from(new Set([...prev, ...valid])).sort((a, b) => a - b)
+        normalizeStickerList([...prev, ...valid])
       );
     },
     [applyListUpdate, totalStickers]
@@ -272,7 +279,7 @@ export function useStickers(debounceMs = 300) {
       if (sectionNumbers.length === 0) return;
 
       applyListUpdate(mode, (prev) =>
-        Array.from(new Set([...prev, ...sectionNumbers])).sort((a, b) => a - b)
+        normalizeStickerList([...prev, ...sectionNumbers])
       );
     },
     [getSectionNumbers, applyListUpdate]
@@ -306,8 +313,7 @@ export function useStickers(debounceMs = 300) {
             newList.push(num);
           }
         }
-        newList.sort((a, b) => a - b);
-        return newList;
+        return normalizeStickerList(newList);
       });
     },
     [findSection, getSectionNumbers, applyListUpdate]
