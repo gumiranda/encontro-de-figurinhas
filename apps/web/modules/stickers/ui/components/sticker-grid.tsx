@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -28,44 +28,34 @@ export function StickerGrid({
   missing,
   onToggle,
 }: Props) {
-  // Gera array de números da seção
-  const sectionNumbers = useMemo(() => {
-    const numbers: number[] = [];
-    for (let i = sectionStart; i <= sectionEnd; i++) {
-      numbers.push(i);
-    }
-    return numbers;
-  }, [sectionStart, sectionEnd]);
-
-  const getState = useCallback(
-    (num: number): "none" | "duplicate" | "missing" | "blocked" => {
-      const isInDuplicates = duplicates.has(num);
-      const isInMissing = missing.has(num);
-
-      // Bloqueado se está no modo oposto
-      if (mode === "duplicates" && isInMissing) return "blocked";
-      if (mode === "missing" && isInDuplicates) return "blocked";
-
-      if (isInDuplicates) return "duplicate";
-      if (isInMissing) return "missing";
-      return "none";
-    },
-    [mode, duplicates, missing]
+  const sectionNumbers = useMemo(
+    () => Array.from({ length: sectionEnd - sectionStart + 1 }, (_, i) => sectionStart + i),
+    [sectionStart, sectionEnd]
   );
 
-  const handleClick = useCallback(
-    (num: number) => {
-      const state = getState(num);
-      if (state === "blocked") return;
+  const getState = (
+    num: number
+  ): "none" | "duplicate" | "missing" | "blocked" => {
+    const isInDuplicates = duplicates.has(num);
+    const isInMissing = missing.has(num);
 
-      // Determina se está atualmente selecionado no modo ativo
-      const isSelected =
-        mode === "duplicates" ? duplicates.has(num) : missing.has(num);
+    if (mode === "duplicates" && isInMissing) return "blocked";
+    if (mode === "missing" && isInDuplicates) return "blocked";
 
-      onToggle(num, isSelected ? "remove" : "add");
-    },
-    [mode, duplicates, missing, getState, onToggle]
-  );
+    if (isInDuplicates) return "duplicate";
+    if (isInMissing) return "missing";
+    return "none";
+  };
+
+  const handleClick = (num: number) => {
+    const state = getState(num);
+    if (state === "blocked") return;
+
+    const isSelected =
+      mode === "duplicates" ? duplicates.has(num) : missing.has(num);
+
+    onToggle(num, isSelected ? "remove" : "add");
+  };
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -74,7 +64,6 @@ export function StickerGrid({
           const relativeNum = num - sectionStart + 1;
           const state = getState(num);
 
-          // Classes baseadas no estado
           let buttonClasses =
             "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 ";
 
