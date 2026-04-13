@@ -1,13 +1,14 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import { ArrowLeft, ArrowLeftRight, ArrowRight, Palette, Settings } from "lucide-react";
+import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
+import { GlobalCheckbox } from "../components/global-checkbox";
 import { SectionAccordion } from "../components/section-accordion";
 import { StickerQuickInput } from "../components/sticker-quick-input";
+import { TabToggle } from "../components/tab-toggle";
 
 type Tab = ListKind;
 
@@ -22,18 +23,6 @@ type TabConfig = {
   hint: string;
   tabActiveClass: string;
 };
-
-const TAB_ORDER: Tab[] = ["duplicates", "missing"];
-
-const tabIcons = {
-  duplicates: Palette,
-  missing: ArrowLeftRight,
-} as const;
-
-const tabLabels = {
-  duplicates: { short: "REPETIDAS", long: "TENHO REPETIDAS" },
-  missing: { short: "PRECISO", long: "PRECISO" },
-} as const;
 
 export function QuickRegisterView() {
   const router = useRouter();
@@ -151,38 +140,7 @@ export function QuickRegisterView() {
       </header>
 
       <main className="flex-1 px-6 pt-6 max-w-2xl mx-auto w-full">
-        {/* Toggle Switch */}
-        <section className="mb-8">
-          <div className="bg-surface-container-low p-1.5 rounded-full flex items-center stadium-shadow">
-            {TAB_ORDER.map((tab) => {
-              const Icon = tabIcons[tab];
-              const cfg = tabConfig[tab];
-              const isActive = activeTab === tab;
-              const labels = tabLabels[tab];
-              return (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 ${
-                    isActive ? cfg.tabActiveClass : "text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  <Icon
-                    className="size-5 shrink-0"
-                    strokeWidth={isActive ? 2.25 : 2}
-                    fill={isActive ? "currentColor" : "none"}
-                  />
-                  <span className="hidden sm:inline">{labels.long}</span>
-                  <span className="sm:hidden">{labels.short}</span>
-                  {cfg.list.length > 0 && (
-                    <span className="ml-1 text-xs opacity-75">({cfg.list.length})</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+        <TabToggle activeTab={activeTab} onTabChange={setActiveTab} tabConfig={tabConfig} />
 
         {/* Campo de Entrada */}
         <section className="mb-10">
@@ -208,35 +166,17 @@ export function QuickRegisterView() {
           </div>
         </section>
 
-        {/* Checkbox Global */}
-        <section className="mb-6">
-          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/20">
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="select-all"
-                checked={current.list.length === totalStickers}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    markAll(activeTab);
-                  } else {
-                    clearAll(activeTab);
-                  }
-                }}
-                className="h-5 w-5"
-              />
-              <label
-                htmlFor="select-all"
-                className="text-sm font-bold text-on-surface cursor-pointer"
-              >
-                {current.selectAllLabel}
-              </label>
-            </div>
-            <span className="text-xs text-on-surface-variant">
-              {current.list.length}/{totalStickers}
-            </span>
-          </div>
-          <p className="text-xs text-on-surface-variant mt-2 px-1">{current.hint}</p>
-        </section>
+        <GlobalCheckbox
+          checked={current.list.length === totalStickers}
+          onCheckedChange={(checked) => {
+            if (checked) markAll(activeTab);
+            else clearAll(activeTab);
+          }}
+          label={current.selectAllLabel}
+          hint={current.hint}
+          currentCount={current.list.length}
+          totalStickers={totalStickers}
+        />
 
         {/* Grid por Seção */}
         <section className="pb-12">
