@@ -66,6 +66,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
 
+  // UX: hide nav links for non-admins. /admin/* is enforced in admin/layout.tsx (server).
   const isSuperadminOrCeo =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";
 
