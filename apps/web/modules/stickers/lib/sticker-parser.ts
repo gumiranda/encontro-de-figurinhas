@@ -173,7 +173,7 @@ export function parseStickers(
   const codeMap = resolveLookup(lookupOrSections).byCode;
 
   const entries = input
-    .split(/[,\s\n]+/)
+    .split(/[,\s]+/)
     .map((e) => e.trim())
     .filter((e) => e.length > 0);
 
