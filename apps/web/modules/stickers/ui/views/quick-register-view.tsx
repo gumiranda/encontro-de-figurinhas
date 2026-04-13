@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -99,9 +100,7 @@ export function QuickRegisterView() {
     try {
       await finalize();
       router.push("/dashboard");
-    } catch {
-      // Erro ja tratado no hook
-    }
+    } catch {}
   };
 
   if (isLoading) {
@@ -116,7 +115,6 @@ export function QuickRegisterView() {
 
   return (
     <div className="min-h-screen flex flex-col pb-24 bg-surface-dim text-on-surface font-body">
-      {/* TopAppBar */}
       <header className="bg-surface-dim sticky top-0 z-50 flex items-center justify-between w-full px-6 h-16">
         <div className="flex items-center gap-4">
           <button
@@ -142,25 +140,22 @@ export function QuickRegisterView() {
       <main className="flex-1 px-6 pt-6 max-w-2xl mx-auto w-full">
         <TabToggle activeTab={activeTab} onTabChange={setActiveTab} tabConfig={tabConfig} />
 
-        {/* Campo de Entrada */}
         <section className="mb-10">
           <StickerQuickInput mode={activeTab} sections={sections} onAdd={current.add} />
         </section>
 
-        {/* Erro */}
         {error && (
           <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
             {error}
           </div>
         )}
 
-        {/* Resumo */}
         <section className="flex items-center justify-between mb-6">
           <h2 className="font-headline font-bold text-lg tracking-tight text-on-surface">
             {current.title}
           </h2>
-          <div className={`px-3 py-1 rounded-full ${current.bgClass}`}>
-            <span className={`font-bold text-xs uppercase tracking-widest ${current.textClass}`}>
+          <div className={cn("rounded-full px-3 py-1", current.bgClass)}>
+            <span className={cn("font-bold text-xs uppercase tracking-widest", current.textClass)}>
               Total: {totalCount} figurinha{totalCount !== 1 ? "s" : ""}
             </span>
           </div>
@@ -178,7 +173,6 @@ export function QuickRegisterView() {
           totalStickers={totalStickers}
         />
 
-        {/* Grid por Seção */}
         <section className="pb-12">
           <SectionAccordion
             sections={sections}
@@ -191,7 +185,6 @@ export function QuickRegisterView() {
         </section>
       </main>
 
-      {/* Floating Bottom Action Button */}
       <div className="fixed bottom-0 left-0 right-0 p-6 z-40 bg-surface-dim/80 glass-effect">
         <div className="max-w-2xl mx-auto">
           <Button

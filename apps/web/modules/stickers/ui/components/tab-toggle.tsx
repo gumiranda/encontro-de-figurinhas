@@ -1,7 +1,11 @@
 "use client";
 
+import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeftRight, Palette } from "lucide-react";
 import type { ListKind } from "../../lib/use-stickers";
+
+const tabButtonBase =
+  "flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 font-label text-sm font-bold uppercase tracking-widest transition-all duration-300";
 
 const TAB_ORDER: ListKind[] = ["duplicates", "missing"];
 
@@ -40,9 +44,12 @@ export function TabToggle({ activeTab, onTabChange, tabConfig }: TabToggleProps)
               key={tab}
               type="button"
               onClick={() => onTabChange(tab)}
-              className={`flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 ${
-                isActive ? cfg.tabActiveClass : "text-on-surface-variant hover:text-on-surface"
-              }`}
+              className={cn(
+                tabButtonBase,
+                isActive
+                  ? cfg.tabActiveClass
+                  : "text-on-surface-variant hover:text-on-surface"
+              )}
             >
               <Icon
                 className="size-5 shrink-0"
