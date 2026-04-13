@@ -34,6 +34,15 @@ export function useStickers(debounceMs = 300) {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const editCountRef = useRef(0);
 
+  // Refs espelham listas locais para saves/debounce sem closure stale (fonte de verdade no timeout)
+  const dupsRef = useRef<number[]>([]);
+  const missRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    dupsRef.current = localDuplicates;
+    missRef.current = localMissing;
+  }, [localDuplicates, localMissing]);
+
   // Sincronizar state local com servidor quando idle
   useEffect(() => {
     if (!isLoading && !isDirty) {
@@ -55,9 +64,9 @@ export function useStickers(debounceMs = 300) {
     []
   );
 
-  // Salvar com debounce e isDirty tracking
+  // Salvar com debounce e isDirty tracking (le sempre dupsRef/missRef no momento do save, nao arrays capturados)
   const saveWithDebounce = useCallback(
-    (dups: number[], miss: number[], finalize: boolean = false) => {
+    (finalize: boolean = false) => {
       // Marcar como dirty e capturar edit ID
       setIsDirty(true);
       editCountRef.current++;
@@ -67,6 +76,9 @@ export function useStickers(debounceMs = 300) {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
+
+      const dups = dupsRef.current;
+      const miss = missRef.current;
 
       // Validar tamanho (rate limit)
       if (dups.length > 980 || miss.length > 980) {
@@ -99,10 +111,16 @@ export function useStickers(debounceMs = 300) {
         return;
       }
 
-      // Debounce para saves normais
+      // Debounce para saves normais — rele refs no tick do timeout para dados mais recentes
       debounceRef.current = setTimeout(() => {
+        const dupsAtSave = dupsRef.current;
+        const missAtSave = missRef.current;
         setIsSaving(true);
-        updateStickerList({ duplicates: dups, missing: miss, finalize: false })
+        updateStickerList({
+          duplicates: dupsAtSave,
+          missing: missAtSave,
+          finalize: false,
+        })
           .then(() => {
             if (editCountRef.current === editId) {
               setIsDirty(false);
@@ -124,11 +142,12 @@ export function useStickers(debounceMs = 300) {
       setLocalDuplicates((prev) => {
         const newSet = new Set([...prev, ...numbers]);
         const newArray = Array.from(newSet).sort((a, b) => a - b);
-        saveWithDebounce(newArray, localMissing);
+        dupsRef.current = newArray;
+        saveWithDebounce();
         return newArray;
       });
     },
-    [localMissing, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   // Remover figurinha repetida
@@ -136,11 +155,12 @@ export function useStickers(debounceMs = 300) {
     (num: number) => {
       setLocalDuplicates((prev) => {
         const newArray = prev.filter((n) => n !== num);
-        saveWithDebounce(newArray, localMissing);
+        dupsRef.current = newArray;
+        saveWithDebounce();
         return newArray;
       });
     },
-    [localMissing, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   // Adicionar figurinhas faltantes
@@ -149,11 +169,12 @@ export function useStickers(debounceMs = 300) {
       setLocalMissing((prev) => {
         const newSet = new Set([...prev, ...numbers]);
         const newArray = Array.from(newSet).sort((a, b) => a - b);
-        saveWithDebounce(localDuplicates, newArray);
+        missRef.current = newArray;
+        saveWithDebounce();
         return newArray;
       });
     },
-    [localDuplicates, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   // Remover figurinha faltante
@@ -161,11 +182,12 @@ export function useStickers(debounceMs = 300) {
     (num: number) => {
       setLocalMissing((prev) => {
         const newArray = prev.filter((n) => n !== num);
-        saveWithDebounce(localDuplicates, newArray);
+        missRef.current = newArray;
+        saveWithDebounce();
         return newArray;
       });
     },
-    [localDuplicates, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   // Finalizar (clicar no FAB)
@@ -175,14 +197,17 @@ export function useStickers(debounceMs = 300) {
       clearTimeout(debounceRef.current);
     }
 
+    const dups = dupsRef.current;
+    const miss = missRef.current;
+
     // Validar
-    const validationError = validateDisjoint(localDuplicates, localMissing);
+    const validationError = validateDisjoint(dups, miss);
     if (validationError) {
       setError(validationError);
       throw new Error(validationError);
     }
 
-    if (localDuplicates.length === 0 || localMissing.length === 0) {
+    if (dups.length === 0 || miss.length === 0) {
       const msg = "Preencha figurinhas repetidas E faltantes antes de continuar";
       setError(msg);
       throw new Error(msg);
@@ -193,8 +218,8 @@ export function useStickers(debounceMs = 300) {
 
     try {
       await updateStickerList({
-        duplicates: localDuplicates,
-        missing: localMissing,
+        duplicates: dups,
+        missing: miss,
         finalize: true,
       });
     } catch (e) {
@@ -204,7 +229,7 @@ export function useStickers(debounceMs = 300) {
     } finally {
       setIsSaving(false);
     }
-  }, [localDuplicates, localMissing, updateStickerList, validateDisjoint]);
+  }, [updateStickerList, validateDisjoint]);
 
   // Verificar se pode finalizar (FAB habilitado)
   const canFinalize =
@@ -253,19 +278,21 @@ export function useStickers(debounceMs = 300) {
         setLocalDuplicates((prev) => {
           const newSet = new Set([...prev, ...sectionNumbers]);
           const newArray = Array.from(newSet).sort((a, b) => a - b);
-          saveWithDebounce(newArray, localMissing);
+          dupsRef.current = newArray;
+          saveWithDebounce();
           return newArray;
         });
       } else {
         setLocalMissing((prev) => {
           const newSet = new Set([...prev, ...sectionNumbers]);
           const newArray = Array.from(newSet).sort((a, b) => a - b);
-          saveWithDebounce(localDuplicates, newArray);
+          missRef.current = newArray;
+          saveWithDebounce();
           return newArray;
         });
       }
     },
-    [getSectionNumbers, localDuplicates, localMissing, saveWithDebounce]
+    [getSectionNumbers, saveWithDebounce]
   );
 
   // Desmarca todas figurinhas da seção
@@ -279,7 +306,8 @@ export function useStickers(debounceMs = 300) {
           const newArray = prev.filter(
             (n) => n < section.startNumber || n > section.endNumber
           );
-          saveWithDebounce(newArray, localMissing);
+          dupsRef.current = newArray;
+          saveWithDebounce();
           return newArray;
         });
       } else {
@@ -287,12 +315,13 @@ export function useStickers(debounceMs = 300) {
           const newArray = prev.filter(
             (n) => n < section.startNumber || n > section.endNumber
           );
-          saveWithDebounce(localDuplicates, newArray);
+          missRef.current = newArray;
+          saveWithDebounce();
           return newArray;
         });
       }
     },
-    [findSection, localDuplicates, localMissing, saveWithDebounce]
+    [findSection, saveWithDebounce]
   );
 
   // Inverte seleção da seção
@@ -302,7 +331,8 @@ export function useStickers(debounceMs = 300) {
       if (!section) return;
 
       const sectionNumbers = getSectionNumbers(sectionCode);
-      const currentList = mode === "duplicates" ? localDuplicates : localMissing;
+      const currentList =
+        mode === "duplicates" ? dupsRef.current : missRef.current;
       const currentSet = new Set(currentList);
 
       // Toggle cada número: se está na lista remove, se não está adiciona
@@ -317,33 +347,37 @@ export function useStickers(debounceMs = 300) {
       newList.sort((a, b) => a - b);
 
       if (mode === "duplicates") {
+        dupsRef.current = newList;
         setLocalDuplicates(newList);
-        saveWithDebounce(newList, localMissing);
+        saveWithDebounce();
       } else {
+        missRef.current = newList;
         setLocalMissing(newList);
-        saveWithDebounce(localDuplicates, newList);
+        saveWithDebounce();
       }
     },
-    [findSection, getSectionNumbers, localDuplicates, localMissing, saveWithDebounce]
+    [findSection, getSectionNumbers, saveWithDebounce]
   );
 
   // SET completo para o grid (substitui array inteiro)
   const setDuplicates = useCallback(
     (numbers: number[]) => {
       const sorted = [...numbers].sort((a, b) => a - b);
+      dupsRef.current = sorted;
       setLocalDuplicates(sorted);
-      saveWithDebounce(sorted, localMissing);
+      saveWithDebounce();
     },
-    [localMissing, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   const setMissing = useCallback(
     (numbers: number[]) => {
       const sorted = [...numbers].sort((a, b) => a - b);
+      missRef.current = sorted;
       setLocalMissing(sorted);
-      saveWithDebounce(localDuplicates, sorted);
+      saveWithDebounce();
     },
-    [localDuplicates, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   // Marca TODAS as figurinhas do álbum
@@ -355,28 +389,32 @@ export function useStickers(debounceMs = 300) {
       }
 
       if (mode === "duplicates") {
+        dupsRef.current = allNumbers;
         setLocalDuplicates(allNumbers);
-        saveWithDebounce(allNumbers, localMissing);
+        saveWithDebounce();
       } else {
+        missRef.current = allNumbers;
         setLocalMissing(allNumbers);
-        saveWithDebounce(localDuplicates, allNumbers);
+        saveWithDebounce();
       }
     },
-    [totalStickers, localDuplicates, localMissing, saveWithDebounce]
+    [totalStickers, saveWithDebounce]
   );
 
   // Desmarca TODAS as figurinhas do álbum
   const clearAll = useCallback(
     (mode: "duplicates" | "missing") => {
       if (mode === "duplicates") {
+        dupsRef.current = [];
         setLocalDuplicates([]);
-        saveWithDebounce([], localMissing);
+        saveWithDebounce();
       } else {
+        missRef.current = [];
         setLocalMissing([]);
-        saveWithDebounce(localDuplicates, []);
+        saveWithDebounce();
       }
     },
-    [localDuplicates, localMissing, saveWithDebounce]
+    [saveWithDebounce]
   );
 
   return {
