@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { useMutation } from "convex/react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toast } from "sonner";
 import { CalendarIcon, Loader2, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -30,9 +30,9 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { NicknameInput } from "./nickname-input";
-import { CityAutocomplete } from "./city-autocomplete";
 import { Id } from "@workspace/backend/_generated/dataModel";
+import { CityAutocomplete } from "./city-autocomplete";
+import { NicknameInput } from "./nickname-input";
 
 const completeProfileSchema = z.object({
   nickname: z
@@ -79,7 +79,7 @@ export function CompleteProfileForm() {
       });
 
       toast.success("Perfil completo! Bem-vindo à Arena.");
-      router.push("/dashboard");
+      router.push("/cadastrar-figurinhas");
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "Nickname already taken") {
