@@ -190,14 +190,16 @@ export function parseStickers(input: string, lookup: SectionLookup): ParseResult
       continue;
     }
 
+    let addedAny = false;
     for (const num of result.valid) {
       if (!seen.has(num)) {
         seen.add(num);
         valid.push(num);
+        addedAny = true;
       }
     }
 
-    if (result.formatted) {
+    if (result.formatted && addedAny) {
       formatted.push(result.formatted);
     }
   }
