@@ -1,20 +1,17 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
-import { useRouter, redirect } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
+import { useConvexAuth, useQuery } from "convex/react";
+import { ArrowLeft } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
 import { CompleteProfileForm } from "../components/complete-profile-form";
-import { FullPageLoader } from "@/components/full-page-loader";
 
 export function CompleteProfileView() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const currentUser = useQuery(
-    api.users.getCurrentUser,
-    isAuthenticated ? {} : "skip"
-  );
+  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
 
   // Middleware handles auth redirect to /sign-in
   if (authLoading || !isAuthenticated || currentUser === undefined) {

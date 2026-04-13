@@ -10,7 +10,41 @@ export const getCurrentUser = query({
   },
 });
 
-export const getOrCreateUser = mutation({
+// Check if any users exist (for bootstrap flow)
+export const hasAnyUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await ctx.db.query("users").first();
+    return user !== null;
+  },
+});
+
+// Bootstrap: create first superadmin (fails if users exist)
+export const bootstrapSuperadmin = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const anyUser = await ctx.db.query("users").first();
+    if (anyUser) {
+      throw new Error("Users already exist - bootstrap not allowed");
+    }
+
+    const userId = await ctx.db.insert("users", {
+      name: identity.name ?? "Superadmin",
+      clerkId: identity.subject,
+      role: Role.SUPERADMIN,
+    });
+
+    return await ctx.db.get(userId);
+  },
+});
+
+// Create regular user (idempotent)
+export const createUser = mutation({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -30,14 +64,10 @@ export const getOrCreateUser = mutation({
       return existingUser;
     }
 
-    // First user becomes superadmin
-    const anyUser = await ctx.db.query("users").first();
-    const role = anyUser ? Role.USER : Role.SUPERADMIN;
-
     const userId = await ctx.db.insert("users", {
       name: identity.name ?? "Unknown",
       clerkId: clerkId,
-      role,
+      role: Role.USER,
     });
 
     return await ctx.db.get(userId);

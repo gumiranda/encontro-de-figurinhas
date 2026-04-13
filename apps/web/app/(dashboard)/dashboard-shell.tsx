@@ -10,8 +10,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import { LayoutDashboard, Menu, UserCog, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 interface NavItem {
