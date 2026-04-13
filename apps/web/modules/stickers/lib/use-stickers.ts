@@ -6,6 +6,14 @@ import { api } from "@workspace/backend/_generated/api";
 import { toast } from "sonner";
 import { buildSectionLookup, type Section, type SectionLookup } from "./sticker-parser";
 
+function validateDisjoint(dups: number[], miss: number[]): string | null {
+  const dupSet = new Set(dups);
+  const overlap = miss.filter((n) => dupSet.has(n));
+  return overlap.length
+    ? `Numeros nao podem estar em ambas listas: ${overlap.join(", ")}`
+    : null;
+}
+
 export function useStickers(debounceMs = 300) {
   // Inline do antigo use-album-config
   const data = useQuery(api.stickers.getUserStickers);
@@ -48,19 +56,6 @@ export function useStickers(debounceMs = 300) {
     }
   }, [isLoading, serverDuplicates, serverMissing, isDirty]);
 
-  // Validacao client-side: arrays disjuntos
-  const validateDisjoint = useCallback(
-    (dups: number[], miss: number[]): string | null => {
-      const dupSet = new Set(dups);
-      const intersection = miss.filter((n) => dupSet.has(n));
-      if (intersection.length > 0) {
-        return `Numeros nao podem estar em ambas listas: ${intersection.join(", ")}`;
-      }
-      return null;
-    },
-    []
-  );
-
   // Salvar com debounce e isDirty tracking (le sempre dupsRef/missRef no momento do save, nao arrays capturados)
   const saveWithDebounce = useCallback(
     (finalize: boolean = false) => {
@@ -77,22 +72,18 @@ export function useStickers(debounceMs = 300) {
       const dups = dupsRef.current;
       const miss = missRef.current;
 
-      // Validar tamanho (rate limit)
-      if (dups.length > 980 || miss.length > 980) {
-        setError("Limite de figurinhas excedido");
-        return;
-      }
+      // Feedback imediato (UI) — nao bloqueia o debounce; o save revalida no tick do timeout
+      const quickError =
+        dups.length > 980 || miss.length > 980
+          ? "Limite de figurinhas excedido"
+          : validateDisjoint(dups, miss);
+      setError(quickError);
 
-      // Validar antes de salvar
-      const validationError = validateDisjoint(dups, miss);
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-      setError(null);
-
-      // Se finalize=true, salvar imediatamente
+      // Se finalize=true, validar e salvar no mesmo instante (sem gap entre validacao e persist)
       if (finalize) {
+        if (quickError) {
+          return;
+        }
         setIsSaving(true);
         updateStickerList({ duplicates: dups, missing: miss, finalize: true })
           .then(() => {
@@ -108,10 +99,22 @@ export function useStickers(debounceMs = 300) {
         return;
       }
 
-      // Debounce para saves normais — rele refs no tick do timeout para dados mais recentes
+      // Debounce: validacao completa dentro do timeout, imediatamente antes do persist
       debounceRef.current = setTimeout(() => {
         const dupsAtSave = dupsRef.current;
         const missAtSave = missRef.current;
+
+        if (dupsAtSave.length > 980 || missAtSave.length > 980) {
+          setError("Limite de figurinhas excedido");
+          return;
+        }
+        const validationError = validateDisjoint(dupsAtSave, missAtSave);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+        setError(null);
+
         setIsSaving(true);
         updateStickerList({
           duplicates: dupsAtSave,
@@ -130,53 +133,57 @@ export function useStickers(debounceMs = 300) {
           .finally(() => setIsSaving(false));
       }, debounceMs);
     },
-    [debounceMs, updateStickerList, validateDisjoint]
+    [debounceMs, updateStickerList]
   );
 
-  // Adicionar figurinhas repetidas
+  type ListKind = "duplicates" | "missing";
+
+  const applyListUpdate = useCallback(
+    (kind: ListKind, computeNext: (prev: number[]) => number[]) => {
+      if (kind === "duplicates") {
+        const next = computeNext(dupsRef.current);
+        dupsRef.current = next;
+        setLocalDuplicates(next);
+      } else {
+        const next = computeNext(missRef.current);
+        missRef.current = next;
+        setLocalMissing(next);
+      }
+      saveWithDebounce();
+    },
+    [saveWithDebounce]
+  );
+
   const addDuplicates = useCallback(
     (numbers: number[]) => {
-      const newSet = new Set([...dupsRef.current, ...numbers]);
-      const newArray = Array.from(newSet).sort((a, b) => a - b);
-      dupsRef.current = newArray;
-      setLocalDuplicates(newArray);
-      saveWithDebounce();
+      applyListUpdate("duplicates", (prev) =>
+        Array.from(new Set([...prev, ...numbers])).sort((a, b) => a - b)
+      );
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
-  // Remover figurinha repetida
   const removeDuplicate = useCallback(
     (num: number) => {
-      const newArray = dupsRef.current.filter((n) => n !== num);
-      dupsRef.current = newArray;
-      setLocalDuplicates(newArray);
-      saveWithDebounce();
+      applyListUpdate("duplicates", (prev) => prev.filter((n) => n !== num));
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
-  // Adicionar figurinhas faltantes
   const addMissing = useCallback(
     (numbers: number[]) => {
-      const newSet = new Set([...missRef.current, ...numbers]);
-      const newArray = Array.from(newSet).sort((a, b) => a - b);
-      missRef.current = newArray;
-      setLocalMissing(newArray);
-      saveWithDebounce();
+      applyListUpdate("missing", (prev) =>
+        Array.from(new Set([...prev, ...numbers])).sort((a, b) => a - b)
+      );
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
-  // Remover figurinha faltante
   const removeMissing = useCallback(
     (num: number) => {
-      const newArray = missRef.current.filter((n) => n !== num);
-      missRef.current = newArray;
-      setLocalMissing(newArray);
-      saveWithDebounce();
+      applyListUpdate("missing", (prev) => prev.filter((n) => n !== num));
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
   // Finalizar (clicar no FAB)
@@ -218,7 +225,7 @@ export function useStickers(debounceMs = 300) {
     } finally {
       setIsSaving(false);
     }
-  }, [updateStickerList, validateDisjoint]);
+  }, [updateStickerList]);
 
   // Verificar se pode finalizar (FAB habilitado)
   const canFinalize =
@@ -259,143 +266,86 @@ export function useStickers(debounceMs = 300) {
 
   // Marca todas figurinhas da seção
   const markAllInSection = useCallback(
-    (sectionCode: string, mode: "duplicates" | "missing") => {
+    (sectionCode: string, mode: ListKind) => {
       const sectionNumbers = getSectionNumbers(sectionCode);
       if (sectionNumbers.length === 0) return;
 
-      if (mode === "duplicates") {
-        const newSet = new Set([...dupsRef.current, ...sectionNumbers]);
-        const newArray = Array.from(newSet).sort((a, b) => a - b);
-        dupsRef.current = newArray;
-        setLocalDuplicates(newArray);
-        saveWithDebounce();
-      } else {
-        const newSet = new Set([...missRef.current, ...sectionNumbers]);
-        const newArray = Array.from(newSet).sort((a, b) => a - b);
-        missRef.current = newArray;
-        setLocalMissing(newArray);
-        saveWithDebounce();
-      }
+      applyListUpdate(mode, (prev) =>
+        Array.from(new Set([...prev, ...sectionNumbers])).sort((a, b) => a - b)
+      );
     },
-    [getSectionNumbers, saveWithDebounce]
+    [getSectionNumbers, applyListUpdate]
   );
 
   // Desmarca todas figurinhas da seção
   const clearSection = useCallback(
-    (sectionCode: string, mode: "duplicates" | "missing") => {
+    (sectionCode: string, mode: ListKind) => {
       const section = findSection(sectionCode);
       if (!section) return;
 
-      if (mode === "duplicates") {
-        const newArray = dupsRef.current.filter(
-          (n) => n < section.startNumber || n > section.endNumber
-        );
-        dupsRef.current = newArray;
-        setLocalDuplicates(newArray);
-        saveWithDebounce();
-      } else {
-        const newArray = missRef.current.filter(
-          (n) => n < section.startNumber || n > section.endNumber
-        );
-        missRef.current = newArray;
-        setLocalMissing(newArray);
-        saveWithDebounce();
-      }
+      applyListUpdate(mode, (prev) =>
+        prev.filter((n) => n < section.startNumber || n > section.endNumber)
+      );
     },
-    [findSection, saveWithDebounce]
+    [findSection, applyListUpdate]
   );
 
   // Inverte seleção da seção
   const invertSection = useCallback(
-    (sectionCode: string, mode: "duplicates" | "missing") => {
+    (sectionCode: string, mode: ListKind) => {
       const section = findSection(sectionCode);
       if (!section) return;
 
       const sectionNumbers = getSectionNumbers(sectionCode);
-      const currentList =
-        mode === "duplicates" ? dupsRef.current : missRef.current;
-      const currentSet = new Set(currentList);
-
-      // Toggle cada número: se está na lista remove, se não está adiciona
-      const newList = currentList.filter(
-        (n) => n < section.startNumber || n > section.endNumber
-      );
-      for (const num of sectionNumbers) {
-        if (!currentSet.has(num)) {
-          newList.push(num);
+      applyListUpdate(mode, (currentList) => {
+        const currentSet = new Set(currentList);
+        const newList = currentList.filter(
+          (n) => n < section.startNumber || n > section.endNumber
+        );
+        for (const num of sectionNumbers) {
+          if (!currentSet.has(num)) {
+            newList.push(num);
+          }
         }
-      }
-      newList.sort((a, b) => a - b);
-
-      if (mode === "duplicates") {
-        dupsRef.current = newList;
-        setLocalDuplicates(newList);
-        saveWithDebounce();
-      } else {
-        missRef.current = newList;
-        setLocalMissing(newList);
-        saveWithDebounce();
-      }
+        newList.sort((a, b) => a - b);
+        return newList;
+      });
     },
-    [findSection, getSectionNumbers, saveWithDebounce]
+    [findSection, getSectionNumbers, applyListUpdate]
   );
 
   // SET completo para o grid (substitui array inteiro)
   const setDuplicates = useCallback(
     (numbers: number[]) => {
-      const sorted = [...numbers].sort((a, b) => a - b);
-      dupsRef.current = sorted;
-      setLocalDuplicates(sorted);
-      saveWithDebounce();
+      applyListUpdate("duplicates", () => [...numbers].sort((a, b) => a - b));
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
   const setMissing = useCallback(
     (numbers: number[]) => {
-      const sorted = [...numbers].sort((a, b) => a - b);
-      missRef.current = sorted;
-      setLocalMissing(sorted);
-      saveWithDebounce();
+      applyListUpdate("missing", () => [...numbers].sort((a, b) => a - b));
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
   // Marca TODAS as figurinhas do álbum
   const markAll = useCallback(
-    (mode: "duplicates" | "missing") => {
+    (mode: ListKind) => {
       const allNumbers: number[] = [];
       for (let i = 1; i <= totalStickers; i++) {
         allNumbers.push(i);
       }
-
-      if (mode === "duplicates") {
-        dupsRef.current = allNumbers;
-        setLocalDuplicates(allNumbers);
-        saveWithDebounce();
-      } else {
-        missRef.current = allNumbers;
-        setLocalMissing(allNumbers);
-        saveWithDebounce();
-      }
+      applyListUpdate(mode, () => allNumbers);
     },
-    [totalStickers, saveWithDebounce]
+    [totalStickers, applyListUpdate]
   );
 
-  // Desmarca TODAS as figurinhas do álbum
   const clearAll = useCallback(
-    (mode: "duplicates" | "missing") => {
-      if (mode === "duplicates") {
-        dupsRef.current = [];
-        setLocalDuplicates([]);
-        saveWithDebounce();
-      } else {
-        missRef.current = [];
-        setLocalMissing([]);
-        saveWithDebounce();
-      }
+    (mode: ListKind) => {
+      applyListUpdate(mode, () => []);
     },
-    [saveWithDebounce]
+    [applyListUpdate]
   );
 
   return {
