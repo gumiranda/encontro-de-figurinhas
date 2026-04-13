@@ -28,6 +28,11 @@ function filterValidStickerNumbers(
   );
 }
 
+/** Valid ints only; Set removes duplicate entries callers may send; sort is canonical order. */
+function normalizeStickerList(valid: number[]): number[] {
+  return Array.from(new Set(valid)).sort((a, b) => a - b);
+}
+
 export function useStickers(debounceMs = 300) {
   const data = useQuery(api.stickers.getUserStickers);
   const sections: Section[] = data?.sections ?? EMPTY_SECTIONS;
@@ -311,9 +316,7 @@ export function useStickers(debounceMs = 300) {
   const setDuplicates = useCallback(
     (numbers: number[]) => {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
-      applyListUpdate("duplicates", () =>
-        Array.from(new Set(valid)).sort((a, b) => a - b)
-      );
+      applyListUpdate("duplicates", () => normalizeStickerList(valid));
     },
     [applyListUpdate, totalStickers]
   );
@@ -321,9 +324,7 @@ export function useStickers(debounceMs = 300) {
   const setMissing = useCallback(
     (numbers: number[]) => {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
-      applyListUpdate("missing", () =>
-        Array.from(new Set(valid)).sort((a, b) => a - b)
-      );
+      applyListUpdate("missing", () => normalizeStickerList(valid));
     },
     [applyListUpdate, totalStickers]
   );
