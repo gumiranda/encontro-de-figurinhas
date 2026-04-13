@@ -63,7 +63,6 @@ export const getMenuItems = query({
       return [
         ...baseMenu,
         { label: "Users", href: "/admin/users", icon: "UserCog" },
-        { label: "Pending Users", href: "/admin/pending-users", icon: "UserPlus" },
       ];
     }
 

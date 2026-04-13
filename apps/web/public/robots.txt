@@ -16,10 +16,7 @@ Disallow: /suggest-spot
 # Rotas de autenticação
 Disallow: /sign-in
 Disallow: /sign-up
-Disallow: /bootstrap
 Disallow: /complete-profile
-Disallow: /pending-approval
-Disallow: /rejected
 
 # API routes
 Disallow: /api/

@@ -1,15 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { ConvexReactClient } from "convex/react";
+import { useRef, useEffect } from "react";
+import { ConvexReactClient, useMutation } from "convex/react";
+import { useConvexAuth } from "convex/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ClerkProvider } from "@clerk/nextjs";
-import { useEnsureAppUser } from "@/hooks/use-ensure-app-user";
+import { api } from "@workspace/backend/_generated/api";
 
-function EnsureAppUser() {
-  useEnsureAppUser();
+function EnsureUser() {
+  const { isAuthenticated } = useConvexAuth();
+  const getOrCreate = useMutation(api.users.getOrCreateUser);
+  const called = useRef(false);
+
+  useEffect(() => {
+    if (isAuthenticated && !called.current) {
+      called.current = true;
+      getOrCreate();
+    }
+  }, [isAuthenticated, getOrCreate]);
+
   return null;
 }
 
@@ -35,7 +47,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
           enableColorScheme
         >
-          <EnsureAppUser />
+          <EnsureUser />
           {children}
         </NextThemesProvider>
       </ConvexProviderWithClerk>

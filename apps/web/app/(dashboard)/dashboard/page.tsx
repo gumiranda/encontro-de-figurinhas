@@ -47,7 +47,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Superadmins and CEOs can approve new users and manage existing ones.
+              Admins can manage users and permissions from the admin panel.
             </p>
           </CardContent>
         </Card>

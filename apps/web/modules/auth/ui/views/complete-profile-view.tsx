@@ -1,26 +1,32 @@
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
+import { useConvexAuth, useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import { CompleteProfileForm } from "../components/complete-profile-form";
-import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { FullPageLoader } from "@/components/full-page-loader";
 
 export function CompleteProfileView() {
   const router = useRouter();
-  // User stays on this page if approved but hasn't completed onboarding
-  // Redirect elsewhere for other states
-  const { isLoading, currentUser } = useAuthRedirect({
-    whenNoUser: "/sign-in",
-    whenPending: "/pending-approval",
-    whenRejected: "/rejected",
-    whenApproved: "/dashboard", // Only triggers if hasCompletedOnboarding + hasCompletedStickerSetup
-    whenNeedsOnboarding: undefined, // Stay here
-    whenNeedsStickerSetup: "/cadastrar-figurinhas",
-  });
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isAuthenticated ? {} : "skip"
+  );
 
-  if (isLoading || !currentUser) {
+  // Middleware handles auth redirect to /sign-in
+  if (authLoading || !isAuthenticated || currentUser === undefined) {
+    return <FullPageLoader />;
+  }
+
+  // Already onboarded - redirect to dashboard
+  if (currentUser?.hasCompletedOnboarding) {
+    redirect("/dashboard");
+  }
+
+  if (!currentUser) {
     return <FullPageLoader />;
   }
 

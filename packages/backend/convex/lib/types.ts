@@ -12,10 +12,3 @@ export const Role = {
 
 export type RoleType = (typeof Role)[keyof typeof Role];
 
-export const UserStatus = {
-  PENDING: "pending",
-  APPROVED: "approved",
-  REJECTED: "rejected",
-} as const;
-
-export type UserStatusType = (typeof UserStatus)[keyof typeof UserStatus];

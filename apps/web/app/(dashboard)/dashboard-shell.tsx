@@ -1,30 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { FullPageLoader } from "@/components/full-page-loader";
+import { RoleBadge } from "@/components/role-badge";
 import { UserButton } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
-import { Badge } from "@workspace/ui/components/badge";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
-import {
-  UserPlus,
-  LayoutDashboard,
-  UserCog,
-  Users,
-  Menu,
-  type LucideIcon,
-} from "lucide-react";
-import { RoleBadge } from "@/components/role-badge";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
-import { FullPageLoader } from "@/components/full-page-loader";
-import { useAuthRedirect } from "@/hooks/use-auth-redirect";
+import { useConvexAuth, useQuery } from "convex/react";
+import { LayoutDashboard, Menu, UserCog, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useMemo, useState } from "react";
 
 interface NavItem {
   label: string;
@@ -47,7 +35,8 @@ function SidebarContent({ navItems, pathname, onNavigate }: SidebarContentProps)
       <nav className="px-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href ||
+          const isActive =
+            pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
           return (
             <Link
@@ -56,9 +45,7 @@ function SidebarContent({ navItems, pathname, onNavigate }: SidebarContentProps)
               onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
+                isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -74,40 +61,31 @@ function SidebarContent({ navItems, pathname, onNavigate }: SidebarContentProps)
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
-  const { currentUser, hasSuperadmin, isLoading } = useAuthRedirect({
-    whenApproved: undefined,
-  });
+  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
 
-  const isSuperadminOrCeo = currentUser?.role === "superadmin" || currentUser?.role === "ceo";
-  const pendingUsersCount = useQuery(
-    api.users.getPendingUsersCount,
-    isSuperadminOrCeo ? {} : "skip"
+  const isSuperadminOrCeo =
+    currentUser?.role === "superadmin" || currentUser?.role === "ceo";
+
+  const navItems = useMemo(
+    () => [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      ...(isSuperadminOrCeo
+        ? [{ label: "Users", href: "/admin/users", icon: UserCog }]
+        : []),
+    ],
+    [isSuperadminOrCeo]
   );
 
-  const navItems = useMemo(() => [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    ...(isSuperadminOrCeo ? [
-      { label: "Users", href: "/admin/users", icon: UserCog },
-      { label: "Pending Users", href: "/admin/pending-users", icon: Users },
-    ] : []),
-  ], [isSuperadminOrCeo]);
-
-  if (isLoading) {
+  // Middleware handles auth redirect to /sign-in
+  if (authLoading || !isAuthenticated || currentUser === undefined) {
     return <FullPageLoader />;
   }
 
-  if (hasSuperadmin === false || !currentUser) {
-    return null;
-  }
-
-  if (currentUser.status !== "approved") {
-    return null;
-  }
-
-  // Redirect to complete profile if onboarding not done
-  if (!currentUser.hasCompletedOnboarding) {
-    return null;
+  // Needs onboarding - redirect to complete profile
+  if (!currentUser?.hasCompletedOnboarding) {
+    redirect("/complete-profile");
   }
 
   const isSuperadmin = currentUser.role === "superadmin";
@@ -130,28 +108,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
-                <SidebarContent navItems={navItems} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+                <SidebarContent
+                  navItems={navItems}
+                  pathname={pathname}
+                  onNavigate={() => setSidebarOpen(false)}
+                />
               </SheetContent>
             </Sheet>
 
-            {(isSuperadmin || isCeo) && (
-              <RoleBadge role={currentUser.role} />
-            )}
+            {(isSuperadmin || isCeo) && <RoleBadge role={currentUser.role} />}
           </div>
           <div className="flex items-center gap-4">
-            {(isSuperadmin || isCeo) && pendingUsersCount && pendingUsersCount > 0 && (
-              <Link href="/admin/pending-users">
-                <Button variant="ghost" size="icon" className="relative">
-                  <UserPlus className="h-5 w-5" />
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                  >
-                    {pendingUsersCount > 9 ? "9+" : pendingUsersCount}
-                  </Badge>
-                </Button>
-              </Link>
-            )}
             <UserButton />
           </div>
         </header>
@@ -159,5 +126,4 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
-};
-
+}
