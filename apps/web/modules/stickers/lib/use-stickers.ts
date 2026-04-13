@@ -6,6 +6,9 @@ import { api } from "@workspace/backend/_generated/api";
 import { toast } from "sonner";
 import { buildSectionLookup, type Section, type SectionLookup } from "./sticker-parser";
 
+const EMPTY_SECTIONS: Section[] = [];
+const EMPTY_NUMBERS: number[] = [];
+
 function validateDisjoint(dups: number[], miss: number[]): string | null {
   const dupSet = new Set(dups);
   const overlap = miss.filter((n) => dupSet.has(n));
@@ -17,10 +20,10 @@ function validateDisjoint(dups: number[], miss: number[]): string | null {
 export function useStickers(debounceMs = 300) {
   // Inline do antigo use-album-config
   const data = useQuery(api.stickers.getUserStickers);
-  const sections: Section[] = data?.sections ?? [];
+  const sections: Section[] = data?.sections ?? EMPTY_SECTIONS;
   const totalStickers = data?.totalStickers ?? 980;
-  const serverDuplicates = data?.duplicates ?? [];
-  const serverMissing = data?.missing ?? [];
+  const serverDuplicates = data?.duplicates ?? EMPTY_NUMBERS;
+  const serverMissing = data?.missing ?? EMPTY_NUMBERS;
   const isLoading = data === undefined;
 
   // SectionLookup memoizado para O(1) lookups
