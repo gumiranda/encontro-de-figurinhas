@@ -224,7 +224,7 @@ export function useStickers(debounceMs = 300) {
   // Encontra seção pelo código - O(1) com Map
   const findSection = useCallback(
     (sectionCode: string): Section | undefined => {
-      return sectionLookup.byCode.get(sectionCode);
+      return sectionLookup.byCode.get(sectionCode.toUpperCase());
     },
     [sectionLookup]
   );

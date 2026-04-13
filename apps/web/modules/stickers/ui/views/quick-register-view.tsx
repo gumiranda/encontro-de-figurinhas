@@ -150,7 +150,6 @@ export function QuickRegisterView() {
           <StickerQuickInput
             mode={activeTab}
             sections={sections}
-            totalStickers={totalStickers}
             onAdd={activeTab === "duplicates" ? addDuplicates : addMissing}
           />
         </section>

@@ -8,7 +8,6 @@ import { parseStickers, type Section } from "../../lib/sticker-parser";
 type StickerQuickInputProps = {
   mode: "duplicates" | "missing";
   sections: Section[];
-  totalStickers: number;
   onAdd: (numbers: number[]) => void;
 };
 
@@ -21,7 +20,6 @@ type FeedbackState = {
 export function StickerQuickInput({
   mode,
   sections,
-  totalStickers,
   onAdd,
 }: StickerQuickInputProps) {
   const [inputValue, setInputValue] = useState("");
@@ -38,7 +36,7 @@ export function StickerQuickInput({
   const handleSubmit = useCallback(() => {
     if (!inputValue.trim()) return;
 
-    const result = parseStickers(inputValue, sections, totalStickers);
+    const result = parseStickers(inputValue, sections);
 
     if (result.valid.length > 0) {
       onAdd(result.valid);
@@ -55,7 +53,7 @@ export function StickerQuickInput({
         invalid: result.invalid,
       });
     }
-  }, [inputValue, onAdd, sections, totalStickers]);
+  }, [inputValue, onAdd, sections]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

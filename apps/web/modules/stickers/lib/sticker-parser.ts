@@ -7,6 +7,7 @@ export type Section = {
 };
 
 export type SectionLookup = {
+  /** FIFA codes as uppercase keys (case-insensitive lookup) */
   byCode: Map<string, Section>;
   byIndex: Section[]; // sorted by startNumber for index lookup
 };
@@ -23,10 +24,11 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
   const byIndex = [...sections].sort((a, b) => a.startNumber - b.startNumber);
 
   for (const section of sections) {
-    if (byCode.has(section.code) && process.env.NODE_ENV === "development") {
+    const key = section.code.toUpperCase();
+    if (byCode.has(key) && process.env.NODE_ENV === "development") {
       console.warn(`Duplicate section code: ${section.code}`);
     }
-    byCode.set(section.code, section);
+    byCode.set(key, section);
   }
 
   return { byCode, byIndex };
@@ -59,15 +61,6 @@ const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
 // Sanitiza input removendo tags HTML/scripts
 function sanitize(input: string): string {
   return input.replace(/<[^>]*>/g, "").trim();
-}
-
-// Cria mapeamento de código FIFA para seção
-function buildCodeMap(sections: Section[]): Map<string, Section> {
-  const map = new Map<string, Section>();
-  for (const section of sections) {
-    map.set(section.code.toUpperCase(), section);
-  }
-  return map;
 }
 
 // Parseia uma entrada singular (ex: BRA-10)
@@ -169,17 +162,13 @@ function parseEntry(
   return { valid: [], error: entry.trim(), formatted: null };
 }
 
-export function parseStickers(
-  input: string,
-  sections: Section[],
-  _maxSticker: number = 980 // Mantido para compatibilidade, mas não usado
-): ParseResult {
+export function parseStickers(input: string, sections: Section[]): ParseResult {
   const valid: number[] = [];
   const invalid: string[] = [];
   const formatted: string[] = [];
   const seen = new Set<number>();
 
-  const codeMap = buildCodeMap(sections);
+  const { byCode: codeMap } = buildSectionLookup(sections);
 
   // Dividir por vírgula, espaço ou quebra de linha
   const entries = input
@@ -263,11 +252,12 @@ export function groupBySections(
   for (const num of numbers) {
     const section = findSectionForNumber(num, lookup);
     if (section) {
-      const existing = groups.get(section.code);
+      const key = section.code.toUpperCase();
+      const existing = groups.get(key);
       if (existing) {
         existing.push(num);
       } else {
-        groups.set(section.code, [num]);
+        groups.set(key, [num]);
       }
     }
   }
