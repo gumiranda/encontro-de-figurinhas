@@ -4,12 +4,36 @@ import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { ArrowLeft, ArrowLeftRight, ArrowRight, Palette, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { SectionAccordion } from "../components/section-accordion";
 import { StickerQuickInput } from "../components/sticker-quick-input";
 
 type Tab = ListKind;
+
+type TabConfig = {
+  list: number[];
+  add: (nums: number[]) => void;
+  remove: (num: number) => void;
+  bgClass: string;
+  textClass: string;
+  title: string;
+  selectAllLabel: string;
+  hint: string;
+  tabActiveClass: string;
+};
+
+const TAB_ORDER: Tab[] = ["duplicates", "missing"];
+
+const tabIcons = {
+  duplicates: Palette,
+  missing: ArrowLeftRight,
+} as const;
+
+const tabLabels = {
+  duplicates: { short: "REPETIDAS", long: "TENHO REPETIDAS" },
+  missing: { short: "PRECISO", long: "PRECISO" },
+} as const;
 
 export function QuickRegisterView() {
   const router = useRouter();
@@ -36,33 +60,51 @@ export function QuickRegisterView() {
     clearAll,
   } = useStickers();
 
-  // Toggle individual para o grid
-  const handleToggle = useCallback(
-    (num: number, action: "add" | "remove") => {
-      if (activeTab === "duplicates") {
-        if (action === "add") addDuplicates([num]);
-        else removeDuplicate(num);
-      } else {
-        if (action === "add") addMissing([num]);
-        else removeMissing(num);
-      }
+  const tabConfig: Record<Tab, TabConfig> = {
+    duplicates: {
+      list: duplicates,
+      add: addDuplicates,
+      remove: removeDuplicate,
+      bgClass: "bg-secondary-container/30",
+      textClass: "text-secondary",
+      title: "Suas Figurinhas",
+      selectAllLabel: "Tenho TODAS as figurinhas",
+      hint: "Marque todas e depois desmarque as que voce NAO tem repetida",
+      tabActiveClass: "bg-secondary/10 text-secondary",
     },
-    [activeTab, addDuplicates, removeDuplicate, addMissing, removeMissing]
-  );
+    missing: {
+      list: missing,
+      add: addMissing,
+      remove: removeMissing,
+      bgClass: "bg-primary/20",
+      textClass: "text-primary",
+      title: "Minha Lista de Desejos",
+      selectAllLabel: "Preciso de TODAS as figurinhas",
+      hint: "Marque todas e depois desmarque as que voce JA tem",
+      tabActiveClass: "bg-primary/10 text-primary",
+    },
+  };
 
-  // Bulk actions
-  const handleBulkAction = useCallback(
-    (sectionCode: string, action: "all" | "none" | "invert") => {
-      if (action === "all") {
-        markAllInSection(sectionCode, activeTab);
-      } else if (action === "none") {
-        clearSection(sectionCode, activeTab);
-      } else {
-        invertSection(sectionCode, activeTab);
-      }
-    },
-    [activeTab, markAllInSection, clearSection, invertSection]
-  );
+  const current = tabConfig[activeTab];
+
+  const handleToggle = (num: number, action: "add" | "remove") => {
+    const { add, remove } = tabConfig[activeTab];
+    if (action === "add") add([num]);
+    else remove(num);
+  };
+
+  const handleBulkAction = (
+    sectionCode: string,
+    action: "all" | "none" | "invert"
+  ) => {
+    if (action === "all") {
+      markAllInSection(sectionCode, activeTab);
+    } else if (action === "none") {
+      clearSection(sectionCode, activeTab);
+    } else {
+      invertSection(sectionCode, activeTab);
+    }
+  };
 
   const handleFinalize = async () => {
     try {
@@ -81,7 +123,7 @@ export function QuickRegisterView() {
     );
   }
 
-  const totalCount = activeTab === "duplicates" ? duplicates.length : missing.length;
+  const totalCount = current.list.length;
 
   return (
     <div className="min-h-screen flex flex-col pb-24 bg-surface-dim text-on-surface font-body">
@@ -112,53 +154,39 @@ export function QuickRegisterView() {
         {/* Toggle Switch */}
         <section className="mb-8">
           <div className="bg-surface-container-low p-1.5 rounded-full flex items-center stadium-shadow">
-            <button
-              onClick={() => setActiveTab("duplicates")}
-              className={`flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === "duplicates"
-                  ? "bg-secondary/10 text-secondary"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <Palette
-                className="size-5 shrink-0"
-                strokeWidth={activeTab === "duplicates" ? 2.25 : 2}
-                fill={activeTab === "duplicates" ? "currentColor" : "none"}
-              />
-              <span className="hidden sm:inline">TENHO REPETIDAS</span>
-              <span className="sm:hidden">REPETIDAS</span>
-              {duplicates.length > 0 && (
-                <span className="ml-1 text-xs opacity-75">({duplicates.length})</span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("missing")}
-              className={`flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === "missing"
-                  ? "bg-primary/10 text-primary"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <ArrowLeftRight
-                className="size-5 shrink-0"
-                strokeWidth={activeTab === "missing" ? 2.25 : 2}
-                fill={activeTab === "missing" ? "currentColor" : "none"}
-              />
-              <span>PRECISO</span>
-              {missing.length > 0 && (
-                <span className="ml-1 text-xs opacity-75">({missing.length})</span>
-              )}
-            </button>
+            {TAB_ORDER.map((tab) => {
+              const Icon = tabIcons[tab];
+              const cfg = tabConfig[tab];
+              const isActive = activeTab === tab;
+              const labels = tabLabels[tab];
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-1 py-3 px-4 rounded-full text-sm font-bold tracking-widest uppercase font-label transition-all duration-300 flex items-center justify-center gap-2 ${
+                    isActive ? cfg.tabActiveClass : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  <Icon
+                    className="size-5 shrink-0"
+                    strokeWidth={isActive ? 2.25 : 2}
+                    fill={isActive ? "currentColor" : "none"}
+                  />
+                  <span className="hidden sm:inline">{labels.long}</span>
+                  <span className="sm:hidden">{labels.short}</span>
+                  {cfg.list.length > 0 && (
+                    <span className="ml-1 text-xs opacity-75">({cfg.list.length})</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </section>
 
         {/* Campo de Entrada */}
         <section className="mb-10">
-          <StickerQuickInput
-            mode={activeTab}
-            sections={sections}
-            onAdd={activeTab === "duplicates" ? addDuplicates : addMissing}
-          />
+          <StickerQuickInput mode={activeTab} sections={sections} onAdd={current.add} />
         </section>
 
         {/* Erro */}
@@ -171,18 +199,10 @@ export function QuickRegisterView() {
         {/* Resumo */}
         <section className="flex items-center justify-between mb-6">
           <h2 className="font-headline font-bold text-lg tracking-tight text-on-surface">
-            {activeTab === "duplicates" ? "Suas Figurinhas" : "Minha Lista de Desejos"}
+            {current.title}
           </h2>
-          <div
-            className={`px-3 py-1 rounded-full ${
-              activeTab === "duplicates" ? "bg-secondary-container/30" : "bg-primary/20"
-            }`}
-          >
-            <span
-              className={`font-bold text-xs uppercase tracking-widest ${
-                activeTab === "duplicates" ? "text-secondary" : "text-primary"
-              }`}
-            >
+          <div className={`px-3 py-1 rounded-full ${current.bgClass}`}>
+            <span className={`font-bold text-xs uppercase tracking-widest ${current.textClass}`}>
               Total: {totalCount} figurinha{totalCount !== 1 ? "s" : ""}
             </span>
           </div>
@@ -194,11 +214,7 @@ export function QuickRegisterView() {
             <div className="flex items-center gap-3">
               <Checkbox
                 id="select-all"
-                checked={
-                  activeTab === "duplicates"
-                    ? duplicates.length === totalStickers
-                    : missing.length === totalStickers
-                }
+                checked={current.list.length === totalStickers}
                 onCheckedChange={(checked) => {
                   if (checked) {
                     markAll(activeTab);
@@ -212,21 +228,14 @@ export function QuickRegisterView() {
                 htmlFor="select-all"
                 className="text-sm font-bold text-on-surface cursor-pointer"
               >
-                {activeTab === "duplicates"
-                  ? "Tenho TODAS as figurinhas"
-                  : "Preciso de TODAS as figurinhas"}
+                {current.selectAllLabel}
               </label>
             </div>
             <span className="text-xs text-on-surface-variant">
-              {activeTab === "duplicates" ? duplicates.length : missing.length}/
-              {totalStickers}
+              {current.list.length}/{totalStickers}
             </span>
           </div>
-          <p className="text-xs text-on-surface-variant mt-2 px-1">
-            {activeTab === "duplicates"
-              ? "Marque todas e depois desmarque as que voce NAO tem repetida"
-              : "Marque todas e depois desmarque as que voce JA tem"}
-          </p>
+          <p className="text-xs text-on-surface-variant mt-2 px-1">{current.hint}</p>
         </section>
 
         {/* Grid por Seção */}
