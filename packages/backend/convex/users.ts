@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
+import { query, mutation, internalQuery } from "./_generated/server";
 import { Sector, Role } from "./lib/types";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
 
@@ -248,5 +249,54 @@ export const completeProfile = mutation({
     });
 
     return { success: true };
+  },
+});
+
+// Internal queries for match computation
+export const getById = internalQuery({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db.get(userId);
+  },
+});
+
+export const getPotentialMatchCandidates = internalQuery({
+  args: {
+    excludeUserId: v.id("users"),
+    cityId: v.optional(v.id("cities")),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, { excludeUserId, cityId, paginationOpts }) => {
+    // Query users with completed sticker setup, optionally filtered by city
+    let query = ctx.db
+      .query("users")
+      .withIndex("by_sticker_setup", (q) => q.eq("hasCompletedStickerSetup", true));
+
+    // If cityId provided, filter to same city for local matches
+    if (cityId) {
+      query = ctx.db
+        .query("users")
+        .withIndex("by_sticker_setup", (q) =>
+          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+        );
+    }
+
+    const results = await query.paginate(paginationOpts);
+
+    // Filter out the requesting user and shadow-banned users
+    const filtered = results.page.filter(
+      (u) => u._id !== excludeUserId && !u.isShadowBanned
+    );
+
+    return {
+      ...results,
+      page: filtered.map((u) => ({
+        _id: u._id,
+        displayNickname: u.displayNickname,
+        duplicates: u.duplicates ?? [],
+        missing: u.missing ?? [],
+        cityId: u.cityId,
+      })),
+    };
   },
 });

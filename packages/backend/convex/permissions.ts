@@ -1,13 +1,9 @@
-import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { Role } from "./lib/types";
 import { getAuthenticatedUser, isAdmin } from "./lib/auth";
 
 export const checkPermission = query({
-  args: {
-    entityType: v.string(),
-    action: v.string(),
-  },
+  args: {},
   handler: async (ctx) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) {

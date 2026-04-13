@@ -40,6 +40,6 @@ export const getBySlug = query({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("cities").collect();
+    return await ctx.db.query("cities").take(500);
   },
 });

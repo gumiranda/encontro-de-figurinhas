@@ -37,7 +37,8 @@ export default defineSchema({
     .index("by_clerk_id", ["clerkId"])
     .index("by_role", ["role"])
     .index("by_nickname", ["nickname"])
-    .index("by_city", ["cityId"]),
+    .index("by_city", ["cityId"])
+    .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"]),
 
   cities: defineTable({
     name: v.string(),
