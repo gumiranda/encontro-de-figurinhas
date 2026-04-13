@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import {
@@ -35,15 +35,13 @@ export function StickerQuickInput({
     [sections]
   );
 
-  // Limpar feedback após 3 segundos
   useEffect(() => {
-    if (feedback) {
-      const timer = setTimeout(() => setFeedback(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!feedback) return;
+    const timer = setTimeout(() => setFeedback(null), 3000);
+    return () => clearTimeout(timer);
   }, [feedback]);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     if (!inputValue.trim()) return;
 
     const result = parseStickers(inputValue, sectionLookup);
@@ -55,7 +53,7 @@ export function StickerQuickInput({
         formatted: result.formatted,
         invalid: result.invalid,
       });
-      setInputValue(""); // Fire-and-forget: limpa após parse
+      setInputValue("");
     } else if (result.invalid.length > 0) {
       setFeedback({
         added: 0,
@@ -63,17 +61,14 @@ export function StickerQuickInput({
         invalid: result.invalid,
       });
     }
-  }, [inputValue, onAdd, sectionLookup]);
+  };
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSubmit();
-      }
-    },
-    [handleSubmit]
-  );
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
 
   const borderGradient =
     mode === "duplicates"
@@ -82,7 +77,6 @@ export function StickerQuickInput({
 
   return (
     <div className="relative group">
-      {/* Gradient border blur effect */}
       <div
         className={`absolute -inset-0.5 rounded-xl blur opacity-30 group-focus-within:opacity-100 transition duration-500 ${borderGradient}`}
       />
@@ -100,7 +94,6 @@ export function StickerQuickInput({
           className="w-full bg-transparent border-none focus:ring-0 focus-visible:ring-0 text-on-surface placeholder:text-outline font-body text-lg resize-none h-24"
         />
 
-        {/* Feedback visual */}
         {feedback && (
           <div className="mt-3 space-y-1">
             {feedback.added > 0 && (
