@@ -38,16 +38,13 @@ export function useStickers(debounceMs = 300) {
   const dupsRef = useRef<number[]>([]);
   const missRef = useRef<number[]>([]);
 
-  useEffect(() => {
-    dupsRef.current = localDuplicates;
-    missRef.current = localMissing;
-  }, [localDuplicates, localMissing]);
-
   // Sincronizar state local com servidor quando idle
   useEffect(() => {
     if (!isLoading && !isDirty) {
       setLocalDuplicates(serverDuplicates);
       setLocalMissing(serverMissing);
+      dupsRef.current = serverDuplicates;
+      missRef.current = serverMissing;
     }
   }, [isLoading, serverDuplicates, serverMissing, isDirty]);
 
@@ -139,13 +136,11 @@ export function useStickers(debounceMs = 300) {
   // Adicionar figurinhas repetidas
   const addDuplicates = useCallback(
     (numbers: number[]) => {
-      setLocalDuplicates((prev) => {
-        const newSet = new Set([...prev, ...numbers]);
-        const newArray = Array.from(newSet).sort((a, b) => a - b);
-        dupsRef.current = newArray;
-        saveWithDebounce();
-        return newArray;
-      });
+      const newSet = new Set([...dupsRef.current, ...numbers]);
+      const newArray = Array.from(newSet).sort((a, b) => a - b);
+      dupsRef.current = newArray;
+      setLocalDuplicates(newArray);
+      saveWithDebounce();
     },
     [saveWithDebounce]
   );
@@ -153,12 +148,10 @@ export function useStickers(debounceMs = 300) {
   // Remover figurinha repetida
   const removeDuplicate = useCallback(
     (num: number) => {
-      setLocalDuplicates((prev) => {
-        const newArray = prev.filter((n) => n !== num);
-        dupsRef.current = newArray;
-        saveWithDebounce();
-        return newArray;
-      });
+      const newArray = dupsRef.current.filter((n) => n !== num);
+      dupsRef.current = newArray;
+      setLocalDuplicates(newArray);
+      saveWithDebounce();
     },
     [saveWithDebounce]
   );
@@ -166,13 +159,11 @@ export function useStickers(debounceMs = 300) {
   // Adicionar figurinhas faltantes
   const addMissing = useCallback(
     (numbers: number[]) => {
-      setLocalMissing((prev) => {
-        const newSet = new Set([...prev, ...numbers]);
-        const newArray = Array.from(newSet).sort((a, b) => a - b);
-        missRef.current = newArray;
-        saveWithDebounce();
-        return newArray;
-      });
+      const newSet = new Set([...missRef.current, ...numbers]);
+      const newArray = Array.from(newSet).sort((a, b) => a - b);
+      missRef.current = newArray;
+      setLocalMissing(newArray);
+      saveWithDebounce();
     },
     [saveWithDebounce]
   );
@@ -180,12 +171,10 @@ export function useStickers(debounceMs = 300) {
   // Remover figurinha faltante
   const removeMissing = useCallback(
     (num: number) => {
-      setLocalMissing((prev) => {
-        const newArray = prev.filter((n) => n !== num);
-        missRef.current = newArray;
-        saveWithDebounce();
-        return newArray;
-      });
+      const newArray = missRef.current.filter((n) => n !== num);
+      missRef.current = newArray;
+      setLocalMissing(newArray);
+      saveWithDebounce();
     },
     [saveWithDebounce]
   );
@@ -275,21 +264,17 @@ export function useStickers(debounceMs = 300) {
       if (sectionNumbers.length === 0) return;
 
       if (mode === "duplicates") {
-        setLocalDuplicates((prev) => {
-          const newSet = new Set([...prev, ...sectionNumbers]);
-          const newArray = Array.from(newSet).sort((a, b) => a - b);
-          dupsRef.current = newArray;
-          saveWithDebounce();
-          return newArray;
-        });
+        const newSet = new Set([...dupsRef.current, ...sectionNumbers]);
+        const newArray = Array.from(newSet).sort((a, b) => a - b);
+        dupsRef.current = newArray;
+        setLocalDuplicates(newArray);
+        saveWithDebounce();
       } else {
-        setLocalMissing((prev) => {
-          const newSet = new Set([...prev, ...sectionNumbers]);
-          const newArray = Array.from(newSet).sort((a, b) => a - b);
-          missRef.current = newArray;
-          saveWithDebounce();
-          return newArray;
-        });
+        const newSet = new Set([...missRef.current, ...sectionNumbers]);
+        const newArray = Array.from(newSet).sort((a, b) => a - b);
+        missRef.current = newArray;
+        setLocalMissing(newArray);
+        saveWithDebounce();
       }
     },
     [getSectionNumbers, saveWithDebounce]
@@ -302,23 +287,19 @@ export function useStickers(debounceMs = 300) {
       if (!section) return;
 
       if (mode === "duplicates") {
-        setLocalDuplicates((prev) => {
-          const newArray = prev.filter(
-            (n) => n < section.startNumber || n > section.endNumber
-          );
-          dupsRef.current = newArray;
-          saveWithDebounce();
-          return newArray;
-        });
+        const newArray = dupsRef.current.filter(
+          (n) => n < section.startNumber || n > section.endNumber
+        );
+        dupsRef.current = newArray;
+        setLocalDuplicates(newArray);
+        saveWithDebounce();
       } else {
-        setLocalMissing((prev) => {
-          const newArray = prev.filter(
-            (n) => n < section.startNumber || n > section.endNumber
-          );
-          missRef.current = newArray;
-          saveWithDebounce();
-          return newArray;
-        });
+        const newArray = missRef.current.filter(
+          (n) => n < section.startNumber || n > section.endNumber
+        );
+        missRef.current = newArray;
+        setLocalMissing(newArray);
+        saveWithDebounce();
       }
     },
     [findSection, saveWithDebounce]
