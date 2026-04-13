@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import { cn } from "@workspace/ui/lib/utils";
 import type { ListKind } from "../../lib/use-stickers";
 
 type Props = {
@@ -64,22 +65,19 @@ export function StickerGrid({
           const relativeNum = num - sectionStart + 1;
           const state = getState(num);
 
-          let buttonClasses =
-            "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95 ";
-
-          if (state === "duplicate") {
-            buttonClasses +=
-              "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500 ";
-          } else if (state === "missing") {
-            buttonClasses +=
-              "bg-destructive/20 text-destructive border-2 border-destructive ";
-          } else if (state === "blocked") {
-            buttonClasses +=
-              "bg-muted/50 text-muted-foreground border-2 border-dashed border-muted-foreground/50 opacity-50 cursor-not-allowed ";
-          } else {
-            buttonClasses +=
-              "bg-surface-container text-on-surface-variant border-2 border-transparent hover:border-outline-variant ";
-          }
+          const buttonClasses = cn(
+            "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95",
+            {
+              "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
+                state === "duplicate",
+              "bg-destructive/20 text-destructive border-2 border-destructive":
+                state === "missing",
+              "bg-muted/50 text-muted-foreground border-2 border-dashed border-muted-foreground/50 opacity-50 cursor-not-allowed":
+                state === "blocked",
+              "bg-surface-container text-on-surface-variant border-2 border-transparent hover:border-outline-variant":
+                state === "none",
+            }
+          );
 
           if (state === "blocked") {
             return (
