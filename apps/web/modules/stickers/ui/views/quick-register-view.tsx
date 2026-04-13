@@ -1,19 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowLeftRight,
-  ArrowRight,
-  Palette,
-  Settings,
-} from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
+import { ArrowLeft, ArrowLeftRight, ArrowRight, Palette, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
-import { StickerQuickInput } from "../components/sticker-quick-input";
 import { SectionAccordion } from "../components/section-accordion";
+import { StickerQuickInput } from "../components/sticker-quick-input";
 
 type Tab = ListKind;
 
@@ -22,11 +16,24 @@ export function QuickRegisterView() {
   const [activeTab, setActiveTab] = useState<Tab>("duplicates");
 
   const {
-    duplicates, missing, sections, totalStickers,
-    isLoading, isSaving, error, canFinalize,
-    addDuplicates, removeDuplicate, addMissing, removeMissing, finalize,
-    markAllInSection, clearSection, invertSection,
-    markAll, clearAll,
+    duplicates,
+    missing,
+    sections,
+    totalStickers,
+    isLoading,
+    isSaving,
+    error,
+    canFinalize,
+    addDuplicates,
+    removeDuplicate,
+    addMissing,
+    removeMissing,
+    finalize,
+    markAllInSection,
+    clearSection,
+    invertSection,
+    markAll,
+    clearAll,
   } = useStickers();
 
   // Toggle individual para o grid
@@ -60,7 +67,7 @@ export function QuickRegisterView() {
   const handleFinalize = async () => {
     try {
       await finalize();
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       // Erro ja tratado no hook
     }
@@ -166,12 +173,16 @@ export function QuickRegisterView() {
           <h2 className="font-headline font-bold text-lg tracking-tight text-on-surface">
             {activeTab === "duplicates" ? "Suas Figurinhas" : "Minha Lista de Desejos"}
           </h2>
-          <div className={`px-3 py-1 rounded-full ${
-            activeTab === "duplicates" ? "bg-secondary-container/30" : "bg-primary/20"
-          }`}>
-            <span className={`font-bold text-xs uppercase tracking-widest ${
-              activeTab === "duplicates" ? "text-secondary" : "text-primary"
-            }`}>
+          <div
+            className={`px-3 py-1 rounded-full ${
+              activeTab === "duplicates" ? "bg-secondary-container/30" : "bg-primary/20"
+            }`}
+          >
+            <span
+              className={`font-bold text-xs uppercase tracking-widest ${
+                activeTab === "duplicates" ? "text-secondary" : "text-primary"
+              }`}
+            >
               Total: {totalCount} figurinha{totalCount !== 1 ? "s" : ""}
             </span>
           </div>
@@ -207,7 +218,8 @@ export function QuickRegisterView() {
               </label>
             </div>
             <span className="text-xs text-on-surface-variant">
-              {activeTab === "duplicates" ? duplicates.length : missing.length}/{totalStickers}
+              {activeTab === "duplicates" ? duplicates.length : missing.length}/
+              {totalStickers}
             </span>
           </div>
           <p className="text-xs text-on-surface-variant mt-2 px-1">

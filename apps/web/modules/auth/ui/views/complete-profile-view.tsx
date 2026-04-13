@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
-import { useConvexAuth, useQuery, useMutation } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 
 export function CompleteProfileView() {
@@ -27,13 +27,19 @@ export function CompleteProfileView() {
   // Already onboarded - redirect to dashboard
   useEffect(() => {
     if (currentUser?.hasCompletedOnboarding) {
-      router.replace("/dashboard");
+      router.replace("/cadastrar-figurinhas");
     }
   }, [currentUser, router]);
 
   // Middleware handles auth redirect to /sign-in
   // Wait for auth and user data
-  if (authLoading || !isAuthenticated || currentUser === undefined || !currentUser || currentUser.hasCompletedOnboarding) {
+  if (
+    authLoading ||
+    !isAuthenticated ||
+    currentUser === undefined ||
+    !currentUser ||
+    currentUser.hasCompletedOnboarding
+  ) {
     return <FullPageLoader />;
   }
 
