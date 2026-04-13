@@ -26,15 +26,28 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
   const byIndex = [...normalized].sort((a, b) => a.startNumber - b.startNumber);
 
   for (const section of normalized) {
-    if (byCode.has(section.code) && process.env.NODE_ENV === "development") {
+    if (byCode.has(section.code)) {
       console.warn(`Duplicate section code: ${section.code}`);
     }
     byCode.set(section.code, section);
   }
 
+  for (let i = 1; i < byIndex.length; i++) {
+    const prev = byIndex[i - 1];
+    const curr = byIndex[i];
+    if (prev && curr && curr.startNumber <= prev.endNumber) {
+      console.warn(`Overlapping sections: ${prev.code} and ${curr.code}`);
+    }
+  }
+
   return { byCode, byIndex };
 }
 
+/**
+ * Finds the section whose [startNumber, endNumber] contains `num`.
+ * Numbers that fall in gaps between sections return `undefined`.
+ * If ranges overlap, the section with the smaller `startNumber` wins (stable sort order).
+ */
 export function findSectionForNumber(
   num: number,
   lookup: SectionLookup
