@@ -52,9 +52,7 @@ export function StickerGrid({
     const state = getState(num);
     if (state === "blocked") return;
 
-    const isSelected =
-      mode === "duplicates" ? duplicates.has(num) : missing.has(num);
-
+    const isSelected = state === "duplicate" || state === "missing";
     onToggle(num, isSelected ? "remove" : "add");
   };
 
