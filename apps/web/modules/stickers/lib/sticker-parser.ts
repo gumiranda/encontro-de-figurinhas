@@ -1,34 +1,35 @@
 export type Section = {
   name: string;
-  code: string; // Código FIFA (ex: BRA, ARG, ENG)
+  code: string;
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
 };
 
 export type SectionLookup = {
-  /** FIFA codes as uppercase keys (case-insensitive lookup) */
   byCode: Map<string, Section>;
-  byIndex: Section[]; // sorted by startNumber for index lookup
+  byIndex: Section[];
 };
 
 export type ParseResult = {
-  valid: number[]; // Números absolutos adicionados
-  invalid: string[]; // Entradas não reconhecidas
-  formatted: string[]; // Exibição amigável (ex: "BRA-10", "ARG-1 a ARG-15")
+  valid: number[];
+  invalid: string[];
+  formatted: string[];
 };
 
-// Build a lookup structure for O(1) code access and sorted number lookup
 export function buildSectionLookup(sections: Section[]): SectionLookup {
+  const normalized = sections.map((s) => ({
+    ...s,
+    code: s.code.toUpperCase(),
+  }));
   const byCode = new Map<string, Section>();
-  const byIndex = [...sections].sort((a, b) => a.startNumber - b.startNumber);
+  const byIndex = [...normalized].sort((a, b) => a.startNumber - b.startNumber);
 
-  for (const section of sections) {
-    const key = section.code.toUpperCase();
-    if (byCode.has(key) && process.env.NODE_ENV === "development") {
+  for (const section of normalized) {
+    if (byCode.has(section.code) && process.env.NODE_ENV === "development") {
       console.warn(`Duplicate section code: ${section.code}`);
     }
-    byCode.set(key, section);
+    byCode.set(section.code, section);
   }
 
   return { byCode, byIndex };
@@ -40,7 +41,6 @@ function resolveLookup(lookupOrSections: SectionLookup | Section[]): SectionLook
     : lookupOrSections;
 }
 
-// Find section for a given absolute number (byIndex sorted by startNumber)
 export function findSectionForNumber(
   num: number,
   lookup: SectionLookup
@@ -58,13 +58,9 @@ export function findSectionForNumber(
   return undefined;
 }
 
-// Regex para formato estrito
-// Singular: BRA-10 (código de 2-4 letras + hífen + número de 1-2 dígitos)
 const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
-// Range: BRA-1-15 (código + hífen + início + hífen + fim)
 const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
 
-// Parseia uma entrada singular (ex: BRA-10)
 function parseSingle(
   code: string,
   num: number,
@@ -92,7 +88,6 @@ function parseSingle(
   };
 }
 
-// Parseia uma entrada de range (ex: BRA-1-15)
 function parseRange(
   code: string,
   start: number,
@@ -108,7 +103,6 @@ function parseRange(
     return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
   }
 
-  // Validar range invertido
   if (start > end) {
     return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
   }
@@ -129,7 +123,6 @@ function parseRange(
   return { valid: numbers, error: null, formatted };
 }
 
-// Parseia uma única entrada (detecta se é singular ou range)
 function parseEntry(
   entry: string,
   codeMap: Map<string, Section>
@@ -139,7 +132,6 @@ function parseEntry(
     return { valid: [], error: null, formatted: null };
   }
 
-  // Tentar range primeiro (2 hífens)
   const rangeMatch = normalized.match(RANGE_PATTERN);
   if (rangeMatch) {
     const [, code, startStr, endStr] = rangeMatch;
@@ -153,7 +145,6 @@ function parseEntry(
     }
   }
 
-  // Tentar singular (1 hífen)
   const singleMatch = normalized.match(SINGLE_PATTERN);
   if (singleMatch) {
     const [, code, numStr] = singleMatch;
@@ -167,7 +158,6 @@ function parseEntry(
     }
   }
 
-  // Formato inválido
   return { valid: [], error: entry.trim(), formatted: null };
 }
 
@@ -182,7 +172,6 @@ export function parseStickers(
 
   const codeMap = resolveLookup(lookupOrSections).byCode;
 
-  // Dividir por vírgula, espaço ou quebra de linha
   const entries = input
     .split(/[,\s\n]+/)
     .map((e) => e.trim())
@@ -208,13 +197,11 @@ export function parseStickers(
     }
   }
 
-  // Ordenar para consistência
   valid.sort((a, b) => a - b);
 
   return { valid, invalid, formatted };
 }
 
-// Formatar número para exibição com código da seção
 export function formatStickerNumber(
   num: number,
   lookupOrSections: SectionLookup | Section[]
@@ -246,7 +233,6 @@ export function formatStickerNumber(
   };
 }
 
-// Agrupar números por seção - O(n) instead of O(n*m)
 export function groupBySections(
   numbers: number[],
   lookupOrSections: SectionLookup | Section[]
@@ -258,12 +244,11 @@ export function groupBySections(
   for (const num of numbers) {
     const section = findSectionForNumber(num, lookup);
     if (section) {
-      const key = section.code.toUpperCase();
-      const existing = groups.get(key);
+      const existing = groups.get(section.code);
       if (existing) {
         existing.push(num);
       } else {
-        groups.set(key, [num]);
+        groups.set(section.code, [num]);
       }
     }
   }
