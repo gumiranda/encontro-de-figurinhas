@@ -44,9 +44,11 @@ export const updateStickerList = mutation({
       );
     }
 
-    // 2. Validacao: range valido (1-maxSticker, dinamico do DB)
+    // 2. Validacao: inteiros no range (1-maxSticker, dinamico do DB)
     const allNumbers = [...args.duplicates, ...args.missing];
-    const invalid = allNumbers.filter((n) => n < 1 || n > maxSticker);
+    const invalid = allNumbers.filter(
+      (n) => !Number.isInteger(n) || n < 1 || n > maxSticker
+    );
     if (invalid.length > 0) {
       throw new Error(`Numeros invalidos (1-${maxSticker}): ${invalid.join(", ")}`);
     }

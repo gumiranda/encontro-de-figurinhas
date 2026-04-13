@@ -9,6 +9,7 @@ import {
 } from "@workspace/ui/components/accordion";
 import { StickerGrid } from "./sticker-grid";
 import { getFlagGradient } from "../../lib/flag-gradients";
+import type { ListKind } from "../../lib/use-stickers";
 
 type Section = {
   name: string;
@@ -20,7 +21,7 @@ type Section = {
 
 type Props = {
   sections: Section[];
-  mode: "duplicates" | "missing";
+  mode: ListKind;
   duplicates: number[];
   missing: number[];
   onToggle: (num: number, action: "add" | "remove") => void;

@@ -8,9 +8,10 @@ import {
   parseStickers,
   type Section,
 } from "../../lib/sticker-parser";
+import type { ListKind } from "../../lib/use-stickers";
 
 type StickerQuickInputProps = {
-  mode: "duplicates" | "missing";
+  mode: ListKind;
   sections: Section[];
   onAdd: (numbers: number[]) => void;
 };

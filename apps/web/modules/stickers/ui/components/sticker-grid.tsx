@@ -7,9 +7,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import type { ListKind } from "../../lib/use-stickers";
 
 type Props = {
-  mode: "duplicates" | "missing";
+  mode: ListKind;
   sectionCode: string;
   sectionStart: number;
   sectionEnd: number;

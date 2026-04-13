@@ -11,11 +11,11 @@ import {
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { useStickers } from "../../lib/use-stickers";
+import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { StickerQuickInput } from "../components/sticker-quick-input";
 import { SectionAccordion } from "../components/section-accordion";
 
-type Tab = "duplicates" | "missing";
+type Tab = ListKind;
 
 export function QuickRegisterView() {
   const router = useRouter();

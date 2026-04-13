@@ -9,12 +9,13 @@ import {
   type Section,
 } from "../../lib/sticker-parser";
 import { getFlagGradient } from "../../lib/flag-gradients";
+import type { ListKind } from "../../lib/use-stickers";
 
 type Props = {
   numbers: number[];
   sections: Section[];
   onRemove: (num: number) => void;
-  variant?: "duplicates" | "missing";
+  variant?: ListKind;
 };
 
 export function StickerListGrouped({
