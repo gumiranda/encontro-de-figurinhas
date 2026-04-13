@@ -35,12 +35,6 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
   return { byCode, byIndex };
 }
 
-function resolveLookup(lookupOrSections: SectionLookup | Section[]): SectionLookup {
-  return Array.isArray(lookupOrSections)
-    ? buildSectionLookup(lookupOrSections)
-    : lookupOrSections;
-}
-
 export function findSectionForNumber(
   num: number,
   lookup: SectionLookup
@@ -163,16 +157,13 @@ function parseEntry(
   return { valid: [], error: entry.trim(), formatted: null };
 }
 
-export function parseStickers(
-  input: string,
-  lookupOrSections: SectionLookup | Section[]
-): ParseResult {
+export function parseStickers(input: string, lookup: SectionLookup): ParseResult {
   const valid: number[] = [];
   const invalid: string[] = [];
   const formatted: string[] = [];
   const seen = new Set<number>();
 
-  const codeMap = resolveLookup(lookupOrSections).byCode;
+  const codeMap = lookup.byCode;
 
   const entries = input
     .split(/[,\s]+/)
@@ -207,15 +198,13 @@ export function parseStickers(
 
 export function formatStickerNumber(
   num: number,
-  lookupOrSections: SectionLookup | Section[]
+  lookup: SectionLookup
 ): {
   code: string;
   relativeNum: number;
   fullName: string;
   display: string;
 } {
-  const lookup = resolveLookup(lookupOrSections);
-
   const section = findSectionForNumber(num, lookup);
 
   if (section) {
@@ -238,10 +227,8 @@ export function formatStickerNumber(
 
 export function groupBySections(
   numbers: number[],
-  lookupOrSections: SectionLookup | Section[]
+  lookup: SectionLookup
 ): Map<string, number[]> {
-  const lookup = resolveLookup(lookupOrSections);
-
   const groups = new Map<string, number[]>();
 
   for (const num of numbers) {
