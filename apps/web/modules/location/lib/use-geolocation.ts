@@ -101,6 +101,8 @@ export function useGeolocation() {
   }, [fetchCoords]);
 
   const requestPermission = useCallback(() => {
+    if (statusRef.current === "checking") return;
+    statusRef.current = "checking";
     setState({ status: "checking", coords: null, error: null });
     fetchCoords();
   }, [fetchCoords]);
