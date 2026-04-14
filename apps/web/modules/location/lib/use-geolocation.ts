@@ -27,6 +27,13 @@ const GPS_UNAVAILABLE: GeolocationState = {
   error: "GPS indisponível",
 };
 
+/** GeolocationPositionError.code — https://w3c.github.io/geolocation-api/#position_error_interface */
+const GEO_ERROR_MAP: Record<number, [GeolocationState["status"], string]> = {
+  1: ["denied", "Permissão negada"],
+  2: ["unavailable", "Posição indisponível"],
+  3: ["timeout", "Timeout"],
+};
+
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
@@ -34,30 +41,36 @@ export function useGeolocation() {
     error: null,
   });
 
+  const mountedRef = useRef(true);
   const isCheckingRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const fetchCoords = useCallback(
     () =>
       new Promise<void>((resolve) => {
         navigator.geolocation.getCurrentPosition(
           ({ coords }) => {
-            setState({
-              status: "granted",
-              coords: { lat: coords.latitude, lng: coords.longitude },
-              error: null,
-            });
+            if (mountedRef.current) {
+              setState({
+                status: "granted",
+                coords: { lat: coords.latitude, lng: coords.longitude },
+                error: null,
+              });
+            }
             resolve();
           },
-          ({ code, PERMISSION_DENIED, POSITION_UNAVAILABLE, TIMEOUT }) => {
+          ({ code }) => {
             const [status, error] =
-              code === PERMISSION_DENIED
-                ? (["denied", "Permissão negada"] as const)
-                : code === TIMEOUT
-                  ? (["timeout", "Timeout"] as const)
-                  : code === POSITION_UNAVAILABLE
-                    ? (["unavailable", "Posição indisponível"] as const)
-                    : (["unavailable", "Erro desconhecido"] as const);
-            setState({ status, coords: null, error });
+              GEO_ERROR_MAP[code] ?? (["unavailable", "Erro desconhecido"] as const);
+            if (mountedRef.current) {
+              setState({ status, coords: null, error });
+            }
             resolve();
           },
           GEO_OPTIONS
@@ -66,15 +79,19 @@ export function useGeolocation() {
     []
   );
 
-  const checkPermission = useCallback(() => {
-    if (isCheckingRef.current) return;
+  const beginCheck = useCallback((): boolean => {
+    if (isCheckingRef.current) return false;
     if (!navigator.geolocation) {
       setState(GPS_UNAVAILABLE);
-      return;
+      return false;
     }
-
     isCheckingRef.current = true;
     setState((s) => ({ ...s, status: "checking", error: null }));
+    return true;
+  }, []);
+
+  const checkPermission = useCallback(() => {
+    if (!beginCheck()) return;
 
     if (!navigator.permissions) {
       fetchCoords().finally(() => {
@@ -87,36 +104,30 @@ export function useGeolocation() {
       .query({ name: "geolocation" })
       .then(({ state: perm }) => {
         if (perm === "granted") return fetchCoords();
-        setState({
-          status: perm === "denied" ? "denied" : "prompting",
-          coords: null,
-          error: perm === "denied" ? "Permissão negada" : null,
-        });
+        if (mountedRef.current) {
+          setState({
+            status: perm === "denied" ? "denied" : "prompting",
+            coords: null,
+            error: perm === "denied" ? "Permissão negada" : null,
+          });
+        }
       })
       .catch(() => fetchCoords())
       .finally(() => {
         isCheckingRef.current = false;
       });
-  }, [fetchCoords]);
+  }, [beginCheck, fetchCoords]);
 
   const requestPermission = useCallback(() => {
-    if (isCheckingRef.current) return;
-    if (!navigator.geolocation) {
-      setState(GPS_UNAVAILABLE);
-      return;
-    }
-
-    isCheckingRef.current = true;
-    setState((s) => ({ ...s, status: "checking", error: null }));
+    if (!beginCheck()) return;
     fetchCoords().finally(() => {
       isCheckingRef.current = false;
     });
-  }, [fetchCoords]);
+  }, [beginCheck, fetchCoords]);
 
   useEffect(() => {
     checkPermission();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run permission probe once on mount
-  }, []);
+  }, [checkPermission]);
 
   return { ...state, requestPermission, checkPermission };
 }
