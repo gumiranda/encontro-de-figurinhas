@@ -63,7 +63,9 @@ export function GpsPermissionScreen({
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
         {status === "checking" && <Button disabled>Verificando...</Button>}
-        {(status === "prompting" || status === "timeout") && (
+        {(status === "idle" ||
+          status === "prompting" ||
+          status === "timeout") && (
           <Button onClick={onRequestPermission}>Ativar localização</Button>
         )}
         <Button variant="outline" onClick={onSkipToManual}>

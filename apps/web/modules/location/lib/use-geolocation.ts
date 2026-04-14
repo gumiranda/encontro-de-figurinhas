@@ -39,7 +39,12 @@ const UNKNOWN_GEO_ERROR: [GeolocationState["status"], string] = [
   "Erro desconhecido",
 ];
 
-export function useGeolocation() {
+export type UseGeolocationOptions = {
+  /** Se true, chama checkPermission uma vez ao montar. O padrão é false para evitar prompt de geolocalização sem gesto do usuário. */
+  autoCheck?: boolean;
+};
+
+export function useGeolocation({ autoCheck = false }: UseGeolocationOptions = {}) {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
     coords: null,
@@ -49,11 +54,8 @@ export function useGeolocation() {
   const mountedRef = useRef(true);
   const isCheckingRef = useRef(false);
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
+  useEffect(() => () => {
+    mountedRef.current = false;
   }, []);
 
   const fetchCoords = useCallback(
@@ -97,19 +99,17 @@ export function useGeolocation() {
   const checkPermission = useCallback(() => {
     if (!beginCheck()) return;
 
-    const releaseCheck = () => {
-      isCheckingRef.current = false;
-    };
-
     // Sem Permissions API: único término é fetchCoords; não há .query().finally abaixo.
     if (!navigator.permissions) {
-      void fetchCoords().finally(releaseCheck);
+      void fetchCoords().finally(() => {
+        isCheckingRef.current = false;
+      });
       return;
     }
 
-    // Com Permissions API: .finally(releaseCheck) corre após o .then/.catch, inclusive
+    // Com Permissions API: .finally zera isCheckingRef após o .then/.catch, inclusive
     // quando granted retorna a Promise de fetchCoords (encadeamento) ou quando denied/prompt
-    // termina síncrono (releaseCheck ainda roda após o handler).
+    // termina síncrono (o .finally ainda roda após o handler).
     void navigator.permissions
       .query({ name: "geolocation" })
       .then(({ state: perm }) => {
@@ -118,25 +118,26 @@ export function useGeolocation() {
           setState({
             status: perm === "denied" ? "denied" : "prompting",
             coords: null,
-            error: perm === "denied" ? "Permissão negada" : null,
+            error: perm === "denied" ? GEO_ERROR_MAP[1]![1] : null,
           });
         }
       })
       .catch(() => fetchCoords())
-      .finally(releaseCheck);
+      .finally(() => {
+        isCheckingRef.current = false;
+      });
   }, [beginCheck, fetchCoords]);
 
   const requestPermission = useCallback(() => {
     if (!beginCheck()) return;
-    const releaseCheck = () => {
+    void fetchCoords().finally(() => {
       isCheckingRef.current = false;
-    };
-    void fetchCoords().finally(releaseCheck);
+    });
   }, [beginCheck, fetchCoords]);
 
   useEffect(() => {
-    checkPermission();
-  }, [checkPermission]);
+    if (autoCheck) checkPermission();
+  }, [autoCheck, checkPermission]);
 
   return { ...state, requestPermission, checkPermission };
 }
