@@ -13,11 +13,12 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { useMutation } from "convex/react";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { CityWithCoords } from "../../lib/location-constants";
+import { resolveSetLocationToastMessage } from "../../lib/resolve-set-location-toast";
 import { useLocationFlow } from "../../lib/use-location-flow";
 import { GpsPermissionScreen } from "../components/gps-permission-screen";
 import { ManualSearchScreen } from "../components/manual-search-screen";
@@ -44,7 +45,7 @@ export function LocationSelectorView({
     selectedCityId,
     locationSource,
     getIpLocationAttestationToken,
-    showIpConsent,
+    shouldShowIpDialog,
     gpsStatus,
     coords,
     requestPermission,
@@ -82,25 +83,16 @@ export function LocationSelectorView({
       });
       router.push("/dashboard");
     } catch (error) {
-      console.error("setLocation failed:", error);
-      const message = error instanceof Error ? error.message : "";
-      if (message.includes("aguarde") || message.includes("Limite")) {
-        toast.error(message);
-      } else {
-        toast.error("Erro ao salvar localização. Tente novamente.");
-      }
+      toast.error(resolveSetLocationToastMessage(error));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const shouldShowIpDialog =
-    viewState === "manual" && gpsStatus === "denied" && showIpConsent;
-
-  const gpsDetectedCityLabel =
-    viewState === "gps" && locationSource === "gps" && selectedCityId
-      ? (cities.find((c) => c._id === selectedCityId)?.name ?? null)
-      : null;
+  const gpsDetectedCityLabel = useMemo(() => {
+    if (viewState !== "gps" || locationSource !== "gps") return undefined;
+    return cities.find((c) => c._id === selectedCityId)?.name;
+  }, [viewState, locationSource, cities, selectedCityId]);
 
   return (
     <main className="landing-theme relative flex min-h-screen flex-col bg-[var(--landing-background)] stadium-gradient p-6">
@@ -133,6 +125,21 @@ export function LocationSelectorView({
               indisponível — use a busca manual.
             </p>
             <p className="text-destructive/90 break-words">{citiesError}</p>
+          </div>
+        </div>
+      )}
+
+      {!citiesError && cities.length === 0 && (
+        <div
+          role="status"
+          className="mb-4 flex gap-2 rounded-lg border border-border bg-muted/40 p-4 text-foreground"
+        >
+          <Info className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+          <div className="text-sm space-y-1 min-w-0">
+            <p>
+              Ainda não há cidades na lista para sugestões automáticas. Use a
+              busca abaixo; se não aparecer resultado, tente novamente mais tarde.
+            </p>
           </div>
         </div>
       )}

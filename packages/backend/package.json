@@ -12,7 +12,8 @@
     "./_generated/api": "./convex/_generated/api.js",
     "./_generated/dataModel": "./convex/_generated/dataModel.d.ts",
     "./lib/types": "./convex/lib/types.ts",
-    "./lib/ipLocationToken": "./convex/lib/ipLocationToken.ts"
+    "./lib/ipLocationToken": "./convex/lib/ipLocationToken.ts",
+    "./lib/setLocationErrors": "./convex/lib/setLocationErrors.ts"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",

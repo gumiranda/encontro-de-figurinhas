@@ -7,6 +7,7 @@ import { verifyIpLocationToken } from "./lib/ipLocationToken";
 import { GEO_VALIDATION, LOCATION_RATE_LIMIT } from "./lib/locationConstants";
 import { getLocationUpdateTimestampsForWindow } from "./lib/locationRateLimit";
 import { checkRateLimit } from "./lib/rateLimit";
+import { throwSetLocationError } from "./lib/setLocationErrors";
 
 export const getCurrentUser = query({
   args: {},
@@ -287,35 +288,37 @@ export const setLocation = mutation({
     );
 
     if (!rateLimit.allowed) {
-      throw new Error(
+      throwSetLocationError(
         rateLimit.reason === "cooldown"
-          ? "Por favor, aguarde antes de tentar novamente"
-          : "Limite de atualizações atingido"
+          ? "LOCATION_RATE_LIMIT_COOLDOWN"
+          : "LOCATION_RATE_LIMIT_HOURLY"
       );
     }
 
     const nextTimestamps = [...timestampsInWindow, now];
 
     const city = await ctx.db.get(args.cityId);
-    if (!city) throw new Error("Cidade não encontrada");
-    if (city.isActive === false) throw new Error("Cidade não disponível");
+    if (!city) throwSetLocationError("LOCATION_CITY_NOT_FOUND");
+    if (city.isActive === false) throwSetLocationError("LOCATION_CITY_INACTIVE");
 
     if ((args.lat !== undefined) !== (args.lng !== undefined)) {
-      throw new Error("lat e lng devem ser ambos presentes ou ambos ausentes");
+      throwSetLocationError("LOCATION_COORDS_PAIR_INVALID");
     }
 
     const hasCoords = args.lat !== undefined && args.lng !== undefined;
 
     if (hasCoords && args.locationSource === "ip") {
-      throw new Error("Origem IP não aceita coordenadas do cliente");
+      throwSetLocationError("LOCATION_IP_WITH_CLIENT_COORDS");
     }
 
     let effectiveSource: "gps" | "manual" | "ip";
     let saveCoords = false;
 
+    // GPS do cliente pode ser spoofado; aqui só exigimos coerência com a cidade escolhida
+    // (Brasil + distância ao centro). Longe demais → trata como manual e não persiste coords.
     if (hasCoords) {
       if (!isInBrazil(args.lat!, args.lng!)) {
-        throw new Error("Coordenadas fora do Brasil");
+        throwSetLocationError("LOCATION_OUTSIDE_BRAZIL");
       }
 
       const distance = haversine(city.lat, city.lng, args.lat!, args.lng!);
@@ -326,14 +329,14 @@ export const setLocation = mutation({
         effectiveSource = "gps";
       }
     } else if (args.locationSource === "gps") {
-      throw new Error("Coordenadas obrigatórias para localização por GPS");
+      throwSetLocationError("LOCATION_GPS_COORDS_REQUIRED");
     } else if (args.locationSource === "ip") {
       const secret = process.env.IP_LOCATION_ATTESTATION_SECRET;
       if (!secret) {
-        throw new Error("Configuração de localização incompleta");
+        throwSetLocationError("LOCATION_IP_SERVER_CONFIG");
       }
       if (!args.ipLocationToken) {
-        throw new Error("Confirmação de localização por IP necessária");
+        throwSetLocationError("LOCATION_IP_TOKEN_REQUIRED");
       }
       const payload = await verifyIpLocationToken(
         args.ipLocationToken,
@@ -341,20 +344,20 @@ export const setLocation = mutation({
         secret
       );
       if (!payload) {
-        throw new Error("Confirmação de localização por IP inválida ou expirada");
+        throwSetLocationError("LOCATION_IP_TOKEN_INVALID");
       }
       if (!isInBrazil(payload.lat, payload.lng)) {
-        throw new Error("Coordenadas fora do Brasil");
+        throwSetLocationError("LOCATION_OUTSIDE_BRAZIL");
       }
       const distance = haversine(city.lat, city.lng, payload.lat, payload.lng);
       if (distance > GEO_VALIDATION.MAX_DISTANCE_FROM_CITY_KM) {
-        throw new Error("Cidade não corresponde à localização detectada");
+        throwSetLocationError("LOCATION_IP_CITY_MISMATCH");
       }
       effectiveSource = "ip";
     } else if (args.locationSource === "manual") {
       effectiveSource = "manual";
     } else {
-      throw new Error("Origem de localização inválida");
+      throwSetLocationError("LOCATION_INVALID_SOURCE");
     }
 
     await ctx.db.patch(user._id, {

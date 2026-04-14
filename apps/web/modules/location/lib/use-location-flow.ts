@@ -143,6 +143,7 @@ export type UseLocationFlowReturn = {
   locationSource: LocationSource;
   getIpLocationAttestationToken: () => string | null;
   showIpConsent: boolean;
+  shouldShowIpDialog: boolean;
   isIpAcceptInFlight: boolean;
   gpsStatus: GeolocationHook["status"];
   coords: GeolocationHook["coords"];
@@ -429,6 +430,9 @@ export function useLocationFlow({
     isIpAcceptInFlight,
   } = state;
 
+  const shouldShowIpDialog =
+    viewState === "manual" && gpsStatus === "denied" && showIpConsent;
+
   return {
     viewState,
     setViewState,
@@ -436,6 +440,7 @@ export function useLocationFlow({
     locationSource,
     getIpLocationAttestationToken,
     showIpConsent,
+    shouldShowIpDialog,
     isIpAcceptInFlight,
     gpsStatus,
     coords,

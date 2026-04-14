@@ -17,6 +17,7 @@ import type * as lib_ipLocationToken from "../lib/ipLocationToken.js";
 import type * as lib_locationConstants from "../lib/locationConstants.js";
 import type * as lib_locationRateLimit from "../lib/locationRateLimit.js";
 import type * as lib_rateLimit from "../lib/rateLimit.js";
+import type * as lib_setLocationErrors from "../lib/setLocationErrors.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_userCoords from "../lib/userCoords.js";
 import type * as lib_utils from "../lib/utils.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   "lib/locationConstants": typeof lib_locationConstants;
   "lib/locationRateLimit": typeof lib_locationRateLimit;
   "lib/rateLimit": typeof lib_rateLimit;
+  "lib/setLocationErrors": typeof lib_setLocationErrors;
   "lib/types": typeof lib_types;
   "lib/userCoords": typeof lib_userCoords;
   "lib/utils": typeof lib_utils;
