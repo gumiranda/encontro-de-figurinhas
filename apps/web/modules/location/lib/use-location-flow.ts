@@ -26,13 +26,27 @@ function setSessionItem(key: string, value: string): void {
   }
 }
 
-/** Matches GET /api/ip-location JSON body on success (validated at runtime). */
 const ipLocationResponseSchema = z.object({
   lat: z.number().finite(),
   lng: z.number().finite(),
   city: z.string().optional(),
-  attestationToken: z.string().min(1).optional(),
+  attestationToken: z.string().min(1),
+  expiresAt: z.number().finite(),
 });
+
+type IpLocationResponse = z.infer<typeof ipLocationResponseSchema>;
+
+type IpLocationFetchResult =
+  | { ok: true; data: IpLocationResponse }
+  | { ok: false; reason: "http" | "parse" };
+
+async function fetchIpLocation(): Promise<IpLocationFetchResult> {
+  const res = await fetch("/api/ip-location");
+  if (!res.ok) return { ok: false, reason: "http" };
+  const parsed = ipLocationResponseSchema.safeParse(await res.json());
+  if (!parsed.success) return { ok: false, reason: "parse" };
+  return { ok: true, data: parsed.data };
+}
 
 function persistIpConsentDismissed(): void {
   setSessionItem(IP_CONSENT_KEY, "true");
@@ -45,15 +59,14 @@ function processNearestCity(
   lng: number,
   cities: CityWithCoords[],
   onFound: (nearest: NearestCityResult) => void,
-  notFoundMessage: string
-): boolean {
+  onNotFound: () => void
+): void {
   const nearest = findNearestCity(lat, lng, cities);
   if (nearest) {
     onFound(nearest);
-    return true;
+  } else {
+    onNotFound();
   }
-  toast.info(notFoundMessage);
-  return false;
 }
 
 const NEAREST_NOT_FOUND_GPS =
@@ -74,6 +87,7 @@ export type UseLocationFlowReturn = {
   locationSource: LocationSource;
   ipLocationToken: string | null;
   showIpConsent: boolean;
+  isIpAcceptInFlight: boolean;
   gpsStatus: GeolocationHook["status"];
   coords: GeolocationHook["coords"];
   requestPermission: GeolocationHook["requestPermission"];
@@ -114,9 +128,39 @@ export function useLocationFlow({
   const citiesRef = useRef(cities);
   citiesRef.current = cities;
 
+  /** Impede segundo clique antes do re-render (estado React não é síncrono). */
+  const ipAcceptLockedRef = useRef(false);
+  const [isIpAcceptInFlight, setIsIpAcceptInFlight] = useState(false);
+
   const [state, setState] = useState<LocationState>(() =>
     initialLocationState(currentCityId)
   );
+
+  useEffect(() => {
+    if (!currentCityId) return;
+    setState((prev) => {
+      if (prev.selectedCityId) return prev;
+      return { ...prev, selectedCityId: currentCityId };
+    });
+  }, [currentCityId]);
+
+  const setGpsSource = (selectedCityId?: Id<"cities">): void => {
+    setState((prev) => ({
+      ...prev,
+      ...(selectedCityId !== undefined ? { selectedCityId } : {}),
+      locationSource: "gps",
+      ipLocationToken: null,
+    }));
+  };
+
+  const setManualSource = (selectedCityId?: Id<"cities">): void => {
+    setState((prev) => ({
+      ...prev,
+      ...(selectedCityId !== undefined ? { selectedCityId } : {}),
+      locationSource: "manual",
+      ipLocationToken: null,
+    }));
+  };
 
   useEffect(() => {
     const dismissed = getSessionItem(IP_CONSENT_KEY);
@@ -124,54 +168,47 @@ export function useLocationFlow({
   }, []);
 
   useEffect(() => {
-    if (citiesError || gpsStatus === "denied" || gpsStatus === "unavailable") {
+    if (!citiesError) return;
+    toast.error("Erro ao carregar cidades. Use a busca manual.");
+    setState((prev) => ({ ...prev, viewState: "manual" }));
+  }, [citiesError]);
+
+  useEffect(() => {
+    if (gpsStatus === "denied" || gpsStatus === "unavailable") {
       setState((prev) => ({ ...prev, viewState: "manual" }));
     }
-  }, [citiesError, gpsStatus]);
+  }, [gpsStatus]);
 
   useEffect(() => {
     if (gpsStatus !== "granted" || !coords) {
       return;
     }
 
-    if (cities.length === 0) {
-      setState((prev) => ({
-        ...prev,
-        locationSource: "gps",
-        ipLocationToken: null,
-      }));
+    const currentCities = citiesRef.current;
+    if (currentCities.length === 0) {
+      setGpsSource();
       toast.info("Use a busca manual para selecionar sua cidade.");
       return;
     }
 
-    const found = processNearestCity(
+    processNearestCity(
       coords.lat,
       coords.lng,
-      cities,
+      currentCities,
       (nearest) => {
-        setState((prev) => ({
-          ...prev,
-          locationSource: "gps",
-          ipLocationToken: null,
-          selectedCityId: nearest.city._id,
-        }));
+        setGpsSource(nearest.city._id);
         if (nearest.isDistant) {
           toast.info(
             `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
           );
         }
       },
-      NEAREST_NOT_FOUND_GPS
+      () => {
+        toast.info(NEAREST_NOT_FOUND_GPS);
+        setGpsSource();
+      }
     );
-
-    if (!found) {
-      setState((prev) => ({
-        ...prev,
-        locationSource: "gps",
-        ipLocationToken: null,
-      }));
-    }
-  }, [gpsStatus, coords, cities]);
+  }, [gpsStatus, coords]);
 
   function setViewState(next: ViewState): void {
     setState((prev) => ({ ...prev, viewState: next }));
@@ -183,16 +220,24 @@ export function useLocationFlow({
   }
 
   async function handleIpAccept(): Promise<void> {
+    if (ipAcceptLockedRef.current || isIpAcceptInFlight) return;
+    ipAcceptLockedRef.current = true;
+    setIsIpAcceptInFlight(true);
     try {
-      const res = await fetch("/api/ip-location");
-      if (!res.ok) throw new Error("IP location failed");
-      const json: unknown = await res.json();
-      const parsed = ipLocationResponseSchema.safeParse(json);
-      if (!parsed.success) {
-        toast.error("Resposta inválida do servidor");
+      const result = await fetchIpLocation();
+      if (!result.ok) {
+        toast.error(
+          result.reason === "parse"
+            ? "Resposta inválida do servidor"
+            : "Não foi possível detectar sua localização"
+        );
         return;
       }
-      const data = parsed.data;
+      const data = result.data;
+      if (data.expiresAt <= Date.now()) {
+        toast.error("Confirmação de localização expirou. Tente novamente.");
+        return;
+      }
       processNearestCity(
         data.lat,
         data.lng,
@@ -202,29 +247,28 @@ export function useLocationFlow({
             ...prev,
             selectedCityId: nearest.city._id,
             locationSource: "ip",
-            ipLocationToken: data.attestationToken ?? null,
+            ipLocationToken: data.attestationToken,
           }));
           toast.success(
             `Localização detectada: ${nearest.city.name}, ${nearest.city.state}`
           );
         },
-        NEAREST_NOT_FOUND_IP
+        () => {
+          toast.info(NEAREST_NOT_FOUND_IP);
+        }
       );
     } catch {
       toast.error("Não foi possível detectar sua localização");
     } finally {
+      ipAcceptLockedRef.current = false;
+      setIsIpAcceptInFlight(false);
       persistIpConsentDismissed();
       setState((prev) => ({ ...prev, showIpConsent: false }));
     }
   }
 
   function selectCityManual(id: Id<"cities">): void {
-    setState((prev) => ({
-      ...prev,
-      selectedCityId: id,
-      locationSource: "manual",
-      ipLocationToken: null,
-    }));
+    setManualSource(id);
   }
 
   const {
@@ -242,6 +286,7 @@ export function useLocationFlow({
     locationSource,
     ipLocationToken,
     showIpConsent,
+    isIpAcceptInFlight,
     gpsStatus,
     coords,
     requestPermission,

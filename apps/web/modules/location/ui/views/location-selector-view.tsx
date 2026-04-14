@@ -55,6 +55,7 @@ export function LocationSelectorView({
     dismissIpConsent,
     handleIpAccept,
     selectCityManual,
+    isIpAcceptInFlight,
   } = useLocationFlow({ cities: stableCities, citiesError, currentCityId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,10 +176,16 @@ export function LocationSelectorView({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={dismissIpConsent}>
+            <Button
+              variant="outline"
+              onClick={dismissIpConsent}
+              disabled={isIpAcceptInFlight}
+            >
               Não, obrigado
             </Button>
-            <Button onClick={handleIpAccept}>Sim, detectar</Button>
+            <Button onClick={handleIpAccept} disabled={isIpAcceptInFlight}>
+              {isIpAcceptInFlight ? "Detectando..." : "Sim, detectar"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

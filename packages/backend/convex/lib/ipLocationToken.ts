@@ -40,16 +40,18 @@ async function importHmacKey(secret: string): Promise<CryptoKey> {
 export async function signIpLocationToken(
   payload: Omit<IpLocationPayload, "exp">,
   secret: string
-): Promise<string> {
+): Promise<{ token: string; expiresAt: number }> {
+  const expiresAt = Date.now() + TOKEN_TTL_MS;
   const full: IpLocationPayload = {
     ...payload,
-    exp: Date.now() + TOKEN_TTL_MS,
+    exp: expiresAt,
   };
   const payloadStr = JSON.stringify(full);
   const payloadBytes = new TextEncoder().encode(payloadStr);
   const key = await importHmacKey(secret);
   const sig = await crypto.subtle.sign("HMAC", key, payloadBytes);
-  return `${uint8ArrayToBase64Url(payloadBytes)}.${uint8ArrayToBase64Url(new Uint8Array(sig))}`;
+  const token = `${uint8ArrayToBase64Url(payloadBytes)}.${uint8ArrayToBase64Url(new Uint8Array(sig))}`;
+  return { token, expiresAt };
 }
 
 export async function verifyIpLocationToken(

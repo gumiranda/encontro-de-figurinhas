@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
   })();
 
-  const attestationToken = await signIpLocationToken(
+  const { token: attestationToken, expiresAt } = await signIpLocationToken(
     { sub: userId, lat: parsedLat, lng: parsedLng },
     secret
   );
@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
     lat: parsedLat,
     lng: parsedLng,
     attestationToken,
+    /** Espelha `exp` do payload assinado; o cliente pode recusar antes de usar. A autoridade é `verifyIpLocationToken` no Convex. */
+    expiresAt,
   });
   response.headers.set("Cache-Control", "private, max-age=300");
   return response;
