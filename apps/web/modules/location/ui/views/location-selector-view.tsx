@@ -15,7 +15,7 @@ import {
 import { useMutation } from "convex/react";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import type { CityWithCoords } from "../../lib/location-constants";
 import { useLocationFlow } from "../../lib/use-location-flow";
@@ -38,16 +38,12 @@ export function LocationSelectorView({
   const router = useRouter();
   const setLocationMutation = useMutation(api.users.setLocation);
 
-  /** Evita identidade nova a cada render quando o conteúdo é o mesmo (ex.: query). */
-  const citiesStableKey = JSON.stringify(cities);
-  const stableCities = useMemo(() => cities, [citiesStableKey]);
-
   const {
     viewState,
     setViewState,
     selectedCityId,
     locationSource,
-    ipLocationToken,
+    getIpLocationAttestationToken,
     showIpConsent,
     gpsStatus,
     coords,
@@ -56,7 +52,7 @@ export function LocationSelectorView({
     handleIpAccept,
     selectCityManual,
     isIpAcceptInFlight,
-  } = useLocationFlow({ cities: stableCities, citiesError, currentCityId });
+  } = useLocationFlow({ cities, citiesError, currentCityId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,6 +68,8 @@ export function LocationSelectorView({
 
   const handleConfirmLocation = async () => {
     if (!selectedCityId || isSubmitting) return;
+    const ipToken =
+      locationSource === "ip" ? getIpLocationAttestationToken() : null;
     setIsSubmitting(true);
     try {
       await setLocationMutation({
@@ -80,9 +78,7 @@ export function LocationSelectorView({
         ...(locationSource === "gps" && coords
           ? { lat: coords.lat, lng: coords.lng }
           : {}),
-        ...(locationSource === "ip" && ipLocationToken
-          ? { ipLocationToken }
-          : {}),
+        ...(locationSource === "ip" && ipToken ? { ipLocationToken: ipToken } : {}),
       });
       router.push("/dashboard");
     } catch (error) {
@@ -103,7 +99,7 @@ export function LocationSelectorView({
 
   const gpsDetectedCityLabel =
     viewState === "gps" && locationSource === "gps" && selectedCityId
-      ? (stableCities.find((c) => c._id === selectedCityId)?.name ?? null)
+      ? (cities.find((c) => c._id === selectedCityId)?.name ?? null)
       : null;
 
   return (
