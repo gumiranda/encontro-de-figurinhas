@@ -21,9 +21,7 @@ function getSessionItem(key: string): string | null {
 function setSessionItem(key: string, value: string): void {
   try {
     sessionStorage.setItem(key, value);
-  } catch {
-    // Silently fail - privacy mode or quota exceeded
-  }
+  } catch {}
 }
 
 const ipLocationResponseSchema = z.object({
@@ -40,8 +38,17 @@ type IpLocationFetchResult =
   | { ok: true; data: IpLocationResponse }
   | { ok: false; reason: "http" | "parse" };
 
-async function fetchIpLocation(): Promise<IpLocationFetchResult> {
-  const res = await fetch("/api/ip-location");
+function isAbortError(e: unknown): boolean {
+  return (
+    (e instanceof DOMException && e.name === "AbortError") ||
+    (e instanceof Error && e.name === "AbortError")
+  );
+}
+
+async function fetchIpLocation(
+  signal?: AbortSignal
+): Promise<IpLocationFetchResult> {
+  const res = await fetch("/api/ip-location", { signal });
   if (!res.ok) return { ok: false, reason: "http" };
   const parsed = ipLocationResponseSchema.safeParse(await res.json());
   if (!parsed.success) return { ok: false, reason: "parse" };
@@ -50,23 +57,6 @@ async function fetchIpLocation(): Promise<IpLocationFetchResult> {
 
 function persistIpConsentDismissed(): void {
   setSessionItem(IP_CONSENT_KEY, "true");
-}
-
-type NearestCityResult = NonNullable<ReturnType<typeof findNearestCity>>;
-
-function processNearestCity(
-  lat: number,
-  lng: number,
-  cities: CityWithCoords[],
-  onFound: (nearest: NearestCityResult) => void,
-  onNotFound: () => void
-): void {
-  const nearest = findNearestCity(lat, lng, cities);
-  if (nearest) {
-    onFound(nearest);
-  } else {
-    onNotFound();
-  }
 }
 
 const NEAREST_NOT_FOUND_GPS =
@@ -126,10 +116,12 @@ export function useLocationFlow({
   const { status: gpsStatus, coords, requestPermission } = useGeolocation();
 
   const citiesRef = useRef(cities);
-  citiesRef.current = cities;
+  useEffect(() => {
+    citiesRef.current = cities;
+  }, [cities]);
 
-  /** Impede segundo clique antes do re-render (estado React não é síncrono). */
-  const ipAcceptLockedRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const [isIpAcceptInFlight, setIsIpAcceptInFlight] = useState(false);
 
   const [state, setState] = useState<LocationState>(() =>
@@ -144,20 +136,14 @@ export function useLocationFlow({
     });
   }, [currentCityId]);
 
-  const setGpsSource = (selectedCityId?: Id<"cities">): void => {
+  const setLocationSource = (
+    source: "gps" | "manual",
+    selectedCityId?: Id<"cities">
+  ): void => {
     setState((prev) => ({
       ...prev,
       ...(selectedCityId !== undefined ? { selectedCityId } : {}),
-      locationSource: "gps",
-      ipLocationToken: null,
-    }));
-  };
-
-  const setManualSource = (selectedCityId?: Id<"cities">): void => {
-    setState((prev) => ({
-      ...prev,
-      ...(selectedCityId !== undefined ? { selectedCityId } : {}),
-      locationSource: "manual",
+      locationSource: source,
       ipLocationToken: null,
     }));
   };
@@ -180,35 +166,36 @@ export function useLocationFlow({
   }, [gpsStatus]);
 
   useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
     if (gpsStatus !== "granted" || !coords) {
       return;
     }
 
-    const currentCities = citiesRef.current;
-    if (currentCities.length === 0) {
-      setGpsSource();
+    if (cities.length === 0) {
+      setLocationSource("gps");
       toast.info("Use a busca manual para selecionar sua cidade.");
       return;
     }
 
-    processNearestCity(
-      coords.lat,
-      coords.lng,
-      currentCities,
-      (nearest) => {
-        setGpsSource(nearest.city._id);
-        if (nearest.isDistant) {
-          toast.info(
-            `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
-          );
-        }
-      },
-      () => {
-        toast.info(NEAREST_NOT_FOUND_GPS);
-        setGpsSource();
+    const nearest = findNearestCity(coords.lat, coords.lng, cities);
+    if (nearest) {
+      setLocationSource("gps", nearest.city._id);
+      if (nearest.isDistant) {
+        toast.info(
+          `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
+        );
       }
-    );
-  }, [gpsStatus, coords]);
+    } else {
+      toast.info(NEAREST_NOT_FOUND_GPS);
+      setLocationSource("gps");
+    }
+  }, [gpsStatus, coords, cities]);
 
   function setViewState(next: ViewState): void {
     setState((prev) => ({ ...prev, viewState: next }));
@@ -220,11 +207,14 @@ export function useLocationFlow({
   }
 
   async function handleIpAccept(): Promise<void> {
-    if (ipAcceptLockedRef.current || isIpAcceptInFlight) return;
-    ipAcceptLockedRef.current = true;
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const signal = controller.signal;
+
     setIsIpAcceptInFlight(true);
     try {
-      const result = await fetchIpLocation();
+      const result = await fetchIpLocation(signal);
       if (!result.ok) {
         toast.error(
           result.reason === "parse"
@@ -238,37 +228,38 @@ export function useLocationFlow({
         toast.error("Confirmação de localização expirou. Tente novamente.");
         return;
       }
-      processNearestCity(
+      const nearest = findNearestCity(
         data.lat,
         data.lng,
-        citiesRef.current,
-        (nearest) => {
-          setState((prev) => ({
-            ...prev,
-            selectedCityId: nearest.city._id,
-            locationSource: "ip",
-            ipLocationToken: data.attestationToken,
-          }));
-          toast.success(
-            `Localização detectada: ${nearest.city.name}, ${nearest.city.state}`
-          );
-        },
-        () => {
-          toast.info(NEAREST_NOT_FOUND_IP);
-        }
+        citiesRef.current
       );
-    } catch {
+      if (nearest) {
+        setState((prev) => ({
+          ...prev,
+          selectedCityId: nearest.city._id,
+          locationSource: "ip",
+          ipLocationToken: data.attestationToken,
+        }));
+        toast.success(
+          `Localização detectada: ${nearest.city.name}, ${nearest.city.state}`
+        );
+      } else {
+        toast.info(NEAREST_NOT_FOUND_IP);
+      }
+    } catch (e) {
+      if (isAbortError(e)) return;
       toast.error("Não foi possível detectar sua localização");
     } finally {
-      ipAcceptLockedRef.current = false;
-      setIsIpAcceptInFlight(false);
-      persistIpConsentDismissed();
-      setState((prev) => ({ ...prev, showIpConsent: false }));
+      if (abortControllerRef.current === controller) {
+        setIsIpAcceptInFlight(false);
+        persistIpConsentDismissed();
+        setState((prev) => ({ ...prev, showIpConsent: false }));
+      }
     }
   }
 
   function selectCityManual(id: Id<"cities">): void {
-    setManualSource(id);
+    setLocationSource("manual", id);
   }
 
   const {
