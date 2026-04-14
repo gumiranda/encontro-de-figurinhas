@@ -9,21 +9,21 @@ export function findNearestCity(
   if (cities.length === 0) return null;
   if (isNaN(userLat) || isNaN(userLng)) return null;
 
-  let nearest = cities[0]!;
-  let minDistance = haversine(userLat, userLng, nearest.lat, nearest.lng);
-
-  for (let i = 1; i < cities.length; i++) {
-    const city = cities[i]!;
-    const distance = haversine(userLat, userLng, city.lat, city.lng);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearest = city;
+  const first = cities[0]!;
+  const nearest = cities.reduce(
+    (best, city) => {
+      const distance = haversine(userLat, userLng, city.lat, city.lng);
+      return distance < best.distance ? { city, distance } : best;
+    },
+    {
+      city: first,
+      distance: haversine(userLat, userLng, first.lat, first.lng),
     }
-  }
+  );
 
   return {
-    city: nearest,
-    distance: Math.round(minDistance),
-    isDistant: minDistance > DISTANCE_THRESHOLD_KM,
+    city: nearest.city,
+    distance: Math.round(nearest.distance),
+    isDistant: nearest.distance > DISTANCE_THRESHOLD_KM,
   };
 }
