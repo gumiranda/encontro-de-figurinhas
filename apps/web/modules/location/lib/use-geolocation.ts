@@ -34,6 +34,11 @@ const GEO_ERROR_MAP: Record<number, [GeolocationState["status"], string]> = {
   3: ["timeout", "Timeout"],
 };
 
+const UNKNOWN_GEO_ERROR: [GeolocationState["status"], string] = [
+  "unavailable",
+  "Erro desconhecido",
+];
+
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
@@ -66,8 +71,7 @@ export function useGeolocation() {
             resolve();
           },
           ({ code }) => {
-            const [status, error] =
-              GEO_ERROR_MAP[code] ?? (["unavailable", "Erro desconhecido"] as const);
+            const [status, error] = GEO_ERROR_MAP[code] ?? UNKNOWN_GEO_ERROR;
             if (mountedRef.current) {
               setState({ status, coords: null, error });
             }
@@ -93,14 +97,20 @@ export function useGeolocation() {
   const checkPermission = useCallback(() => {
     if (!beginCheck()) return;
 
+    const releaseCheck = () => {
+      isCheckingRef.current = false;
+    };
+
+    // Sem Permissions API: único término é fetchCoords; não há .query().finally abaixo.
     if (!navigator.permissions) {
-      fetchCoords().finally(() => {
-        isCheckingRef.current = false;
-      });
+      void fetchCoords().finally(releaseCheck);
       return;
     }
 
-    navigator.permissions
+    // Com Permissions API: .finally(releaseCheck) corre após o .then/.catch, inclusive
+    // quando granted retorna a Promise de fetchCoords (encadeamento) ou quando denied/prompt
+    // termina síncrono (releaseCheck ainda roda após o handler).
+    void navigator.permissions
       .query({ name: "geolocation" })
       .then(({ state: perm }) => {
         if (perm === "granted") return fetchCoords();
@@ -113,16 +123,15 @@ export function useGeolocation() {
         }
       })
       .catch(() => fetchCoords())
-      .finally(() => {
-        isCheckingRef.current = false;
-      });
+      .finally(releaseCheck);
   }, [beginCheck, fetchCoords]);
 
   const requestPermission = useCallback(() => {
     if (!beginCheck()) return;
-    fetchCoords().finally(() => {
+    const releaseCheck = () => {
       isCheckingRef.current = false;
-    });
+    };
+    void fetchCoords().finally(releaseCheck);
   }, [beginCheck, fetchCoords]);
 
   useEffect(() => {
