@@ -10,6 +10,42 @@ import { useGeolocation } from "./use-geolocation";
 
 const IP_CONSENT_KEY = "ip-consent-dismissed";
 
+const IP_LOCATION_CLIENT_CLOCK_SKEW_MS = 30_000;
+
+const IP_LOCATION_SERVER_RETRY_ATTEMPTS = 3;
+const IP_LOCATION_SERVER_RETRY_BASE_MS = 400;
+
+function delay(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
+      return;
+    }
+    const id = setTimeout(resolve, ms);
+    const onAbort = () => {
+      clearTimeout(id);
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+async function fetchIpLocationWithServerRetry(
+  signal: AbortSignal
+): Promise<IpLocationFetchResult> {
+  let delayMs = IP_LOCATION_SERVER_RETRY_BASE_MS;
+  let last: IpLocationFetchResult = { ok: false, reason: "server" };
+  for (let attempt = 0; attempt < IP_LOCATION_SERVER_RETRY_ATTEMPTS; attempt++) {
+    last = await fetchIpLocation(signal);
+    if (last.ok || last.reason !== "server") return last;
+    if (attempt < IP_LOCATION_SERVER_RETRY_ATTEMPTS - 1) {
+      await delay(delayMs, signal);
+      delayMs *= 2;
+    }
+  }
+  return last;
+}
+
 function getSessionItem(key: string): string | null {
   try {
     return typeof window !== "undefined" ? sessionStorage.getItem(key) : null;
@@ -37,13 +73,6 @@ type IpLocationResponse = z.infer<typeof ipLocationResponseSchema>;
 type IpLocationFetchResult =
   | { ok: true; data: IpLocationResponse }
   | { ok: false; reason: "parse" | "server" | "client" };
-
-function isAbortError(e: unknown): boolean {
-  return (
-    (e instanceof DOMException && e.name === "AbortError") ||
-    (e instanceof Error && e.name === "AbortError")
-  );
-}
 
 async function fetchIpLocation(
   signal?: AbortSignal
@@ -128,7 +157,7 @@ export function locationReducer(
     case "SET_GPS_SOURCE":
       return {
         ...state,
-        ...(action.cityId !== undefined ? { selectedCityId: action.cityId } : {}),
+        selectedCityId: action.cityId ?? state.selectedCityId,
         locationSource: "gps",
         ipLocationToken: null,
       };
@@ -245,7 +274,7 @@ export function useLocationFlow({
       toast.info(NEAREST_NOT_FOUND_GPS);
       dispatch({ type: "SET_GPS_SOURCE" });
     }
-  }, [gpsStatus, coords, cities.length]);
+  }, [gpsStatus, coords]);
 
   function setViewState(next: ViewState): void {
     dispatch({ type: "SET_VIEW", view: next });
@@ -257,6 +286,15 @@ export function useLocationFlow({
   }
 
   async function handleIpAccept(): Promise<void> {
+    const showErrorWithRetry = (message: string): void => {
+      toast.error(message, {
+        action: {
+          label: "Tentar novamente",
+          onClick: () => void handleIpAccept(),
+        },
+      });
+    };
+
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -264,7 +302,7 @@ export function useLocationFlow({
 
     setIsIpAcceptInFlight(true);
     try {
-      const result = await fetchIpLocation(signal);
+      const result = await fetchIpLocationWithServerRetry(signal);
       if (!result.ok) {
         const message =
           result.reason === "parse"
@@ -272,13 +310,17 @@ export function useLocationFlow({
             : result.reason === "server"
               ? "Serviço indisponível. Tente novamente em instantes."
               : "Não foi possível detectar sua localização";
-        toast.error(message);
+        showErrorWithRetry(message);
         return;
       }
       const data = result.data;
-      // UX: resposta pode ser adulterada; a mutação Convex usa verifyIpLocationToken (valida `exp`).
-      if (data.expiresAt <= Date.now()) {
-        toast.error("Confirmação de localização expirou. Tente novamente.");
+      if (
+        data.expiresAt <=
+        Date.now() + IP_LOCATION_CLIENT_CLOCK_SKEW_MS
+      ) {
+        showErrorWithRetry(
+          "Confirmação de localização expirou. Tente novamente."
+        );
         return;
       }
       const nearest = findNearestCity(
@@ -299,8 +341,8 @@ export function useLocationFlow({
         toast.info(NEAREST_NOT_FOUND_IP);
       }
     } catch (e) {
-      if (isAbortError(e)) return;
-      toast.error("Não foi possível detectar sua localização");
+      if (e instanceof Error && e.name === "AbortError") return;
+      showErrorWithRetry("Não foi possível detectar sua localização");
     } finally {
       if (abortControllerRef.current === controller) {
         setIsIpAcceptInFlight(false);
