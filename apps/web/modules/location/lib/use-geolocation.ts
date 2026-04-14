@@ -62,32 +62,23 @@ export function useGeolocation({
     error: null,
   });
 
-  const mountedRef = useRef(true);
   const isCheckingRef = useRef(false);
-
-  useEffect(() => () => {
-    mountedRef.current = false;
-  }, []);
 
   const fetchCoords = useCallback(
     () =>
       new Promise<void>((resolve) => {
         navigator.geolocation.getCurrentPosition(
           ({ coords }) => {
-            if (mountedRef.current) {
-              setState({
-                status: "granted",
-                coords: { lat: coords.latitude, lng: coords.longitude },
-                error: null,
-              });
-            }
+            setState({
+              status: "granted",
+              coords: { lat: coords.latitude, lng: coords.longitude },
+              error: null,
+            });
             resolve();
           },
           ({ code }) => {
             const [status, error] = GEO_ERROR_MAP[code] ?? UNKNOWN_GEO_ERROR;
-            if (mountedRef.current) {
-              setState({ status, coords: null, error });
-            }
+            setState({ status, coords: null, error });
             resolve();
           },
           GEO_OPTIONS
@@ -125,13 +116,11 @@ export function useGeolocation({
       .query({ name: "geolocation" })
       .then(({ state: perm }) => {
         if (perm === "granted") return fetchCoords();
-        if (mountedRef.current) {
-          setState({
-            status: perm === "denied" ? "denied" : "prompting",
-            coords: null,
-            error: perm === "denied" ? GEO_ERROR_MAP[1]![1] : null,
-          });
-        }
+        setState({
+          status: perm === "denied" ? "denied" : "prompting",
+          coords: null,
+          error: perm === "denied" ? GEO_ERROR_MAP[1]![1] : null,
+        });
       })
       .catch(() => fetchCoords())
       .finally(() => {
