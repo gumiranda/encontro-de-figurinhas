@@ -36,7 +36,7 @@ type IpLocationResponse = z.infer<typeof ipLocationResponseSchema>;
 
 type IpLocationFetchResult =
   | { ok: true; data: IpLocationResponse }
-  | { ok: false; reason: "http" | "parse" };
+  | { ok: false; reason: "parse" | "server" | "client" };
 
 function isAbortError(e: unknown): boolean {
   return (
@@ -49,7 +49,12 @@ async function fetchIpLocation(
   signal?: AbortSignal
 ): Promise<IpLocationFetchResult> {
   const res = await fetch("/api/ip-location", { signal });
-  if (!res.ok) return { ok: false, reason: "http" };
+  if (!res.ok) {
+    return {
+      ok: false,
+      reason: res.status >= 500 ? "server" : "client",
+    };
+  }
   const parsed = ipLocationResponseSchema.safeParse(await res.json());
   if (!parsed.success) return { ok: false, reason: "parse" };
   return { ok: true, data: parsed.data };
@@ -167,9 +172,7 @@ export function useLocationFlow({
   const { status: gpsStatus, coords, requestPermission } = useGeolocation();
 
   const citiesRef = useRef(cities);
-  useEffect(() => {
-    citiesRef.current = cities;
-  }, [cities]);
+  citiesRef.current = cities;
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -183,12 +186,16 @@ export function useLocationFlow({
 
   useEffect(() => {
     if (!currentCityId) return;
+    if (state.selectedCityId) return;
     dispatch({ type: "SYNC_CURRENT_CITY_ID", cityId: currentCityId });
-  }, [currentCityId]);
+  }, [currentCityId, state.selectedCityId]);
 
   useEffect(() => {
     const dismissed = getSessionItem(IP_CONSENT_KEY);
-    dispatch({ type: "SET_SHOW_IP_CONSENT", show: !dismissed });
+    dispatch({
+      type: "SET_SHOW_IP_CONSENT",
+      show: dismissed === null,
+    });
   }, []);
 
   useEffect(() => {
@@ -215,13 +222,18 @@ export function useLocationFlow({
       return;
     }
 
-    if (cities.length === 0) {
+    const currentCities = citiesRef.current;
+    if (currentCities.length === 0) {
       dispatch({ type: "SET_GPS_SOURCE" });
       toast.info("Use a busca manual para selecionar sua cidade.");
       return;
     }
 
-    const nearest = findNearestCity(coords.lat, coords.lng, cities);
+    const nearest = findNearestCity(
+      coords.lat,
+      coords.lng,
+      currentCities
+    );
     if (nearest) {
       dispatch({ type: "SET_GPS_SOURCE", cityId: nearest.city._id });
       if (nearest.isDistant) {
@@ -233,7 +245,7 @@ export function useLocationFlow({
       toast.info(NEAREST_NOT_FOUND_GPS);
       dispatch({ type: "SET_GPS_SOURCE" });
     }
-  }, [gpsStatus, coords, cities]);
+  }, [gpsStatus, coords, cities.length]);
 
   function setViewState(next: ViewState): void {
     dispatch({ type: "SET_VIEW", view: next });
@@ -254,14 +266,17 @@ export function useLocationFlow({
     try {
       const result = await fetchIpLocation(signal);
       if (!result.ok) {
-        toast.error(
+        const message =
           result.reason === "parse"
             ? "Resposta inválida do servidor"
-            : "Não foi possível detectar sua localização"
-        );
+            : result.reason === "server"
+              ? "Serviço indisponível. Tente novamente em instantes."
+              : "Não foi possível detectar sua localização";
+        toast.error(message);
         return;
       }
       const data = result.data;
+      // UX: resposta pode ser adulterada; a mutação Convex usa verifyIpLocationToken (valida `exp`).
       if (data.expiresAt <= Date.now()) {
         toast.error("Confirmação de localização expirou. Tente novamente.");
         return;

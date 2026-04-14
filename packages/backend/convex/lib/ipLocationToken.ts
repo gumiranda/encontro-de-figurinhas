@@ -82,6 +82,7 @@ export async function verifyIpLocationToken(
 
   if (typeof parsed.sub !== "string" || parsed.sub !== expectedSub) return null;
   if (typeof parsed.lat !== "number" || typeof parsed.lng !== "number") return null;
+  // Autoridade para expiração: `exp` está no payload assinado; ignorar checks só no cliente.
   if (typeof parsed.exp !== "number" || parsed.exp <= Date.now()) return null;
 
   return parsed;
