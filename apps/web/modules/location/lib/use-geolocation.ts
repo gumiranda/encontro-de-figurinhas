@@ -21,6 +21,12 @@ const GEO_OPTIONS: PositionOptions = {
   maximumAge: 5 * 60 * 1000,
 };
 
+const GPS_UNAVAILABLE: GeolocationState = {
+  status: "unavailable",
+  coords: null,
+  error: "GPS indisponível",
+};
+
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
@@ -42,9 +48,8 @@ export function useGeolocation() {
             });
             resolve();
           },
-          (error) => {
-            const { code, PERMISSION_DENIED, POSITION_UNAVAILABLE, TIMEOUT } = error;
-            const [status, err] =
+          ({ code, PERMISSION_DENIED, POSITION_UNAVAILABLE, TIMEOUT }) => {
+            const [status, error] =
               code === PERMISSION_DENIED
                 ? (["denied", "Permissão negada"] as const)
                 : code === TIMEOUT
@@ -52,7 +57,7 @@ export function useGeolocation() {
                   : code === POSITION_UNAVAILABLE
                     ? (["unavailable", "Posição indisponível"] as const)
                     : (["unavailable", "Erro desconhecido"] as const);
-            setState({ status, coords: null, error: err });
+            setState({ status, coords: null, error });
             resolve();
           },
           GEO_OPTIONS
@@ -64,24 +69,22 @@ export function useGeolocation() {
   const checkPermission = useCallback(() => {
     if (isCheckingRef.current) return;
     if (!navigator.geolocation) {
-      setState({ status: "unavailable", coords: null, error: "GPS indisponível" });
+      setState(GPS_UNAVAILABLE);
       return;
     }
 
     isCheckingRef.current = true;
     setState((s) => ({ ...s, status: "checking", error: null }));
 
-    let queryPromise: Promise<PermissionStatus>;
-    try {
-      queryPromise = navigator.permissions.query({ name: "geolocation" });
-    } catch {
+    if (!navigator.permissions) {
       fetchCoords().finally(() => {
         isCheckingRef.current = false;
       });
       return;
     }
 
-    queryPromise
+    navigator.permissions
+      .query({ name: "geolocation" })
       .then(({ state: perm }) => {
         if (perm === "granted") return fetchCoords();
         setState({
@@ -99,7 +102,7 @@ export function useGeolocation() {
   const requestPermission = useCallback(() => {
     if (isCheckingRef.current) return;
     if (!navigator.geolocation) {
-      setState({ status: "unavailable", coords: null, error: "GPS indisponível" });
+      setState(GPS_UNAVAILABLE);
       return;
     }
 
@@ -112,7 +115,8 @@ export function useGeolocation() {
 
   useEffect(() => {
     checkPermission();
-  }, [checkPermission]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run permission probe once on mount
+  }, []);
 
   return { ...state, requestPermission, checkPermission };
 }
