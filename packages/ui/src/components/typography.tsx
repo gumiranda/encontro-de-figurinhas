@@ -57,4 +57,27 @@ function Typography({
   );
 }
 
-export { Typography, typographyVariants };
+const headingLevels = [1, 2, 3, 4] as const;
+export type HeadingLevel = (typeof headingLevels)[number];
+
+function Heading({
+  level,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLElement> & { level: HeadingLevel }) {
+  const variant = `h${level}` as const;
+  return <Typography variant={variant} className={className} {...props} />;
+}
+
+const textVariants = ["p", "lead", "large", "small", "muted"] as const;
+export type TextVariant = (typeof textVariants)[number];
+
+function Text({
+  variant = "p",
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLElement> & { variant?: TextVariant }) {
+  return <Typography variant={variant} className={className} {...props} />;
+}
+
+export { Typography, typographyVariants, Heading, Text };

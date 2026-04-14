@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
+import { Heading, Text } from "@workspace/ui/components/typography";
 import { MapPin } from "lucide-react";
 
 interface GpsPermissionScreenProps {
@@ -31,41 +32,53 @@ export function GpsPermissionScreen({
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold">
+        <Heading level={2} className="border-0 pb-0 text-xl">
           Para encontrar colecionadores perto de você
-        </h2>
-        <p className="text-muted-foreground">
+        </Heading>
+        <Text variant="muted">
           Precisamos da sua localização para mostrar pontos de troca na sua região.
-        </p>
+        </Text>
       </div>
 
       {status === "timeout" && (
-        <p className="text-amber-600">
+        <Text variant="small" className="text-warning font-normal">
           GPS demorou para responder. Tente novamente ou busque manualmente.
-        </p>
+        </Text>
+      )}
+
+      {status === "denied" && (
+        <Text variant="small" className="text-destructive font-normal">
+          Localização negada. Libere nas configurações do navegador ou busque
+          manualmente.
+        </Text>
       )}
 
       {status === "unavailable" && (
-        <p className="text-red-600">GPS não disponível no seu dispositivo.</p>
+        <Text variant="small" className="text-destructive font-normal">
+          GPS não disponível no seu dispositivo.
+        </Text>
       )}
 
-      {status === "granted" && detectedCityLabel && (
-        <p className="text-green-600 text-sm">
-          Cidade sugerida: <span className="font-medium">{detectedCityLabel}</span>.
-          Confirme abaixo ou use a busca manual para trocar.
-        </p>
-      )}
-      {status === "granted" && !detectedCityLabel && (
-        <p className="text-green-600 text-sm">
-          Localização obtida. Confirme abaixo ou use a busca manual.
-        </p>
+      {status === "granted" && (
+        <Text variant="small" className="text-success font-normal">
+          {detectedCityLabel ? (
+            <>
+              Cidade sugerida:{" "}
+              <span className="font-medium">{detectedCityLabel}</span>. Confirme abaixo ou
+              use a busca manual para trocar.
+            </>
+          ) : (
+            "Localização obtida. Confirme abaixo ou use a busca manual."
+          )}
+        </Text>
       )}
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
         {status === "checking" && <Button disabled>Verificando...</Button>}
         {(status === "idle" ||
           status === "prompting" ||
-          status === "timeout") && (
+          status === "timeout" ||
+          status === "denied") && (
           <Button onClick={onRequestPermission}>Ativar localização</Button>
         )}
         <Button variant="outline" onClick={onSkipToManual}>
