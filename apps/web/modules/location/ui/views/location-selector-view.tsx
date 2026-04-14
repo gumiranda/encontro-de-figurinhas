@@ -15,7 +15,7 @@ import {
 import { useMutation } from "convex/react";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { CityWithCoords } from "../../lib/location-constants";
 import { useLocationFlow } from "../../lib/use-location-flow";
@@ -38,6 +38,10 @@ export function LocationSelectorView({
   const router = useRouter();
   const setLocationMutation = useMutation(api.users.setLocation);
 
+  /** Evita identidade nova a cada render quando o conteúdo é o mesmo (ex.: query). */
+  const citiesStableKey = JSON.stringify(cities);
+  const stableCities = useMemo(() => cities, [citiesStableKey]);
+
   const {
     viewState,
     setViewState,
@@ -51,7 +55,7 @@ export function LocationSelectorView({
     dismissIpConsent,
     handleIpAccept,
     selectCityManual,
-  } = useLocationFlow({ cities, citiesError, currentCityId });
+  } = useLocationFlow({ cities: stableCities, citiesError, currentCityId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -98,7 +102,7 @@ export function LocationSelectorView({
 
   const gpsDetectedCityLabel =
     viewState === "gps" && locationSource === "gps" && selectedCityId
-      ? (cities.find((c) => c._id === selectedCityId)?.name ?? null)
+      ? (stableCities.find((c) => c._id === selectedCityId)?.name ?? null)
       : null;
 
   return (
