@@ -15,8 +15,8 @@ interface City {
 }
 
 interface CityAutocompleteProps {
-  value: string | null;
-  onChange: (cityId: string) => void;
+  value: Id<"cities"> | null;
+  onChange: (cityId: Id<"cities"> | null) => void;
   error?: string;
 }
 
@@ -58,12 +58,12 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
     setSearchValue(value);
     if (selectedCity) {
       setSelectedCity(null);
-      onChange("");
+      onChange(null);
     }
   };
 
   return (
-    <div className="space-y-2" ref={containerRef}>
+    <div className="relative z-10 space-y-2" ref={containerRef}>
       <div className="relative">
         <Input
           type="text"
@@ -80,7 +80,7 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
 
         {showSuggestions && (
           <div
-            className="absolute top-full left-0 w-full mt-2 bg-[var(--landing-surface-container-high)] rounded-xl border border-[var(--landing-outline-variant)]/10 shadow-2xl overflow-hidden z-20"
+            className="absolute top-full left-0 z-50 w-full mt-2 bg-[var(--landing-surface-container-high)] rounded-xl border border-[var(--landing-outline-variant)]/10 shadow-2xl overflow-hidden"
             role="listbox"
             aria-label="Sugestoes de cidades"
           >

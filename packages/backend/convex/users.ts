@@ -1,8 +1,13 @@
 import { v } from "convex/values";
-import { paginationOptsValidator } from "convex/server";
-import { query, mutation, internalQuery } from "./_generated/server";
-import { Sector, Role } from "./lib/types";
-import { getAuthenticatedUser, isAdmin } from "./lib/auth";
+import { query, mutation } from "./_generated/server";
+import { Role, isValidRole, isValidSector } from "./lib/types";
+import { getAuthenticatedUser, isAdmin, requireAuth } from "./lib/auth";
+import { haversine, isInBrazil } from "./lib/geo";
+import { verifyIpLocationToken } from "./lib/ipLocationToken";
+import { GEO_VALIDATION, LOCATION_RATE_LIMIT } from "./lib/locationConstants";
+import { getLocationUpdateTimestampsForWindow } from "./lib/locationRateLimit";
+import { checkRateLimit } from "./lib/rateLimit";
+import { throwSetLocationError } from "./lib/setLocationErrors";
 
 export const getCurrentUser = query({
   args: {},
@@ -11,7 +16,6 @@ export const getCurrentUser = query({
   },
 });
 
-// Check if any users exist (for bootstrap flow)
 export const hasAnyUsers = query({
   args: {},
   handler: async (ctx) => {
@@ -20,7 +24,6 @@ export const hasAnyUsers = query({
   },
 });
 
-// Bootstrap: create first superadmin (fails if users exist)
 export const bootstrapSuperadmin = mutation({
   args: {},
   handler: async (ctx) => {
@@ -44,7 +47,6 @@ export const bootstrapSuperadmin = mutation({
   },
 });
 
-// Create regular user (idempotent)
 export const createUser = mutation({
   args: {},
   handler: async (ctx) => {
@@ -55,7 +57,6 @@ export const createUser = mutation({
 
     const clerkId = identity.subject;
 
-    // Idempotent: return existing user if found
     const existingUser = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
@@ -80,10 +81,11 @@ export const getAllUsers = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const currentUser = await getAuthenticatedUser(ctx);
-    if (!currentUser || !isAdmin(currentUser.role)) return [];
+    const currentUser = await requireAuth(ctx);
+    if (!isAdmin(currentUser.role)) {
+      throw new Error("Admin access required");
+    }
 
-    // Limite padrão de 100, máximo 500
     const limit = Math.min(args.limit ?? 100, 500);
     return await ctx.db.query("users").take(limit);
   },
@@ -95,13 +97,12 @@ export const updateUserRole = mutation({
     role: v.string(),
   },
   handler: async (ctx, args) => {
-    const currentUser = await getAuthenticatedUser(ctx);
-    if (!currentUser || currentUser.role !== Role.SUPERADMIN) {
+    const currentUser = await requireAuth(ctx);
+    if (currentUser.role !== Role.SUPERADMIN) {
       throw new Error("Only superadmin can change user roles");
     }
 
-    const validRoles = Object.values(Role) as string[];
-    if (!validRoles.includes(args.role)) {
+    if (!isValidRole(args.role)) {
       throw new Error("Invalid role");
     }
 
@@ -131,17 +132,13 @@ export const updateUserSector = mutation({
     sector: v.string(),
   },
   handler: async (ctx, args) => {
-    const currentUser = await getAuthenticatedUser(ctx);
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = await requireAuth(ctx);
 
     if (!isAdmin(currentUser.role)) {
       throw new Error("Only superadmin or CEO can change user sectors");
     }
 
-    const validSectors = Object.values(Sector) as string[];
-    if (!validSectors.includes(args.sector)) {
+    if (!isValidSector(args.sector)) {
       throw new Error("Invalid sector");
     }
 
@@ -164,19 +161,34 @@ export const updateUserSector = mutation({
 });
 
 
-// Helper to normalize nickname (remove accents + lowercase)
+const NICKNAME_REGEX = /^[a-z0-9_]+$/;
+
+/** Normalizes nickname (accents removed, lowercased) and enforces safe charset for storage. */
 function normalizeNickname(nickname: string): string {
-  return nickname
+  const normalized = nickname
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
+
+  if (!NICKNAME_REGEX.test(normalized)) {
+    throw new Error(
+      "Nickname can only contain letters, numbers, and underscores"
+    );
+  }
+
+  return normalized;
 }
 
 export const checkNicknameAvailable = query({
   args: { nickname: v.string() },
   handler: async (ctx, { nickname }) => {
-    const normalized = normalizeNickname(nickname);
+    let normalized: string;
+    try {
+      normalized = normalizeNickname(nickname);
+    } catch {
+      return { available: false };
+    }
     if (normalized.length < 3) return { available: false };
 
     const existing = await ctx.db
@@ -191,7 +203,6 @@ export const completeProfile = mutation({
   args: {
     nickname: v.string(),
     birthDate: v.number(),
-    cityId: v.id("cities"),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -205,14 +216,12 @@ export const completeProfile = mutation({
     if (!user) throw new Error("User not found");
     if (user.hasCompletedOnboarding) throw new Error("Profile already completed");
 
-    // Validate birthDate (server-side)
     const birthDate = new Date(args.birthDate);
     const today = new Date();
     const minDate = new Date("1900-01-01");
     if (birthDate > today) throw new Error("Birth date cannot be in the future");
     if (birthDate < minDate) throw new Error("Birth date cannot be before 1900");
 
-    // Validate nickname uniqueness (normalized to avoid collisions)
     const nicknameLower = normalizeNickname(args.nickname);
     if (nicknameLower.length < 3) throw new Error("Nickname must be at least 3 characters");
     if (nicknameLower.length > 20) throw new Error("Nickname must be at most 20 characters");
@@ -225,17 +234,12 @@ export const completeProfile = mutation({
       throw new Error("Nickname already taken");
     }
 
-    // Validate city exists
-    const city = await ctx.db.get(args.cityId);
-    if (!city) throw new Error("City not found");
-
     const now = Date.now();
 
     await ctx.db.patch(user._id, {
       nickname: nicknameLower,
       displayNickname: args.nickname,
       birthDate: args.birthDate,
-      cityId: args.cityId,
       hasCompletedOnboarding: true,
       reliabilityScore: 3,
       totalTrades: 0,
@@ -252,51 +256,117 @@ export const completeProfile = mutation({
   },
 });
 
-// Internal queries for match computation
-export const getById = internalQuery({
-  args: { userId: v.id("users") },
-  handler: async (ctx, { userId }) => {
-    return await ctx.db.get(userId);
-  },
-});
-
-export const getPotentialMatchCandidates = internalQuery({
+export const setLocation = mutation({
   args: {
-    excludeUserId: v.id("users"),
-    cityId: v.optional(v.id("cities")),
-    paginationOpts: paginationOptsValidator,
+    cityId: v.id("cities"),
+    locationSource: v.union(
+      v.literal("gps"),
+      v.literal("manual"),
+      v.literal("ip")
+    ),
+    lat: v.optional(v.float64()),
+    lng: v.optional(v.float64()),
+    /** Token HMAC emitido por GET em `/api/ip-location` (obrigatório quando locationSource é ip). */
+    ipLocationToken: v.optional(v.string()),
   },
-  handler: async (ctx, { excludeUserId, cityId, paginationOpts }) => {
-    // Query users with completed sticker setup, optionally filtered by city
-    let query = ctx.db
-      .query("users")
-      .withIndex("by_sticker_setup", (q) => q.eq("hasCompletedStickerSetup", true));
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
 
-    // If cityId provided, filter to same city for local matches
-    if (cityId) {
-      query = ctx.db
-        .query("users")
-        .withIndex("by_sticker_setup", (q) =>
-          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
-        );
-    }
+    const now = Date.now();
+    const lastUpdate = user.locationUpdatedAt ?? 0;
 
-    const results = await query.paginate(paginationOpts);
+    const timestampsInWindow = getLocationUpdateTimestampsForWindow(user, now);
 
-    // Filter out the requesting user and shadow-banned users
-    const filtered = results.page.filter(
-      (u) => u._id !== excludeUserId && !u.isShadowBanned
+    const rateLimit = checkRateLimit(
+      lastUpdate,
+      timestampsInWindow.length,
+      {
+        cooldownMs: LOCATION_RATE_LIMIT.COOLDOWN_MS,
+        maxPerHour: LOCATION_RATE_LIMIT.MAX_PER_HOUR,
+        windowMs: LOCATION_RATE_LIMIT.WINDOW_MS,
+      }
     );
 
-    return {
-      ...results,
-      page: filtered.map((u) => ({
-        _id: u._id,
-        displayNickname: u.displayNickname,
-        duplicates: u.duplicates ?? [],
-        missing: u.missing ?? [],
-        cityId: u.cityId,
-      })),
-    };
+    if (!rateLimit.allowed) {
+      throwSetLocationError(
+        rateLimit.reason === "cooldown"
+          ? "LOCATION_RATE_LIMIT_COOLDOWN"
+          : "LOCATION_RATE_LIMIT_HOURLY"
+      );
+    }
+
+    const nextTimestamps = [...timestampsInWindow, now];
+
+    const city = await ctx.db.get(args.cityId);
+    if (!city) throwSetLocationError("LOCATION_CITY_NOT_FOUND");
+    if (city.isActive === false) throwSetLocationError("LOCATION_CITY_INACTIVE");
+
+    if ((args.lat !== undefined) !== (args.lng !== undefined)) {
+      throwSetLocationError("LOCATION_COORDS_PAIR_INVALID");
+    }
+
+    const hasCoords = args.lat !== undefined && args.lng !== undefined;
+
+    if (hasCoords && args.locationSource === "ip") {
+      throwSetLocationError("LOCATION_IP_WITH_CLIENT_COORDS");
+    }
+
+    let effectiveSource: "gps" | "manual" | "ip";
+    let saveCoords = false;
+
+    // GPS do cliente pode ser spoofado; aqui só exigimos coerência com a cidade escolhida
+    // (Brasil + distância ao centro). Longe demais → trata como manual e não persiste coords.
+    if (hasCoords) {
+      if (!isInBrazil(args.lat!, args.lng!)) {
+        throwSetLocationError("LOCATION_OUTSIDE_BRAZIL");
+      }
+
+      const distance = haversine(city.lat, city.lng, args.lat!, args.lng!);
+      if (distance > GEO_VALIDATION.MAX_DISTANCE_FROM_CITY_KM) {
+        effectiveSource = "manual";
+      } else {
+        saveCoords = true;
+        effectiveSource = "gps";
+      }
+    } else if (args.locationSource === "gps") {
+      throwSetLocationError("LOCATION_GPS_COORDS_REQUIRED");
+    } else if (args.locationSource === "ip") {
+      const secret = process.env.IP_LOCATION_ATTESTATION_SECRET;
+      if (!secret) {
+        throwSetLocationError("LOCATION_IP_SERVER_CONFIG");
+      }
+      if (!args.ipLocationToken) {
+        throwSetLocationError("LOCATION_IP_TOKEN_REQUIRED");
+      }
+      const payload = await verifyIpLocationToken(
+        args.ipLocationToken,
+        user.clerkId,
+        secret
+      );
+      if (!payload) {
+        throwSetLocationError("LOCATION_IP_TOKEN_INVALID");
+      }
+      if (!isInBrazil(payload.lat, payload.lng)) {
+        throwSetLocationError("LOCATION_OUTSIDE_BRAZIL");
+      }
+      const distance = haversine(city.lat, city.lng, payload.lat, payload.lng);
+      if (distance > GEO_VALIDATION.MAX_DISTANCE_FROM_CITY_KM) {
+        throwSetLocationError("LOCATION_IP_CITY_MISMATCH");
+      }
+      effectiveSource = "ip";
+    } else if (args.locationSource === "manual") {
+      effectiveSource = "manual";
+    } else {
+      throwSetLocationError("LOCATION_INVALID_SOURCE");
+    }
+
+    await ctx.db.patch(user._id, {
+      cityId: args.cityId,
+      locationSource: effectiveSource,
+      ...(saveCoords ? { lat: args.lat, lng: args.lng } : {}),
+      locationUpdatedAt: now,
+      locationUpdateTimestamps: nextTimestamps,
+    });
+    return { success: true };
   },
 });

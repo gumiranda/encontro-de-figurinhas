@@ -30,8 +30,6 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { Id } from "@workspace/backend/_generated/dataModel";
-import { CityAutocomplete } from "./city-autocomplete";
 import { NicknameInput } from "./nickname-input";
 
 const completeProfileSchema = z.object({
@@ -41,7 +39,6 @@ const completeProfileSchema = z.object({
     .max(20, "Máximo 20 caracteres")
     .regex(/^[\p{L}\p{N}_]+$/u, "Apenas letras, números e underscore"),
   birthDate: z.date({ required_error: "Data de nascimento obrigatória" }),
-  cityId: z.string().min(1, "Selecione sua cidade"),
   terms: z.literal(true, {
     errorMap: () => ({ message: "Você deve aceitar os termos" }),
   }),
@@ -59,7 +56,6 @@ export function CompleteProfileForm() {
     resolver: zodResolver(completeProfileSchema),
     defaultValues: {
       nickname: "",
-      cityId: "",
       terms: undefined,
     },
   });
@@ -75,7 +71,6 @@ export function CompleteProfileForm() {
       await completeProfile({
         nickname: data.nickname,
         birthDate: data.birthDate.getTime(),
-        cityId: data.cityId as Id<"cities">,
       });
 
       toast.success("Perfil completo! Bem-vindo à Arena.");
@@ -85,9 +80,6 @@ export function CompleteProfileForm() {
         if (error.message === "Nickname already taken") {
           toast.error("Este apelido já está em uso. Escolha outro.");
           form.setError("nickname", { message: "Apelido indisponível" });
-        } else if (error.message === "City not found") {
-          toast.error("Cidade não encontrada. Selecione novamente.");
-          form.setError("cityId", { message: "Cidade inválida" });
         } else {
           toast.error("Erro ao salvar perfil. Tente novamente.");
         }
@@ -168,26 +160,6 @@ export function CompleteProfileForm() {
               <p className="text-[var(--landing-outline)] text-xs mt-1 px-1">
                 Apenas para maiores de 18 anos.
               </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="cityId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--landing-on-surface-variant)]">
-                Cidade
-              </FormLabel>
-              <FormControl>
-                <CityAutocomplete
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={form.formState.errors.cityId?.message}
-                />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}

@@ -99,7 +99,7 @@ export function QuickRegisterView() {
   const handleFinalize = async () => {
     try {
       await finalize();
-      router.push("/dashboard");
+      router.push("/selecionar-localizacao");
     } catch {}
   };
 

@@ -34,10 +34,14 @@ export default function BootstrapPage() {
 
     // User exists - redirect based on onboarding status
     if (currentUser) {
-      if (currentUser.hasCompletedOnboarding) {
-        router.replace("/dashboard");
-      } else {
+      if (!currentUser.hasCompletedOnboarding) {
         router.replace("/complete-profile");
+      } else if (!currentUser.hasCompletedStickerSetup) {
+        router.replace("/cadastrar-figurinhas");
+      } else if (!currentUser.locationSource) {
+        router.replace("/selecionar-localizacao");
+      } else {
+        router.replace("/dashboard");
       }
     }
   }, [hasAnyUsers, currentUser, router]);

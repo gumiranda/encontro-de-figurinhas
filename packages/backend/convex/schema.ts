@@ -33,6 +33,14 @@ export default defineSchema({
     lastActiveAt: v.optional(v.number()),
     createdAt: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
+
+    locationSource: v.optional(
+      v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"))
+    ),
+    lat: v.optional(v.float64()),
+    lng: v.optional(v.float64()),
+    locationUpdatedAt: v.optional(v.number()),
+    locationUpdateTimestamps: v.optional(v.array(v.number())),
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_role", ["role"])
@@ -46,8 +54,10 @@ export default defineSchema({
     slug: v.string(),
     lat: v.number(),
     lng: v.number(),
+    isActive: v.optional(v.boolean()),
   })
     .index("by_slug", ["slug"])
+    .index("by_isActive", ["isActive"])
     .searchIndex("search_name", { searchField: "name" }),
 
   albumConfig: defineTable({

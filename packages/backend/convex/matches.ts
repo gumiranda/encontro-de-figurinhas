@@ -1,4 +1,5 @@
-import { internalAction } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
+import { internalAction, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
@@ -19,6 +20,51 @@ type PaginatedResult = {
   continueCursor: string;
 };
 
+export const getById = internalQuery({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db.get(userId);
+  },
+});
+
+export const getPotentialMatchCandidates = internalQuery({
+  args: {
+    excludeUserId: v.id("users"),
+    cityId: v.optional(v.id("cities")),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, { excludeUserId, cityId, paginationOpts }) => {
+    let query = ctx.db
+      .query("users")
+      .withIndex("by_sticker_setup", (q) => q.eq("hasCompletedStickerSetup", true));
+
+    if (cityId) {
+      query = ctx.db
+        .query("users")
+        .withIndex("by_sticker_setup", (q) =>
+          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+        );
+    }
+
+    const results = await query.paginate(paginationOpts);
+
+    const filtered = results.page.filter(
+      (u) => u._id !== excludeUserId && !u.isShadowBanned
+    );
+
+    return {
+      ...results,
+      page: filtered.map((u) => ({
+        _id: u._id,
+        displayNickname: u.displayNickname,
+        duplicates: u.duplicates ?? [],
+        missing: u.missing ?? [],
+        cityId: u.cityId,
+      })),
+    };
+  },
+});
+
 /**
  * Computes potential trade matches for a user.
  * Uses internalAction (10min timeout) for batch processing.
@@ -30,7 +76,7 @@ type PaginatedResult = {
 export const recomputeMatches = internalAction({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    const user = await ctx.runQuery(internal.users.getById, {
+    const user = await ctx.runQuery(internal.matches.getById, {
       userId: args.userId,
     });
 
@@ -60,7 +106,7 @@ export const recomputeMatches = internalAction({
 
     // Paginated batch processing
     do {
-      const batch: PaginatedResult = await ctx.runQuery(internal.users.getPotentialMatchCandidates, {
+      const batch: PaginatedResult = await ctx.runQuery(internal.matches.getPotentialMatchCandidates, {
         excludeUserId: args.userId,
         cityId: user.cityId, // Prioritize local matches
         paginationOpts: {
