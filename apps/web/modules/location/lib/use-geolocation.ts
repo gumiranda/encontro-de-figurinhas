@@ -21,6 +21,8 @@ interface GeolocationState {
   error: string | null;
 }
 
+const GEOLOCATION_MAXIMUM_AGE_MS = 5 * 60 * 1000;
+
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
@@ -47,6 +49,11 @@ export function useGeolocation() {
   const setStatus = useCallback(
     (status: GeolocationState["status"], error: string | null = null) =>
       setStateIfMounted({ status, coords: null, error }),
+    [setStateIfMounted]
+  );
+
+  const setChecking = useCallback(
+    () => setStateIfMounted((s) => ({ ...s, status: "checking", error: null })),
     [setStateIfMounted]
   );
 
@@ -84,7 +91,11 @@ export function useGeolocation() {
         }
         onSettled?.();
       },
-      { timeout: 10000, enableHighAccuracy: false }
+      {
+        timeout: 10000,
+        enableHighAccuracy: false,
+        maximumAge: GEOLOCATION_MAXIMUM_AGE_MS,
+      }
     );
   }, [setStatus, setStateIfMounted]);
 
@@ -103,7 +114,7 @@ export function useGeolocation() {
         return;
       }
 
-      setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
+      setChecking();
 
       try {
         const result = await navigator.permissions.query({ name: "geolocation" });
