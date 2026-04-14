@@ -2,6 +2,7 @@
 
 import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
 import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import type { CityWithCoords } from "../../lib/location-constants";
 
@@ -37,36 +38,38 @@ export function ManualSearchScreen({
       />
 
       {suggestedCities.length > 0 && (
-        <div>
-          <p className="text-sm text-muted-foreground mb-2">
-            Ou escolha uma das principais cidades:
-          </p>
-          <div
-            role="radiogroup"
-            aria-label="Cidades sugeridas"
-            className="flex flex-wrap gap-2"
-          >
-            {suggestedCities.map((city, index) => {
-              const isRovingFocus =
-                selectedInSuggested
-                  ? selectedCityId === city._id
-                  : index === 0;
-              return (
-                <Button
-                  key={city._id}
-                  variant={selectedCityId === city._id ? "default" : "outline"}
-                  role="radio"
-                  aria-checked={selectedCityId === city._id}
-                  tabIndex={isRovingFocus ? 0 : -1}
-                  onClick={() => onCitySelect(city._id)}
-                  size="sm"
-                >
-                  {city.name}
-                </Button>
-              );
-            })}
-          </div>
-        </div>
+        <Card className="relative z-0 gap-0 border-border/60 bg-muted/40 py-4 shadow-none dark:bg-muted/25">
+          <CardContent className="px-4 pt-0 pb-0">
+            <p className="mb-3 text-sm text-muted-foreground">
+              Ou escolha uma das principais cidades:
+            </p>
+            <div
+              role="radiogroup"
+              aria-label="Cidades sugeridas"
+              className="flex flex-wrap gap-2"
+            >
+              {suggestedCities.map((city, index) => {
+                const isRovingFocus =
+                  selectedInSuggested
+                    ? selectedCityId === city._id
+                    : index === 0;
+                return (
+                  <Button
+                    key={city._id}
+                    variant={selectedCityId === city._id ? "default" : "outline"}
+                    role="radio"
+                    aria-checked={selectedCityId === city._id}
+                    tabIndex={isRovingFocus ? 0 : -1}
+                    onClick={() => onCitySelect(city._id)}
+                    size="sm"
+                  >
+                    {city.name}
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
