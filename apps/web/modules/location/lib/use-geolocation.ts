@@ -31,6 +31,14 @@ export function useGeolocation() {
   const mountedRef = useRef(true);
   const isCheckingRef = useRef(false);
 
+  const withCheckGuard = useCallback((fn: () => void | Promise<void>) => {
+    if (isCheckingRef.current) return;
+    isCheckingRef.current = true;
+    Promise.resolve(fn()).finally(() => {
+      isCheckingRef.current = false;
+    });
+  }, []);
+
   const setStateIfMounted = useCallback((update: SetStateAction<GeolocationState>) => {
     if (!mountedRef.current) return;
     setState(update);
@@ -80,45 +88,44 @@ export function useGeolocation() {
     );
   }, [setStatus, setStateIfMounted]);
 
-  const checkPermission = useCallback(async () => {
-    if (isCheckingRef.current) return;
-    isCheckingRef.current = true;
+  const awaitFetchCoords = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        fetchCoords(() => resolve());
+      }),
+    [fetchCoords]
+  );
 
-    if (!navigator.geolocation) {
-      setStatus("unavailable", "GPS indisponível");
-      isCheckingRef.current = false;
-      return;
-    }
-
-    setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
-
-    try {
-      const result = await navigator.permissions.query({ name: "geolocation" });
-      if (result.state === "granted") {
-        fetchCoords(() => {
-          isCheckingRef.current = false;
-        });
-      } else if (result.state === "denied") {
-        setStatus("denied");
-        isCheckingRef.current = false;
-      } else {
-        setStatus("prompting");
-        isCheckingRef.current = false;
+  const checkPermission = useCallback(() => {
+    void withCheckGuard(async () => {
+      if (!navigator.geolocation) {
+        setStatus("unavailable", "GPS indisponível");
+        return;
       }
-    } catch {
-      setStatus("prompting");
-      isCheckingRef.current = false;
-    }
-  }, [fetchCoords, setStatus, setStateIfMounted]);
+
+      setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
+
+      try {
+        const result = await navigator.permissions.query({ name: "geolocation" });
+        if (result.state === "granted") {
+          await awaitFetchCoords();
+        } else if (result.state === "denied") {
+          setStatus("denied");
+        } else {
+          setStatus("prompting");
+        }
+      } catch {
+        setStatus("prompting");
+      }
+    });
+  }, [withCheckGuard, awaitFetchCoords, setStatus, setStateIfMounted]);
 
   const requestPermission = useCallback(() => {
-    if (isCheckingRef.current) return;
-    isCheckingRef.current = true;
-    setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
-    fetchCoords(() => {
-      isCheckingRef.current = false;
+    void withCheckGuard(async () => {
+      setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
+      await awaitFetchCoords();
     });
-  }, [fetchCoords]);
+  }, [withCheckGuard, awaitFetchCoords, setStateIfMounted]);
 
   useEffect(() => {
     mountedRef.current = true;
