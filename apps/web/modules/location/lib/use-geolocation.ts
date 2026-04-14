@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type SetStateAction,
+} from "react";
 
 interface GeolocationState {
   status:
@@ -22,12 +28,18 @@ export function useGeolocation() {
     error: null,
   });
 
+  const mountedRef = useRef(true);
   const isCheckingRef = useRef(false);
+
+  const setStateIfMounted = useCallback((update: SetStateAction<GeolocationState>) => {
+    if (!mountedRef.current) return;
+    setState(update);
+  }, []);
 
   const setStatus = useCallback(
     (status: GeolocationState["status"], error: string | null = null) =>
-      setState({ status, coords: null, error }),
-    []
+      setStateIfMounted({ status, coords: null, error }),
+    [setStateIfMounted]
   );
 
   const fetchCoords = useCallback((onSettled?: () => void) => {
@@ -37,7 +49,7 @@ export function useGeolocation() {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setState({
+        setStateIfMounted({
           status: "granted",
           coords: {
             lat: position.coords.latitude,
@@ -66,7 +78,7 @@ export function useGeolocation() {
       },
       { timeout: 10000, enableHighAccuracy: false }
     );
-  }, [setStatus]);
+  }, [setStatus, setStateIfMounted]);
 
   const checkPermission = useCallback(async () => {
     if (isCheckingRef.current) return;
@@ -78,7 +90,7 @@ export function useGeolocation() {
       return;
     }
 
-    setState((s) => ({ ...s, status: "checking", error: null }));
+    setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
 
     try {
       const result = await navigator.permissions.query({ name: "geolocation" });
@@ -97,19 +109,23 @@ export function useGeolocation() {
       setStatus("prompting");
       isCheckingRef.current = false;
     }
-  }, [fetchCoords, setStatus]);
+  }, [fetchCoords, setStatus, setStateIfMounted]);
 
   const requestPermission = useCallback(() => {
     if (isCheckingRef.current) return;
     isCheckingRef.current = true;
-    setState((s) => ({ ...s, status: "checking", error: null }));
+    setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
     fetchCoords(() => {
       isCheckingRef.current = false;
     });
-  }, [fetchCoords, setStatus]);
+  }, [fetchCoords]);
 
   useEffect(() => {
-    checkPermission();
+    mountedRef.current = true;
+    void checkPermission();
+    return () => {
+      mountedRef.current = false;
+    };
   }, [checkPermission]);
 
   return { ...state, requestPermission, checkPermission };
