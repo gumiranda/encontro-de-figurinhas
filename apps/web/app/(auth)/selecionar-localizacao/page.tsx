@@ -19,8 +19,16 @@ const getCities = unstable_cache(
 
 export default async function SelecionarLocalizacaoPage() {
   const { userId, getToken } = await auth();
-  const token = userId ? await getToken({ template: "convex" }) : null;
-  if (!token || !userId) redirect("/sign-in");
+  if (!userId) redirect("/sign-in");
+
+  const [token, citiesOrError] = await Promise.all([
+    getToken({ template: "convex" }),
+    getCities().catch((e: unknown) =>
+      e instanceof Error ? e : new Error("Erro desconhecido")
+    ),
+  ]);
+
+  if (!token) redirect("/sign-in");
 
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
   if (!user?.hasCompletedOnboarding) redirect("/complete-profile");
@@ -29,12 +37,11 @@ export default async function SelecionarLocalizacaoPage() {
   let cities: CityWithCoords[] = [];
   let citiesError: string | undefined;
 
-  try {
-    cities = await getCities();
-  } catch (error) {
-    citiesError =
-      error instanceof Error ? error.message : "Erro desconhecido";
-    console.error("Failed to fetch cities:", error);
+  if (citiesOrError instanceof Error) {
+    citiesError = citiesOrError.message;
+    console.error("Failed to fetch cities:", citiesOrError);
+  } else {
+    cities = citiesOrError;
   }
 
   const cityMap = new Map(
