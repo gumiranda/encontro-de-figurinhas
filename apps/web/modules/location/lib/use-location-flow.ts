@@ -2,7 +2,6 @@
 
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import {
-  useCallback,
   useEffect,
   useMemo,
   useReducer,
@@ -291,8 +290,8 @@ export function useLocationFlow({
 }): UseLocationFlowReturn {
   const { status: gpsStatus, coords, requestPermission } = useGeolocation();
 
-  const citiesStableKey = JSON.stringify(cities);
-  const citiesStable = useMemo(() => cities, [citiesStableKey]);
+  const citiesKey = `${cities.length}-${cities[0]?._id ?? ""}-${cities.at(-1)?._id ?? ""}`;
+  const citiesStable = useMemo(() => cities, [citiesKey]);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const ipLocationAttestationRef = useRef<string | null>(null);
@@ -418,9 +417,8 @@ export function useLocationFlow({
     dispatch({ type: "SET_MANUAL_SOURCE", cityId: id });
   }
 
-  const getIpLocationAttestationToken = useCallback((): string | null => {
-    return ipLocationAttestationRef.current;
-  }, []);
+  const getIpLocationAttestationToken = (): string | null =>
+    ipLocationAttestationRef.current;
 
   const {
     viewState,
