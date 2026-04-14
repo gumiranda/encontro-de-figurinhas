@@ -58,10 +58,6 @@ export function useGeolocation() {
   );
 
   const fetchCoords = useCallback((onSettled?: () => void) => {
-    if (!navigator.geolocation) {
-      onSettled?.();
-      return;
-    }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setStateIfMounted({
@@ -129,14 +125,18 @@ export function useGeolocation() {
         setStatus("prompting");
       }
     });
-  }, [withCheckGuard, awaitFetchCoords, setStatus, setStateIfMounted]);
+  }, [withCheckGuard, awaitFetchCoords, setStatus, setChecking]);
 
   const requestPermission = useCallback(() => {
     void withCheckGuard(async () => {
-      setStateIfMounted((s) => ({ ...s, status: "checking", error: null }));
+      if (!navigator.geolocation) {
+        setStatus("unavailable", "GPS indisponível");
+        return;
+      }
+      setChecking();
       await awaitFetchCoords();
     });
-  }, [withCheckGuard, awaitFetchCoords, setStateIfMounted]);
+  }, [withCheckGuard, awaitFetchCoords, setChecking, setStatus]);
 
   useEffect(() => {
     mountedRef.current = true;
