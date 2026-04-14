@@ -1,7 +1,7 @@
 "use client";
 
 import type { Id } from "@workspace/backend/_generated/dataModel";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { findNearestCity } from "./find-nearest-city";
@@ -86,13 +86,22 @@ export type UseLocationFlowReturn = {
   selectCityManual: (cityId: Id<"cities">) => void;
 };
 
-type LocationState = {
+export type LocationState = {
   viewState: ViewState;
   selectedCityId: Id<"cities"> | null;
   locationSource: LocationSource;
   ipLocationToken: string | null;
   showIpConsent: boolean;
 };
+
+export type LocationAction =
+  | { type: "SET_VIEW"; view: ViewState }
+  | { type: "SET_GPS_SOURCE"; cityId?: Id<"cities"> }
+  | { type: "SET_MANUAL_SOURCE"; cityId: Id<"cities"> }
+  | { type: "SET_IP_SOURCE"; cityId: Id<"cities">; token: string }
+  | { type: "SET_SHOW_IP_CONSENT"; show: boolean }
+  | { type: "SYNC_CURRENT_CITY_ID"; cityId: Id<"cities"> }
+  | { type: "DISMISS_IP_CONSENT" };
 
 function initialLocationState(currentCityId?: Id<"cities">): LocationState {
   return {
@@ -102,6 +111,48 @@ function initialLocationState(currentCityId?: Id<"cities">): LocationState {
     ipLocationToken: null,
     showIpConsent: false,
   };
+}
+
+export function locationReducer(
+  state: LocationState,
+  action: LocationAction
+): LocationState {
+  switch (action.type) {
+    case "SET_VIEW":
+      return { ...state, viewState: action.view };
+    case "SET_GPS_SOURCE":
+      return {
+        ...state,
+        ...(action.cityId !== undefined ? { selectedCityId: action.cityId } : {}),
+        locationSource: "gps",
+        ipLocationToken: null,
+      };
+    case "SET_MANUAL_SOURCE":
+      return {
+        ...state,
+        selectedCityId: action.cityId,
+        locationSource: "manual",
+        ipLocationToken: null,
+      };
+    case "SET_IP_SOURCE":
+      return {
+        ...state,
+        selectedCityId: action.cityId,
+        locationSource: "ip",
+        ipLocationToken: action.token,
+      };
+    case "SET_SHOW_IP_CONSENT":
+      return { ...state, showIpConsent: action.show };
+    case "SYNC_CURRENT_CITY_ID":
+      if (state.selectedCityId) return state;
+      return { ...state, selectedCityId: action.cityId };
+    case "DISMISS_IP_CONSENT":
+      return { ...state, showIpConsent: false };
+    default: {
+      const _exhaustive: never = action;
+      return _exhaustive;
+    }
+  }
 }
 
 export function useLocationFlow({
@@ -124,44 +175,31 @@ export function useLocationFlow({
 
   const [isIpAcceptInFlight, setIsIpAcceptInFlight] = useState(false);
 
-  const [state, setState] = useState<LocationState>(() =>
-    initialLocationState(currentCityId)
+  const [state, dispatch] = useReducer(
+    locationReducer,
+    currentCityId,
+    (initialCityId?: Id<"cities">) => initialLocationState(initialCityId)
   );
 
   useEffect(() => {
     if (!currentCityId) return;
-    setState((prev) => {
-      if (prev.selectedCityId) return prev;
-      return { ...prev, selectedCityId: currentCityId };
-    });
+    dispatch({ type: "SYNC_CURRENT_CITY_ID", cityId: currentCityId });
   }, [currentCityId]);
-
-  const setLocationSource = (
-    source: "gps" | "manual",
-    selectedCityId?: Id<"cities">
-  ): void => {
-    setState((prev) => ({
-      ...prev,
-      ...(selectedCityId !== undefined ? { selectedCityId } : {}),
-      locationSource: source,
-      ipLocationToken: null,
-    }));
-  };
 
   useEffect(() => {
     const dismissed = getSessionItem(IP_CONSENT_KEY);
-    setState((prev) => ({ ...prev, showIpConsent: !dismissed }));
+    dispatch({ type: "SET_SHOW_IP_CONSENT", show: !dismissed });
   }, []);
 
   useEffect(() => {
     if (!citiesError) return;
     toast.error("Erro ao carregar cidades. Use a busca manual.");
-    setState((prev) => ({ ...prev, viewState: "manual" }));
+    dispatch({ type: "SET_VIEW", view: "manual" });
   }, [citiesError]);
 
   useEffect(() => {
     if (gpsStatus === "denied" || gpsStatus === "unavailable") {
-      setState((prev) => ({ ...prev, viewState: "manual" }));
+      dispatch({ type: "SET_VIEW", view: "manual" });
     }
   }, [gpsStatus]);
 
@@ -178,14 +216,14 @@ export function useLocationFlow({
     }
 
     if (cities.length === 0) {
-      setLocationSource("gps");
+      dispatch({ type: "SET_GPS_SOURCE" });
       toast.info("Use a busca manual para selecionar sua cidade.");
       return;
     }
 
     const nearest = findNearestCity(coords.lat, coords.lng, cities);
     if (nearest) {
-      setLocationSource("gps", nearest.city._id);
+      dispatch({ type: "SET_GPS_SOURCE", cityId: nearest.city._id });
       if (nearest.isDistant) {
         toast.info(
           `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
@@ -193,17 +231,17 @@ export function useLocationFlow({
       }
     } else {
       toast.info(NEAREST_NOT_FOUND_GPS);
-      setLocationSource("gps");
+      dispatch({ type: "SET_GPS_SOURCE" });
     }
   }, [gpsStatus, coords, cities]);
 
   function setViewState(next: ViewState): void {
-    setState((prev) => ({ ...prev, viewState: next }));
+    dispatch({ type: "SET_VIEW", view: next });
   }
 
   function dismissIpConsent(): void {
     persistIpConsentDismissed();
-    setState((prev) => ({ ...prev, showIpConsent: false }));
+    dispatch({ type: "DISMISS_IP_CONSENT" });
   }
 
   async function handleIpAccept(): Promise<void> {
@@ -234,12 +272,11 @@ export function useLocationFlow({
         citiesRef.current
       );
       if (nearest) {
-        setState((prev) => ({
-          ...prev,
-          selectedCityId: nearest.city._id,
-          locationSource: "ip",
-          ipLocationToken: data.attestationToken,
-        }));
+        dispatch({
+          type: "SET_IP_SOURCE",
+          cityId: nearest.city._id,
+          token: data.attestationToken,
+        });
         toast.success(
           `Localização detectada: ${nearest.city.name}, ${nearest.city.state}`
         );
@@ -253,13 +290,13 @@ export function useLocationFlow({
       if (abortControllerRef.current === controller) {
         setIsIpAcceptInFlight(false);
         persistIpConsentDismissed();
-        setState((prev) => ({ ...prev, showIpConsent: false }));
+        dispatch({ type: "DISMISS_IP_CONSENT" });
       }
     }
   }
 
   function selectCityManual(id: Id<"cities">): void {
-    setLocationSource("manual", id);
+    dispatch({ type: "SET_MANUAL_SOURCE", cityId: id });
   }
 
   const {
