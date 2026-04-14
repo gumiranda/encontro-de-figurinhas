@@ -79,11 +79,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated || authLoading || currentUser === undefined) return;
     if (currentUser === null || !currentUser.hasCompletedOnboarding) {
       router.replace("/complete-profile");
+    } else if (!currentUser.hasCompletedStickerSetup) {
+      router.replace("/cadastrar-figurinhas");
+    } else if (!currentUser.locationSource) {
+      router.replace("/selecionar-localizacao");
     }
   }, [isAuthenticated, authLoading, currentUser, router]);
 
+  const isFullyOnboarded =
+    currentUser?.hasCompletedOnboarding &&
+    currentUser?.hasCompletedStickerSetup &&
+    currentUser?.locationSource;
+
   const isLoading = authLoading || !isAuthenticated || currentUser === undefined;
-  if (isLoading || !currentUser || !currentUser.hasCompletedOnboarding) {
+  if (isLoading || !currentUser || !isFullyOnboarded) {
     return <FullPageLoader />;
   }
 

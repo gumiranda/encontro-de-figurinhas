@@ -48,7 +48,10 @@ function getSectorName(sector: string | undefined) {
 
 export default function AdminUsersPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
-  const users = useQuery(api.users.getAllUsers, {});
+  const isSuperadmin = currentUser?.role === "superadmin";
+  const isCeo = currentUser?.role === "ceo";
+  const canListUsers = isSuperadmin || isCeo;
+  const users = useQuery(api.users.getAllUsers, canListUsers ? {} : "skip");
   const updateUserRole = useMutation(api.users.updateUserRole);
   const updateUserSector = useMutation(api.users.updateUserSector);
 
@@ -62,10 +65,15 @@ export default function AdminUsersPage() {
   const [selectedSector, setSelectedSector] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const isSuperadmin = currentUser?.role === "superadmin";
-  const isCeo = currentUser?.role === "ceo";
+  if (currentUser === undefined) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
-  if (!currentUser || (!isSuperadmin && !isCeo)) {
+  if (!canListUsers) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-muted-foreground">

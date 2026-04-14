@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 
 export const search = query({
   args: { query: v.string() },
@@ -10,13 +10,16 @@ export const search = query({
     const cities = await ctx.db
       .query("cities")
       .withSearchIndex("search_name", (q) => q.search("name", normalized))
-      .take(10);
+      .take(15);
 
-    return cities.map((c) => ({
-      _id: c._id,
-      name: c.name,
-      state: c.state,
-    }));
+    return cities
+      .filter((c) => c.isActive !== false)
+      .slice(0, 10)
+      .map((c) => ({
+        _id: c._id,
+        name: c.name,
+        state: c.state,
+      }));
   },
 });
 
@@ -40,6 +43,34 @@ export const getBySlug = query({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("cities").take(500);
+    const cities = await ctx.db.query("cities").take(500);
+    const activeCities = cities.filter((c) => c.isActive !== false);
+
+    if (activeCities.length > 400) {
+      console.warn(`cities.getAll: ${activeCities.length} `);
+    }
+
+    return activeCities.map((c) => ({
+      _id: c._id,
+      name: c.name,
+      state: c.state,
+      lat: c.lat,
+      lng: c.lng,
+    }));
+  },
+});
+
+export const migrateSetCitiesActive = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db.query("cities").collect();
+    let updated = 0;
+    for (const city of cities) {
+      if (city.isActive === undefined) {
+        await ctx.db.patch(city._id, { isActive: true });
+        updated++;
+      }
+    }
+    return { updated };
   },
 });

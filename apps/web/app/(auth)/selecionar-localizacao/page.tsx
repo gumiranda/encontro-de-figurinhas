@@ -1,0 +1,74 @@
+import { fetchQuery } from "convex/nextjs";
+import { unstable_cache } from "next/cache";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { api } from "@workspace/backend/_generated/api";
+import { LocationSelectorView } from "@/modules/location/ui/views/location-selector-view";
+import {
+  SUGGESTED_CITY_KEYS,
+  type CityWithCoords,
+} from "@/modules/location/lib/location-constants";
+
+export const metadata = { title: "Selecionar localização" };
+
+const getCities = unstable_cache(
+  () => fetchQuery(api.cities.getAll),
+  ["cities-all-coords"],
+  { revalidate: 3600 }
+);
+
+function getCachedCurrentUser(userId: string, token: string) {
+  return unstable_cache(
+    () => fetchQuery(api.users.getCurrentUser, {}, { token }),
+    ["user-current", userId],
+    { revalidate: 60, tags: [`user-${userId}`] }
+  )();
+}
+
+export default async function SelecionarLocalizacaoPage() {
+  const { userId, getToken } = await auth();
+  const token = userId ? await getToken({ template: "convex" }) : null;
+  if (!token || !userId) redirect("/sign-in");
+
+  const user = await getCachedCurrentUser(userId, token);
+  if (!user?.hasCompletedOnboarding) redirect("/complete-profile");
+  if (!user?.hasCompletedStickerSetup) redirect("/cadastrar-figurinhas");
+
+  let cities: CityWithCoords[] = [];
+  let citiesError: string | undefined;
+
+  try {
+    cities = await getCities();
+  } catch (error) {
+    citiesError =
+      error instanceof Error ? error.message : "Erro desconhecido";
+    console.error("Failed to fetch cities:", error);
+  }
+
+  const cityMap = new Map(
+    cities.map((c) => [`${c.name}|${c.state}`, c] as const)
+  );
+
+  const suggestedCities = SUGGESTED_CITY_KEYS.reduce<CityWithCoords[]>(
+    (acc, key) => {
+      const found = cityMap.get(`${key.name}|${key.state}`);
+      if (found) acc.push(found);
+      else if (process.env.NODE_ENV === "development") {
+        console.warn(
+          `SUGGESTED_CITY not found in seed: ${key.name}, ${key.state}`
+        );
+      }
+      return acc;
+    },
+    []
+  );
+
+  return (
+    <LocationSelectorView
+      cities={cities}
+      suggestedCities={suggestedCities}
+      citiesError={citiesError}
+      currentCityId={user?.cityId}
+    />
+  );
+}
