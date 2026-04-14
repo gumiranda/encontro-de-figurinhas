@@ -23,24 +23,15 @@ export function useGeolocation() {
   });
 
   const statusRef = useRef(state.status);
-  const isMountedRef = useRef(true);
 
   useEffect(() => {
     statusRef.current = state.status;
   }, [state.status]);
 
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   const fetchCoords = useCallback(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        if (!isMountedRef.current) return;
         setState({
           status: "granted",
           coords: {
@@ -51,7 +42,6 @@ export function useGeolocation() {
         });
       },
       (error) => {
-        if (!isMountedRef.current) return;
         switch (error.code) {
           case error.PERMISSION_DENIED:
             setState({
@@ -69,6 +59,13 @@ export function useGeolocation() {
             break;
           case error.TIMEOUT:
             setState({ status: "timeout", coords: null, error: "Timeout" });
+            break;
+          default:
+            setState({
+              status: "unavailable",
+              coords: null,
+              error: "Erro desconhecido",
+            });
             break;
         }
       },
@@ -91,7 +88,6 @@ export function useGeolocation() {
 
     try {
       const result = await navigator.permissions.query({ name: "geolocation" });
-      if (!isMountedRef.current) return;
       if (result.state === "granted") {
         fetchCoords();
       } else if (result.state === "denied") {
@@ -100,7 +96,6 @@ export function useGeolocation() {
         setState((s) => ({ ...s, status: "prompting" }));
       }
     } catch {
-      if (!isMountedRef.current) return;
       setState({ status: "prompting", coords: null, error: null });
     }
   }, [fetchCoords]);
