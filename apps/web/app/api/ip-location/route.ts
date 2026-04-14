@@ -18,16 +18,12 @@ export async function GET(request: NextRequest) {
   const lat = request.headers.get("x-vercel-ip-latitude");
   const lng = request.headers.get("x-vercel-ip-longitude");
 
-  let parsedLat: number;
-  let parsedLng: number;
-  let decodedCity: string;
-
   if (!city || !lat || !lng) {
     return NextResponse.json({ error: "Geolocation unavailable" }, { status: 400 });
   }
 
-  parsedLat = parseFloat(lat);
-  parsedLng = parseFloat(lng);
+  const parsedLat = parseFloat(lat);
+  const parsedLng = parseFloat(lng);
 
   if (isNaN(parsedLat) || isNaN(parsedLng)) {
     return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
@@ -37,15 +33,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Location outside Brazil" }, { status: 400 });
   }
 
-  try {
-    decodedCity = decodeURIComponent(city);
-  } catch {
-    decodedCity = city;
-  }
-
-  if (!isInBrazil(parsedLat, parsedLng)) {
-    return NextResponse.json({ error: "Location outside Brazil" }, { status: 400 });
-  }
+  const decodedCity = (() => {
+    try {
+      return decodeURIComponent(city);
+    } catch {
+      return city;
+    }
+  })();
 
   const attestationToken = await signIpLocationToken(
     { sub: userId, lat: parsedLat, lng: parsedLng },
