@@ -22,14 +22,19 @@ export function useGeolocation() {
     error: null,
   });
 
-  const statusRef = useRef(state.status);
+  const isCheckingRef = useRef(false);
 
-  useEffect(() => {
-    statusRef.current = state.status;
-  }, [state.status]);
+  const setStatus = useCallback(
+    (status: GeolocationState["status"], error: string | null = null) =>
+      setState({ status, coords: null, error }),
+    []
+  );
 
-  const fetchCoords = useCallback(() => {
-    if (!navigator.geolocation) return;
+  const fetchCoords = useCallback((onSettled?: () => void) => {
+    if (!navigator.geolocation) {
+      onSettled?.();
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setState({
@@ -40,72 +45,68 @@ export function useGeolocation() {
           },
           error: null,
         });
+        onSettled?.();
       },
       (error) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            setState({
-              status: "denied",
-              coords: null,
-              error: "Permissão negada",
-            });
+            setStatus("denied", "Permissão negada");
             break;
           case error.POSITION_UNAVAILABLE:
-            setState({
-              status: "unavailable",
-              coords: null,
-              error: "Posição indisponível",
-            });
+            setStatus("unavailable", "Posição indisponível");
             break;
           case error.TIMEOUT:
-            setState({ status: "timeout", coords: null, error: "Timeout" });
+            setStatus("timeout", "Timeout");
             break;
           default:
-            setState({
-              status: "unavailable",
-              coords: null,
-              error: "Erro desconhecido",
-            });
+            setStatus("unavailable", "Erro desconhecido");
             break;
         }
+        onSettled?.();
       },
       { timeout: 10000, enableHighAccuracy: false }
     );
-  }, []);
+  }, [setStatus]);
 
   const checkPermission = useCallback(async () => {
-    if (statusRef.current === "checking") return;
+    if (isCheckingRef.current) return;
+    isCheckingRef.current = true;
+
     if (!navigator.geolocation) {
-      setState({
-        status: "unavailable",
-        coords: null,
-        error: "GPS indisponível",
-      });
+      setStatus("unavailable", "GPS indisponível");
+      isCheckingRef.current = false;
       return;
     }
 
-    setState({ status: "checking", coords: null, error: null });
+    setState((s) => ({ ...s, status: "checking", error: null }));
 
     try {
       const result = await navigator.permissions.query({ name: "geolocation" });
       if (result.state === "granted") {
-        fetchCoords();
+        fetchCoords(() => {
+          isCheckingRef.current = false;
+        });
       } else if (result.state === "denied") {
-        setState((s) => ({ ...s, status: "denied" }));
+        setStatus("denied");
+        isCheckingRef.current = false;
       } else {
-        setState((s) => ({ ...s, status: "prompting" }));
+        setStatus("prompting");
+        isCheckingRef.current = false;
       }
     } catch {
-      setState({ status: "prompting", coords: null, error: null });
+      setStatus("prompting");
+      isCheckingRef.current = false;
     }
-  }, [fetchCoords]);
+  }, [fetchCoords, setStatus]);
 
   const requestPermission = useCallback(() => {
-    if (statusRef.current === "checking") return;
-    statusRef.current = "checking";
-    setState({ status: "checking", coords: null, error: null });
-    fetchCoords();
-  }, [fetchCoords]);
+    if (isCheckingRef.current) return;
+    isCheckingRef.current = true;
+    setState((s) => ({ ...s, status: "checking", error: null }));
+    fetchCoords(() => {
+      isCheckingRef.current = false;
+    });
+  }, [fetchCoords, setStatus]);
 
   useEffect(() => {
     checkPermission();
