@@ -1,9 +1,5 @@
 import { haversine } from "./geo";
-import {
-  DISTANCE_THRESHOLD_KM,
-  type CityWithCoords,
-  isCityWithCoords,
-} from "./location-constants";
+import { DISTANCE_THRESHOLD_KM, type CityWithCoords } from "./location-constants";
 
 export function findNearestCity(
   userLat: number,
@@ -13,21 +9,17 @@ export function findNearestCity(
   if (cities.length === 0) return null;
   if (isNaN(userLat) || isNaN(userLng)) return null;
 
-  const validCities = cities.filter(isCityWithCoords);
-  if (validCities.length === 0) return null;
+  let nearest = cities[0]!;
+  let minDistance = haversine(userLat, userLng, nearest.lat, nearest.lng);
 
-  let nearest: CityWithCoords | null = null;
-  let minDistance = Infinity;
-
-  for (const city of validCities) {
+  for (let i = 1; i < cities.length; i++) {
+    const city = cities[i]!;
     const distance = haversine(userLat, userLng, city.lat, city.lng);
     if (distance < minDistance) {
       minDistance = distance;
       nearest = city;
     }
   }
-
-  if (!nearest) return null;
 
   return {
     city: nearest,
