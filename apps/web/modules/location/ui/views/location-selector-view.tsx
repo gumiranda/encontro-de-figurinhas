@@ -103,12 +103,20 @@ export function LocationSelectorView({
       : null;
 
   return (
-    <div className="min-h-screen flex flex-col p-6">
+    <main className="landing-theme relative flex min-h-screen flex-col bg-[var(--landing-background)] stadium-gradient p-6">
       <header className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={handleBack}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
+          onClick={handleBack}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Typography variant="h1" className="text-lg">
+        <Typography
+          variant="h1"
+          className="text-lg text-[var(--landing-on-surface)]"
+        >
           Selecionar localização
         </Typography>
       </header>
@@ -185,6 +193,6 @@ export function LocationSelectorView({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }

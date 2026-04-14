@@ -24,10 +24,10 @@ export function ManualSearchScreen({
   return (
     <div className="space-y-6 flex-1">
       <div>
-        <h2 className="text-xl font-semibold mb-2">
+        <h2 className="mb-2 text-xl font-semibold text-[var(--landing-on-surface)]">
           Buscar arena manualmente
         </h2>
-        <p className="text-muted-foreground text-sm mb-4">
+        <p className="mb-4 text-sm text-[var(--landing-on-surface-variant)]">
           Digite sua cidade para encontrar pontos de troca próximos
         </p>
       </div>
@@ -38,9 +38,9 @@ export function ManualSearchScreen({
       />
 
       {suggestedCities.length > 0 && (
-        <Card className="relative z-0 gap-0 border-border/60 bg-muted/40 py-4 shadow-none dark:bg-muted/25">
+        <Card className="relative z-0 gap-0 border border-[var(--landing-outline-variant)]/25 bg-[var(--landing-surface-container-high)] py-4 text-[var(--landing-on-surface)] shadow-sm">
           <CardContent className="px-4 pt-0 pb-0">
-            <p className="mb-3 text-sm text-muted-foreground">
+            <p className="mb-3 text-sm text-[var(--landing-on-surface-variant)]">
               Ou escolha uma das principais cidades:
             </p>
             <div
