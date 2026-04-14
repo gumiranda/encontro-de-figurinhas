@@ -17,20 +17,12 @@ const getCities = unstable_cache(
   { revalidate: 3600 }
 );
 
-function getCachedCurrentUser(userId: string, token: string) {
-  return unstable_cache(
-    () => fetchQuery(api.users.getCurrentUser, {}, { token }),
-    ["user-current", userId],
-    { revalidate: 60, tags: [`user-${userId}`] }
-  )();
-}
-
 export default async function SelecionarLocalizacaoPage() {
   const { userId, getToken } = await auth();
   const token = userId ? await getToken({ template: "convex" }) : null;
   if (!token || !userId) redirect("/sign-in");
 
-  const user = await getCachedCurrentUser(userId, token);
+  const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
   if (!user?.hasCompletedOnboarding) redirect("/complete-profile");
   if (!user?.hasCompletedStickerSetup) redirect("/cadastrar-figurinhas");
 
