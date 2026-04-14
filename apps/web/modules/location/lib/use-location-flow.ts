@@ -149,7 +149,7 @@ export type UseLocationFlowReturn = {
   requestPermission: GeolocationHook["requestPermission"];
   dismissIpConsent: () => void;
   handleIpAccept: () => Promise<void>;
-  selectCityManual: (cityId: Id<"cities">) => void;
+  selectCityManual: (cityId: Id<"cities"> | null) => void;
 };
 
 export type LocationState = {
@@ -408,7 +408,8 @@ export function useLocationFlow({
     }
   }
 
-  function selectCityManual(id: Id<"cities">): void {
+  function selectCityManual(id: Id<"cities"> | null): void {
+    if (id == null) return;
     const cityExists = citiesStable.some((c) => c._id === id);
     if (!cityExists) {
       toast.error("Cidade inválida");

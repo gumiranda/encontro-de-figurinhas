@@ -7,7 +7,7 @@ import type { CityWithCoords } from "../../lib/location-constants";
 
 interface ManualSearchScreenProps {
   selectedCityId: Id<"cities"> | null;
-  onCitySelect: (cityId: Id<"cities">) => void;
+  onCitySelect: (cityId: Id<"cities"> | null) => void;
   suggestedCities: CityWithCoords[];
 }
 
@@ -16,6 +16,10 @@ export function ManualSearchScreen({
   onCitySelect,
   suggestedCities,
 }: ManualSearchScreenProps) {
+  const selectedInSuggested =
+    selectedCityId != null &&
+    suggestedCities.some((c) => c._id === selectedCityId);
+
   return (
     <div className="space-y-6 flex-1">
       <div>
@@ -29,7 +33,7 @@ export function ManualSearchScreen({
 
       <CityAutocomplete
         value={selectedCityId}
-        onChange={(cityId) => onCitySelect(cityId as Id<"cities">)}
+        onChange={onCitySelect}
       />
 
       {suggestedCities.length > 0 && (
@@ -42,18 +46,25 @@ export function ManualSearchScreen({
             aria-label="Cidades sugeridas"
             className="flex flex-wrap gap-2"
           >
-            {suggestedCities.map((city) => (
-              <Button
-                key={city._id}
-                variant={selectedCityId === city._id ? "default" : "outline"}
-                role="radio"
-                aria-checked={selectedCityId === city._id}
-                onClick={() => onCitySelect(city._id)}
-                size="sm"
-              >
-                {city.name}
-              </Button>
-            ))}
+            {suggestedCities.map((city, index) => {
+              const isRovingFocus =
+                selectedInSuggested
+                  ? selectedCityId === city._id
+                  : index === 0;
+              return (
+                <Button
+                  key={city._id}
+                  variant={selectedCityId === city._id ? "default" : "outline"}
+                  role="radio"
+                  aria-checked={selectedCityId === city._id}
+                  tabIndex={isRovingFocus ? 0 : -1}
+                  onClick={() => onCitySelect(city._id)}
+                  size="sm"
+                >
+                  {city.name}
+                </Button>
+              );
+            })}
           </div>
         </div>
       )}

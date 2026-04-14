@@ -15,8 +15,8 @@ interface City {
 }
 
 interface CityAutocompleteProps {
-  value: string | null;
-  onChange: (cityId: string) => void;
+  value: Id<"cities"> | null;
+  onChange: (cityId: Id<"cities"> | null) => void;
   error?: string;
 }
 
@@ -58,7 +58,7 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
     setSearchValue(value);
     if (selectedCity) {
       setSelectedCity(null);
-      onChange("");
+      onChange(null);
     }
   };
 
