@@ -44,7 +44,18 @@ export type UseGeolocationOptions = {
   autoCheck?: boolean;
 };
 
-export function useGeolocation({ autoCheck = false }: UseGeolocationOptions = {}) {
+/**
+ * Estado + ações. Quando `status === "prompting"`, a permissão ainda não foi solicitada ao usuário;
+ * a transição esperada é chamar `requestPermission()` (idealmente após um gesto).
+ */
+export interface UseGeolocationReturn extends GeolocationState {
+  requestPermission: () => void;
+  checkPermission: () => void;
+}
+
+export function useGeolocation({
+  autoCheck = false,
+}: UseGeolocationOptions = {}): UseGeolocationReturn {
   const [state, setState] = useState<GeolocationState>({
     status: "idle",
     coords: null,
