@@ -8,8 +8,13 @@ import {
   SUGGESTED_CITY_KEYS,
   type CityWithCoords,
 } from "@/modules/location/lib/location-constants";
+import type { Viewport } from "next";
 
 export const metadata = { title: "Selecionar localização" };
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 const getCities = unstable_cache(
   () => fetchQuery(api.cities.getAll),

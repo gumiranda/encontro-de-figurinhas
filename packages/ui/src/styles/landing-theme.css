@@ -52,3 +52,69 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Stadium glow — radial center version */
+.stadium-glow {
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 82, 255, 0.15) 0%,
+    rgba(9, 14, 28, 0) 70%
+  );
+}
+
+/* Pulse ring */
+.pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-ring {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.1); }
+}
+
+/* Radar bars — scaleY suave */
+.bar-wave {
+  transform-origin: bottom;
+  animation: bar-wave 1.2s ease-in-out infinite;
+}
+@keyframes bar-wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50%      { transform: scaleY(1); }
+}
+
+/* Botão primário com gradiente */
+.btn-primary-gradient {
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  background-image: linear-gradient(
+    to right,
+    var(--landing-primary-dim),
+    var(--landing-primary)
+  );
+  color: var(--landing-on-primary);
+  font-family: var(--font-headline);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 10px 25px -5px rgba(149, 170, 255, 0.2);
+  transition-property: opacity, transform;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
+}
+@supports (color: color-mix(in srgb, red, blue)) {
+  .btn-primary-gradient {
+    box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--landing-primary) 20%, transparent);
+  }
+}
+.btn-primary-gradient:hover { opacity: 0.95; }
+.btn-primary-gradient:active { transform: scale(0.98); }
+
+/* Prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring,
+  .bar-wave {
+    animation: none;
+  }
+  .btn-primary-gradient:active {
+    transform: none;
+  }
+}

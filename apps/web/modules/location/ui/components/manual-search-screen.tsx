@@ -1,9 +1,10 @@
 "use client";
 
 import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
-import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
 import type { Id } from "@workspace/backend/_generated/dataModel";
+import { Heading, Text } from "@workspace/ui/components/typography";
+import { cn } from "@workspace/ui/lib/utils";
+import { Zap } from "lucide-react";
 import type { CityWithCoords } from "../../lib/location-constants";
 
 interface ManualSearchScreenProps {
@@ -17,59 +18,60 @@ export function ManualSearchScreen({
   onCitySelect,
   suggestedCities,
 }: ManualSearchScreenProps) {
-  const selectedInSuggested =
-    selectedCityId != null &&
-    suggestedCities.some((c) => c._id === selectedCityId);
-
   return (
-    <div className="space-y-6 flex-1">
-      <div>
-        <h2 className="mb-2 text-xl font-semibold text-[var(--landing-on-surface)]">
-          Buscar arena manualmente
-        </h2>
-        <p className="mb-4 text-sm text-[var(--landing-on-surface-variant)]">
-          Digite sua cidade para encontrar pontos de troca próximos
-        </p>
-      </div>
+    <div className="flex flex-1 flex-col">
+      <section className="mb-10">
+        <Heading
+          level={2}
+          className="border-0 pb-0 mb-3 font-headline text-3xl font-bold uppercase tracking-tight text-[var(--landing-on-surface)] leading-tight"
+        >
+          Buscar arena <span className="sm:hidden"><br /></span>manualmente
+        </Heading>
+        <Text
+          variant="p"
+          className="text-base text-[var(--landing-on-surface-variant)] [&:not(:first-child)]:mt-0"
+        >
+          Digite sua cidade para encontrar pontos de troca próximos de você.
+        </Text>
+      </section>
 
-      <CityAutocomplete
-        value={selectedCityId}
-        onChange={onCitySelect}
-      />
+      <section className="mb-10">
+        <CityAutocomplete value={selectedCityId} onChange={onCitySelect} />
+      </section>
 
       {suggestedCities.length > 0 && (
-        <Card className="relative z-0 gap-0 border border-[var(--landing-outline-variant)]/25 bg-[var(--landing-surface-container-high)] py-4 text-[var(--landing-on-surface)] shadow-sm">
-          <CardContent className="px-4 pt-0 pb-0">
-            <p className="mb-3 text-sm text-[var(--landing-on-surface-variant)]">
-              Ou escolha uma das principais cidades:
-            </p>
-            <div
-              role="radiogroup"
-              aria-label="Cidades sugeridas"
-              className="flex flex-wrap gap-2"
+        <section className="mb-8">
+          <div className="mb-4 flex items-center gap-2">
+            <Zap className="h-4 w-4 fill-current text-[var(--landing-secondary)]" />
+            <Heading
+              level={3}
+              className="border-0 pb-0 font-headline text-xs font-bold uppercase tracking-widest text-[var(--landing-secondary)]"
             >
-              {suggestedCities.map((city, index) => {
-                const isRovingFocus =
-                  selectedInSuggested
-                    ? selectedCityId === city._id
-                    : index === 0;
-                return (
-                  <Button
-                    key={city._id}
-                    variant={selectedCityId === city._id ? "default" : "outline"}
-                    role="radio"
-                    aria-checked={selectedCityId === city._id}
-                    tabIndex={isRovingFocus ? 0 : -1}
-                    onClick={() => onCitySelect(city._id)}
-                    size="sm"
-                  >
-                    {city.name}
-                  </Button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+              Cidades Ativas
+            </Heading>
+          </div>
+          <div role="group" aria-label="Cidades sugeridas" className="flex flex-wrap gap-3">
+            {suggestedCities.map((city) => {
+              const selected = selectedCityId === city._id;
+              return (
+                <button
+                  key={city._id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => onCitySelect(city._id)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-full border px-4 py-2.5 font-headline text-sm font-bold transition-all active:scale-95",
+                    selected
+                      ? "border-[var(--landing-primary)]/60 bg-[var(--landing-primary)]/15 text-[var(--landing-primary)]"
+                      : "border-[var(--landing-outline-variant)]/20 bg-[var(--landing-surface-container-high)] text-[var(--landing-on-surface)] hover:bg-[var(--landing-surface-container-highest)]"
+                  )}
+                >
+                  {city.name}, {city.state}
+                </button>
+              );
+            })}
+          </div>
+        </section>
       )}
     </div>
   );

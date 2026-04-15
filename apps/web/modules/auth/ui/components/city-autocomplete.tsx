@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Input } from "@workspace/ui/components/input";
-import { MapPin } from "lucide-react";
+import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Id } from "@workspace/backend/_generated/dataModel";
 
@@ -70,12 +70,13 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
           value={searchValue}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
-          placeholder="Selecione sua cidade..."
-          className="w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent font-body pr-12"
+          placeholder="Digite sua cidade, ex: Belo Horizonte"
+          className="w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded-xl text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent font-body pl-12"
           aria-invalid={!!error}
+          aria-describedby={error ? "city-autocomplete-error" : undefined}
         />
-        <div className="absolute inset-y-0 right-4 flex items-center text-[var(--landing-on-surface-variant)]">
-          <MapPin className="h-5 w-5" />
+        <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[var(--landing-primary)]">
+          <Search className="h-5 w-5" />
         </div>
 
         {showSuggestions && (
@@ -104,6 +105,11 @@ export function CityAutocomplete({ value, onChange, error }: CityAutocompletePro
           </div>
         )}
       </div>
+      {error && (
+        <span id="city-autocomplete-error" role="alert" className="text-xs text-destructive">
+          {error}
+        </span>
+      )}
     </div>
   );
 }
