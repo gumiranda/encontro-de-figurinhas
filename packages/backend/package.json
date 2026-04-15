@@ -13,7 +13,8 @@
     "./_generated/dataModel": "./convex/_generated/dataModel.d.ts",
     "./lib/types": "./convex/lib/types.ts",
     "./lib/ipLocationToken": "./convex/lib/ipLocationToken.ts",
-    "./lib/setLocationErrors": "./convex/lib/setLocationErrors.ts"
+    "./lib/setLocationErrors": "./convex/lib/setLocationErrors.ts",
+    "./lib/geo": "./convex/lib/geo.ts"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",

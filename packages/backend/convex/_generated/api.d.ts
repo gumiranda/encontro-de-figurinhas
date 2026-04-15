@@ -26,6 +26,7 @@ import type * as permissions from "../permissions.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
 import type * as stickers from "../stickers.js";
+import type * as tradePoints from "../tradePoints.js";
 import type * as users from "../users.js";
 
 import type {
@@ -61,6 +62,7 @@ declare const fullApi: ApiFromModules<{
   seedAlbumConfig: typeof seedAlbumConfig;
   "seeds/seedCities": typeof seeds_seedCities;
   stickers: typeof stickers;
+  tradePoints: typeof tradePoints;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

@@ -60,6 +60,39 @@ export default defineSchema({
     .index("by_isActive", ["isActive"])
     .searchIndex("search_name", { searchField: "name" }),
 
+  tradePoints: defineTable({
+    name: v.string(),
+    address: v.string(),
+    cityId: v.id("cities"),
+    lat: v.float64(),
+    lng: v.float64(),
+    whatsappLink: v.optional(v.string()),
+    whatsappLinkStatus: v.union(
+      v.literal("active"),
+      v.literal("reported"),
+      v.literal("invalid")
+    ),
+    suggestedHours: v.optional(v.string()),
+    description: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("suspended"),
+      v.literal("inactive")
+    ),
+    rejectionReason: v.optional(v.string()),
+    requestedBy: v.id("users"),
+    confidenceScore: v.float64(),
+    lastActivityAt: v.number(),
+    peakHours: v.optional(v.array(v.number())),
+    confirmedTradesCount: v.number(),
+    reportCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_city_status", ["cityId", "status"])
+    .index("by_status", ["status"])
+    .index("by_requestedBy", ["requestedBy"]),
+
   albumConfig: defineTable({
     totalStickers: v.number(),
     sections: v.array(

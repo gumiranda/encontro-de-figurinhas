@@ -5,12 +5,13 @@ import { Button } from "@workspace/ui/components/button";
 import { Heading, Text } from "@workspace/ui/components/typography";
 import { MapPin, LandPlot, Info } from "lucide-react";
 
+/** Heights in px — symmetric equalizer; animation adds scaleY via .bar-wave */
 const RADAR_BARS: readonly { readonly style: CSSProperties }[] = [
-  { style: { height: "0.75rem", opacity: 0.4, animationDelay: "0.1s" } },
-  { style: { height: "1.25rem", opacity: 0.6, animationDelay: "0.2s" } },
-  { style: { height: "2rem", opacity: 1, animationDelay: "0.3s" } },
-  { style: { height: "1.25rem", opacity: 0.6, animationDelay: "0.4s" } },
-  { style: { height: "0.75rem", opacity: 0.4, animationDelay: "0.5s" } },
+  { style: { height: 11, opacity: 0.45, animationDelay: "0s" } },
+  { style: { height: 17, opacity: 0.65, animationDelay: "0.12s" } },
+  { style: { height: 26, opacity: 1, animationDelay: "0.24s" } },
+  { style: { height: 17, opacity: 0.65, animationDelay: "0.36s" } },
+  { style: { height: 11, opacity: 0.45, animationDelay: "0.48s" } },
 ] as const;
 
 interface GpsPermissionScreenProps {
@@ -70,14 +71,18 @@ export function GpsPermissionScreen({
 
             <div className="relative z-10 flex flex-col items-center">
               <MapPin
-                className="relative z-20 mb-3 h-24 w-24 text-[var(--landing-secondary)]"
+                className="-mb-1 h-24 w-24 text-[var(--landing-secondary)]"
                 strokeWidth={1.5}
+                aria-hidden
               />
-              <div className="flex h-8 items-end justify-center gap-1">
+              <div
+                className="flex h-[26px] shrink-0 items-end justify-center gap-[3px] rounded-full bg-[var(--landing-secondary)]/[0.08] px-2.5"
+                aria-hidden
+              >
                 {RADAR_BARS.map((bar, i) => (
                   <div
                     key={i}
-                    className="w-1.5 rounded-full bg-[var(--landing-secondary)] bar-wave"
+                    className="w-1.5 shrink-0 rounded-full bg-[var(--landing-secondary)] bar-wave"
                     style={bar.style}
                   />
                 ))}
