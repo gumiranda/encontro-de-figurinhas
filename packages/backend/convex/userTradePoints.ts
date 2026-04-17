@@ -1,0 +1,115 @@
+import { v } from "convex/values";
+import { mutation } from "./_generated/server";
+import { authErrorValidators, checkAuth } from "./lib/auth";
+import { FREE_USER_MAX_POINTS } from "./lib/limits";
+
+export const join = mutation({
+  args: { tradePointId: v.id("tradePoints") },
+  returns: v.union(
+    v.object({ ok: v.literal(true) }),
+    ...authErrorValidators,
+    v.object({ ok: v.literal(false), error: v.literal("already-member") }),
+    v.object({ ok: v.literal(false), error: v.literal("limit-reached") }),
+    v.object({ ok: v.literal(false), error: v.literal("point-unavailable") })
+  ),
+  handler: async (ctx, { tradePointId }) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return { ok: false as const, error: auth.state };
+    }
+    const user = auth.user;
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "approved") {
+      return { ok: false as const, error: "point-unavailable" as const };
+    }
+
+    const existing = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user_point", (q) =>
+        q.eq("userId", user._id).eq("tradePointId", tradePointId)
+      )
+      .unique();
+    if (existing) return { ok: false as const, error: "already-member" as const };
+
+    if (!user.isPremium) {
+      const sample = await ctx.db
+        .query("userTradePoints")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .take(FREE_USER_MAX_POINTS + 1);
+      if (sample.length >= FREE_USER_MAX_POINTS) {
+        return { ok: false as const, error: "limit-reached" as const };
+      }
+    }
+
+    await ctx.db.insert("userTradePoints", {
+      userId: user._id,
+      tradePointId,
+      joinedAt: Date.now(),
+    });
+    await ctx.db.patch(tradePointId, {
+      participantCount: (point.participantCount ?? 0) + 1,
+    });
+    return { ok: true as const };
+  },
+});
+
+export const leave = mutation({
+  args: { tradePointId: v.id("tradePoints") },
+  returns: v.union(
+    v.object({ ok: v.literal(true) }),
+    ...authErrorValidators,
+    v.object({ ok: v.literal(false), error: v.literal("not-member") })
+  ),
+  handler: async (ctx, { tradePointId }) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return { ok: false as const, error: auth.state };
+    }
+    const user = auth.user;
+
+    const membership = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user_point", (q) =>
+        q.eq("userId", user._id).eq("tradePointId", tradePointId)
+      )
+      .unique();
+    if (!membership) {
+      return { ok: false as const, error: "not-member" as const };
+    }
+
+    // Invariante (auto-overwrite no create): no máximo 1 checkin ativo global por
+    // usuário → no máximo 1 neste ponto. .first() é exato.
+    const now = Date.now();
+    const activeCheckin = await ctx.db
+      .query("checkins")
+      .withIndex("by_user_tradePoint_active", (q) =>
+        q
+          .eq("userId", user._id)
+          .eq("tradePointId", tradePointId)
+          .gt("expiresAt", now)
+      )
+      .first();
+
+    let publicCheckinsToRemove = 0;
+    if (activeCheckin) {
+      if (activeCheckin.countedInPublic) publicCheckinsToRemove = 1;
+      await ctx.db.delete(activeCheckin._id);
+    }
+
+    await ctx.db.delete(membership._id);
+
+    const point = await ctx.db.get(tradePointId);
+    if (point) {
+      await ctx.db.patch(tradePointId, {
+        participantCount: Math.max(0, (point.participantCount ?? 0) - 1),
+        activeCheckinsCount: Math.max(
+          0,
+          (point.activeCheckinsCount ?? 0) - publicCheckinsToRemove
+        ),
+      });
+    }
+
+    return { ok: true as const };
+  },
+});

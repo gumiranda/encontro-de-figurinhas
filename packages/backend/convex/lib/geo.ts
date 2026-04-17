@@ -34,3 +34,10 @@ export function isInBrazil(lat: number, lng: number): boolean {
     lng <= BRAZIL_BOUNDS.lng.max
   );
 }
+
+export const BRAZIL_UTC_OFFSET_HOURS = -3;
+
+export function getBrazilHour(timestamp: number): number {
+  const utcHour = new Date(timestamp).getUTCHours();
+  return (utcHour + 24 + BRAZIL_UTC_OFFSET_HOURS) % 24;
+}

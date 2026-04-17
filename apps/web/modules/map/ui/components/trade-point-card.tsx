@@ -1,6 +1,6 @@
 "use client";
+import Link from "next/link";
 import { MapPin, Clock, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -76,16 +76,13 @@ export function TradePointCard({ point }: TradePointCardProps) {
         )}
       </CardContent>
       <CardFooter>
-        <Button
-          size="sm"
-          variant="outline"
-          className="w-full"
-          onClick={(e) => {
-            e.stopPropagation();
-            toast.info("Página do ponto em breve");
-          }}
-        >
-          Ver detalhes
+        <Button asChild size="sm" variant="outline" className="w-full">
+          <Link
+            href={`/points/${point._id}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            Ver detalhes
+          </Link>
         </Button>
       </CardFooter>
     </Card>

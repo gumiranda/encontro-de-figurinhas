@@ -19,6 +19,20 @@ export default defineSchema({
     reliabilityScore: v.optional(v.number()),
     totalTrades: v.optional(v.number()),
     isShadowBanned: v.optional(v.boolean()),
+    isBanned: v.optional(v.boolean()),
+
+    // Minor protection fields (PRD seguranca.md:23-25, arquitetura-tecnica.md:63-71)
+    ageGroup: v.optional(
+      v.union(
+        v.literal("child"),
+        v.literal("teen"),
+        v.literal("young"),
+        v.literal("adult")
+      )
+    ),
+    parentalConsentAt: v.optional(v.number()),
+    guardianName: v.optional(v.string()),
+    guardianEmail: v.optional(v.string()),
 
     // Sticker fields (PRD §4.3)
     duplicates: v.optional(v.array(v.number())),
@@ -88,10 +102,46 @@ export default defineSchema({
     confirmedTradesCount: v.number(),
     reportCount: v.number(),
     createdAt: v.number(),
+    participantCount: v.optional(v.number()),
+    activeCheckinsCount: v.optional(v.number()),
   })
     .index("by_city_status", ["cityId", "status"])
     .index("by_status", ["status"])
     .index("by_requestedBy", ["requestedBy"]),
+
+  userTradePoints: defineTable({
+    userId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    joinedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_tradePoint", ["tradePointId"])
+    .index("by_user_point", ["userId", "tradePointId"]),
+
+  checkins: defineTable({
+    userId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    lat: v.float64(),
+    lng: v.float64(),
+    distanceMeters: v.number(),
+    expiresAt: v.number(),
+    createdAt: v.number(),
+    countedInPublic: v.boolean(),
+  })
+    .index("by_tradePoint_active", ["tradePointId", "expiresAt"])
+    .index("by_user", ["userId"])
+    .index("by_user_active", ["userId", "expiresAt"])
+    .index("by_user_tradePoint_active", ["userId", "tradePointId", "expiresAt"])
+    .index("by_expiresAt", ["expiresAt"]),
+
+  scoreBumps: defineTable({
+    userId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    at: v.number(),
+  })
+    .index("by_user_point_time", ["userId", "tradePointId", "at"])
+    .index("by_at", ["at"])
+    .index("by_user", ["userId"]),
 
   albumConfig: defineTable({
     totalStickers: v.number(),
