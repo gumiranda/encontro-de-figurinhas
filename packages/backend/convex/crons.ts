@@ -24,4 +24,11 @@ crons.weekly(
   {}
 );
 
+crons.daily(
+  "expire pending trade points",
+  { hourUTC: 6, minuteUTC: 0 },
+  internal.tradePoints.expireStalePending,
+  {}
+);
+
 export default crons;

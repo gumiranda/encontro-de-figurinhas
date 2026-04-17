@@ -41,6 +41,8 @@ export const bootstrapSuperadmin = mutation({
       name: identity.name ?? "Superadmin",
       clerkId: identity.subject,
       role: Role.SUPERADMIN,
+      reliabilityScore: 3,
+      pendingSubmissionsCount: 0,
     });
 
     return await ctx.db.get(userId);
@@ -70,6 +72,8 @@ export const createUser = mutation({
       name: identity.name ?? "Unknown",
       clerkId: clerkId,
       role: Role.USER,
+      reliabilityScore: 3,
+      pendingSubmissionsCount: 0,
     });
 
     return await ctx.db.get(userId);

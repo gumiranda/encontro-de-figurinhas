@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MapPin, Clock, Users, Shield, ArrowRight } from "lucide-react";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@workspace/backend/_generated/api";
+import {
+  MapPin,
+  Clock,
+  Users,
+  Shield,
+  ArrowRight,
+  Share2,
+} from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -9,7 +19,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
+import {
+  Announcement,
+  AnnouncementTag,
+  AnnouncementTitle,
+} from "@workspace/ui/components/kibo-ui/announcement";
+import {
+  Pill,
+  PillIndicator,
+} from "@workspace/ui/components/kibo-ui/pill";
+import {
+  Status,
+  StatusIndicator,
+  StatusLabel,
+} from "@workspace/ui/components/kibo-ui/status";
+import { QRCode } from "@workspace/ui/components/kibo-ui/qr-code";
+import {
+  Glimpse,
+  GlimpseContent,
+  GlimpseTrigger,
+  GlimpseTitle,
+  GlimpseDescription,
+} from "@workspace/ui/components/kibo-ui/glimpse";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
@@ -24,87 +55,61 @@ interface PontoPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// TODO: Replace with actual data fetching when trade points are implemented
-async function getTradePoint(slug: string) {
-  // Placeholder data for SEO purposes
-  // This will be replaced with actual Convex query
-  const mockPoints: Record<
-    string,
-    {
-      name: string;
-      city: string;
-      state: string;
-      address: string;
-      lat: number;
-      lng: number;
-    }
-  > = {
-    "praca-da-se-sp": {
-      name: "Praça da Sé",
-      city: "São Paulo",
-      state: "SP",
-      address: "Praça da Sé, Centro, São Paulo - SP",
-      lat: -23.5505,
-      lng: -46.6333,
-    },
-    "parque-ibirapuera-sp": {
-      name: "Parque Ibirapuera",
-      city: "São Paulo",
-      state: "SP",
-      address: "Av. Pedro Álvares Cabral, Ibirapuera, São Paulo - SP",
-      lat: -23.5874,
-      lng: -46.6576,
-    },
-  };
+const loadTradePoint = cache((slug: string) =>
+  fetchQuery(api.tradePoints.getBySlug, { slug })
+);
 
-  return mockPoints[slug] || null;
-}
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function generateMetadata({
   params,
 }: PontoPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const point = await getTradePoint(slug);
+  const point = await loadTradePoint(slug);
 
-  if (!point) {
+  if (!point || !point.city) {
     return {
       title: "Ponto não encontrado",
     };
   }
 
-  return generateTradePointMetadata(point.name, slug, point.city, point.state);
-}
-
-export async function generateStaticParams() {
-  // Generate static pages for known trade points
-  // This will be expanded when trade points are implemented
-  return [
-    { slug: "praca-da-se-sp" },
-    { slug: "parque-ibirapuera-sp" },
-  ];
+  return generateTradePointMetadata(
+    point.name,
+    slug,
+    point.city.name,
+    point.city.state
+  );
 }
 
 export default async function PontoPage({ params }: PontoPageProps) {
   const { slug } = await params;
-  const point = await getTradePoint(slug);
+  const point = await loadTradePoint(slug);
 
-  if (!point) {
+  if (!point || !point.city) {
     notFound();
   }
 
+  const isActive = Date.now() - point.lastActivityAt < SEVEN_DAYS_MS;
+  const citySlug = point.city.slug;
+
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
-    { name: point.city, url: `${BASE_URL}/cidade/${point.city.toLowerCase().replace(" ", "-")}` },
+    {
+      name: point.city.name,
+      url: `${BASE_URL}/cidade/${citySlug}`,
+    },
     { name: point.name },
   ]);
 
   const localBusinessSchema = generatePlaceSchema(
     point.name,
-    point.city,
-    point.state,
+    point.city.name,
+    point.city.state,
     point.lat,
     point.lng
   );
+
+  const shareUrl = `${BASE_URL}/ponto/${slug}`;
 
   return (
     <>
@@ -125,10 +130,10 @@ export default async function PontoPage({ params }: PontoPageProps) {
                 <li>/</li>
                 <li>
                   <Link
-                    href={`/cidade/${point.city.toLowerCase().replace(" ", "-")}`}
+                    href={`/cidade/${citySlug}`}
                     className="hover:text-primary"
                   >
-                    {point.city}
+                    {point.city.name}
                   </Link>
                 </li>
                 <li>/</li>
@@ -137,18 +142,58 @@ export default async function PontoPage({ params }: PontoPageProps) {
             </nav>
 
             <div className="max-w-3xl">
-              <Badge variant="secondary" className="mb-4">
-                Ponto de Troca
-              </Badge>
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <Status status={isActive ? "online" : "offline"}>
+                  <StatusIndicator />
+                  <StatusLabel>
+                    {isActive ? "Ativo nesta semana" : "Sem atividade recente"}
+                  </StatusLabel>
+                </Status>
+                <Pill variant="secondary">
+                  <PillIndicator variant="success" />
+                  {point.confirmedTradesCount}{" "}
+                  {point.confirmedTradesCount === 1
+                    ? "troca confirmada"
+                    : "trocas confirmadas"}
+                </Pill>
+              </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
                 {point.name}
               </h1>
 
-              <div className="flex items-center gap-2 text-muted-foreground mb-6">
-                <MapPin className="h-5 w-5" />
-                <span>{point.address}</span>
-              </div>
+              <Glimpse>
+                <GlimpseTrigger asChild>
+                  <button
+                    type="button"
+                    className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <MapPin className="h-5 w-5" aria-hidden="true" />
+                    <span className="underline decoration-dotted underline-offset-4">
+                      {point.address}
+                    </span>
+                  </button>
+                </GlimpseTrigger>
+                <GlimpseContent className="w-80">
+                  <GlimpseTitle>{point.name}</GlimpseTitle>
+                  <GlimpseDescription>
+                    {point.city.name} - {point.city.state} ·{" "}
+                    {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
+                  </GlimpseDescription>
+                </GlimpseContent>
+              </Glimpse>
+
+              <Announcement
+                variant="outline"
+                className="mb-6 w-fit border-primary/30 text-primary"
+              >
+                <AnnouncementTag>
+                  <Shield className="h-3 w-3" aria-hidden="true" />
+                </AnnouncementTag>
+                <AnnouncementTitle className="text-xs">
+                  Ponto público · vá acompanhado(a) e leve apenas figurinhas
+                </AnnouncementTitle>
+              </Announcement>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild>
@@ -158,7 +203,7 @@ export default async function PontoPage({ params }: PontoPageProps) {
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link href="/arena/map">Ver no mapa</Link>
+                  <Link href="/map">Ver no mapa</Link>
                 </Button>
               </div>
             </div>
@@ -178,8 +223,8 @@ export default async function PontoPage({ params }: PontoPageProps) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    As trocas geralmente acontecem aos finais de semana, das 10h
-                    às 16h. Verifique o calendário atualizado no app.
+                    {point.suggestedHours ??
+                      "As trocas geralmente acontecem aos finais de semana, das 10h às 16h. Verifique o calendário atualizado no app."}
                   </p>
                 </CardContent>
               </Card>
@@ -193,8 +238,9 @@ export default async function PontoPage({ params }: PontoPageProps) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Este ponto reúne dezenas de colecionadores toda semana.
-                    Ótimo lugar para encontrar figurinhas raras.
+                    {point.confirmedTradesCount > 0
+                      ? `${point.confirmedTradesCount} trocas já foram confirmadas neste ponto.`
+                      : "Seja um dos primeiros a confirmar trocas neste ponto."}
                   </p>
                 </CardContent>
               </Card>
@@ -202,14 +248,20 @@ export default async function PontoPage({ params }: PontoPageProps) {
               <Card>
                 <CardHeader>
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Shield className="h-6 w-6 text-primary" />
+                    <Share2 className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle>Segurança</CardTitle>
+                  <CardTitle>Compartilhe</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Local público e movimentado, ideal para trocas seguras.
-                    Sempre vá acompanhado quando possível.
+                <CardContent className="flex flex-col items-center gap-3">
+                  <div className="rounded-lg border bg-card p-3">
+                    <QRCode
+                      data={shareUrl}
+                      className="h-32 w-32"
+                      foreground="currentColor"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Escaneie para abrir este ponto no celular.
                   </p>
                 </CardContent>
               </Card>
@@ -217,19 +269,23 @@ export default async function PontoPage({ params }: PontoPageProps) {
           </div>
         </section>
 
-        {/* SEO Content */}
+        {/* SEO Content — prose via typography wrapper */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
+            <div className="typography max-w-3xl mx-auto">
               <h2>
-                Troca de figurinhas em {point.name}, {point.city}
+                Troca de figurinhas em {point.name}, {point.city.name}
               </h2>
-              <p>
-                O {point.name} é um dos principais pontos de encontro para
-                colecionadores de figurinhas em {point.city}. Localizado em{" "}
-                {point.address}, o local oferece um ambiente seguro e
-                movimentado para realizar trocas.
-              </p>
+              {point.description ? (
+                <p>{point.description}</p>
+              ) : (
+                <p>
+                  O {point.name} é um dos principais pontos de encontro para
+                  colecionadores de figurinhas em {point.city.name}. Localizado
+                  em {point.address}, o local oferece um ambiente seguro e
+                  movimentado para realizar trocas.
+                </p>
+              )}
 
               <h3>Como participar</h3>
               <ol>

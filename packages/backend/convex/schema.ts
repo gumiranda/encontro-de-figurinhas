@@ -16,7 +16,9 @@ export default defineSchema({
     hasCompletedOnboarding: v.optional(v.boolean()),
 
     // Reputation fields (PRD §2.3)
-    reliabilityScore: v.optional(v.number()),
+    reliabilityScore: v.number(),
+    pendingSubmissionsCount: v.number(),
+    lastSubmissionAt: v.optional(v.number()),
     totalTrades: v.optional(v.number()),
     isShadowBanned: v.optional(v.boolean()),
     isBanned: v.optional(v.boolean()),
@@ -76,6 +78,7 @@ export default defineSchema({
 
   tradePoints: defineTable({
     name: v.string(),
+    slug: v.string(),
     address: v.string(),
     cityId: v.id("cities"),
     lat: v.float64(),
@@ -92,7 +95,8 @@ export default defineSchema({
       v.literal("pending"),
       v.literal("approved"),
       v.literal("suspended"),
-      v.literal("inactive")
+      v.literal("inactive"),
+      v.literal("expired")
     ),
     rejectionReason: v.optional(v.string()),
     requestedBy: v.id("users"),
@@ -107,7 +111,9 @@ export default defineSchema({
   })
     .index("by_city_status", ["cityId", "status"])
     .index("by_status", ["status"])
-    .index("by_requestedBy", ["requestedBy"]),
+    .index("by_status_createdAt", ["status", "createdAt"])
+    .index("by_requestedBy_status", ["requestedBy", "status"])
+    .index("by_slug", ["slug"]),
 
   userTradePoints: defineTable({
     userId: v.id("users"),

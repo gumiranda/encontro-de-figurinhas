@@ -41,6 +41,15 @@ const nextConfig = {
         ],
       },
       {
+        source: "/ponto/solicitar",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
+        ],
+      },
+      {
         source: "/(.*)\\.(ico|png|jpg|jpeg|gif|svg|woff|woff2|avif|webp)",
         headers: [
           {

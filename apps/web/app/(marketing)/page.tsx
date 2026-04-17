@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { isbot } from "isbot";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { HeroSection } from "@/modules/landing/ui/components/hero-section";
 import { SocialProofSection } from "@/modules/landing/ui/components/social-proof-section";
@@ -57,6 +59,21 @@ const FAQ_DATA = [
     answer:
       "Use nosso mapa interativo para encontrar pontos de troca na sua cidade. São locais públicos onde colecionadores se encontram para realizar trocas de forma segura.",
   },
+  {
+    question: "Quanto tempo leva para analisar uma sugestão de ponto de troca?",
+    answer:
+      "A análise leva de 24 a 48 horas. Nossa equipe verifica segurança do local, movimento e adequação antes de aprovar.",
+  },
+  {
+    question: "Posso sugerir qualquer local como ponto de troca?",
+    answer:
+      "Priorize locais públicos e movimentados como shoppings, praças de alimentação e parques. Evitamos pontos em residências, ruas isoladas ou estabelecimentos privados sem acesso livre.",
+  },
+  {
+    question: "Quantas sugestões de novos pontos posso enviar?",
+    answer:
+      "Usuários com Reliability Score abaixo de 5 podem ter até 2 sugestões pendentes simultaneamente. Contribuições aprovadas aumentam seu score e liberam envios ilimitados.",
+  },
 ];
 
 const HOW_TO_STEPS = [
@@ -94,8 +111,17 @@ const combinedSchema = generateCombinedSchema([
   howToSchema,
 ]);
 
-export default function LandingPage() {
-  const totalTrocas = null; // Will show "Milhares" instead of fake numbers
+export default async function LandingPage() {
+  const totalTrocas = null;
+
+  const h = await headers();
+  const ua = h.get("user-agent") ?? "";
+  const ipCity = h.get("x-vercel-ip-city");
+  const cityName = isbot(ua)
+    ? null
+    : ipCity
+      ? decodeURIComponent(ipCity)
+      : null;
 
   return (
     <>
@@ -115,7 +141,7 @@ export default function LandingPage() {
         {/* 6. FAQ - Handle objections */}
         <FAQSection faqs={FAQ_DATA} />
         {/* 7. Final CTA - Capture remainders */}
-        <FinalCTASection />
+        <FinalCTASection cityName={cityName} />
       </main>
       <LandingFooter />
     </>

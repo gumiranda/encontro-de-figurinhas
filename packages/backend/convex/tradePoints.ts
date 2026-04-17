@@ -1,8 +1,29 @@
 import { v } from "convex/values";
-import { query, internalMutation, mutation } from "./_generated/server";
+import {
+  query,
+  internalMutation,
+  mutation,
+  type MutationCtx,
+} from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { authErrorValidators, checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
+import { generateTradePointSlug } from "./lib/slug";
 import { evaluateWhatsappAccess } from "./lib/whatsapp";
+
+const RELIABILITY_UNLIMITED_THRESHOLD = 5;
+const MAX_PENDING_SUBMISSIONS = 2;
+
+async function decrementPendingCount(
+  ctx: MutationCtx,
+  userId: Id<"users">
+): Promise<void> {
+  const u = await ctx.db.get(userId);
+  if (!u || u.pendingSubmissionsCount <= 0) return;
+  await ctx.db.patch(userId, {
+    pendingSubmissionsCount: u.pendingSubmissionsCount - 1,
+  });
+}
 
 export const getMapView = query({
   args: {},
@@ -157,17 +178,37 @@ export const submitRequest = mutation({
   },
   returns: v.union(
     v.object({ ok: v.literal(true), tradePointId: v.id("tradePoints") }),
+    v.object({ ok: v.literal(true), tradePointId: v.null() }),
     ...authErrorValidators,
     v.object({ ok: v.literal(false), error: v.literal("city-mismatch") }),
     v.object({ ok: v.literal(false), error: v.literal("invalid-coordinates") }),
-    v.object({ ok: v.literal(false), error: v.literal("invalid-fields") })
+    v.object({ ok: v.literal(false), error: v.literal("invalid-fields") }),
+    v.object({ ok: v.literal(false), error: v.literal("rate-limited") })
   ),
   handler: async (ctx, args) => {
     const auth = await checkAuth(ctx);
-    if (auth.state !== "ok") {
-      return { ok: false as const, error: auth.state };
+    if (auth.state === "needs-auth") {
+      return { ok: false as const, error: "needs-auth" as const };
+    }
+    if (auth.state === "banned") {
+      return { ok: false as const, error: "banned" as const };
+    }
+    if (auth.state === "needs-onboarding") {
+      return { ok: false as const, error: "needs-onboarding" as const };
     }
     const user = auth.user;
+
+    if (user.isShadowBanned) {
+      return { ok: true as const, tradePointId: null };
+    }
+
+    if (
+      user.reliabilityScore < RELIABILITY_UNLIMITED_THRESHOLD &&
+      user.pendingSubmissionsCount >= MAX_PENDING_SUBMISSIONS
+    ) {
+      return { ok: false as const, error: "rate-limited" as const };
+    }
+
     if (!user.cityId || user.cityId !== args.cityId) {
       return { ok: false as const, error: "city-mismatch" as const };
     }
@@ -200,9 +241,11 @@ export const submitRequest = mutation({
       return { ok: false as const, error: "invalid-fields" as const };
     }
 
+    const slug = await generateTradePointSlug(ctx, trimmedName, city.slug);
     const now = Date.now();
     const tradePointId = await ctx.db.insert("tradePoints", {
       name: trimmedName,
+      slug,
       address: trimmedAddress,
       cityId: args.cityId,
       lat: args.lat,
@@ -222,7 +265,119 @@ export const submitRequest = mutation({
       activeCheckinsCount: 0,
     });
 
+    await ctx.db.patch(user._id, {
+      pendingSubmissionsCount: user.pendingSubmissionsCount + 1,
+      lastSubmissionAt: now,
+    });
+
     return { ok: true as const, tradePointId };
+  },
+});
+
+export const getSubmissionQuota = query({
+  args: {},
+  returns: v.union(
+    v.null(),
+    v.object({
+      remaining: v.number(),
+      limit: v.number(),
+      unlimited: v.boolean(),
+      lastSubmissionAt: v.union(v.number(), v.null()),
+    })
+  ),
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+    const unlimited =
+      user.reliabilityScore >= RELIABILITY_UNLIMITED_THRESHOLD;
+    return {
+      remaining: unlimited
+        ? MAX_PENDING_SUBMISSIONS
+        : Math.max(
+            0,
+            MAX_PENDING_SUBMISSIONS - user.pendingSubmissionsCount
+          ),
+      limit: MAX_PENDING_SUBMISSIONS,
+      unlimited,
+      lastSubmissionAt: user.lastSubmissionAt ?? null,
+    };
+  },
+});
+
+export const getBySlug = query({
+  args: { slug: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      name: v.string(),
+      slug: v.string(),
+      address: v.string(),
+      lat: v.float64(),
+      lng: v.float64(),
+      confirmedTradesCount: v.number(),
+      suggestedHours: v.union(v.string(), v.null()),
+      description: v.union(v.string(), v.null()),
+      lastActivityAt: v.number(),
+      city: v.union(
+        v.null(),
+        v.object({
+          name: v.string(),
+          state: v.string(),
+          slug: v.string(),
+        })
+      ),
+    })
+  ),
+  handler: async (ctx, { slug }) => {
+    const point = await ctx.db
+      .query("tradePoints")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+    if (!point || point.status !== "approved") return null;
+    const city = await ctx.db.get(point.cityId);
+    return {
+      name: point.name,
+      slug: point.slug,
+      address: point.address,
+      lat: point.lat,
+      lng: point.lng,
+      confirmedTradesCount: point.confirmedTradesCount,
+      suggestedHours: point.suggestedHours ?? null,
+      description: point.description ?? null,
+      lastActivityAt: point.lastActivityAt,
+      city: city
+        ? { name: city.name, state: city.state, slug: city.slug }
+        : null,
+    };
+  },
+});
+
+export const expireStalePending = internalMutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - THIRTY_DAYS_MS;
+    const stale = await ctx.db
+      .query("tradePoints")
+      .withIndex("by_status_createdAt", (q) =>
+        q.eq("status", "pending").lt("createdAt", cutoff)
+      )
+      .take(500);
+    for (const p of stale) {
+      await ctx.db.patch(p._id, { status: "expired" });
+      await decrementPendingCount(ctx, p.requestedBy);
+    }
+    return null;
+  },
+});
+
+export const decrementPendingOnModeration = internalMutation({
+  args: { userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
+    await decrementPendingCount(ctx, userId);
+    return null;
   },
 });
 
@@ -262,8 +417,10 @@ export const seedForCity = internalMutation({
     ];
     const jitter = () => (Math.random() - 0.5) * 0.04;
     for (const name of seedNames) {
+      const slug = await generateTradePointSlug(ctx, name, city.slug);
       await ctx.db.insert("tradePoints", {
         name,
+        slug,
         address: `Endereço ${name}, ${city.name}`,
         cityId: city._id,
         lat: city.lat + jitter(),

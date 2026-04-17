@@ -1,7 +1,12 @@
 import Link from "next/link";
-import { Rocket } from "lucide-react";
+import { Rocket, MapPinPlus } from "lucide-react";
 
-export function FinalCTASection() {
+type FinalCTASectionProps = {
+  cityName?: string | null;
+};
+
+export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
+  const suggestAnchorCity = cityName ?? "perto de você";
   return (
     <section className="px-6 py-24 bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-primary-container)]">
       <div className="max-w-3xl mx-auto text-center">
@@ -23,6 +28,15 @@ export function FinalCTASection() {
         </div>
         <p className="text-[var(--landing-on-primary)]/60 text-sm mt-6">
           Sem cartão de crédito. Cancele quando quiser.
+        </p>
+        <p className="text-[var(--landing-on-primary)]/80 text-base mt-10 font-[var(--font-body)]">
+          <Link
+            href="/ponto/solicitar"
+            className="underline decoration-2 underline-offset-4 hover:decoration-[var(--landing-on-primary)] transition-all inline-flex items-center gap-2"
+          >
+            <MapPinPlus className="w-4 h-4" aria-hidden="true" />
+            Sugerir novo ponto de troca de figurinhas {suggestAnchorCity ? `em ${suggestAnchorCity}` : "perto de você"}
+          </Link>
         </p>
       </div>
     </section>
