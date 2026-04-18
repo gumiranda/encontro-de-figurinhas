@@ -149,6 +149,27 @@ export function useStickers(debounceMs = 300) {
   const dupsRef = useRef<number[]>([]);
   const missRef = useRef<number[]>([]);
 
+  const runSerializedSave = useCallback(
+    async (payload: {
+      duplicates: number[];
+      missing: number[];
+      finalize: boolean;
+    }) => {
+      while (savePromiseRef.current) {
+        await savePromiseRef.current;
+      }
+
+      const p = updateStickerList(payload).then(() => undefined);
+      savePromiseRef.current = p;
+      p.finally(() => {
+        if (savePromiseRef.current === p) savePromiseRef.current = null;
+      });
+
+      await p;
+    },
+    [updateStickerList]
+  );
+
   useEffect(() => {
     if (!isLoading && !isDirty) {
       setLocalDuplicates(serverDuplicates);
@@ -196,22 +217,11 @@ export function useStickers(debounceMs = 300) {
       void (async () => {
         dispatch({ type: "setSaving", saving: true });
         try {
-          while (savePromiseRef.current) {
-            await savePromiseRef.current;
-          }
-
-          const p = updateStickerList({
+          await runSerializedSave({
             duplicates: dupsAtSave,
             missing: missAtSave,
             finalize: false,
-          }).then(() => undefined);
-
-          savePromiseRef.current = p;
-          p.finally(() => {
-            if (savePromiseRef.current === p) savePromiseRef.current = null;
           });
-
-          await p;
 
           if (editCountRef.current === editId) {
             dispatch({ type: "setDirty", dirty: false });
@@ -225,7 +235,7 @@ export function useStickers(debounceMs = 300) {
         }
       })();
     }, debounceMs);
-  }, [debounceMs, updateStickerList]);
+  }, [debounceMs, runSerializedSave]);
 
   useEffect(() => {
     const { duplicates: d, missing: m } = clampStickerListsToMax(
@@ -338,22 +348,11 @@ export function useStickers(debounceMs = 300) {
     dispatch({ type: "setSaving", saving: true });
 
     try {
-      while (savePromiseRef.current) {
-        await savePromiseRef.current;
-      }
-
-      const p = updateStickerList({
+      await runSerializedSave({
         duplicates: dups,
         missing: miss,
         finalize: true,
-      }).then(() => undefined);
-
-      savePromiseRef.current = p;
-      p.finally(() => {
-        if (savePromiseRef.current === p) savePromiseRef.current = null;
       });
-
-      await p;
     } catch (e) {
       const msg = getUserFacingStickerError(e);
       dispatch({ type: "setError", error: msg });
@@ -361,7 +360,7 @@ export function useStickers(debounceMs = 300) {
     } finally {
       dispatch({ type: "setSaving", saving: false });
     }
-  }, [updateStickerList]);
+  }, [runSerializedSave]);
 
   const flush = useCallback(async () => {
     if (debounceRef.current) {
@@ -373,22 +372,11 @@ export function useStickers(debounceMs = 300) {
     dispatch({ type: "setError", error: null });
 
     try {
-      while (savePromiseRef.current) {
-        await savePromiseRef.current;
-      }
-
-      const p = updateStickerList({
+      await runSerializedSave({
         duplicates: dupsRef.current,
         missing: missRef.current,
         finalize: false,
-      }).then(() => undefined);
-
-      savePromiseRef.current = p;
-      p.finally(() => {
-        if (savePromiseRef.current === p) savePromiseRef.current = null;
       });
-
-      await p;
       dispatch({ type: "setDirty", dirty: false });
     } catch (e) {
       const msg = getUserFacingStickerError(e);
@@ -397,7 +385,7 @@ export function useStickers(debounceMs = 300) {
     } finally {
       dispatch({ type: "setSaving", saving: false });
     }
-  }, [updateStickerList]);
+  }, [runSerializedSave]);
 
   const canFinalize =
     (localDuplicates.length > 0 || localMissing.length > 0) && !isSaving;
