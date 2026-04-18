@@ -6,17 +6,6 @@ interface OnboardingProgressProps {
   label?: string;
 }
 
-type SegmentState = "done" | "active" | "pending";
-
-function getSegmentState(
-  index: number,
-  currentStep: number,
-): SegmentState {
-  if (index < currentStep) return "done";
-  if (index === currentStep) return "active";
-  return "pending";
-}
-
 export function OnboardingProgress({
   currentStep,
   totalSteps,
@@ -38,16 +27,16 @@ export function OnboardingProgress({
     >
       <div className="flex gap-1.5 lg:hidden" aria-hidden="true">
         {Array.from({ length: totalSteps }, (_, i) => {
-          const state = getSegmentState(i + 1, currentStep);
+          const step = i + 1;
           return (
             <div
               key={i}
               className={cn(
                 "h-1.5 flex-1 rounded-full transition-colors",
-                state === "done" && "bg-[var(--secondary)]",
-                state === "active" &&
+                step < currentStep && "bg-[var(--secondary)]",
+                step === currentStep &&
                   "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)]",
-                state === "pending" && "bg-[var(--surface-container-high)]",
+                step > currentStep && "bg-[var(--surface-container-high)]",
               )}
             />
           );

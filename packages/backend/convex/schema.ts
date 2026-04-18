@@ -14,6 +14,8 @@ export default defineSchema({
     birthDate: v.optional(v.number()),
     cityId: v.optional(v.id("cities")),
     hasCompletedOnboarding: v.optional(v.boolean()),
+    avatarStorageId: v.optional(v.id("_storage")),
+    avatarUrl: v.optional(v.string()),
 
     // Reputation fields (PRD §2.3)
     reliabilityScore: v.number(),

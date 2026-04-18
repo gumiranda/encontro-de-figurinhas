@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { useUser } from "@clerk/nextjs";
-import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { Camera, Loader2, Sparkles, Upload } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,75 +14,44 @@ interface AvatarPickerProps {
   imageUrl?: string | null;
 }
 
-const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"] as const;
+const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"];
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-
-const CLERK_ERROR_PT_BR: Record<string, string> = {
-  image_size_limit_exceeded: "Imagem muito grande. Use até 5MB.",
-  form_param_format_invalid: "Formato de imagem inválido. Envie PNG ou JPG.",
-  request_timeout: "A conexão demorou demais. Tente novamente.",
-  authentication_invalid: "Sua sessão expirou. Faça login novamente.",
-};
+const GENERIC_ERROR = "Algo deu errado. Tente de novo.";
 
 function initialsFrom(nickname: string | undefined) {
   const clean = nickname?.trim();
   if (!clean) return "FF";
   const parts = clean.split(/[\s_]+/).filter(Boolean);
-  if (parts.length === 0) return "FF";
   if (parts.length === 1) {
-    const first = parts[0];
-    return (first ? first.slice(0, 2) : "FF").toUpperCase();
+    return (parts[0] ?? "FF").slice(0, 2).toUpperCase();
   }
   const head = parts[0]?.[0] ?? "";
   const tail = parts[parts.length - 1]?.[0] ?? "";
-  return (head + tail).toUpperCase();
+  return (head + tail).toUpperCase() || "FF";
 }
 
-function explainClerkError(err: unknown): string {
-  if (isClerkAPIResponseError(err)) {
-    if (err.status === 429) {
-      return "Muitas tentativas seguidas. Aguarde um instante.";
-    }
-    for (const apiErr of err.errors ?? []) {
-      const mapped = CLERK_ERROR_PT_BR[apiErr.code];
-      if (mapped) return mapped;
-    }
-  }
-  return "Algo deu errado. Tente de novo.";
-}
-
-async function svgToPngBlob(svg: string, size = 256): Promise<Blob> {
-  const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(svgBlob);
-  try {
-    const img = new Image();
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Falha ao carregar SVG"));
-      img.src = url;
-    });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas 2D indisponível");
-    ctx.drawImage(img, 0, 0, size, size);
-
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((b) => resolve(b), "image/png");
-    });
-    if (!blob) throw new Error("Não foi possível converter SVG para PNG");
-    return blob;
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+async function uploadToConvex(
+  uploadUrl: string,
+  payload: Blob,
+  contentType: string,
+): Promise<Id<"_storage">> {
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { "Content-Type": contentType },
+    body: payload,
+  });
+  if (!response.ok) throw new Error(`Upload falhou (${response.status})`);
+  const { storageId } = (await response.json()) as { storageId?: string };
+  if (!storageId) throw new Error("Resposta de upload inválida");
+  return storageId as Id<"_storage">;
 }
 
 export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
-  const { user } = useUser();
   const fileRef = useRef<HTMLInputElement>(null);
   const [isBusy, setIsBusy] = useState(false);
+
+  const generateUploadUrl = useMutation(api.users.generateAvatarUploadUrl);
+  const setAvatar = useMutation(api.users.setAvatar);
 
   useEffect(() => {
     void import("@dicebear/core");
@@ -92,9 +62,9 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || isBusy) return;
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type as (typeof ALLOWED_MIME_TYPES)[number])) {
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       toast.error("Envie uma imagem PNG ou JPG.");
       if (fileRef.current) fileRef.current.value = "";
       return;
@@ -105,15 +75,14 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
       return;
     }
 
-    if (!user || isBusy) return;
-
     setIsBusy(true);
     try {
-      await user.setProfileImage({ file });
-      await user.reload();
+      const uploadUrl = await generateUploadUrl();
+      const storageId = await uploadToConvex(uploadUrl, file, file.type);
+      await setAvatar({ storageId });
       toast.success("Foto atualizada.");
-    } catch (err) {
-      toast.error(explainClerkError(err));
+    } catch {
+      toast.error(GENERIC_ERROR);
     } finally {
       setIsBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -121,7 +90,7 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
   };
 
   const handleGenerate = async () => {
-    if (!user || isBusy) return;
+    if (isBusy) return;
 
     setIsBusy(true);
     try {
@@ -139,12 +108,13 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
       const svg =
         typeof result === "string" ? result : await (result as Promise<string>);
 
-      const blob = await svgToPngBlob(svg);
-      await user.setProfileImage({ file: blob });
-      await user.reload();
+      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+      const uploadUrl = await generateUploadUrl();
+      const storageId = await uploadToConvex(uploadUrl, blob, "image/svg+xml");
+      await setAvatar({ storageId });
       toast.success("Avatar gerado.");
-    } catch (err) {
-      toast.error(explainClerkError(err));
+    } catch {
+      toast.error(GENERIC_ERROR);
     } finally {
       setIsBusy(false);
     }

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@workspace/backend/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Loader2, Zap } from "lucide-react";
@@ -30,7 +30,6 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { useUser } from "@clerk/nextjs";
 import { AvatarPicker } from "./avatar-picker";
 import { NicknameInput } from "./nickname-input";
 
@@ -50,7 +49,7 @@ type CompleteProfileFormData = z.infer<typeof completeProfileSchema>;
 
 export function CompleteProfileForm() {
   const router = useRouter();
-  const { user } = useUser();
+  const currentUser = useQuery(api.users.getCurrentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNicknameAvailable, setIsNicknameAvailable] = useState<boolean | null>(null);
   const completeProfile = useMutation(api.users.completeProfile);
@@ -100,7 +99,7 @@ export function CompleteProfileForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="w-full min-w-0 space-y-8"
       >
-        <AvatarPicker nickname={currentNickname} imageUrl={user?.imageUrl} />
+        <AvatarPicker nickname={currentNickname} imageUrl={currentUser?.avatarUrl} />
 
         <div className="grid min-w-0 grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-6 md:gap-y-2">
           <FormField

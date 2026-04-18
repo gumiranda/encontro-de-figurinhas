@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { useTransition } from "react";
 import { useClerk } from "@clerk/nextjs";
 import { Loader2, LogOut } from "lucide-react";
@@ -7,27 +8,14 @@ import { Loader2, LogOut } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 
-type ButtonVariant =
-  | "default"
-  | "destructive"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | "link"
-  | "transparent"
-  | "gradient"
-  | "tertiary"
-  | "success"
-  | "warning";
-
-type ButtonSize = "default" | "sm" | "lg" | "icon";
+type ButtonProps = ComponentProps<typeof Button>;
 
 interface SignOutButtonProps {
   iconOnly?: boolean;
   redirectUrl?: string;
   label?: string;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  variant?: ButtonProps["variant"];
+  size?: ButtonProps["size"];
   className?: string;
 }
 
@@ -42,20 +30,12 @@ export function SignOutButton({
   const { signOut } = useClerk();
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = () => {
-    startTransition(async () => {
-      await signOut({ redirectUrl });
-    });
-  };
-
-  const resolvedSize: ButtonSize = iconOnly ? "icon" : size;
-
   return (
     <Button
       type="button"
       variant={variant}
-      size={resolvedSize}
-      onClick={handleClick}
+      size={iconOnly ? "icon" : size}
+      onClick={() => startTransition(() => signOut({ redirectUrl }))}
       disabled={isPending}
       aria-label={iconOnly ? label : undefined}
       className={cn(iconOnly && "rounded-full", className)}
