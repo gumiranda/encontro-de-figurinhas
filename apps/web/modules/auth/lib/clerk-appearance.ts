@@ -1,12 +1,15 @@
+import type { ComponentProps } from "react";
+import type { SignIn } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import type { Appearance } from "@clerk/types";
 import { BRAND_COLORS } from "@workspace/ui/lib/design-tokens";
+
+type ClerkAppearance = NonNullable<ComponentProps<typeof SignIn>["appearance"]>;
 
 /**
  * Tema único para Clerk alinhado ao styleguide MD3 Arena (dark).
  * Use em <SignIn appearance={clerkAuthAppearance} /> e equivalentes.
  */
-export const clerkAuthAppearance: Appearance = {
+export const clerkAuthAppearance: ClerkAppearance = {
   baseTheme: dark,
   variables: {
     colorPrimary: BRAND_COLORS.primaryDim,
