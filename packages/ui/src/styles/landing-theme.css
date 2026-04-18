@@ -144,29 +144,36 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  pointer-events: none;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(79, 243, 37, 0.35) 40deg,
-    transparent 60deg
+    rgba(79, 243, 37, 0.55) 30deg,
+    rgba(79, 243, 37, 0.18) 55deg,
+    transparent 75deg
   );
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+  will-change: transform;
   animation: radar-sweep 3s linear infinite;
 }
 .radar-sweep[data-speed="fast"] {
   animation-duration: 1.5s;
 }
 @keyframes radar-sweep {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* Prefers-reduced-motion */
+/* Prefers-reduced-motion: mantém o sweep girando mas devagar p/ preservar affordance */
 @media (prefers-reduced-motion: reduce) {
   .pulse-ring,
   .pulse-dot,
-  .bar-wave,
-  .radar-sweep {
+  .bar-wave {
     animation: none;
+  }
+  .radar-sweep {
+    animation-duration: 12s;
   }
   .btn-primary-gradient:active {
     transform: none;
