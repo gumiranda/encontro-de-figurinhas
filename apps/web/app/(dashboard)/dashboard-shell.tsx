@@ -12,6 +12,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeftRight,
   LayoutDashboard,
+  ListPlus,
   Map as MapIcon,
   MapPin,
   MapPinPlus,
@@ -100,6 +101,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       items: [
         { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         { label: "Meu Álbum", href: "/album", icon: StickyNote },
+        { label: "Cadastrar figurinhas", href: "/cadastrar-figurinhas", icon: ListPlus },
         { label: "Encontrar trocas", href: "/encontrar-trocas", icon: ArrowLeftRight },
         { label: "Mapa da arena", href: "/map", icon: MapIcon },
       ],

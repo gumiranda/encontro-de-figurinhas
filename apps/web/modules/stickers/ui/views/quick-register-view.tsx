@@ -244,7 +244,7 @@ export function QuickRegisterView() {
           </Button>
           {!canFinalize && !isSaving && (
             <p className="text-center text-xs text-on-surface-variant mt-2">
-              Preencha figurinhas repetidas E faltantes para continuar
+              Preencha figurinhas repetidas ou faltantes para continuar
             </p>
           )}
         </div>

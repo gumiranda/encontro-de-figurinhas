@@ -104,13 +104,14 @@ export const updateStickerList = mutation({
       throw new Error("Aguarde alguns segundos antes de atualizar novamente");
     }
 
-    // 4. Finalize: listas não vazias
+    // 4. Finalize: pelo menos uma lista não vazia
     if (
       args.finalize &&
-      (args.duplicates.length === 0 || args.missing.length === 0)
+      args.duplicates.length === 0 &&
+      args.missing.length === 0
     ) {
       throw new Error(
-        "Preencha figurinhas repetidas E faltantes antes de continuar"
+        "Preencha figurinhas repetidas ou faltantes antes de continuar"
       );
     }
 

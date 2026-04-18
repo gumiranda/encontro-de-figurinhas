@@ -286,8 +286,8 @@ export function useStickers(debounceMs = 300) {
       throw new Error(validationError);
     }
 
-    if (dups.length === 0 || miss.length === 0) {
-      const msg = "Preencha figurinhas repetidas E faltantes antes de continuar";
+    if (dups.length === 0 && miss.length === 0) {
+      const msg = "Preencha figurinhas repetidas ou faltantes antes de continuar";
       dispatch({ type: "setError", error: msg });
       throw new Error(msg);
     }
@@ -311,7 +311,7 @@ export function useStickers(debounceMs = 300) {
   }, [updateStickerList]);
 
   const canFinalize =
-    localDuplicates.length > 0 && localMissing.length > 0 && !isSaving;
+    (localDuplicates.length > 0 || localMissing.length > 0) && !isSaving;
 
   useEffect(() => {
     return () => {
