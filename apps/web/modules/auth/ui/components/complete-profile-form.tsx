@@ -49,6 +49,8 @@ const completeProfileSchema = z.object({
 
 type CompleteProfileFormData = z.infer<typeof completeProfileSchema>;
 
+const NICKNAME_TAKEN_MSG = "Este apelido já está em uso. Escolha outro.";
+
 export function CompleteProfileForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +68,7 @@ export function CompleteProfileForm() {
 
   const onSubmit = async (data: CompleteProfileFormData) => {
     if (isNicknameAvailable === false) {
-      toast.error("Este apelido já está em uso. Escolha outro.");
+      toast.error(NICKNAME_TAKEN_MSG);
       return;
     }
 
@@ -83,7 +85,7 @@ export function CompleteProfileForm() {
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "Nickname already taken") {
-          toast.error("Este apelido já está em uso. Escolha outro.");
+          toast.error(NICKNAME_TAKEN_MSG);
           form.setError("nickname", { message: "Apelido indisponível" });
         } else if (error.message === "City not found") {
           toast.error("Cidade não encontrada. Selecione novamente.");

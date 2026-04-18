@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { Input } from "@workspace/ui/components/input";
@@ -26,9 +26,7 @@ export function NicknameInput({
   onAvailabilityChange,
   error,
 }: NicknameInputProps) {
-  const [isChecking, setIsChecking] = useState(false);
   const debouncedValue = useDebounce(value, 500);
-  const lastCheckedRef = useRef<string>("");
 
   const shouldCheck = debouncedValue.length >= 3;
   const nicknameCheck = useQuery(
@@ -36,27 +34,17 @@ export function NicknameInput({
     shouldCheck ? { nickname: debouncedValue } : "skip"
   );
 
+  const isChecking =
+    value.length >= 3 &&
+    (value !== debouncedValue || (shouldCheck && nicknameCheck === undefined));
+
   useEffect(() => {
     if (value.length < 3) {
       onAvailabilityChange(null);
-      setIsChecking(false);
-      return;
+    } else if (nicknameCheck !== undefined && shouldCheck && value === debouncedValue) {
+      onAvailabilityChange(nicknameCheck.available);
     }
-
-    if (value !== debouncedValue) {
-      setIsChecking(true);
-    }
-  }, [value, debouncedValue, onAvailabilityChange]);
-
-  useEffect(() => {
-    if (nicknameCheck !== undefined && debouncedValue.length >= 3) {
-      if (lastCheckedRef.current !== debouncedValue) {
-        lastCheckedRef.current = debouncedValue;
-        onAvailabilityChange(nicknameCheck.available);
-      }
-      setIsChecking(false);
-    }
-  }, [nicknameCheck, debouncedValue, onAvailabilityChange]);
+  }, [value, nicknameCheck, debouncedValue, shouldCheck, onAvailabilityChange]);
 
   const renderStatusIcon = () => {
     if (value.length < 3) return null;
