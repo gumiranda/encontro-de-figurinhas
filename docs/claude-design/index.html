@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Figurinha Fácil — Redesign de Telas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/theme.css">
+</head>
+<body>
+<div class="index-page">
+  <section class="hero">
+    <div class="chip" style="margin-bottom:20px"><span class="bullet"></span><span>Design Review · 11 telas</span></div>
+    <h1>Redesign de <em>telas.</em></h1>
+    <p>Refinamento de UX e visual em todas as telas do Figurinha Fácil, usando o design system existente (MD3 dark + acentos Copa). Cada tela mostra <strong style="color:var(--on-surface)">mobile + desktop lado a lado</strong> e traz 2–3 variações como tweaks.</p>
+  </section>
+
+  <div class="index-grid">
+    <a class="index-card" href="screens/01-landing.html">
+      <span class="num">01</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--primary)">stadium</span>
+      </div>
+      <h3>Landing Page</h3>
+      <p>Página inicial pública — hero, cidades, como funciona, CTA.</p>
+      <div class="meta"><span class="pill pill-primary">Pública</span><span class="pill pill-neutral">3 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/02-auth.html">
+      <span class="num">02</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--primary)">login</span>
+      </div>
+      <h3>Autenticação</h3>
+      <p>Sign-in e sign-up com OAuth e email.</p>
+      <div class="meta"><span class="pill pill-primary">Auth</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/03-perfil.html">
+      <span class="num">03</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--tertiary)">badge</span>
+      </div>
+      <h3>Finalizar Perfil</h3>
+      <p>Onboarding: nome, avatar, WhatsApp.</p>
+      <div class="meta"><span class="pill pill-warn">Onboarding</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/04-cadastrar-figurinhas.html">
+      <span class="num">04</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--secondary)">style</span>
+      </div>
+      <h3>Cadastrar Figurinhas</h3>
+      <p>Quick entry com abas Tenho / Preciso.</p>
+      <div class="meta"><span class="pill pill-success">Core</span><span class="pill pill-neutral">3 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/05-gps.html">
+      <span class="num">05</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--primary)">my_location</span>
+      </div>
+      <h3>GPS / Localização</h3>
+      <p>Detecção de cidade automática + seleção manual.</p>
+      <div class="meta"><span class="pill pill-primary">Onboarding</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/06-mapa.html">
+      <span class="num">06</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--primary)">map</span>
+      </div>
+      <h3>Mapa da Arena</h3>
+      <p>Mapa de pontos de troca próximos.</p>
+      <div class="meta"><span class="pill pill-success">Core</span><span class="pill pill-neutral">3 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/07-ponto.html">
+      <span class="num">07</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--tertiary)">location_on</span>
+      </div>
+      <h3>Detalhe do Ponto</h3>
+      <p>Info, horários, colecionadores, ações.</p>
+      <div class="meta"><span class="pill pill-success">Core</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/08-add-ponto.html">
+      <span class="num">08</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--secondary)">add_location</span>
+      </div>
+      <h3>Sugerir Ponto</h3>
+      <p>Formulário para adicionar novo local.</p>
+      <div class="meta"><span class="pill pill-neutral">Contribuição</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/09-album.html">
+      <span class="num">09</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--primary)">grid_view</span>
+      </div>
+      <h3>Álbum</h3>
+      <p>Grid de figurinhas com status.</p>
+      <div class="meta"><span class="pill pill-success">Core</span><span class="pill pill-neutral">3 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/10-trocas.html">
+      <span class="num">10</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--secondary)">swap_horiz</span>
+      </div>
+      <h3>Encontrar Trocas</h3>
+      <p>Match de trocas potenciais.</p>
+      <div class="meta"><span class="pill pill-success">Core</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+    <a class="index-card" href="screens/11-meus-pontos.html">
+      <span class="num">11</span>
+      <div class="thumb" style="background:linear-gradient(135deg,#0d1323,#181f33);display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--tertiary)">bookmark</span>
+      </div>
+      <h3>Meus Pontos</h3>
+      <p>Pontos que o usuário frequenta.</p>
+      <div class="meta"><span class="pill pill-neutral">Perfil</span><span class="pill pill-neutral">2 variações</span></div>
+    </a>
+
+  </div>
+</div>
+</body>
+</html>

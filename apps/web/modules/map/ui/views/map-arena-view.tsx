@@ -86,7 +86,7 @@ export function MapArenaView() {
         </header>
 
         <div>
-          <section className="relative">
+          <section className="relative isolate">
             {isReady && mapCenter ? (
               <MemoMapView
                 center={mapCenter}

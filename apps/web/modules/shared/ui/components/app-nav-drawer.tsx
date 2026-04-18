@@ -2,7 +2,12 @@
 
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
-import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
@@ -149,6 +154,7 @@ export function AppNavDrawer({
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
+        <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
         <AppSidebarContent
           groups={groups}
           pathname={pathname}
