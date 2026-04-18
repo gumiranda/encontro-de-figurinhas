@@ -10,9 +10,10 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Menu, MapPinPlus, ArrowRight } from "lucide-react";
+import { MapPinPlus, ArrowRight } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Heading, Text } from "@workspace/ui/components/typography";
+import { AppNavDrawer } from "@/modules/shared/ui/components/app-nav-drawer";
 import { useArenaMap } from "../../lib/use-arena-map";
 import { TradePointCard } from "../components/trade-point-card";
 
@@ -69,9 +70,7 @@ export function MapArenaView() {
       <main className="relative flex min-h-[100dvh] flex-col bg-background text-foreground">
         <header className="sticky top-0 z-50 flex items-center justify-between bg-background/80 px-6 pt-[max(theme(spacing.4),env(safe-area-inset-top))] pb-4 backdrop-blur-xl">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" aria-label="Abrir menu">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <AppNavDrawer />
             <div className="flex flex-col">
               <Text
                 variant="small"
