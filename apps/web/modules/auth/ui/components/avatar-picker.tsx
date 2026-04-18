@@ -26,8 +26,8 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
   const initials = initialsFrom(nickname);
 
   return (
-    <div className="flex items-center gap-6">
-      <div className="relative">
+    <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+      <div className="relative shrink-0">
         <div
           className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)]"
           aria-hidden={imageUrl ? undefined : "true"}
@@ -51,11 +51,11 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
         </button>
       </div>
 
-      <div className="space-y-2">
+      <div className="min-w-0 flex-1 space-y-2">
         <p className="font-[var(--font-headline)] text-sm font-bold uppercase tracking-wider text-[var(--on-surface)]">
           Seu avatar
         </p>
-        <p className="text-sm text-[var(--on-surface-variant)]">
+        <p className="break-words text-sm text-[var(--on-surface-variant)]">
           {imageUrl
             ? "Foto sincronizada com sua conta."
             : "Usaremos suas iniciais até você subir uma foto."}
@@ -65,10 +65,10 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
           variant="ghost"
           size="sm"
           disabled
-          className="h-auto p-0 text-xs uppercase tracking-wider text-[var(--primary)]/70"
+          className="h-auto min-w-0 shrink justify-start whitespace-normal p-0 text-left text-xs uppercase tracking-wider text-[var(--primary)]/70"
           aria-label="Gerar avatar (em breve)"
         >
-          <Sparkles className="mr-1 size-3.5" /> Gerar avatar (em breve)
+          <Sparkles className="mr-1 size-3.5 shrink-0" /> Gerar avatar (em breve)
         </Button>
       </div>
     </div>

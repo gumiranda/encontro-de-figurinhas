@@ -96,82 +96,93 @@ export function CompleteProfileForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full min-w-0 space-y-8"
+      >
         <AvatarPicker nickname={currentNickname} imageUrl={user?.imageUrl} />
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid min-w-0 grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-6 md:gap-y-2">
           <FormField
             control={form.control}
             name="nickname"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">
+              <FormItem className="contents">
+                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)] md:col-start-1 md:row-start-1 md:self-end">
                   @username
                 </FormLabel>
-                <FormControl>
-                  <NicknameInput
-                    value={field.value}
-                    onChange={field.onChange}
-                    onAvailabilityChange={setIsNicknameAvailable}
-                    error={form.formState.errors.nickname?.message}
-                  />
-                </FormControl>
-                <FormMessage />
+                <div className="md:col-start-1 md:row-start-2">
+                  <FormControl>
+                    <NicknameInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      onAvailabilityChange={setIsNicknameAvailable}
+                      error={form.formState.errors.nickname?.message}
+                    />
+                  </FormControl>
+                </div>
+                <div className="md:col-start-1 md:row-start-3">
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
 
-        <FormField
-          control={form.control}
-          name="birthDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">
-                Data de Nascimento
-              </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full h-14 bg-[var(--surface-container-highest)] dark:bg-[var(--surface-container-highest)] border-none rounded text-left font-body font-normal px-4 justify-between hover:bg-[var(--surface-container-highest)] hover:text-[var(--on-surface)] dark:hover:bg-[var(--surface-container-highest)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40 focus-visible:border-transparent",
-                        !field.value && "text-[var(--outline)]"
-                      )}
-                    >
-                      {field.value ? (
-                        <span className="text-[var(--on-surface)]">
-                          {format(field.value, "dd/MM/yyyy", { locale: ptBR })}
-                        </span>
-                      ) : (
-                        <span>dd/mm/aaaa</span>
-                      )}
-                      <CalendarIcon className="h-5 w-5 text-[var(--on-surface-variant)]" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    defaultMonth={new Date(2000, 0)}
-                    captionLayout="dropdown"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                  />
-                </PopoverContent>
-              </Popover>
-              <p className="text-[var(--outline)] text-xs mt-1 px-1">
-                Apenas para maiores de 18 anos.
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem className="contents">
+                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)] md:col-start-2 md:row-start-1 md:self-end">
+                  Data de Nascimento
+                </FormLabel>
+                <div className="md:col-start-2 md:row-start-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="ghost"
+                          className={cn(
+                            "w-full h-14 bg-[var(--surface-container-highest)] dark:bg-[var(--surface-container-highest)] border-none rounded text-left font-body font-normal px-4 justify-between hover:bg-[var(--surface-container-highest)] hover:text-[var(--on-surface)] dark:hover:bg-[var(--surface-container-highest)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40 focus-visible:border-transparent",
+                            !field.value && "text-[var(--outline)]"
+                          )}
+                        >
+                          {field.value ? (
+                            <span className="text-[var(--on-surface)]">
+                              {format(field.value, "dd/MM/yyyy", { locale: ptBR })}
+                            </span>
+                          ) : (
+                            <span>dd/mm/aaaa</span>
+                          )}
+                          <CalendarIcon className="h-5 w-5 text-[var(--on-surface-variant)]" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        defaultMonth={new Date(2000, 0)}
+                        captionLayout="dropdown"
+                        fromYear={1920}
+                        toYear={new Date().getFullYear()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-1 px-1 md:col-start-2 md:row-start-3">
+                  <p className="text-xs text-[var(--outline)]">
+                    Apenas para maiores de 18 anos.
+                  </p>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="pt-4">
@@ -188,7 +199,7 @@ export function CompleteProfileForm() {
                   />
                 </FormControl>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <FormLabel className="block w-full cursor-pointer text-sm font-normal leading-relaxed text-[var(--on-surface-variant)]">
+                  <FormLabel className="block w-full min-w-0 cursor-pointer break-words text-sm font-normal leading-relaxed text-[var(--on-surface-variant)]">
                     Concordo com os{" "}
                     <span className="text-[var(--primary)] underline cursor-pointer">
                       Termos da Arena
@@ -220,12 +231,12 @@ export function CompleteProfileForm() {
               </>
             )}
           </Button>
-          <div className="flex items-center justify-center mt-6 gap-2">
-            <div className="h-[1px] w-8 bg-[var(--outline-variant)]/30" />
-            <p className="text-[10px] text-[var(--outline)] uppercase tracking-widest font-bold">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-1">
+            <div className="h-px w-8 shrink-0 bg-[var(--outline-variant)]/30" />
+            <p className="max-w-full text-center text-[10px] font-bold uppercase tracking-widest text-[var(--outline)]">
               Protocolo de Segurança Ativo
             </p>
-            <div className="h-[1px] w-8 bg-[var(--outline-variant)]/30" />
+            <div className="h-px w-8 shrink-0 bg-[var(--outline-variant)]/30" />
           </div>
         </div>
       </form>

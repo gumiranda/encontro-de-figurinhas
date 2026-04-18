@@ -78,7 +78,7 @@ export function NicknameInput({
   }, [value.length, nicknameCheck, debouncedValue, onAvailabilityChange]);
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <div className="relative">
         <Input
           type="text"

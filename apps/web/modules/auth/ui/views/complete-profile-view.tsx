@@ -45,11 +45,11 @@ export function CompleteProfileView() {
   }
 
   return (
-    <main className="relative grid min-h-screen bg-background stadium-gradient lg:grid-cols-[340px_1fr]">
+    <main className="relative grid min-h-screen min-w-0 bg-background stadium-gradient lg:grid-cols-[340px_1fr]">
       <OnboardingStepper currentStep={2} />
 
-      <div className="flex flex-col">
-        <header className="flex items-center justify-between px-6 py-6">
+      <div className="flex min-w-0 flex-col overflow-x-clip">
+        <header className="flex min-w-0 items-center justify-between gap-3 px-6 py-6">
           <Button
             variant="ghost"
             className="group flex items-center gap-2 p-0 text-[var(--on-surface)] hover:text-[var(--primary)]"
@@ -58,7 +58,7 @@ export function CompleteProfileView() {
             <ArrowLeft className="h-6 w-6" />
             <span className="font-label text-sm font-medium">Voltar</span>
           </Button>
-          <span className="text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
+          <span className="shrink-0 text-right text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
             Passo 02 / 03
           </span>
         </header>
@@ -76,12 +76,12 @@ export function CompleteProfileView() {
           </div>
         </div>
 
-        <section className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pb-12 pt-8 lg:px-10">
-          <div className="mb-8">
+        <section className="mx-auto flex w-full min-w-0 max-w-[560px] flex-1 flex-col px-6 pb-12 pt-8 lg:px-10">
+          <div className="mb-8 min-w-0">
             <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--on-surface)] lg:text-4xl">
               Como te chamamos?
             </h1>
-            <p className="mt-3 text-[var(--on-surface-variant)]">
+            <p className="mt-3 break-words text-pretty text-[var(--on-surface-variant)]">
               Escolha seu nome e @username. Eles vão aparecer para outros
               colecionadores quando você agendar trocas.
             </p>
