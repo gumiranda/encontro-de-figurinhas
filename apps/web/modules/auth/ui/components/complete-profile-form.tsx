@@ -51,7 +51,6 @@ export function CompleteProfileForm() {
   const router = useRouter();
   const currentUser = useQuery(api.users.getCurrentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isNicknameAvailable, setIsNicknameAvailable] = useState<boolean | null>(null);
   const completeProfile = useMutation(api.users.completeProfile);
 
   const form = useForm<CompleteProfileFormData>({
@@ -65,11 +64,6 @@ export function CompleteProfileForm() {
   const currentNickname = form.watch("nickname");
 
   const onSubmit = async (data: CompleteProfileFormData) => {
-    if (isNicknameAvailable === false) {
-      toast.error("Este apelido já está em uso. Escolha outro.");
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       await completeProfile({
@@ -115,7 +109,7 @@ export function CompleteProfileForm() {
                     <NicknameInput
                       value={field.value}
                       onChange={field.onChange}
-                      onAvailabilityChange={setIsNicknameAvailable}
+                      onBlur={field.onBlur}
                       error={form.formState.errors.nickname?.message}
                     />
                   </FormControl>
@@ -215,7 +209,7 @@ export function CompleteProfileForm() {
         <div className="pt-8">
           <Button
             type="submit"
-            disabled={isSubmitting || isNicknameAvailable === false}
+            disabled={isSubmitting}
             className="w-full h-16 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (

@@ -64,6 +64,18 @@
   --outline: oklch(0.5 0 0);
   --outline-variant: oklch(0.75 0 0);
 
+  /* Landing/onboarding — alias MD3 tokens */
+  --landing-primary: var(--primary);
+  --landing-on-primary: var(--primary-foreground);
+  --landing-secondary: var(--secondary);
+  --landing-on-secondary: var(--secondary-foreground);
+  --landing-surface-container-low: var(--surface-container-low);
+  --landing-surface-container: var(--surface-container);
+  --landing-surface-container-high: var(--surface-container-high);
+  --landing-on-surface: var(--on-surface);
+  --landing-on-surface-variant: var(--on-surface-variant);
+  --landing-outline-variant: var(--outline-variant);
+
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm:
@@ -137,6 +149,18 @@
   /* MD3 Outline — WCAG AA: #9499ad on #090e1c = 6.80 */
   --outline: #9499ad;
   --outline-variant: #434759;
+
+  /* Landing/onboarding — alias MD3 tokens */
+  --landing-primary: var(--primary);
+  --landing-on-primary: var(--on-primary);
+  --landing-secondary: var(--secondary);
+  --landing-on-secondary: var(--on-secondary);
+  --landing-surface-container-low: var(--surface-container-low);
+  --landing-surface-container: var(--surface-container);
+  --landing-surface-container-high: var(--surface-container-high);
+  --landing-on-surface: var(--on-surface);
+  --landing-on-surface-variant: var(--on-surface-variant);
+  --landing-outline-variant: var(--outline-variant);
 
   --muted: #1e253b;
   --muted-foreground: #a6aabf;
