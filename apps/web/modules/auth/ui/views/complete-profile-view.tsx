@@ -50,22 +50,20 @@ export function CompleteProfileView() {
       <OnboardingStepper currentStep={2} />
 
       <div className="flex min-w-0 flex-col overflow-x-clip">
-        <header className="flex min-w-0 items-center justify-between gap-3 px-6 py-6">
+        <header className="flex min-w-0 items-center gap-2 px-4 py-6 sm:px-6">
           <Button
             variant="ghost"
-            className="group flex items-center gap-2 p-0 text-[var(--on-surface)] hover:text-[var(--primary)]"
+            className="group shrink-0 flex items-center gap-2 p-0 text-[var(--on-surface)] hover:text-[var(--primary)]"
             onClick={() => router.back()}
           >
-            <ArrowLeft className="h-6 w-6" />
+            <ArrowLeft className="h-6 w-6 shrink-0" />
             <span className="font-label text-sm font-medium">Voltar</span>
           </Button>
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="lg:hidden">
-              <SignOutButton variant="outline" size="default" />
-            </div>
-            <span className="text-right text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
-              Passo 02 / 03
-            </span>
+          <p className="min-w-0 flex-1 truncate text-center text-xs uppercase tracking-widest text-[var(--on-surface-variant)] lg:text-right">
+            Passo 02 / 03
+          </p>
+          <div className="shrink-0 lg:hidden">
+            <SignOutButton iconOnly variant="outline" label="Sair da conta" />
           </div>
         </header>
 
