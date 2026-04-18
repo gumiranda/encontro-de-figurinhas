@@ -34,6 +34,10 @@ export function StickerQuickInput({
     () => buildSectionLookup(sections),
     [sections]
   );
+  const totalStickers = useMemo(
+    () => sections.reduce((max, section) => Math.max(max, section.endNumber), 0),
+    [sections]
+  );
 
   useEffect(() => {
     if (!feedback) return;
@@ -44,7 +48,7 @@ export function StickerQuickInput({
   const handleSubmit = () => {
     if (!inputValue.trim()) return;
 
-    const result = parseStickers(inputValue, sectionLookup);
+    const result = parseStickers(inputValue, sectionLookup, totalStickers);
 
     if (result.valid.length > 0) {
       onAdd(result.valid);

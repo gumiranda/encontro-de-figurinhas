@@ -15,8 +15,34 @@ import { buildSectionLookup, type Section } from "./sticker-parser";
 
 const EMPTY_SECTIONS: Section[] = [];
 const EMPTY_NUMBERS: number[] = [];
+const RETRY_SOON_ERROR = "Aguarde alguns segundos antes de tentar novamente.";
+const GENERIC_SAVE_ERROR = "Erro ao salvar. Tente novamente.";
 
 export type ListKind = "duplicates" | "missing";
+
+function getUserFacingStickerError(
+  error: unknown,
+  fallback = GENERIC_SAVE_ERROR
+): string {
+  const rawMessage = error instanceof Error ? error.message : String(error ?? "");
+  const message = rawMessage.trim();
+
+  if (!message) return fallback;
+
+  if (message.includes("Aguarde alguns segundos antes de atualizar novamente")) {
+    return RETRY_SOON_ERROR;
+  }
+
+  if (
+    message.includes("[CONVEX") ||
+    message.includes("Server Error") ||
+    message.includes("Called by client")
+  ) {
+    return fallback;
+  }
+
+  return message;
+}
 
 function validateDisjoint(dups: number[], miss: number[]): string | null {
   const dupSet = new Set(dups);
@@ -177,8 +203,9 @@ export function useStickers(debounceMs = 300) {
           }
         })
         .catch((e) => {
-          dispatch({ type: "setError", error: e.message });
-          toast.error("Erro ao salvar. Tente novamente.");
+          const msg = getUserFacingStickerError(e);
+          dispatch({ type: "setError", error: msg });
+          toast.error(msg);
         })
         .finally(() => {
           dispatch({ type: "setSaving", saving: false });
@@ -302,9 +329,9 @@ export function useStickers(debounceMs = 300) {
         finalize: true,
       });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Erro ao salvar";
+      const msg = getUserFacingStickerError(e);
       dispatch({ type: "setError", error: msg });
-      throw e;
+      throw new Error(msg);
     } finally {
       dispatch({ type: "setSaving", saving: false });
     }
