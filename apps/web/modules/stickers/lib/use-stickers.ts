@@ -143,6 +143,7 @@ export function useStickers(debounceMs = 300) {
   const updateStickerList = useMutation(api.stickers.updateStickerList);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const savePromiseRef = useRef<Promise<void> | null>(null);
   const editCountRef = useRef(0);
 
   const dupsRef = useRef<number[]>([]);
@@ -177,6 +178,7 @@ export function useStickers(debounceMs = 300) {
     }
 
     debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
       const dupsAtSave = dupsRef.current;
       const missAtSave = missRef.current;
 
@@ -191,25 +193,37 @@ export function useStickers(debounceMs = 300) {
       }
       dispatch({ type: "setError", error: null });
 
-      dispatch({ type: "setSaving", saving: true });
-      updateStickerList({
-        duplicates: dupsAtSave,
-        missing: missAtSave,
-        finalize: false,
-      })
-        .then(() => {
+      void (async () => {
+        dispatch({ type: "setSaving", saving: true });
+        try {
+          while (savePromiseRef.current) {
+            await savePromiseRef.current;
+          }
+
+          const p = updateStickerList({
+            duplicates: dupsAtSave,
+            missing: missAtSave,
+            finalize: false,
+          }).then(() => undefined);
+
+          savePromiseRef.current = p;
+          p.finally(() => {
+            if (savePromiseRef.current === p) savePromiseRef.current = null;
+          });
+
+          await p;
+
           if (editCountRef.current === editId) {
             dispatch({ type: "setDirty", dirty: false });
           }
-        })
-        .catch((e) => {
+        } catch (e) {
           const msg = getUserFacingStickerError(e);
           dispatch({ type: "setError", error: msg });
           toast.error(msg);
-        })
-        .finally(() => {
+        } finally {
           dispatch({ type: "setSaving", saving: false });
-        });
+        }
+      })();
     }, debounceMs);
   }, [debounceMs, updateStickerList]);
 
@@ -302,6 +316,7 @@ export function useStickers(debounceMs = 300) {
   const finalize = useCallback(async () => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
+      debounceRef.current = null;
     }
 
     const dups = dupsRef.current;
@@ -323,15 +338,62 @@ export function useStickers(debounceMs = 300) {
     dispatch({ type: "setSaving", saving: true });
 
     try {
-      await updateStickerList({
+      while (savePromiseRef.current) {
+        await savePromiseRef.current;
+      }
+
+      const p = updateStickerList({
         duplicates: dups,
         missing: miss,
         finalize: true,
+      }).then(() => undefined);
+
+      savePromiseRef.current = p;
+      p.finally(() => {
+        if (savePromiseRef.current === p) savePromiseRef.current = null;
       });
+
+      await p;
     } catch (e) {
       const msg = getUserFacingStickerError(e);
       dispatch({ type: "setError", error: msg });
       throw new Error(msg);
+    } finally {
+      dispatch({ type: "setSaving", saving: false });
+    }
+  }, [updateStickerList]);
+
+  const flush = useCallback(async () => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+
+    dispatch({ type: "setSaving", saving: true });
+    dispatch({ type: "setError", error: null });
+
+    try {
+      while (savePromiseRef.current) {
+        await savePromiseRef.current;
+      }
+
+      const p = updateStickerList({
+        duplicates: dupsRef.current,
+        missing: missRef.current,
+        finalize: false,
+      }).then(() => undefined);
+
+      savePromiseRef.current = p;
+      p.finally(() => {
+        if (savePromiseRef.current === p) savePromiseRef.current = null;
+      });
+
+      await p;
+      dispatch({ type: "setDirty", dirty: false });
+    } catch (e) {
+      const msg = getUserFacingStickerError(e);
+      dispatch({ type: "setError", error: msg });
+      toast.error(msg);
     } finally {
       dispatch({ type: "setSaving", saving: false });
     }
@@ -438,6 +500,7 @@ export function useStickers(debounceMs = 300) {
     addMissing,
     removeMissing,
     finalize,
+    flush,
 
     markAllInSection,
     clearSection,
