@@ -1,5 +1,5 @@
-import { Check, Landmark } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { Check, Landmark } from "lucide-react";
 
 import { SignOutButton } from "./sign-out-button";
 
@@ -32,7 +32,10 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
           className="flex size-9 items-center justify-center rounded-xl bg-[var(--landing-primary)]"
           aria-hidden="true"
         >
-          <Landmark className="size-5 text-[var(--landing-on-primary)]" strokeWidth={2.5} />
+          <Landmark
+            className="size-5 text-[var(--landing-on-primary)]"
+            strokeWidth={2.5}
+          />
         </span>
         <span className="text-lg font-bold text-[var(--landing-on-surface)] [font-family:var(--font-headline)]">
           Figurinha Fácil
@@ -53,7 +56,7 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
               className={cn(
                 "flex gap-3 rounded-xl p-4 transition-colors",
                 state === "active" &&
-                  "border border-[var(--landing-outline-variant)] bg-[var(--landing-surface-container)]",
+                  "border border-[var(--landing-outline-variant)] bg-[var(--landing-surface-container)]"
               )}
             >
               <span
@@ -65,7 +68,7 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
                   state === "active" &&
                     "bg-[var(--landing-primary)] text-[var(--landing-on-primary)]",
                   state === "done" &&
-                    "bg-[var(--landing-secondary)] text-[var(--landing-on-secondary)]",
+                    "bg-[var(--landing-secondary)] text-[var(--landing-on-secondary)]"
                 )}
               >
                 {state === "done" ? (
@@ -78,7 +81,9 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
                 <div className="text-sm font-semibold text-[var(--landing-on-surface)] [font-family:var(--font-headline)]">
                   {step.title}
                 </div>
-                <div className="text-xs text-[var(--landing-on-surface-variant)]">{step.description}</div>
+                <div className="text-xs text-[var(--landing-on-surface-variant)]">
+                  {step.description}
+                </div>
               </div>
             </li>
           );
