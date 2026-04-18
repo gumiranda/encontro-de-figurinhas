@@ -46,21 +46,21 @@ export const FEATURES = [
     icon: "shield",
     title: "Troca Segura",
     description: "Validamos os pontos de encontro para garantir que você esteja em locais movimentados e monitorados.",
-    colorClass: "text-[var(--landing-primary)] bg-[var(--landing-primary)]/10",
+    colorClass: "text-[var(--primary)] bg-[var(--primary)]/10",
   },
   {
     id: "map",
     icon: "map",
     title: "Mapa de Calor",
     description: "Veja em tempo real onde estão as figurinhas que você mais precisa na sua região.",
-    colorClass: "text-[var(--landing-secondary)] bg-[var(--landing-secondary)]/10",
+    colorClass: "text-[var(--secondary)] bg-[var(--secondary)]/10",
   },
   {
     id: "match",
     icon: "zap",
     title: "Match Instantâneo",
     description: "Nosso algoritmo conecta você diretamente com quem tem o que você procura e quer o que você tem.",
-    colorClass: "text-[var(--landing-tertiary)] bg-[var(--landing-tertiary)]/10",
+    colorClass: "text-[var(--tertiary)] bg-[var(--tertiary)]/10",
   },
 ];
 

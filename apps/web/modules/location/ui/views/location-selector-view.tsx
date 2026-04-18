@@ -95,9 +95,9 @@ export function LocationSelectorView({
   }, [viewState, locationSource, cities, selectedCityId]);
 
   return (
-    <main className="landing-theme relative flex min-h-screen flex-col bg-[var(--landing-background)]">
+    <main className="relative flex min-h-screen flex-col bg-background">
       <header
-        className="fixed top-0 w-full z-50 flex items-center gap-3 px-6 min-h-16 bg-[var(--landing-background)]"
+        className="fixed top-0 w-full z-50 flex items-center gap-3 px-6 min-h-16 bg-[var(--background)]"
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
           boxShadow: "0 25px 50px -12px rgba(149, 170, 255, 0.1)",
@@ -107,14 +107,14 @@ export function LocationSelectorView({
           type="button"
           variant="ghost"
           size="icon"
-          className="text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
+          className="text-[var(--on-surface)] hover:text-[var(--primary)]"
           onClick={handleBack}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <Heading
           level={1}
-          className="font-headline font-bold tracking-tighter uppercase text-lg text-[var(--landing-primary)]"
+          className="font-headline font-bold tracking-tighter uppercase text-lg text-[var(--primary)]"
         >
           figurinha fácil
         </Heading>
@@ -127,7 +127,7 @@ export function LocationSelectorView({
         {citiesError && (
           <div
             role="alert"
-            className="mb-4 flex gap-2 rounded-lg border border-[var(--landing-tertiary)]/50 bg-[var(--landing-tertiary)]/10 p-4 text-[var(--landing-tertiary)]"
+            className="mb-4 flex gap-2 rounded-lg border border-[var(--tertiary)]/50 bg-[var(--tertiary)]/10 p-4 text-[var(--tertiary)]"
           >
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <div className="text-sm space-y-1 min-w-0">
@@ -145,9 +145,9 @@ export function LocationSelectorView({
         {!citiesError && cities.length === 0 && (
           <div
             role="status"
-            className="mb-4 flex gap-2 rounded-lg border border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container-high)] p-4 text-[var(--landing-on-surface)]"
+            className="mb-4 flex gap-2 rounded-lg border border-[var(--outline-variant)]/30 bg-[var(--surface-container-high)] p-4 text-[var(--on-surface)]"
           >
-            <Info className="h-4 w-4 shrink-0 mt-0.5 text-[var(--landing-on-surface-variant)]" />
+            <Info className="h-4 w-4 shrink-0 mt-0.5 text-[var(--on-surface-variant)]" />
             <div className="text-sm space-y-1 min-w-0">
               <Text variant="small" className="font-normal">
                 Ainda não há cidades na lista para sugestões automáticas. Use a

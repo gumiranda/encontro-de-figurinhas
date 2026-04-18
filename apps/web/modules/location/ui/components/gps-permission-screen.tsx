@@ -49,13 +49,13 @@ export function GpsPermissionScreen({
       <div className="relative z-10 max-w-md text-center">
         <Heading
           level={2}
-          className="border-0 pb-0 mb-4 font-headline text-3xl font-bold uppercase tracking-tight text-[var(--landing-on-surface)]"
+          className="border-0 pb-0 mb-4 font-headline text-3xl font-bold uppercase tracking-tight text-[var(--on-surface)]"
         >
           Encontre seu <span className="sm:hidden"><br /></span>ponto de troca
         </Heading>
         <Text
           variant="p"
-          className="mb-8 text-base text-[var(--landing-on-surface-variant)] leading-relaxed [&:not(:first-child)]:mt-0"
+          className="mb-8 text-base text-[var(--on-surface-variant)] leading-relaxed [&:not(:first-child)]:mt-0"
         >
           Para mostrar os pontos de troca mais próximos em tempo real, precisamos acessar sua localização.
         </Text>
@@ -63,22 +63,22 @@ export function GpsPermissionScreen({
         {hasStatusMessage && (
           <div aria-live="polite" role="status" className="mb-4">
             {status === "timeout" && (
-              <Text variant="small" className="font-normal text-[var(--landing-tertiary)]">
+              <Text variant="small" className="font-normal text-[var(--tertiary)]">
                 GPS demorou. Tente novamente ou busque manualmente.
               </Text>
             )}
             {status === "denied" && (
-              <Text variant="small" className="font-normal text-[var(--landing-on-surface-variant)]">
+              <Text variant="small" className="font-normal text-[var(--on-surface-variant)]">
                 Localização negada. Libere nas configurações ou busque manualmente.
               </Text>
             )}
             {status === "unavailable" && (
-              <Text variant="small" className="font-normal text-[var(--landing-tertiary)]">
+              <Text variant="small" className="font-normal text-[var(--tertiary)]">
                 GPS não disponível no seu dispositivo.
               </Text>
             )}
             {status === "granted" && detectedCityLabel && (
-              <Text variant="small" className="font-normal text-[var(--landing-secondary)]">
+              <Text variant="small" className="font-normal text-[var(--secondary)]">
                 Cidade sugerida: <span className="font-semibold">{detectedCityLabel}</span>.
                 Confirme abaixo ou troque manualmente.
               </Text>
@@ -105,13 +105,13 @@ export function GpsPermissionScreen({
             type="button"
             variant="outline"
             onClick={onSkipToManual}
-            className="h-14 w-full rounded-xl border-[var(--landing-outline-variant)]/30 bg-transparent text-[var(--landing-on-surface)] font-headline font-semibold uppercase tracking-wide text-sm hover:border-[var(--landing-outline)]/50 hover:bg-transparent"
+            className="h-14 w-full rounded-xl border-[var(--outline-variant)]/30 bg-transparent text-[var(--on-surface)] font-headline font-semibold uppercase tracking-wide text-sm hover:border-[var(--outline)]/50 hover:bg-transparent"
           >
             Buscar manualmente
           </Button>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-2 text-[var(--landing-on-surface-variant)]/60">
+        <div className="mt-8 flex items-center justify-center gap-2 text-[var(--on-surface-variant)]/60">
           <Info className="h-4 w-4" />
           <Text variant="small" className="font-normal uppercase tracking-widest text-xs">
             Você pode mudar isso a qualquer momento

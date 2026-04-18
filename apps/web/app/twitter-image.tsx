@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BRAND_GRADIENTS } from "@workspace/ui/lib/design-tokens";
 
 export const runtime = "edge";
 
@@ -20,7 +21,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #3C82F6 0%, #1E40AF 100%)",
+          background: BRAND_GRADIENTS.primary,
           fontFamily: "system-ui, sans-serif",
         }}
       >

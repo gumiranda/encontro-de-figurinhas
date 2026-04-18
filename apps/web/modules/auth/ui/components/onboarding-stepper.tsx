@@ -31,21 +31,21 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
   return (
     <aside
       aria-label="Progresso do onboarding"
-      className="hidden border-r border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container-low)] p-8 lg:block"
+      className="hidden border-r border-[var(--outline-variant)]/30 bg-[var(--surface-container-low)] p-8 lg:block"
     >
       <div className="flex items-center gap-3 pb-10">
         <span
-          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-primary-dim)]"
+          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dim)]"
           aria-hidden="true"
         >
-          <Landmark className="size-5 text-[var(--landing-on-primary)]" strokeWidth={2.5} />
+          <Landmark className="size-5 text-[var(--on-primary)]" strokeWidth={2.5} />
         </span>
-        <span className="font-[var(--font-headline)] text-lg font-bold text-[var(--landing-on-surface)]">
+        <span className="font-[var(--font-headline)] text-lg font-bold text-[var(--on-surface)]">
           Figurinha Fácil
         </span>
       </div>
 
-      <p className="mb-4 text-xs uppercase tracking-widest text-[var(--landing-on-surface-variant)]">
+      <p className="mb-4 text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
         Onboarding
       </p>
 
@@ -56,11 +56,11 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
             className={cn(
               "flex items-center gap-3 rounded-xl border p-4 transition-colors",
               step.state === "done" &&
-                "border-[var(--landing-secondary)]/30 bg-[var(--landing-secondary)]/10 text-[var(--landing-secondary)]",
+                "border-[var(--secondary)]/30 bg-[var(--secondary)]/10 text-[var(--secondary)]",
               step.state === "active" &&
-                "border-[var(--landing-primary)]/40 bg-[var(--landing-primary)]/10 text-[var(--landing-on-surface)]",
+                "border-[var(--primary)]/40 bg-[var(--primary)]/10 text-[var(--on-surface)]",
               step.state === "pending" &&
-                "border-[var(--landing-outline-variant)]/30 text-[var(--landing-on-surface-variant)]",
+                "border-[var(--outline-variant)]/30 text-[var(--on-surface-variant)]",
             )}
           >
             <span
@@ -68,11 +68,11 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
               className={cn(
                 "flex size-7 items-center justify-center rounded-full font-bold",
                 step.state === "done" &&
-                  "bg-[var(--landing-secondary)] text-[var(--landing-on-secondary)]",
+                  "bg-[var(--secondary)] text-[var(--on-secondary)]",
                 step.state === "active" &&
-                  "bg-[var(--landing-primary)] text-[var(--landing-on-primary)]",
+                  "bg-[var(--primary)] text-[var(--on-primary)]",
                 step.state === "pending" &&
-                  "bg-[var(--landing-surface-container-high)] text-[var(--landing-on-surface-variant)]",
+                  "bg-[var(--surface-container-high)] text-[var(--on-surface-variant)]",
               )}
             >
               {step.state === "done" ? (

@@ -105,7 +105,7 @@ export function CompleteProfileForm() {
             name="nickname"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--landing-on-surface-variant)]">
+                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">
                   @username
                 </FormLabel>
                 <FormControl>
@@ -126,7 +126,7 @@ export function CompleteProfileForm() {
           name="birthDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--landing-on-surface-variant)]">
+              <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--on-surface-variant)]">
                 Data de Nascimento
               </FormLabel>
               <Popover>
@@ -135,18 +135,18 @@ export function CompleteProfileForm() {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-left font-body font-normal px-4 justify-between hover:bg-[var(--landing-surface-container-highest)] hover:text-[var(--landing-on-surface)] dark:hover:bg-[var(--landing-surface-container-highest)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent",
-                        !field.value && "text-[var(--landing-outline)]"
+                        "w-full h-14 bg-[var(--surface-container-highest)] dark:bg-[var(--surface-container-highest)] border-none rounded text-left font-body font-normal px-4 justify-between hover:bg-[var(--surface-container-highest)] hover:text-[var(--on-surface)] dark:hover:bg-[var(--surface-container-highest)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40 focus-visible:border-transparent",
+                        !field.value && "text-[var(--outline)]"
                       )}
                     >
                       {field.value ? (
-                        <span className="text-[var(--landing-on-surface)]">
+                        <span className="text-[var(--on-surface)]">
                           {format(field.value, "dd/MM/yyyy", { locale: ptBR })}
                         </span>
                       ) : (
                         <span>dd/mm/aaaa</span>
                       )}
-                      <CalendarIcon className="h-5 w-5 text-[var(--landing-on-surface-variant)]" />
+                      <CalendarIcon className="h-5 w-5 text-[var(--on-surface-variant)]" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -165,7 +165,7 @@ export function CompleteProfileForm() {
                   />
                 </PopoverContent>
               </Popover>
-              <p className="text-[var(--landing-outline)] text-xs mt-1 px-1">
+              <p className="text-[var(--outline)] text-xs mt-1 px-1">
                 Apenas para maiores de 18 anos.
               </p>
               <FormMessage />
@@ -184,13 +184,13 @@ export function CompleteProfileForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="mt-1 h-5 w-5 border-[var(--landing-outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--landing-primary)] data-[state=checked]:border-[var(--landing-primary)] dark:data-[state=checked]:bg-[var(--landing-primary)] focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-[var(--landing-primary)]"
+                    className="mt-1 h-5 w-5 border-[var(--outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--primary)] data-[state=checked]:border-[var(--primary)] dark:data-[state=checked]:bg-[var(--primary)] focus-visible:ring-[var(--primary)]/40 focus-visible:border-[var(--primary)]"
                   />
                 </FormControl>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <FormLabel className="block w-full cursor-pointer text-sm font-normal leading-relaxed text-[var(--landing-on-surface-variant)]">
+                  <FormLabel className="block w-full cursor-pointer text-sm font-normal leading-relaxed text-[var(--on-surface-variant)]">
                     Concordo com os{" "}
-                    <span className="text-[var(--landing-primary)] underline cursor-pointer">
+                    <span className="text-[var(--primary)] underline cursor-pointer">
                       Termos da Arena
                     </span>{" "}
                     e confirmo que meus dados estão corretos para trocas seguras.
@@ -206,7 +206,7 @@ export function CompleteProfileForm() {
           <Button
             type="submit"
             disabled={isSubmitting || isNicknameAvailable === false}
-            className="w-full h-16 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-primary-dim)] text-[var(--landing-on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--landing-primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full h-16 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <>
@@ -221,11 +221,11 @@ export function CompleteProfileForm() {
             )}
           </Button>
           <div className="flex items-center justify-center mt-6 gap-2">
-            <div className="h-[1px] w-8 bg-[var(--landing-outline-variant)]/30" />
-            <p className="text-[10px] text-[var(--landing-outline)] uppercase tracking-widest font-bold">
+            <div className="h-[1px] w-8 bg-[var(--outline-variant)]/30" />
+            <p className="text-[10px] text-[var(--outline)] uppercase tracking-widest font-bold">
               Protocolo de Segurança Ativo
             </p>
-            <div className="h-[1px] w-8 bg-[var(--landing-outline-variant)]/30" />
+            <div className="h-[1px] w-8 bg-[var(--outline-variant)]/30" />
           </div>
         </div>
       </form>

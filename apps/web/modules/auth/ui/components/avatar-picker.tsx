@@ -29,7 +29,7 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
     <div className="flex items-center gap-6">
       <div className="relative">
         <div
-          className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--landing-on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)]"
+          className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)]"
           aria-hidden={imageUrl ? undefined : "true"}
           role="img"
           aria-label={imageUrl ? `Avatar de ${nickname ?? "você"}` : undefined}
@@ -45,17 +45,17 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
           type="button"
           aria-label="Upload de foto (em breve)"
           disabled
-          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-[var(--landing-outline-variant)]/40 bg-[var(--landing-surface-container-high)] text-[var(--landing-on-surface)] opacity-60 shadow-lg"
+          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-[var(--outline-variant)]/40 bg-[var(--surface-container-high)] text-[var(--on-surface)] opacity-60 shadow-lg"
         >
           <Camera className="size-4" aria-hidden="true" />
         </button>
       </div>
 
       <div className="space-y-2">
-        <p className="font-[var(--font-headline)] text-sm font-bold uppercase tracking-wider text-[var(--landing-on-surface)]">
+        <p className="font-[var(--font-headline)] text-sm font-bold uppercase tracking-wider text-[var(--on-surface)]">
           Seu avatar
         </p>
-        <p className="text-sm text-[var(--landing-on-surface-variant)]">
+        <p className="text-sm text-[var(--on-surface-variant)]">
           {imageUrl
             ? "Foto sincronizada com sua conta."
             : "Usaremos suas iniciais até você subir uma foto."}
@@ -65,7 +65,7 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
           variant="ghost"
           size="sm"
           disabled
-          className="h-auto p-0 text-xs uppercase tracking-wider text-[var(--landing-primary)]/70"
+          className="h-auto p-0 text-xs uppercase tracking-wider text-[var(--primary)]/70"
           aria-label="Gerar avatar (em breve)"
         >
           <Sparkles className="mr-1 size-3.5" /> Gerar avatar (em breve)

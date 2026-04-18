@@ -17,11 +17,11 @@ function StatusIcon({ isChecking, isAvailable, valueLength }: StatusIconProps) {
   if (valueLength < 3) return null;
 
   if (isChecking) {
-    return <Loader2 className="h-5 w-5 animate-spin text-[var(--landing-outline)]" />;
+    return <Loader2 className="h-5 w-5 animate-spin text-[var(--outline)]" />;
   }
 
   if (isAvailable === true) {
-    return <CheckCircle2 className="h-5 w-5 text-[var(--landing-secondary)]" />;
+    return <CheckCircle2 className="h-5 w-5 text-[var(--secondary)]" />;
   }
 
   if (isAvailable === false) {
@@ -85,7 +85,7 @@ export function NicknameInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Ex: Artilheiro2026"
-          className="w-full h-14 bg-[var(--landing-surface-container-highest)] dark:bg-[var(--landing-surface-container-highest)] border-none rounded text-[var(--landing-on-surface)] placeholder:text-[var(--landing-outline)] focus-visible:ring-2 focus-visible:ring-[var(--landing-primary)]/40 focus-visible:border-transparent font-body pr-12"
+          className="w-full h-14 bg-[var(--surface-container-highest)] dark:bg-[var(--surface-container-highest)] border-none rounded text-[var(--on-surface)] placeholder:text-[var(--outline)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40 focus-visible:border-transparent font-body pr-12"
           aria-invalid={!!error}
         />
         <div className="absolute inset-y-0 right-4 flex items-center">
@@ -98,8 +98,8 @@ export function NicknameInput({
       </div>
       {value.length >= 3 && nicknameCheck?.available === true && !isChecking && (
         <div className="flex items-center gap-2 px-1">
-          <CheckCircle2 className="h-4 w-4 text-[var(--landing-secondary)]" />
-          <p className="text-[var(--landing-secondary)] text-xs font-medium">
+          <CheckCircle2 className="h-4 w-4 text-[var(--secondary)]" />
+          <p className="text-[var(--secondary)] text-xs font-medium">
             Apelido disponível para uso
           </p>
         </div>

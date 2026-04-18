@@ -17,6 +17,14 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        /* MD3 Arena styleguide semantics */
+        destaque:
+          "border-transparent bg-secondary text-[color:var(--on-secondary)] font-bold uppercase tracking-wider text-[10px]",
+        premium:
+          "border-transparent bg-tertiary text-[color:var(--on-tertiary)] font-bold uppercase tracking-wider text-[10px]",
+        live:
+          "border-transparent bg-destructive text-white font-bold uppercase tracking-wider text-[10px]",
+        new: "border-transparent bg-primary text-primary-foreground font-bold uppercase tracking-wider text-[10px]",
       },
     },
     defaultVariants: {

@@ -45,43 +45,43 @@ export function CompleteProfileView() {
   }
 
   return (
-    <main className="landing-theme relative grid min-h-screen bg-[var(--landing-background)] stadium-gradient lg:grid-cols-[340px_1fr]">
+    <main className="relative grid min-h-screen bg-background stadium-gradient lg:grid-cols-[340px_1fr]">
       <OnboardingStepper currentStep={2} />
 
       <div className="flex flex-col">
         <header className="flex items-center justify-between px-6 py-6">
           <Button
             variant="ghost"
-            className="group flex items-center gap-2 p-0 text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
+            className="group flex items-center gap-2 p-0 text-[var(--on-surface)] hover:text-[var(--primary)]"
             onClick={() => router.back()}
           >
             <ArrowLeft className="h-6 w-6" />
             <span className="font-label text-sm font-medium">Voltar</span>
           </Button>
-          <span className="text-xs uppercase tracking-widest text-[var(--landing-on-surface-variant)]">
+          <span className="text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
             Passo 02 / 03
           </span>
         </header>
 
         <div className="px-6 lg:px-10">
           <div
-            className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--landing-surface-container-high)]"
+            className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-container-high)]"
             role="progressbar"
             aria-valuenow={66}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label="Progresso do onboarding"
           >
-            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)]" />
+            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)]" />
           </div>
         </div>
 
         <section className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pb-12 pt-8 lg:px-10">
           <div className="mb-8">
-            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--landing-on-surface)] lg:text-4xl">
+            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--on-surface)] lg:text-4xl">
               Como te chamamos?
             </h1>
-            <p className="mt-3 text-[var(--landing-on-surface-variant)]">
+            <p className="mt-3 text-[var(--on-surface-variant)]">
               Escolha seu nome e @username. Eles vão aparecer para outros
               colecionadores quando você agendar trocas.
             </p>

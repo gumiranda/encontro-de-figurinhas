@@ -6,7 +6,7 @@ import { CITIES } from "../../lib/landing-data";
 export function CitiesSection() {
   return (
     <section
-      className="px-6 py-24 bg-[var(--landing-surface-container-low)]/50"
+      className="px-6 py-24 bg-[var(--surface-container-low)]/50"
       aria-labelledby="cities-heading"
     >
       <div className="max-w-7xl mx-auto">
@@ -14,17 +14,17 @@ export function CitiesSection() {
           <div>
             <h2
               id="cities-heading"
-              className="font-[var(--font-headline)] font-bold text-3xl md:text-5xl tracking-tight mb-4 text-[var(--landing-on-surface)]"
+              className="font-[var(--font-headline)] font-bold text-3xl md:text-5xl tracking-tight mb-4 text-[var(--on-surface)]"
             >
               Principais Arenas
             </h2>
-            <p className="text-[var(--landing-on-surface-variant)] max-w-md font-[var(--font-body)]">
+            <p className="text-[var(--on-surface-variant)] max-w-md font-[var(--font-body)]">
               As cidades com maior volume de trocas e pontos de encontro ativos esta semana.
             </p>
           </div>
           <Link
             href="#"
-            className="inline-flex items-center gap-2 text-[var(--landing-primary)] font-bold hover:gap-4 transition-all"
+            className="inline-flex items-center gap-2 text-[var(--primary)] font-bold hover:gap-4 transition-all"
           >
             VER TODAS AS CIDADES
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
