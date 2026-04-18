@@ -1,6 +1,8 @@
 import { Check, Landmark } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { SignOutButton } from "./sign-out-button";
+
 const STEPS = [
   { index: 1, title: "Conta criada", description: "Email verificado" },
   { index: 2, title: "Seu perfil", description: "Nome, foto, contato" },
@@ -23,7 +25,7 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
   return (
     <aside
       aria-label="Progresso do onboarding"
-      className="hidden border-r border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container-low)] p-8 lg:block"
+      className="hidden min-h-screen border-r border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container-low)] p-8 lg:flex lg:flex-col"
     >
       <div className="flex items-center gap-3 pb-10">
         <span
@@ -82,6 +84,10 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
           );
         })}
       </ol>
+
+      <div className="mt-auto border-t border-[var(--landing-outline-variant)]/30 pt-8">
+        <SignOutButton className="w-full justify-center" variant="outline" />
+      </div>
     </aside>
   );
 }

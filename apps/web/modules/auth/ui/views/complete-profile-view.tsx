@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 import { OnboardingStepper } from "../components/onboarding-stepper";
+import { SignOutButton } from "../components/sign-out-button";
 
 export function CompleteProfileView() {
   const router = useRouter();
@@ -58,9 +59,14 @@ export function CompleteProfileView() {
             <ArrowLeft className="h-6 w-6" />
             <span className="font-label text-sm font-medium">Voltar</span>
           </Button>
-          <span className="shrink-0 text-right text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
-            Passo 02 / 03
-          </span>
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="lg:hidden">
+              <SignOutButton variant="outline" size="default" />
+            </div>
+            <span className="text-right text-xs uppercase tracking-widest text-[var(--on-surface-variant)]">
+              Passo 02 / 03
+            </span>
+          </div>
         </header>
 
         <div className="px-6 lg:px-10">

@@ -5,7 +5,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Loader2, Zap } from "lucide-react";
+import { ArrowRight, CalendarIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -54,6 +54,7 @@ export function CompleteProfileForm() {
   const completeProfile = useMutation(api.users.completeProfile);
 
   const form = useForm<CompleteProfileFormData>({
+    mode: "onSubmit",
     resolver: zodResolver(completeProfileSchema),
     defaultValues: {
       nickname: "",
@@ -109,7 +110,10 @@ export function CompleteProfileForm() {
                     <NicknameInput
                       value={field.value}
                       onChange={field.onChange}
-                      onBlur={field.onBlur}
+                      onBlur={() => {
+                        field.onBlur();
+                        void form.trigger("nickname");
+                      }}
                       error={form.formState.errors.nickname?.message}
                     />
                   </FormControl>
@@ -151,7 +155,12 @@ export function CompleteProfileForm() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent
+                      align="end"
+                      sideOffset={8}
+                      collisionPadding={16}
+                      className="w-auto p-0"
+                    >
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -178,39 +187,38 @@ export function CompleteProfileForm() {
           />
         </div>
 
-        <div className="pt-4">
-          <FormField
-            control={form.control}
-            name="terms"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start gap-3 space-y-0">
-                <FormControl className="shrink-0">
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="mt-1 h-5 w-5 border-[var(--outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--primary)] data-[state=checked]:border-[var(--primary)] dark:data-[state=checked]:bg-[var(--primary)] focus-visible:ring-[var(--primary)]/40 focus-visible:border-[var(--primary)]"
-                  />
-                </FormControl>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <FormLabel className="block w-full min-w-0 cursor-pointer break-words text-sm font-normal leading-relaxed text-[var(--on-surface-variant)]">
-                    Concordo com os{" "}
-                    <span className="text-[var(--primary)] underline cursor-pointer">
-                      Termos da Arena
-                    </span>{" "}
-                    e confirmo que meus dados estão corretos para trocas seguras.
-                  </FormLabel>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="terms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-2 space-y-0">
+              <FormControl className="shrink-0">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="h-5 w-5 border-[var(--outline-variant)] dark:bg-transparent data-[state=checked]:bg-[var(--primary)] data-[state=checked]:border-[var(--primary)] dark:data-[state=checked]:bg-[var(--primary)] focus-visible:ring-[var(--primary)]/40 focus-visible:border-[var(--primary)]"
+                />
+              </FormControl>
+              <div className="min-w-0 flex-1">
+                <FormLabel className="block w-full min-w-0 cursor-pointer text-sm font-normal leading-snug text-[var(--on-surface-variant)]">
+                  Concordo com os{" "}
+                  <span className="text-[var(--primary)] underline cursor-pointer">
+                    Termos da Arena
+                  </span>{" "}
+                  e confirmo que meus dados estão corretos para trocas seguras.
+                </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
 
-        <div className="pt-8">
+        <div className="pt-6">
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-16 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            aria-busy={isSubmitting}
+            className="h-16 w-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <>
@@ -219,18 +227,10 @@ export function CompleteProfileForm() {
               </>
             ) : (
               <>
-                Entrar na Arena
-                <Zap className="h-6 w-6" />
+                Continuar <ArrowRight className="h-6 w-6" />
               </>
             )}
           </Button>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-1">
-            <div className="h-px w-8 shrink-0 bg-[var(--outline-variant)]/30" />
-            <p className="max-w-full text-center text-[10px] font-bold uppercase tracking-widest text-[var(--outline)]">
-              Protocolo de Segurança Ativo
-            </p>
-            <div className="h-px w-8 shrink-0 bg-[var(--outline-variant)]/30" />
-          </div>
         </div>
       </form>
     </Form>
