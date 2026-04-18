@@ -18,6 +18,19 @@ export const getCurrentUser = query({
   },
 });
 
+export const getNavContext = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+    return {
+      role: user.role,
+      hasCompletedOnboarding: user.hasCompletedOnboarding ?? false,
+      hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
+    };
+  },
+});
+
 export const hasAnyUsers = query({
   args: {},
   handler: async (ctx) => {

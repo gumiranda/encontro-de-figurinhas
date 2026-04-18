@@ -480,6 +480,7 @@ export function useStickers(debounceMs = 300) {
     totalStickers,
     isLoading,
     isSaving,
+    isDirty,
     error,
     canFinalize,
 
