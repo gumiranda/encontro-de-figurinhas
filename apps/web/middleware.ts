@@ -2,9 +2,31 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
-  "/",              // Landing page
+  // Landing + auth
+  "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
+
+  // SEO / metadata endpoints (Next gera automaticamente)
+  "/sitemap.xml",
+  "/robots.txt",
+  "/manifest.webmanifest",
+  "/opengraph-image(.*)",
+  "/twitter-image(.*)",
+  "/icon(.*)",
+  "/apple-icon(.*)",
+
+  // Páginas marketing públicas (SEO)
+  "/sobre",
+  "/como-funciona",
+  "/contato",
+  "/termos",
+  "/privacidade",
+  "/album-copa-do-mundo-2026(.*)",
+  "/cidade(.*)",
+  "/ponto/id(.*)",
+  // /ponto/[slug] público (SEO) exceto /ponto/solicitar (autenticado)
+  /^\/ponto\/(?!solicitar(?:\/|$))[^/]+(?:\/.*)?$/,
 ]);
 
 // Routes that require auth but allow incomplete onboarding
