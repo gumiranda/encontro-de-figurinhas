@@ -71,6 +71,37 @@
   50%      { opacity: 0.5; transform: scale(1.1); }
 }
 
+/* Pulse dot — bulletinho verde com pulso suave (tag chip "ao vivo") */
+.pulse-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--landing-secondary);
+  box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(79, 243, 37, 0); }
+}
+
+/* Tag chip — mini pill verde com bullet (hero "Ao vivo · XX trocando agora") */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(79, 243, 37, 0.12);
+  border: 1px solid rgba(79, 243, 37, 0.35);
+  color: var(--landing-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* Radar bars — scaleY suave */
 .bar-wave {
   transform-origin: bottom;
@@ -108,10 +139,33 @@
 .btn-primary-gradient:hover { opacity: 0.95; }
 .btn-primary-gradient:active { transform: scale(0.98); }
 
+/* Radar sweep — animação conic rotacionando (GPS/Localização) */
+.radar-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(79, 243, 37, 0.35) 40deg,
+    transparent 60deg
+  );
+  animation: radar-sweep 3s linear infinite;
+}
+.radar-sweep[data-speed="fast"] {
+  animation-duration: 1.5s;
+}
+@keyframes radar-sweep {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .pulse-ring,
-  .bar-wave {
+  .pulse-dot,
+  .bar-wave,
+  .radar-sweep {
     animation: none;
   }
   .btn-primary-gradient:active {

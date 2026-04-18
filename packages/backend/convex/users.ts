@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { Role, isValidRole, isValidSector } from "./lib/types";
@@ -7,6 +8,7 @@ import { verifyIpLocationToken } from "./lib/ipLocationToken";
 import { GEO_VALIDATION, LOCATION_RATE_LIMIT } from "./lib/locationConstants";
 import { getLocationUpdateTimestampsForWindow } from "./lib/locationRateLimit";
 import { checkRateLimit } from "./lib/rateLimit";
+import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
 
 export const getCurrentUser = query({
@@ -82,16 +84,14 @@ export const createUser = mutation({
 
 export const getAllUsers = query({
   args: {
-    limit: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, { paginationOpts }) => {
     const currentUser = await requireAuth(ctx);
     if (!isAdmin(currentUser.role)) {
       throw new Error("Admin access required");
     }
-
-    const limit = Math.min(args.limit ?? 100, 500);
-    return await ctx.db.query("users").take(limit);
+    return await ctx.db.query("users").paginate(paginationOpts);
   },
 });
 
@@ -187,6 +187,7 @@ function normalizeNickname(nickname: string): string {
 export const checkNicknameAvailable = query({
   args: { nickname: v.string() },
   handler: async (ctx, { nickname }) => {
+    if (nickname.length > 24) return { available: false };
     let normalized: string;
     try {
       normalized = normalizeNickname(nickname);
@@ -194,6 +195,9 @@ export const checkNicknameAvailable = query({
       return { available: false };
     }
     if (normalized.length < 3) return { available: false };
+
+    const status = await rateLimiter.check(ctx, "nicknameCheck", { key: "global" });
+    if (!status.ok) return { available: false };
 
     const existing = await ctx.db
       .query("users")
@@ -211,6 +215,12 @@ export const completeProfile = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+
+    // Hard rate-limit por usuário: evita reserva em batch de nicknames por 1 ator
+    await rateLimiter.limit(ctx, "completeProfile", {
+      key: identity.subject,
+      throws: true,
+    });
 
     const user = await ctx.db
       .query("users")

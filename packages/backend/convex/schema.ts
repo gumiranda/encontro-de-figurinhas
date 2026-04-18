@@ -23,6 +23,17 @@ export default defineSchema({
     isShadowBanned: v.optional(v.boolean()),
     isBanned: v.optional(v.boolean()),
 
+    deletionPending: v.optional(v.boolean()),
+    cleanupStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("running"),
+        v.literal("complete"),
+        v.literal("partial"),
+      ),
+    ),
+    cleanupInProgressAt: v.optional(v.number()),
+
     // Minor protection fields (PRD seguranca.md:23-25, arquitetura-tecnica.md:63-71)
     ageGroup: v.optional(
       v.union(

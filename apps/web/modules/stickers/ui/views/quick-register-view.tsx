@@ -3,6 +3,31 @@
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
+
+function StickerStatCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "primary" | "secondary" | "tertiary" | "outline";
+}) {
+  const toneClass = {
+    primary: "text-primary",
+    secondary: "text-secondary",
+    tertiary: "text-tertiary",
+    outline: "text-on-surface-variant",
+  }[tone];
+  return (
+    <div className="rounded-xl border border-outline-variant/30 bg-surface-container p-4 text-center">
+      <p className={cn("font-headline text-2xl font-black", toneClass)}>{value}</p>
+      <p className="mt-1 text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">
+        {label}
+      </p>
+    </div>
+  );
+}
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
@@ -113,6 +138,8 @@ export function QuickRegisterView() {
 
   const totalCount = current.list.length;
 
+  const haveCount = Math.max(0, totalStickers - missing.length);
+
   return (
     <div className="min-h-screen flex flex-col pb-24 bg-surface-dim text-on-surface font-body">
       <header className="bg-surface-dim sticky top-0 z-50 flex items-center justify-between w-full px-6 h-16">
@@ -124,9 +151,14 @@ export function QuickRegisterView() {
           >
             <ArrowLeft className="size-6" strokeWidth={2} />
           </button>
-          <h1 className="font-headline font-bold text-xl uppercase tracking-tighter text-primary">
-            Cadastrar Figurinhas
-          </h1>
+          <div>
+            <h1 className="font-headline font-bold text-lg uppercase tracking-tighter text-primary">
+              Álbum · Copa 2026
+            </h1>
+            <p className="text-xs text-on-surface-variant">
+              {totalStickers} figurinhas · {haveCount} tenho · {missing.length} preciso
+            </p>
+          </div>
         </div>
         <button
           type="button"
@@ -136,6 +168,15 @@ export function QuickRegisterView() {
           <Settings className="size-6" strokeWidth={2} />
         </button>
       </header>
+
+      <section className="hidden px-6 pt-6 lg:block">
+        <div className="mx-auto grid max-w-4xl grid-cols-4 gap-3">
+          <StickerStatCard label="Tenho" value={haveCount} tone="secondary" />
+          <StickerStatCard label="Duplicadas" value={duplicates.length} tone="primary" />
+          <StickerStatCard label="Preciso" value={missing.length} tone="tertiary" />
+          <StickerStatCard label="Total" value={totalStickers} tone="outline" />
+        </div>
+      </section>
 
       <main className="flex-1 px-6 pt-6 max-w-2xl mx-auto w-full">
         <TabToggle activeTab={activeTab} onTabChange={setActiveTab} tabConfig={tabConfig} />

@@ -64,13 +64,9 @@ export const FEATURES = [
   },
 ];
 
-export const HERO_IMAGE = {
-  src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCGGs56EbPv0jyVIe5SsR_KzUxmAVhbYsQFGRIgQhZzCJErDVH1qTclUV9FsoBGgcJ2vzQSvXqWGW-iJvEZ96CZ6Ps7QdDx9W89nCnAQajXPn19KAZb6z6XYwQITpLZ4XdSn9gTKvkdhUJTBoB_H3RqLaGVQMJRlETyZiRE25BbEPMWO2Kq55S8ftXSLwcZbuqZv-RcuCGp5ksTBs123gNYzoI5wY9gJY0KNeuAUvxQV9gA4sO6XrIq9tnHvZx-QnpGYK26R52zBYtI",
-  alt: "Estádio iluminado à noite com luzes azuis",
-};
-
 export const NAV_ITEMS = [
   { label: "Explorar", href: "/", active: true },
   { label: "Como Funciona", href: "/como-funciona", active: false },
-  { label: "Arena", href: "/arena", active: false },
+  { label: "Álbum", href: "/album-copa-do-mundo-2026", active: false },
+  { label: "Cidades", href: "/#cities-heading", active: false },
 ];

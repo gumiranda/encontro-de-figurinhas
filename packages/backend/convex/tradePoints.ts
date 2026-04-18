@@ -237,7 +237,17 @@ export const submitRequest = mutation({
     const description = args.description?.trim();
     let whatsappLink = args.whatsappLink?.trim();
     if (whatsappLink === "") whatsappLink = undefined;
-    if (whatsappLink && !/^https?:\/\//i.test(whatsappLink)) {
+    if (
+      (suggestedHours && suggestedHours.length > 120) ||
+      (description && description.length > 600) ||
+      (whatsappLink && whatsappLink.length > 200)
+    ) {
+      return { ok: false as const, error: "invalid-fields" as const };
+    }
+    if (
+      whatsappLink &&
+      !/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{20,24}$/.test(whatsappLink)
+    ) {
       return { ok: false as const, error: "invalid-fields" as const };
     }
 

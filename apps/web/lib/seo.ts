@@ -49,6 +49,49 @@ export function generateWebSiteSchema() {
     url: BASE_URL,
     description:
       "A maior rede de troca de figurinhas do Brasil. Encontre colecionadores perto de você.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BASE_URL}/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function generateSportsEventSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name: "Copa do Mundo FIFA 2026",
+    alternateName: "FIFA World Cup 2026",
+    startDate: "2026-06-11",
+    endDate: "2026-07-19",
+    eventStatus: "https://schema.org/EventScheduled",
+    sport: "Association Football",
+    location: [
+      {
+        "@type": "Country",
+        name: "Estados Unidos",
+        address: { "@type": "PostalAddress", addressCountry: "US" },
+      },
+      {
+        "@type": "Country",
+        name: "México",
+        address: { "@type": "PostalAddress", addressCountry: "MX" },
+      },
+      {
+        "@type": "Country",
+        name: "Canadá",
+        address: { "@type": "PostalAddress", addressCountry: "CA" },
+      },
+    ],
+    organizer: {
+      "@type": "Organization",
+      name: "FIFA",
+      url: "https://www.fifa.com",
+    },
   };
 }
 

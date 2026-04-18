@@ -93,19 +93,33 @@
   /* MD3 Primary (Blue) */
   --primary: #95aaff;
   --primary-dim: #3766ff;
+  --primary-container: #829bff;
   --primary-foreground: #00247e;
+  --on-primary-container: #001a63;
 
   /* MD3 Secondary (Green - for duplicates) */
   --secondary: #4ff325;
+  --secondary-dim: #3ee40c;
   --secondary-container: #176e00;
   --secondary-foreground: #105500;
 
   /* MD3 Tertiary (Yellow/Gold - for extras) */
   --tertiary: #ffc965;
+  --tertiary-dim: #ecaa00;
+  --tertiary-container: #feb700;
   --tertiary-foreground: #5f4200;
+
+  /* MD3 Error (distinct from shadcn destructive alias) */
+  --error: #ff6e84;
+  --error-dim: #d73357;
+  --error-container: #a70138;
+  /* WCAG AA: #ffdad7 on #a70138 = 6.01 (normal text pass) */
+  --on-error: #ffdad7;
 
   /* MD3 Surface variants */
   --surface-dim: #090e1c;
+  --surface-bright: #242b43;
+  --surface-variant: #1e253b;
   --surface-container-low: #0d1323;
   --surface-container: #13192b;
   --surface-container-high: #181f33;
@@ -115,8 +129,8 @@
   --on-surface: #e1e4fa;
   --on-surface-variant: #a6aabf;
 
-  /* MD3 Outline */
-  --outline: #707588;
+  /* MD3 Outline — WCAG AA: #9499ad on #090e1c = 6.80 */
+  --outline: #9499ad;
   --outline-variant: #434759;
 
   --muted: #1e253b;
@@ -162,6 +176,12 @@
     0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --shadow-stadium: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+
+  /* Copa 2026 glows */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lift: 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+  --shadow-glow-primary: 0 0 20px rgba(149, 170, 255, 0.35);
+  --shadow-glow-success: 0 0 20px rgba(79, 243, 37, 0.35);
 }
 
 @theme inline {
@@ -208,6 +228,8 @@
 
   /* MD3 Surface Colors */
   --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-variant: var(--surface-variant);
   --color-surface-container-low: var(--surface-container-low);
   --color-surface-container: var(--surface-container);
   --color-surface-container-high: var(--surface-container-high);
@@ -216,6 +238,19 @@
   --color-on-surface-variant: var(--on-surface-variant);
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
+
+  /* MD3 Containers */
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary-dim: var(--secondary-dim);
+  --color-tertiary-dim: var(--tertiary-dim);
+  --color-tertiary-container: var(--tertiary-container);
+
+  /* MD3 Error (distinct from destructive alias) */
+  --color-error: var(--error);
+  --color-error-dim: var(--error-dim);
+  --color-error-container: var(--error-container);
+  --color-on-error: var(--on-error);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -238,6 +273,10 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
   --shadow-stadium: var(--shadow-stadium);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-lift: var(--shadow-lift);
+  --shadow-glow-primary: var(--shadow-glow-primary);
+  --shadow-glow-success: var(--shadow-glow-success);
 }
 
 @layer base {

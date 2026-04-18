@@ -15,27 +15,32 @@ type MapViewProps = {
 };
 
 const userIcon = L.divIcon({
-  html: `<div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-lg ring-4 ring-primary/30">VOCÊ</div>`,
+  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:9999px;background:#95aaff;color:#00247e;font-size:10px;font-weight:800;letter-spacing:0.05em;box-shadow:0 0 0 4px rgba(149,170,255,0.25),0 0 16px rgba(149,170,255,0.45);">VOCÊ</div>`,
   className: "",
   iconSize: [40, 40],
   iconAnchor: [20, 20],
 });
 
 function createPointIcon(selected: boolean) {
+  const fill = selected ? "#95aaff" : "#4ff325";
+  const ring = selected
+    ? "box-shadow:0 0 0 4px rgba(149,170,255,0.35),0 6px 14px rgba(0,0,0,0.4);"
+    : "box-shadow:0 0 0 3px rgba(79,243,37,0.25),0 4px 10px rgba(0,0,0,0.4);";
+  const fg = selected ? "#00247e" : "#105500";
   return L.divIcon({
-    html: `<div class="flex items-center justify-center w-8 h-8 rounded-full ${selected ? "bg-primary ring-4 ring-primary/50" : "bg-secondary"} text-secondary-foreground shadow-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>`,
+    html: `<div style="position:relative;display:flex;flex-direction:column;align-items:center;"><div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;background:${fill};color:${fg};${ring}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><div style="width:2px;height:8px;background:${fill};"></div></div>`,
     className: "",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
+    iconSize: [36, 44],
+    iconAnchor: [18, 44],
   });
 }
 
 function createClusterIcon(count: number) {
   return L.divIcon({
-    html: `<div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg"><span class="absolute inset-0 rounded-full bg-primary motion-safe:animate-ping opacity-30"></span><span class="relative">${count}</span></div>`,
+    html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9999px;background:#95aaff;color:#00247e;font-size:14px;font-weight:800;box-shadow:0 0 0 5px rgba(149,170,255,0.25),0 6px 14px rgba(0,0,0,0.45);"><span>${count}</span></div>`,
     className: "",
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
   });
 }
 
@@ -122,8 +127,9 @@ export function MapView({ center, zoom = 13, userLocation, points }: MapViewProp
       className="h-[50dvh] w-full"
     >
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        subdomains="abcd"
       />
       <MapControls />
       <PanToSelected points={points} />

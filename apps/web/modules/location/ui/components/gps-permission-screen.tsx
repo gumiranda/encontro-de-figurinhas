@@ -1,18 +1,9 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { Button } from "@workspace/ui/components/button";
 import { Heading, Text } from "@workspace/ui/components/typography";
-import { MapPin, LandPlot, Info } from "lucide-react";
-
-/** Heights in px — symmetric equalizer; animation adds scaleY via .bar-wave */
-const RADAR_BARS: readonly { readonly style: CSSProperties }[] = [
-  { style: { height: 11, opacity: 0.45, animationDelay: "0s" } },
-  { style: { height: 17, opacity: 0.65, animationDelay: "0.12s" } },
-  { style: { height: 26, opacity: 1, animationDelay: "0.24s" } },
-  { style: { height: 17, opacity: 0.65, animationDelay: "0.36s" } },
-  { style: { height: 11, opacity: 0.45, animationDelay: "0.48s" } },
-] as const;
+import { Info } from "lucide-react";
+import { RadarVisual } from "./radar-visual";
 
 interface GpsPermissionScreenProps {
   status:
@@ -40,71 +31,19 @@ export function GpsPermissionScreen({
     status === "unavailable" ||
     (status === "granted" && !!detectedCityLabel);
 
+  const radarMode =
+    status === "checking" || status === "prompting" ? "searching" : "idle";
+  const radarLabel =
+    status === "granted" && detectedCityLabel
+      ? `Detectamos ${detectedCityLabel}`
+      : status === "checking"
+        ? "Procurando sua localização..."
+        : "Pontos ativos perto de você";
+
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-2 min-h-[400px]">
-      <div className="relative z-10 mb-10 w-80 h-80 flex items-center justify-center">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 stadium-glow"
-        />
-        <div className="relative w-64 h-64">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 rounded-full bg-[var(--landing-surface-container-high)] opacity-20 blur-3xl"
-          />
-
-          <div
-            aria-hidden="true"
-            className="pulse-ring pointer-events-none absolute inset-8 rounded-full bg-[var(--landing-secondary)]/10 blur-xl z-0"
-          />
-
-          <div className="relative z-[1] flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-[var(--landing-outline-variant)]/20 bg-[var(--landing-surface-container-highest)] shadow-2xl">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle, var(--landing-primary) 1px, transparent 1px)",
-                backgroundSize: "20px 20px",
-              }}
-            />
-
-            <div className="relative z-10 flex flex-col items-center">
-              <MapPin
-                className="-mb-1 h-24 w-24 text-[var(--landing-secondary)]"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-              <div
-                className="flex h-[26px] shrink-0 items-end justify-center gap-[3px] rounded-full bg-[var(--landing-secondary)]/[0.08] px-2.5"
-                aria-hidden
-              >
-                {RADAR_BARS.map((bar, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 shrink-0 rounded-full bg-[var(--landing-secondary)] bar-wave"
-                    style={bar.style}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="absolute bottom-0 h-1/4 w-full bg-gradient-to-t from-[var(--landing-surface-container-highest)]/80 to-transparent"
-            />
-          </div>
-
-          <div className="absolute -right-2 -top-2 flex items-center gap-2 rounded-full border border-[var(--landing-outline-variant)]/20 bg-[var(--landing-surface-container-high)] px-4 py-2 shadow-xl">
-            <LandPlot className="h-4 w-4 text-[var(--landing-primary)]" />
-            <Text
-              variant="small"
-              className="font-headline font-bold uppercase tracking-widest text-[var(--landing-primary)]"
-            >
-              Pontos Ativos
-            </Text>
-          </div>
-        </div>
+      <div className="relative z-10 mb-16 flex w-full max-w-sm items-center justify-center">
+        <RadarVisual mode={radarMode} label={radarLabel} />
       </div>
 
       <div className="relative z-10 max-w-md text-center">

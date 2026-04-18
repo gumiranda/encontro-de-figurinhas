@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@clerk/backend": "^2.10.1",
+    "@convex-dev/rate-limiter": "^0.3.2",
     "convex": "1.25.4",
     "convex-helpers": "^0.1.104",
     "crypto": "^1.0.1",

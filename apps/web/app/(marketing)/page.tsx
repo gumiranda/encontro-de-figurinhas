@@ -15,6 +15,7 @@ import {
   generateWebSiteSchema,
   generateFAQSchema,
   generateHowToSchema,
+  generateSportsEventSchema,
   generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
@@ -102,13 +103,14 @@ const howToSchema = generateHowToSchema(
   "Aprenda a trocar figurinhas em 3 passos simples e complete seu álbum da Copa 2026.",
   HOW_TO_STEPS
 );
+const sportsEventSchema = generateSportsEventSchema();
 
-// Combined schema with @graph pattern for better AEO
 const combinedSchema = generateCombinedSchema([
   organizationSchema,
   webSiteSchema,
   faqSchema,
   howToSchema,
+  sportsEventSchema,
 ]);
 
 export default async function LandingPage() {

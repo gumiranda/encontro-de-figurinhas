@@ -30,6 +30,8 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { useUser } from "@clerk/nextjs";
+import { AvatarPicker } from "./avatar-picker";
 import { NicknameInput } from "./nickname-input";
 
 const completeProfileSchema = z.object({
@@ -48,6 +50,7 @@ type CompleteProfileFormData = z.infer<typeof completeProfileSchema>;
 
 export function CompleteProfileForm() {
   const router = useRouter();
+  const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNicknameAvailable, setIsNicknameAvailable] = useState<boolean | null>(null);
   const completeProfile = useMutation(api.users.completeProfile);
@@ -59,6 +62,8 @@ export function CompleteProfileForm() {
       terms: undefined,
     },
   });
+
+  const currentNickname = form.watch("nickname");
 
   const onSubmit = async (data: CompleteProfileFormData) => {
     if (isNicknameAvailable === false) {
@@ -92,26 +97,29 @@ export function CompleteProfileForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="nickname"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--landing-on-surface-variant)]">
-                Apelido (Nickname)
-              </FormLabel>
-              <FormControl>
-                <NicknameInput
-                  value={field.value}
-                  onChange={field.onChange}
-                  onAvailabilityChange={setIsNicknameAvailable}
-                  error={form.formState.errors.nickname?.message}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <AvatarPicker nickname={currentNickname} imageUrl={user?.imageUrl} />
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="nickname"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-label text-sm font-semibold uppercase tracking-wider text-[var(--landing-on-surface-variant)]">
+                  @username
+                </FormLabel>
+                <FormControl>
+                  <NicknameInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    onAvailabilityChange={setIsNicknameAvailable}
+                    error={form.formState.errors.nickname?.message}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
         <FormField
           control={form.control}
@@ -164,6 +172,7 @@ export function CompleteProfileForm() {
             </FormItem>
           )}
         />
+        </div>
 
         <div className="pt-4">
           <FormField

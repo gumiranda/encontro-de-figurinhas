@@ -1,7 +1,8 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import { authErrorValidators, checkAuth } from "./lib/auth";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
@@ -262,84 +263,161 @@ export const expireCheckins = internalMutation({
 
 /**
  * Cleanup quando admin shadow-bana um usuário.
- * Deleta checkins ativos + decrementa contagens públicas + deleta scoreBumps do user.
+ * Duas fases (checkins → scoreBumps) em batches de CLEANUP_BATCH via scheduler.runAfter.
  *
- * NÃO é invocada por mutations desta tela (escopo: tela admin/moderação separada).
- * Exposta como API interna para a tela de admin que setará isShadowBanned = true OU
- * isBanned = true OU para a tela de delete-account.
+ * Caller deve setar isShadowBanned=true ou deletionPending=true ANTES de agendar,
+ * para UI esconder o conteúdo imediatamente. A precondition lança ConvexError caso
+ * contrário. Idempotência via cleanupInProgressAt (lease de CLEANUP_LEASE_MS).
+ *
+ * cleanupStatus final: "complete" se drenou ambas fases, "partial" se hit MAX_CHUNKS.
  */
+const CLEANUP_BATCH = 50;
+const CLEANUP_MAX_CHUNKS = 400;
+const CLEANUP_LEASE_MS = 10 * 60_000;
+
 export const cleanupForShadowBannedUser = internalMutation({
-  args: { userId: v.id("users") },
+  args: {
+    userId: v.id("users"),
+    phase: v.optional(
+      v.union(v.literal("checkins"), v.literal("scoreBumps"))
+    ),
+    chunk: v.optional(v.number()),
+  },
   returns: v.object({
-    cleanedCheckins: v.number(),
-    cleanedScoreBumps: v.number(),
+    deleted: v.number(),
+    phase: v.string(),
+    rescheduled: v.boolean(),
   }),
-  handler: async (ctx, { userId }) => {
+  handler: async (ctx, { userId, phase = "checkins", chunk = 0 }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) throw new ConvexError("cleanup-user-not-found");
+    if (!user.isShadowBanned && !user.deletionPending) {
+      throw new ConvexError("cleanup-precondition-not-met");
+    }
     const now = Date.now();
-    const activeCheckins = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", userId).gt("expiresAt", now)
-      )
-      .collect();
-
-    const decrements = new Map<Id<"tradePoints">, number>();
-    for (const checkin of activeCheckins) {
-      if (checkin.countedInPublic) {
-        decrements.set(
-          checkin.tradePointId,
-          (decrements.get(checkin.tradePointId) ?? 0) + 1
-        );
-      }
-      await ctx.db.delete(checkin._id);
+    if (
+      chunk === 0 &&
+      phase === "checkins" &&
+      user.cleanupInProgressAt &&
+      now - user.cleanupInProgressAt < CLEANUP_LEASE_MS
+    ) {
+      console.warn("cleanupForShadowBannedUser: lease ativo, skip", {
+        userId,
+      });
+      return { deleted: 0, phase, rescheduled: false };
     }
+    await ctx.db.patch(userId, {
+      cleanupStatus: "running",
+      cleanupInProgressAt: now,
+    });
 
-    for (const [tradePointId, count] of decrements) {
-      const point = await ctx.db.get(tradePointId);
-      if (point) {
-        await ctx.db.patch(tradePointId, {
-          activeCheckinsCount: Math.max(
-            0,
-            (point.activeCheckinsCount ?? 0) - count
-          ),
+    if (phase === "checkins") {
+      const batch = await ctx.db
+        .query("checkins")
+        .withIndex("by_user_active", (q) =>
+          q.eq("userId", userId).gt("expiresAt", now)
+        )
+        .take(CLEANUP_BATCH);
+
+      const decrements = new Map<Id<"tradePoints">, number>();
+      for (const c of batch) {
+        if (c.countedInPublic) {
+          decrements.set(
+            c.tradePointId,
+            (decrements.get(c.tradePointId) ?? 0) + 1
+          );
+        }
+        await ctx.db.delete(c._id);
+      }
+      for (const [pid, n] of decrements) {
+        const p = await ctx.db.get(pid);
+        if (p) {
+          await ctx.db.patch(pid, {
+            activeCheckinsCount: Math.max(
+              0,
+              (p.activeCheckinsCount ?? 0) - n
+            ),
+          });
+        }
+      }
+
+      if (batch.length === CLEANUP_BATCH) {
+        const result = await rescheduleIfMore(ctx, {
+          self: internal.checkins.cleanupForShadowBannedUser,
+          args: { userId, phase: "checkins" },
+          hasMore: true,
+          chunk,
+          maxChunks: CLEANUP_MAX_CHUNKS,
+          label: "cleanupForShadowBannedUser:checkins",
         });
+        if (result.aborted) {
+          await ctx.db.patch(userId, { cleanupStatus: "partial" });
+        }
+        return {
+          deleted: batch.length,
+          phase: "checkins",
+          rescheduled: result.rescheduled,
+        };
       }
+      await ctx.scheduler.runAfter(
+        0,
+        internal.checkins.cleanupForShadowBannedUser,
+        { userId, phase: "scoreBumps", chunk: 0 }
+      );
+      return { deleted: batch.length, phase: "checkins", rescheduled: true };
     }
 
-    const scoreBumps = await ctx.db
+    const scoreBumpBatch = await ctx.db
       .query("scoreBumps")
       .withIndex("by_user", (q) => q.eq("userId", userId))
-      .collect();
-    for (const row of scoreBumps) {
-      await ctx.db.delete(row._id);
+      .take(CLEANUP_BATCH);
+    for (const r of scoreBumpBatch) await ctx.db.delete(r._id);
+
+    if (scoreBumpBatch.length === CLEANUP_BATCH) {
+      const result = await rescheduleIfMore(ctx, {
+        self: internal.checkins.cleanupForShadowBannedUser,
+        args: { userId, phase: "scoreBumps" },
+        hasMore: true,
+        chunk,
+        maxChunks: CLEANUP_MAX_CHUNKS,
+        label: "cleanupForShadowBannedUser:scoreBumps",
+      });
+      if (result.aborted) {
+        await ctx.db.patch(userId, { cleanupStatus: "partial" });
+      }
+      return {
+        deleted: scoreBumpBatch.length,
+        phase: "scoreBumps",
+        rescheduled: result.rescheduled,
+      };
     }
 
+    await ctx.db.patch(userId, { cleanupStatus: "complete" });
     return {
-      cleanedCheckins: activeCheckins.length,
-      cleanedScoreBumps: scoreBumps.length,
+      deleted: scoreBumpBatch.length,
+      phase: "scoreBumps",
+      rescheduled: false,
     };
   },
 });
 
-const DECAY_RESCALE_THRESHOLD = 3000;
+const DECAY_BATCH = 200;
+const DECAY_MAX_CHUNKS = 50;
 
 export const decayPeakHours = internalMutation({
-  args: {},
-  returns: v.object({ processed: v.number() }),
-  handler: async (ctx) => {
-    const points = await ctx.db
+  args: {
+    cursor: v.optional(v.string()),
+    chunk: v.optional(v.number()),
+  },
+  returns: v.object({ processed: v.number(), rescheduled: v.boolean() }),
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const page = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .collect();
-
-    if (points.length >= DECAY_RESCALE_THRESHOLD) {
-      throw new Error(
-        `decayPeakHours: ${points.length} approved points >= threshold ${DECAY_RESCALE_THRESHOLD}. Re-introduzir paginação (ver git history dessa função antes do v13).`
-      );
-    }
+      .paginate({ numItems: DECAY_BATCH, cursor: cursor ?? null });
 
     let processed = 0;
-    for (const point of points) {
+    for (const point of page.page) {
       if (!point.peakHours || point.peakHours.length === 0) continue;
       const decayed = point.peakHours.map((h) => {
         const original = h ?? 0;
@@ -351,7 +429,19 @@ export const decayPeakHours = internalMutation({
       processed++;
     }
 
-    return { processed };
+    if (!page.isDone) {
+      const result = await rescheduleIfMore(ctx, {
+        self: internal.checkins.decayPeakHours,
+        args: { cursor: page.continueCursor },
+        hasMore: true,
+        chunk,
+        maxChunks: DECAY_MAX_CHUNKS,
+        label: "decayPeakHours",
+      });
+      return { processed, rescheduled: result.rescheduled };
+    }
+
+    return { processed, rescheduled: false };
   },
 });
 

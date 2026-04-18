@@ -1,5 +1,4 @@
 import { mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthenticatedUser } from "./lib/auth";
@@ -133,10 +132,5 @@ export const updateStickerList = mutation({
     }
 
     await ctx.db.patch(user._id, patch);
-
-    // 7. recomputeMatches
-    await ctx.scheduler.runAfter(0, internal.matches.recomputeMatches, {
-      userId: user._id,
-    });
   },
 });

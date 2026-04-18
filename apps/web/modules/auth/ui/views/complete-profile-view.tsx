@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
+import { OnboardingStepper } from "../components/onboarding-stepper";
 
 export function CompleteProfileView() {
   const router = useRouter();
@@ -44,47 +45,50 @@ export function CompleteProfileView() {
   }
 
   return (
-    <main className="landing-theme relative flex min-h-screen flex-col bg-[var(--landing-background)] stadium-gradient">
-      <header className="flex items-center px-6 py-8">
-        <Button
-          variant="ghost"
-          className="text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)] flex items-center gap-2 group p-0"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="h-6 w-6" />
-          <span className="font-label text-sm font-medium">Voltar</span>
-        </Button>
-      </header>
+    <main className="landing-theme relative grid min-h-screen bg-[var(--landing-background)] stadium-gradient lg:grid-cols-[340px_1fr]">
+      <OnboardingStepper currentStep={2} />
 
-      <section className="flex flex-1 flex-col px-6 pb-12 max-w-[480px] mx-auto w-full">
-        <div className="mb-10">
-          <h1 className="font-headline text-4xl font-bold leading-tight tracking-tight text-[var(--landing-on-surface)] uppercase italic">
-            Finalize seu <br />
-            <span className="text-[var(--landing-primary)]">Perfil</span>
-          </h1>
-          <p className="text-[var(--landing-on-surface-variant)] mt-3 text-base">
-            Crie sua identidade na arena digital e comece a trocar.
-          </p>
+      <div className="flex flex-col">
+        <header className="flex items-center justify-between px-6 py-6">
+          <Button
+            variant="ghost"
+            className="group flex items-center gap-2 p-0 text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="h-6 w-6" />
+            <span className="font-label text-sm font-medium">Voltar</span>
+          </Button>
+          <span className="text-xs uppercase tracking-widest text-[var(--landing-on-surface-variant)]">
+            Passo 02 / 03
+          </span>
+        </header>
+
+        <div className="px-6 lg:px-10">
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--landing-surface-container-high)]"
+            role="progressbar"
+            aria-valuenow={66}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progresso do onboarding"
+          >
+            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)]" />
+          </div>
         </div>
 
-        <CompleteProfileForm />
-      </section>
+        <section className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pb-12 pt-8 lg:px-10">
+          <div className="mb-8">
+            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--landing-on-surface)] lg:text-4xl">
+              Como te chamamos?
+            </h1>
+            <p className="mt-3 text-[var(--landing-on-surface-variant)]">
+              Escolha seu nome e @username. Eles vão aparecer para outros
+              colecionadores quando você agendar trocas.
+            </p>
+          </div>
 
-      <div className="mt-auto overflow-hidden opacity-30 select-none pointer-events-none">
-        <div className="flex justify-between items-end px-4 gap-1 h-24">
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[20%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[40%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[60%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[30%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[80%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[50%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[90%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[40%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[100%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[70%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[50%] rounded-t-sm" />
-          <div className="w-8 bg-[var(--landing-surface-container-high)] h-[30%] rounded-t-sm" />
-        </div>
+          <CompleteProfileForm />
+        </section>
       </div>
     </main>
   );

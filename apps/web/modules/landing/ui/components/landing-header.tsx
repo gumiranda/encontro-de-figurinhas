@@ -21,13 +21,18 @@ export function LandingHeader() {
       <div className="flex min-h-14 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
         <Link
           href="/"
-          className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 pr-2"
+          className="flex min-w-0 flex-1 items-center gap-3 pr-2"
         >
-          <Landmark
-            className="text-[var(--landing-primary)] size-7 shrink-0 sm:size-8"
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-primary-dim)] shadow-[0_0_24px_rgba(149,170,255,0.35)]"
             aria-hidden="true"
-          />
-          <span className="font-[var(--font-headline)] font-bold tracking-tight text-lg text-[var(--landing-primary)] sm:text-xl md:text-2xl truncate">
+          >
+            <Landmark
+              className="size-5 text-[var(--landing-on-primary)]"
+              strokeWidth={2.5}
+            />
+          </span>
+          <span className="truncate font-[var(--font-headline)] text-lg font-bold tracking-tight text-[var(--landing-on-surface)] sm:text-xl md:text-2xl">
             Figurinha Fácil
           </span>
         </Link>
@@ -49,14 +54,24 @@ export function LandingHeader() {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Button
+            asChild
+            variant="ghost"
+            size="lg"
+            className="hidden rounded-lg px-4 text-xs font-bold uppercase tracking-wider text-[var(--landing-on-surface)] hover:bg-[var(--landing-surface-variant)] sm:inline-flex sm:text-sm"
+          >
+            <Link href="/sign-in" className="whitespace-nowrap">
+              Entrar
+            </Link>
+          </Button>
           <Button
             asChild
             size="lg"
-            className="rounded-lg border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-primary-dim)] px-4 text-xs font-bold text-[var(--landing-on-primary-container)] shadow-none hover:from-[var(--landing-primary-dim)] hover:to-[var(--landing-primary)] hover:opacity-95 active:scale-95 sm:px-6 sm:text-sm"
+            className="rounded-lg border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-primary-dim)] px-4 text-xs font-bold uppercase tracking-wider text-[var(--landing-on-primary-container)] shadow-none hover:opacity-95 active:scale-95 sm:px-6 sm:text-sm"
           >
-            <Link href="/sign-in" className="whitespace-nowrap">
-              ENTRAR
+            <Link href="/sign-up" className="whitespace-nowrap">
+              Criar conta
             </Link>
           </Button>
 

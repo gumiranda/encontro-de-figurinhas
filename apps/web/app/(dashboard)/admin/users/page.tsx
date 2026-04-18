@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import {
@@ -51,7 +51,15 @@ export default function AdminUsersPage() {
   const isSuperadmin = currentUser?.role === "superadmin";
   const isCeo = currentUser?.role === "ceo";
   const canListUsers = isSuperadmin || isCeo;
-  const users = useQuery(api.users.getAllUsers, canListUsers ? {} : "skip");
+  const {
+    results: users,
+    status: usersStatus,
+    loadMore,
+  } = usePaginatedQuery(
+    api.users.getAllUsers,
+    canListUsers ? {} : "skip",
+    { initialNumItems: 50 }
+  );
   const updateUserRole = useMutation(api.users.updateUserRole);
   const updateUserSector = useMutation(api.users.updateUserSector);
 
@@ -161,42 +169,56 @@ export default function AdminUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {users === undefined ? (
+          {usersStatus === "LoadingFirstPage" ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Sector</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell><RoleBadge role={user.role} /></TableCell>
-                    <TableCell>{getSectorName(user.sector)}</TableCell>
-                    <TableCell className="text-right">
-                      {canEditUser(user.role) &&
-                        user._id !== currentUser._id && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditUser(user)}
-                          >
-                            Edit
-                          </Button>
-                        )}
-                    </TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Sector</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user._id}>
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell><RoleBadge role={user.role} /></TableCell>
+                      <TableCell>{getSectorName(user.sector)}</TableCell>
+                      <TableCell className="text-right">
+                        {canEditUser(user.role) &&
+                          user._id !== currentUser._id && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditUser(user)}
+                            >
+                              Edit
+                            </Button>
+                          )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {usersStatus === "CanLoadMore" && (
+                <div className="flex justify-center pt-4">
+                  <Button variant="outline" onClick={() => loadMore(50)}>
+                    Carregar mais
+                  </Button>
+                </div>
+              )}
+              {usersStatus === "LoadingMore" && (
+                <div className="flex justify-center pt-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

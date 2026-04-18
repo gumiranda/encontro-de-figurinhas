@@ -1,5 +1,5 @@
 "use client";
-import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { AuthPitchPanel } from "@/modules/auth/ui/components/auth-pitch-panel";
 
@@ -21,12 +21,12 @@ const clerkAppearance = {
   },
 };
 
-export const SignInView = () => {
+export const SignUpView = () => {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <AuthPitchPanel />
       <section className="flex items-center justify-center p-6 lg:p-10">
-        <SignIn routing="hash" appearance={clerkAppearance} />
+        <SignUp routing="hash" appearance={clerkAppearance} />
       </section>
     </div>
   );

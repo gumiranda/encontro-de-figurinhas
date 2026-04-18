@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as _helpers_pagination from "../_helpers/pagination.js";
 import type * as checkins from "../checkins.js";
 import type * as cities from "../cities.js";
 import type * as crons from "../crons.js";
@@ -20,13 +21,13 @@ import type * as lib_limits from "../lib/limits.js";
 import type * as lib_locationConstants from "../lib/locationConstants.js";
 import type * as lib_locationRateLimit from "../lib/locationRateLimit.js";
 import type * as lib_rateLimit from "../lib/rateLimit.js";
+import type * as lib_rateLimiter from "../lib/rateLimiter.js";
 import type * as lib_setLocationErrors from "../lib/setLocationErrors.js";
 import type * as lib_slug from "../lib/slug.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_userCoords from "../lib/userCoords.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_whatsapp from "../lib/whatsapp.js";
-import type * as matches from "../matches.js";
 import type * as permissions from "../permissions.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
@@ -50,6 +51,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "_helpers/pagination": typeof _helpers_pagination;
   checkins: typeof checkins;
   cities: typeof cities;
   crons: typeof crons;
@@ -62,13 +64,13 @@ declare const fullApi: ApiFromModules<{
   "lib/locationConstants": typeof lib_locationConstants;
   "lib/locationRateLimit": typeof lib_locationRateLimit;
   "lib/rateLimit": typeof lib_rateLimit;
+  "lib/rateLimiter": typeof lib_rateLimiter;
   "lib/setLocationErrors": typeof lib_setLocationErrors;
   "lib/slug": typeof lib_slug;
   "lib/types": typeof lib_types;
   "lib/userCoords": typeof lib_userCoords;
   "lib/utils": typeof lib_utils;
   "lib/whatsapp": typeof lib_whatsapp;
-  matches: typeof matches;
   permissions: typeof permissions;
   seedAlbumConfig: typeof seedAlbumConfig;
   "seeds/seedCities": typeof seeds_seedCities;
@@ -88,4 +90,139 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  rateLimiter: {
+    lib: {
+      checkRateLimit: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      clearAll: FunctionReference<
+        "mutation",
+        "internal",
+        { before?: number },
+        null
+      >;
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
+      getValue: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          key?: string;
+          name: string;
+          sampleShards?: number;
+        },
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          shard: number;
+          ts: number;
+          value: number;
+        }
+      >;
+      rateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      resetRateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        { key?: string; name: string },
+        null
+      >;
+    };
+    time: {
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
+    };
+  };
+};
