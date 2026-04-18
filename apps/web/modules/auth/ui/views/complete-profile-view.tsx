@@ -66,7 +66,10 @@ export function CompleteProfileView() {
 
           <div className="mb-8 mt-10 min-w-0">
             <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--on-surface)] lg:text-4xl">
-              Como te chamamos?
+              Como te{" "}
+              <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--tertiary)] bg-clip-text text-transparent">
+                chamamos?
+              </span>
             </h1>
             <p className="mt-3 break-words text-pretty text-[var(--on-surface-variant)]">
               Escolha um apelido único e confirme sua idade. Ele aparece nas propostas de

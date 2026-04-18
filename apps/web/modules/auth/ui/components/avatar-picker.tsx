@@ -121,7 +121,7 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+    <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
       <div className="relative shrink-0">
         <div
           className="flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface-container-low)] bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)] lg:size-36"
@@ -135,12 +135,20 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
             initials
           )}
         </div>
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border-4 border-[var(--surface-container-low)] bg-[var(--surface-container-high)] text-[var(--on-surface)] shadow-lg"
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={isBusy}
+          aria-busy={isBusy}
+          aria-label="Enviar foto"
+          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border-4 border-[var(--surface-container-low)] bg-[var(--primary)] text-[var(--on-primary)] shadow-lg disabled:opacity-60"
         >
-          <Camera className="size-4" />
-        </span>
+          {isBusy ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Camera className="size-4" aria-hidden="true" />
+          )}
+        </button>
       </div>
 
       <div className="min-w-0 flex-1 space-y-2">
