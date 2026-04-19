@@ -38,7 +38,7 @@ export function MobileBottomNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-16 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
+                  "flex h-[var(--mobile-nav-height)] flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
                   active
                     ? "text-primary"
                     : "text-on-surface-variant hover:text-foreground",

@@ -64,6 +64,19 @@
   --outline: oklch(0.5 0 0);
   --outline-variant: oklch(0.75 0 0);
 
+  /* Landing/onboarding — alias MD3 tokens */
+  --landing-primary: var(--primary);
+  --landing-on-primary: var(--primary-foreground);
+  --landing-secondary: var(--secondary);
+  --landing-on-secondary: var(--secondary-foreground);
+  --landing-surface-container-low: var(--surface-container-low);
+  --landing-surface-container: var(--surface-container);
+  --landing-surface-container-high: var(--surface-container-high);
+  --landing-on-surface: var(--on-surface);
+  --landing-on-surface-variant: var(--on-surface-variant);
+  --landing-outline-variant: var(--outline-variant);
+  --landing-sweep-color: color-mix(in srgb, var(--landing-secondary) 40%, transparent);
+
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm:
@@ -79,6 +92,13 @@
   --shadow-stadium: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* Glass overlays (mockup 06-mapa.html: rgba(13,19,35,.85) e .9) — herdadas em .dark */
+  --glass-surface: rgba(13, 19, 35, 0.85);
+  --glass-surface-strong: rgba(13, 19, 35, 0.9);
+
+  /* Altura do MobileBottomNav (h-16 = 4rem). Consumida pelo nav e pela bottom-sheet do mapa */
+  --mobile-nav-height: 4rem;
 }
 
 .dark {
@@ -90,24 +110,29 @@
   --popover: #1e253b;
   --popover-foreground: #e1e4fa;
 
-  /* MD3 Primary (Blue) */
+  /* MD3 Primary (Blue) — stadium blue */
   --primary: #95aaff;
   --primary-dim: #3766ff;
   --primary-container: #829bff;
+  --on-primary: #00247e;
   --primary-foreground: #00247e;
   --on-primary-container: #001a63;
 
-  /* MD3 Secondary (Green - for duplicates) */
+  /* MD3 Secondary (Green - for duplicates / pitch green) */
   --secondary: #4ff325;
   --secondary-dim: #3ee40c;
   --secondary-container: #176e00;
+  --on-secondary: #105500;
   --secondary-foreground: #105500;
+  --on-secondary-container: #e7ffd8;
 
-  /* MD3 Tertiary (Yellow/Gold - for extras) */
+  /* MD3 Tertiary (Yellow/Gold - for extras / trophy) */
   --tertiary: #ffc965;
   --tertiary-dim: #ecaa00;
   --tertiary-container: #feb700;
+  --on-tertiary: #5f4200;
   --tertiary-foreground: #5f4200;
+  --on-tertiary-container: #533a00;
 
   /* MD3 Error (distinct from shadcn destructive alias) */
   --error: #ff6e84;
@@ -132,6 +157,19 @@
   /* MD3 Outline — WCAG AA: #9499ad on #090e1c = 6.80 */
   --outline: #9499ad;
   --outline-variant: #434759;
+
+  /* Landing/onboarding — alias MD3 tokens */
+  --landing-primary: var(--primary);
+  --landing-on-primary: var(--on-primary);
+  --landing-secondary: var(--secondary);
+  --landing-on-secondary: var(--on-secondary);
+  --landing-surface-container-low: var(--surface-container-low);
+  --landing-surface-container: var(--surface-container);
+  --landing-surface-container-high: var(--surface-container-high);
+  --landing-on-surface: var(--on-surface);
+  --landing-on-surface-variant: var(--on-surface-variant);
+  --landing-outline-variant: var(--outline-variant);
+  --landing-sweep-color: color-mix(in srgb, var(--landing-secondary) 40%, transparent);
 
   --muted: #1e253b;
   --muted-foreground: #a6aabf;
@@ -241,10 +279,16 @@
 
   /* MD3 Containers */
   --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
   --color-on-primary-container: var(--on-primary-container);
   --color-secondary-dim: var(--secondary-dim);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+  --color-on-secondary-container: var(--on-secondary-container);
   --color-tertiary-dim: var(--tertiary-dim);
   --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-on-tertiary-container: var(--on-tertiary-container);
 
   /* MD3 Error (distinct from destructive alias) */
   --color-error: var(--error);
@@ -292,20 +336,208 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body), var(--font-sans), system-ui, sans-serif;
     letter-spacing: var(--tracking-normal);
     font-weight: 500;
   }
 }
 
-/* Custom utility classes for MD3 design */
+/* Custom utility classes for MD3 design (styleguide v1.0 — arena/stadium) */
 @layer utilities {
   .glass-effect {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
+  /* Glass card — painel translúcido usado em heroes/sheets */
+  .glass-card {
+    background: rgba(30, 37, 59, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
   .stadium-shadow {
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Stadium gradient — fundo radial de arena */
+  .stadium-gradient {
+    background:
+      radial-gradient(circle at top right, rgba(149, 170, 255, 0.15), transparent),
+      radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent);
+  }
+
+  /* Stadium glow radial central (GPS/localização) */
+  .stadium-glow {
+    background: radial-gradient(
+      circle at center,
+      rgba(55, 102, 255, 0.15) 0%,
+      rgba(9, 14, 28, 0) 70%
+    );
+  }
+
+  /* Text gradient primary → secondary — headlines de hero */
+  .text-gradient-primary {
+    background: linear-gradient(
+      to right,
+      var(--primary),
+      var(--primary-dim),
+      var(--secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Tag chip — pill verde "ao vivo" */
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(79, 243, 37, 0.12);
+    border: 1px solid rgba(79, 243, 37, 0.35);
+    color: var(--secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Botão primário com gradiente (CTA da landing/trocas) */
+  .btn-primary-gradient {
+    height: 3rem;
+    border-radius: 0.75rem;
+    padding: 0 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-image: linear-gradient(
+      to right,
+      var(--primary-dim),
+      var(--primary)
+    );
+    color: var(--on-primary);
+    font-family: var(--font-headline), var(--font-body), sans-serif;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 10px 25px -5px rgba(149, 170, 255, 0.25);
+    transition-property: opacity, transform;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+  .btn-primary-gradient:hover {
+    opacity: 0.95;
+  }
+  .btn-primary-gradient:active {
+    transform: scale(0.98);
+  }
+
+  /* Pulse ring — badge "ao vivo" */
+  .pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Pulse dot — bulletinho verde pulsante */
+  .pulse-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--secondary);
+    box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5);
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+
+  /* Radar bars — ondinhas que sobem/descem */
+  .bar-wave {
+    transform-origin: bottom;
+    animation: bar-wave 1.2s ease-in-out infinite;
+  }
+
+  /* Radar sweep — conic GPS rodando */
+  .radar-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    background: conic-gradient(
+      from 0deg,
+      transparent 85%,
+      var(--landing-sweep-color) 95%,
+      transparent 100%
+    );
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+    will-change: transform;
+    animation: radar-sweep 3s linear infinite;
+  }
+  .radar-sweep[data-speed="fast"] {
+    animation-duration: 1.5s;
+  }
+}
+
+@supports not (color: color-mix(in srgb, red, blue)) {
+  :root,
+  .dark {
+    --landing-sweep-color: rgba(79, 243, 37, 0.4);
+  }
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(79, 243, 37, 0);
+  }
+}
+@keyframes bar-wave {
+  0%,
+  100% {
+    transform: scaleY(0.68);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes radar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring,
+  .pulse-dot,
+  .bar-wave {
+    animation: none;
+  }
+  .radar-sweep {
+    animation-duration: 12s;
+  }
+  .btn-primary-gradient:active {
+    transform: none;
   }
 }
 

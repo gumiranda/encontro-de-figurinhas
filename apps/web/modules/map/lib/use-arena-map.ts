@@ -49,5 +49,7 @@ export function useArenaMap() {
       .sort((a, b) => a.distanceKm - b.distanceKm);
   }, [data]);
 
-  return { status, userCoords, mapCenter, points };
+  const cityName = data?.state === "ready" ? data.city.name : null;
+
+  return { status, userCoords, mapCenter, points, cityName };
 }

@@ -18,6 +18,19 @@ export const getCurrentUser = query({
   },
 });
 
+export const getNavContext = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+    return {
+      role: user.role,
+      hasCompletedOnboarding: user.hasCompletedOnboarding ?? false,
+      hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
+    };
+  },
+});
+
 export const hasAnyUsers = query({
   args: {},
   handler: async (ctx) => {
@@ -267,6 +280,68 @@ export const completeProfile = mutation({
     });
 
     return { success: true };
+  },
+});
+
+export const generateAvatarUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requireAuth(ctx);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const setAvatar = mutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const url = await ctx.storage.getUrl(args.storageId);
+    if (!url) {
+      throw new Error("Upload not found");
+    }
+
+    const previousStorageId = user.avatarStorageId;
+
+    await ctx.db.patch(user._id, {
+      avatarStorageId: args.storageId,
+      avatarUrl: url,
+    });
+
+    if (previousStorageId && previousStorageId !== args.storageId) {
+      await ctx.storage.delete(previousStorageId);
+    }
+
+    return { avatarUrl: url };
+  },
+});
+
+export const getMyFavoriteTradePointIds = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return [];
+    return user.favoriteTradePointIds ?? [];
+  },
+});
+
+export const toggleFavoriteTradePoint = mutation({
+  args: { tradePointId: v.id("tradePoints") },
+  handler: async (ctx, { tradePointId }) => {
+    const user = await requireAuth(ctx);
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "approved") {
+      throw new Error("Point unavailable");
+    }
+    const current = user.favoriteTradePointIds ?? [];
+    const has = current.includes(tradePointId);
+    const next = has
+      ? current.filter((id) => id !== tradePointId)
+      : [...current, tradePointId];
+    await ctx.db.patch(user._id, { favoriteTradePointIds: next });
+    return { isFavorite: !has };
   },
 });
 

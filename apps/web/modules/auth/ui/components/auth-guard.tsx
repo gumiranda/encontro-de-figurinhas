@@ -3,7 +3,6 @@
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInView } from "../views/sign-in-view";
 import { FullPageLoader } from "@/components/full-page-loader";
-import "@workspace/ui/styles/landing-theme.css";
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   return (

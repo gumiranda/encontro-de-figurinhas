@@ -47,6 +47,34 @@ export const getMapView = query({
       )
       .take(50);
 
+    const now = Date.now();
+    const points = await Promise.all(
+      rawPoints.map(async (p) => {
+        const active = await ctx.db
+          .query("checkins")
+          .withIndex("by_tradePoint_active", (q) =>
+            q.eq("tradePointId", p._id).gt("expiresAt", now)
+          )
+          .collect();
+        return {
+          _id: p._id,
+          name: p.name,
+          address: p.address,
+          lat: p.lat,
+          lng: p.lng,
+          suggestedHours: p.suggestedHours,
+          description: p.description,
+          confidenceScore: p.confidenceScore,
+          lastActivityAt: p.lastActivityAt,
+          confirmedTradesCount: p.confirmedTradesCount,
+          activeCheckinsCount: active.length,
+          participantCount: p.participantCount ?? 0,
+          acceptsMail: p.acceptsMail === true,
+          pointType: p.pointType ?? ("fixed" as const),
+        };
+      })
+    );
+
     return {
       state: "ready" as const,
       userLocation:
@@ -54,18 +82,7 @@ export const getMapView = query({
           ? { lat: user.lat, lng: user.lng }
           : null,
       city: { lat: city.lat, lng: city.lng, name: city.name },
-      points: rawPoints.map((p) => ({
-        _id: p._id,
-        name: p.name,
-        address: p.address,
-        lat: p.lat,
-        lng: p.lng,
-        suggestedHours: p.suggestedHours,
-        description: p.description,
-        confidenceScore: p.confidenceScore,
-        lastActivityAt: p.lastActivityAt,
-        confirmedTradesCount: p.confirmedTradesCount,
-      })),
+      points,
     };
   },
 });

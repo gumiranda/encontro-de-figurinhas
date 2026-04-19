@@ -37,24 +37,44 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export function useAppNavGroups(): NavGroup[] {
+interface RenderedNavItem extends NavItem {
+  ariaDisabled: boolean;
+}
+
+interface RenderedNavGroup {
+  title: string;
+  items: RenderedNavItem[];
+}
+
+const ONBOARDING_ALLOWED_HREFS = new Set<string>([
+  "/cadastrar-figurinhas",
+  "/cadastrar-figurinhas/quick",
+]);
+
+export function useAppNavGroups(): RenderedNavGroup[] {
   const { isAuthenticated } = useConvexAuth();
-  const currentUser = useQuery(
-    api.users.getCurrentUser,
-    isAuthenticated ? {} : "skip"
-  );
+  const navContext = useQuery(api.users.getNavContext, isAuthenticated ? {} : "skip");
 
-  return useMemo<NavGroup[]>(() => {
+  return useMemo<RenderedNavGroup[]>(() => {
     const isSuperadminOrCeo =
-      currentUser?.role === "superadmin" || currentUser?.role === "ceo";
+      navContext?.role === "superadmin" || navContext?.role === "ceo";
 
-    return [
+    // Fail-closed: enquanto navContext === undefined (primeiro tick) ou null (not authed),
+    // desabilitar tudo exceto /cadastrar-figurinhas. Evita flash clicável que dispararia
+    // o redirect loop do DashboardShell antes do setup completar.
+    const setupCompleted = navContext?.hasCompletedStickerSetup === true;
+
+    const baseGroups: NavGroup[] = [
       {
         title: "Principal",
         items: [
           { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
           { label: "Meu Álbum", href: "/album", icon: StickyNote },
-          { label: "Cadastrar figurinhas", href: "/cadastrar-figurinhas", icon: ListPlus },
+          {
+            label: "Cadastrar figurinhas",
+            href: "/cadastrar-figurinhas/quick",
+            icon: ListPlus,
+          },
           { label: "Encontrar trocas", href: "/encontrar-trocas", icon: ArrowLeftRight },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
@@ -75,11 +95,19 @@ export function useAppNavGroups(): NavGroup[] {
           ]
         : []),
     ];
-  }, [currentUser?.role]);
+
+    return baseGroups.map((group) => ({
+      title: group.title,
+      items: group.items.map((item) => ({
+        ...item,
+        ariaDisabled: !setupCompleted && !ONBOARDING_ALLOWED_HREFS.has(item.href),
+      })),
+    }));
+  }, [navContext?.role, navContext?.hasCompletedStickerSetup]);
 }
 
 interface SidebarContentProps {
-  groups: NavGroup[];
+  groups: RenderedNavGroup[];
   pathname: string;
   onNavigate?: () => void;
 }
@@ -103,16 +131,33 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
               const isActive =
                 pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
+
+              const baseClass = cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+              );
+
+              if (item.ariaDisabled) {
+                return (
+                  <span
+                    key={item.href}
+                    aria-disabled="true"
+                    tabIndex={-1}
+                    className={cn(baseClass, "pointer-events-none opacity-50")}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </span>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                    isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                  )}
+                  className={baseClass}
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}

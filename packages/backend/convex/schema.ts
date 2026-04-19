@@ -14,6 +14,8 @@ export default defineSchema({
     birthDate: v.optional(v.number()),
     cityId: v.optional(v.id("cities")),
     hasCompletedOnboarding: v.optional(v.boolean()),
+    avatarStorageId: v.optional(v.id("_storage")),
+    avatarUrl: v.optional(v.string()),
 
     // Reputation fields (PRD §2.3)
     reliabilityScore: v.number(),
@@ -54,6 +56,9 @@ export default defineSchema({
     totalStickersOwned: v.optional(v.number()),
     hasCompletedStickerSetup: v.optional(v.boolean()),
 
+    // Favoritos de pontos de troca (array no user doc — padrão de stickers)
+    favoriteTradePointIds: v.optional(v.array(v.id("tradePoints"))),
+
     // Additional PRD fields
     hasSeenSafetyTips: v.optional(v.boolean()),
     isPremium: v.optional(v.boolean()),
@@ -68,6 +73,8 @@ export default defineSchema({
     lng: v.optional(v.float64()),
     locationUpdatedAt: v.optional(v.number()),
     locationUpdateTimestamps: v.optional(v.array(v.number())),
+
+    acceptsMail: v.optional(v.boolean()),
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_role", ["role"])
@@ -119,6 +126,11 @@ export default defineSchema({
     createdAt: v.number(),
     participantCount: v.optional(v.number()),
     activeCheckinsCount: v.optional(v.number()),
+
+    acceptsMail: v.optional(v.boolean()),
+    pointType: v.optional(
+      v.union(v.literal("fixed"), v.literal("event"), v.literal("mail"))
+    ),
   })
     .index("by_city_status", ["cityId", "status"])
     .index("by_status", ["status"])
@@ -169,9 +181,70 @@ export default defineSchema({
         startNumber: v.number(),
         endNumber: v.number(),
         isExtra: v.optional(v.boolean()),
+        flagEmoji: v.optional(v.string()),
+        goldenNumbers: v.optional(v.array(v.number())),
+        legendNumbers: v.optional(
+          v.array(
+            v.object({ number: v.number(), name: v.string() })
+          )
+        ),
       })
     ),
     version: v.number(),
     year: v.number(),
   }),
+
+  userMatchCache: defineTable({
+    userId: v.id("users"),
+    cityId: v.id("cities"),
+    matches: v.array(
+      v.object({
+        otherUserId: v.id("users"),
+        ihaveCount: v.number(),
+        ineedCount: v.number(),
+        distanceMeters: v.union(v.number(), v.null()),
+        distanceBucket: v.union(
+          v.literal("near"),
+          v.literal("close"),
+          v.literal("mid"),
+          v.literal("far"),
+          v.literal("unknown")
+        ),
+        ihaveSample: v.array(v.number()),
+        ineedSample: v.array(v.number()),
+        score: v.number(),
+        hasSpecial: v.boolean(),
+        otherAcceptsMail: v.boolean(),
+      })
+    ),
+    recomputeCursor: v.union(v.string(), v.null()),
+    partialMatches: v.union(
+      v.null(),
+      v.array(
+        v.object({
+          otherUserId: v.id("users"),
+          ihaveCount: v.number(),
+          ineedCount: v.number(),
+          distanceMeters: v.union(v.number(), v.null()),
+          distanceBucket: v.union(
+            v.literal("near"),
+            v.literal("close"),
+            v.literal("mid"),
+            v.literal("far"),
+            v.literal("unknown")
+          ),
+          ihaveSample: v.array(v.number()),
+          ineedSample: v.array(v.number()),
+          score: v.number(),
+          hasSpecial: v.boolean(),
+          otherAcceptsMail: v.boolean(),
+        })
+      )
+    ),
+    recomputedAt: v.number(),
+    recomputeStartedAt: v.union(v.number(), v.null()),
+    stale: v.boolean(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_city", ["cityId"]),
 });

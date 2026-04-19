@@ -21,18 +21,18 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
 
           <h1
             id="hero-heading"
-            className="font-[var(--font-headline)] text-4xl font-black leading-tight tracking-tighter text-[var(--landing-on-surface)] sm:text-5xl lg:text-6xl"
+            className="font-[var(--font-headline)] text-4xl font-black leading-tight tracking-tighter text-[var(--on-surface)] sm:text-5xl lg:text-6xl"
           >
             Sua figurinha perdida{" "}
             <em className="not-italic text-gradient-primary">está aqui perto.</em>
           </h1>
 
-          <p className="max-w-lg text-lg leading-relaxed text-[var(--landing-on-surface-variant)]">
+          <p className="max-w-lg text-lg leading-relaxed text-[var(--on-surface-variant)]">
             A maior rede de troca do Brasil. Encontre colecionadores e pontos
             verificados na sua cidade em segundos — grátis.
           </p>
 
-          <div className="rounded-2xl border border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container)] p-4 shadow-soft">
+          <div className="rounded-2xl border border-[var(--outline-variant)]/30 bg-[var(--surface-container)] p-4 shadow-soft">
             <CitySearch />
           </div>
 
@@ -55,7 +55,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
             </Link>
             <Link
               href="/como-funciona"
-              className="flex h-14 items-center justify-center rounded-xl border border-[var(--landing-outline-variant)]/40 px-8 font-bold uppercase tracking-wider text-[var(--landing-on-surface)] transition-colors hover:bg-[var(--landing-surface-variant)]"
+              className="flex h-14 items-center justify-center rounded-xl border border-[var(--outline-variant)]/40 px-8 font-bold uppercase tracking-wider text-[var(--on-surface)] transition-colors hover:bg-[var(--surface-variant)]"
             >
               Como funciona
             </Link>
@@ -82,17 +82,17 @@ function Stat({
   tone: "primary" | "secondary" | "tertiary";
 }) {
   const toneClass = {
-    primary: "text-[var(--landing-primary)]",
-    secondary: "text-[var(--landing-secondary)]",
-    tertiary: "text-[var(--landing-tertiary)]",
+    primary: "text-[var(--primary)]",
+    secondary: "text-[var(--secondary)]",
+    tertiary: "text-[var(--tertiary)]",
   }[tone];
 
   return (
-    <div className="rounded-xl border border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container)] p-4 text-center">
+    <div className="rounded-xl border border-[var(--outline-variant)]/30 bg-[var(--surface-container)] p-4 text-center">
       <dd className={`font-[var(--font-headline)] text-2xl font-black ${toneClass}`}>
         {value}
       </dd>
-      <dt className="mt-1 text-[0.6875rem] uppercase tracking-widest text-[var(--landing-on-surface-variant)]">
+      <dt className="mt-1 text-[0.6875rem] uppercase tracking-widest text-[var(--on-surface-variant)]">
         {label}
       </dt>
     </div>
@@ -107,14 +107,14 @@ function ArenaVisual() {
       aria-label="Arena visual com colecionadores ativos em cidades próximas"
     >
       <div className="absolute inset-0 rounded-full stadium-glow" />
-      <div className="absolute inset-[8%] rounded-full border border-[var(--landing-primary)]/25" />
-      <div className="absolute inset-[20%] rounded-full border border-[var(--landing-secondary)]/20" />
-      <div className="absolute inset-[34%] rounded-full border border-[var(--landing-tertiary)]/20" />
+      <div className="absolute inset-[8%] rounded-full border border-[var(--primary)]/25" />
+      <div className="absolute inset-[20%] rounded-full border border-[var(--secondary)]/20" />
+      <div className="absolute inset-[34%] rounded-full border border-[var(--tertiary)]/20" />
 
       <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-primary-dim)] shadow-[0_0_40px_rgba(149,170,255,0.45)]">
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dim)] shadow-[0_0_40px_rgba(149,170,255,0.45)]">
           <Landmark
-            className="h-10 w-10 text-[var(--landing-on-primary)]"
+            className="h-10 w-10 text-[var(--on-primary)]"
             aria-hidden="true"
             strokeWidth={2.5}
           />
@@ -140,9 +140,9 @@ function PeripheralPin({
   tone: "primary" | "secondary" | "tertiary";
 }) {
   const toneBg = {
-    primary: "bg-[var(--landing-primary)] text-[var(--landing-on-primary)]",
-    secondary: "bg-[var(--landing-secondary)] text-[var(--landing-on-secondary)]",
-    tertiary: "bg-[var(--landing-tertiary)] text-[var(--landing-on-tertiary)]",
+    primary: "bg-[var(--primary)] text-[var(--on-primary)]",
+    secondary: "bg-[var(--secondary)] text-[var(--on-secondary)]",
+    tertiary: "bg-[var(--tertiary)] text-[var(--on-tertiary)]",
   }[tone];
 
   return (
@@ -158,11 +158,11 @@ function PeripheralPin({
 
 function AeoExplainer() {
   return (
-    <div className="mt-12 max-w-3xl rounded-2xl border border-[var(--landing-outline-variant)]/25 bg-[var(--landing-surface-container-low)] p-6">
-      <h2 className="mb-2 font-[var(--font-headline)] text-lg font-bold text-[var(--landing-on-surface)]">
+    <div className="mt-12 max-w-3xl rounded-2xl border border-[var(--outline-variant)]/25 bg-[var(--surface-container-low)] p-6">
+      <h2 className="mb-2 font-[var(--font-headline)] text-lg font-bold text-[var(--on-surface)]">
         O que é o Figurinha Fácil?
       </h2>
-      <p className="text-[var(--landing-on-surface-variant)]">
+      <p className="text-[var(--on-surface-variant)]">
         Figurinha Fácil é a maior rede brasileira de troca de figurinhas do álbum
         da Copa do Mundo 2026. Colecionadores cadastram repetidas e faltantes, o
         sistema encontra matches em cidades próximas e conecta via WhatsApp em

@@ -15,8 +15,34 @@ import { buildSectionLookup, type Section } from "./sticker-parser";
 
 const EMPTY_SECTIONS: Section[] = [];
 const EMPTY_NUMBERS: number[] = [];
+const RETRY_SOON_ERROR = "Aguarde alguns segundos antes de tentar novamente.";
+const GENERIC_SAVE_ERROR = "Erro ao salvar. Tente novamente.";
 
 export type ListKind = "duplicates" | "missing";
+
+function getUserFacingStickerError(
+  error: unknown,
+  fallback = GENERIC_SAVE_ERROR
+): string {
+  const rawMessage = error instanceof Error ? error.message : String(error ?? "");
+  const message = rawMessage.trim();
+
+  if (!message) return fallback;
+
+  if (message.includes("Aguarde alguns segundos antes de atualizar novamente")) {
+    return RETRY_SOON_ERROR;
+  }
+
+  if (
+    message.includes("[CONVEX") ||
+    message.includes("Server Error") ||
+    message.includes("Called by client")
+  ) {
+    return fallback;
+  }
+
+  return message;
+}
 
 function validateDisjoint(dups: number[], miss: number[]): string | null {
   const dupSet = new Set(dups);
@@ -117,10 +143,32 @@ export function useStickers(debounceMs = 300) {
   const updateStickerList = useMutation(api.stickers.updateStickerList);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const savePromiseRef = useRef<Promise<void> | null>(null);
   const editCountRef = useRef(0);
 
   const dupsRef = useRef<number[]>([]);
   const missRef = useRef<number[]>([]);
+
+  const runSerializedSave = useCallback(
+    async (payload: {
+      duplicates: number[];
+      missing: number[];
+      finalize: boolean;
+    }) => {
+      while (savePromiseRef.current) {
+        await savePromiseRef.current;
+      }
+
+      const p = updateStickerList(payload).then(() => undefined);
+      savePromiseRef.current = p;
+      p.finally(() => {
+        if (savePromiseRef.current === p) savePromiseRef.current = null;
+      });
+
+      await p;
+    },
+    [updateStickerList]
+  );
 
   useEffect(() => {
     if (!isLoading && !isDirty) {
@@ -151,6 +199,7 @@ export function useStickers(debounceMs = 300) {
     }
 
     debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
       const dupsAtSave = dupsRef.current;
       const missAtSave = missRef.current;
 
@@ -165,26 +214,28 @@ export function useStickers(debounceMs = 300) {
       }
       dispatch({ type: "setError", error: null });
 
-      dispatch({ type: "setSaving", saving: true });
-      updateStickerList({
-        duplicates: dupsAtSave,
-        missing: missAtSave,
-        finalize: false,
-      })
-        .then(() => {
+      void (async () => {
+        dispatch({ type: "setSaving", saving: true });
+        try {
+          await runSerializedSave({
+            duplicates: dupsAtSave,
+            missing: missAtSave,
+            finalize: false,
+          });
+
           if (editCountRef.current === editId) {
             dispatch({ type: "setDirty", dirty: false });
           }
-        })
-        .catch((e) => {
-          dispatch({ type: "setError", error: e.message });
-          toast.error("Erro ao salvar. Tente novamente.");
-        })
-        .finally(() => {
+        } catch (e) {
+          const msg = getUserFacingStickerError(e);
+          dispatch({ type: "setError", error: msg });
+          toast.error(msg);
+        } finally {
           dispatch({ type: "setSaving", saving: false });
-        });
+        }
+      })();
     }, debounceMs);
-  }, [debounceMs, updateStickerList]);
+  }, [debounceMs, runSerializedSave]);
 
   useEffect(() => {
     const { duplicates: d, missing: m } = clampStickerListsToMax(
@@ -275,6 +326,7 @@ export function useStickers(debounceMs = 300) {
   const finalize = useCallback(async () => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
+      debounceRef.current = null;
     }
 
     const dups = dupsRef.current;
@@ -296,19 +348,44 @@ export function useStickers(debounceMs = 300) {
     dispatch({ type: "setSaving", saving: true });
 
     try {
-      await updateStickerList({
+      await runSerializedSave({
         duplicates: dups,
         missing: miss,
         finalize: true,
       });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Erro ao salvar";
+      const msg = getUserFacingStickerError(e);
       dispatch({ type: "setError", error: msg });
-      throw e;
+      throw new Error(msg);
     } finally {
       dispatch({ type: "setSaving", saving: false });
     }
-  }, [updateStickerList]);
+  }, [runSerializedSave]);
+
+  const flush = useCallback(async () => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+
+    dispatch({ type: "setSaving", saving: true });
+    dispatch({ type: "setError", error: null });
+
+    try {
+      await runSerializedSave({
+        duplicates: dupsRef.current,
+        missing: missRef.current,
+        finalize: false,
+      });
+      dispatch({ type: "setDirty", dirty: false });
+    } catch (e) {
+      const msg = getUserFacingStickerError(e);
+      dispatch({ type: "setError", error: msg });
+      toast.error(msg);
+    } finally {
+      dispatch({ type: "setSaving", saving: false });
+    }
+  }, [runSerializedSave]);
 
   const canFinalize =
     (localDuplicates.length > 0 || localMissing.length > 0) && !isSaving;
@@ -403,6 +480,7 @@ export function useStickers(debounceMs = 300) {
     totalStickers,
     isLoading,
     isSaving,
+    isDirty,
     error,
     canFinalize,
 
@@ -411,6 +489,7 @@ export function useStickers(debounceMs = 300) {
     addMissing,
     removeMissing,
     finalize,
+    flush,
 
     markAllInSection,
     clearSection,

@@ -14,17 +14,17 @@ export function CitySearch() {
 
   return (
     <div className="relative group w-full max-w-xl">
-      <div className="absolute -inset-1 bg-gradient-to-r from-[var(--landing-primary)]/20 to-[var(--landing-secondary)]/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-      <div className="relative flex flex-col gap-2 rounded-xl border border-[var(--landing-outline-variant)]/15 bg-[var(--landing-surface-container-highest)] p-2 sm:flex-row sm:items-center sm:gap-0">
+      <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary)]/20 to-[var(--secondary)]/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+      <div className="relative flex flex-col gap-2 rounded-xl border border-[var(--outline-variant)]/15 bg-[var(--surface-container-highest)] p-2 sm:flex-row sm:items-center sm:gap-0">
         <div className="flex min-w-0 flex-1 items-center">
           <Search
-            className="ml-2 shrink-0 text-[var(--landing-outline)] sm:ml-4"
+            className="ml-2 shrink-0 text-[var(--outline)] sm:ml-4"
             aria-hidden="true"
             size={20}
           />
           <Input
             type="text"
-            className="h-auto min-w-0 flex-1 border-0 bg-transparent py-3 pl-3 pr-2 text-base text-[var(--landing-on-surface)] shadow-none placeholder:text-[var(--landing-outline)] focus-visible:ring-0 md:text-sm font-[var(--font-body)]"
+            className="h-auto min-w-0 flex-1 border-0 bg-transparent py-3 pl-3 pr-2 text-base text-[var(--on-surface)] shadow-none placeholder:text-[var(--outline)] focus-visible:ring-0 md:text-sm font-[var(--font-body)]"
             placeholder="Digite sua cidade (ex: Sao Paulo, Rio...)"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
@@ -36,7 +36,7 @@ export function CitySearch() {
         </div>
         <Button
           type="button"
-          className="w-full shrink-0 rounded-lg bg-[var(--landing-primary)] px-6 py-4 font-bold text-[var(--landing-on-primary)] hover:bg-[var(--landing-primary-dim)] active:scale-95 sm:w-auto sm:px-8"
+          className="w-full shrink-0 rounded-lg bg-[var(--primary)] px-6 py-4 font-bold text-[var(--on-primary)] hover:bg-[var(--primary-dim)] active:scale-95 sm:w-auto sm:px-8"
         >
           BUSCAR
         </Button>
@@ -47,7 +47,7 @@ export function CitySearch() {
 
       {showSuggestions && (
         <div
-          className="absolute top-full left-0 w-full mt-2 bg-[var(--landing-surface-container-high)] rounded-xl border border-[var(--landing-outline-variant)]/10 shadow-2xl overflow-hidden z-20"
+          className="absolute top-full left-0 w-full mt-2 bg-[var(--surface-container-high)] rounded-xl border border-[var(--outline-variant)]/10 shadow-2xl overflow-hidden z-20"
           role="listbox"
           aria-label="Sugestoes de cidades"
         >
@@ -55,18 +55,18 @@ export function CitySearch() {
             <button
               key={city.name}
               type="button"
-              className={`w-full px-4 py-3 hover:bg-[var(--landing-surface-variant)] cursor-pointer flex justify-between items-center text-left ${
-                index > 0 ? "border-t border-[var(--landing-outline-variant)]/5" : ""
+              className={`w-full px-4 py-3 hover:bg-[var(--surface-variant)] cursor-pointer flex justify-between items-center text-left ${
+                index > 0 ? "border-t border-[var(--outline-variant)]/5" : ""
               }`}
               role="option"
               aria-selected="false"
               onMouseDown={(e) => e.preventDefault()}
             >
               <div>
-                <p className="font-bold text-[var(--landing-on-surface)]">{city.name}</p>
-                <p className="text-xs text-[var(--landing-outline)]">{city.state}</p>
+                <p className="font-bold text-[var(--on-surface)]">{city.name}</p>
+                <p className="text-xs text-[var(--outline)]">{city.state}</p>
               </div>
-              <span className="text-[var(--landing-secondary)] text-xs font-bold">
+              <span className="text-[var(--secondary)] text-xs font-bold">
                 {city.activeUsers} Ativos
               </span>
             </button>

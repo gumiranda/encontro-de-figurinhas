@@ -119,7 +119,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontHeadline.variable} ${fontBody.variable} font-sans antialiased `}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontHeadline.variable} ${fontBody.variable} font-body antialiased`}
       >
         <Providers>
           <Toaster />
