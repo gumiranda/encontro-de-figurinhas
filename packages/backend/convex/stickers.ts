@@ -1,9 +1,12 @@
 import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { getAuthenticatedUser } from "./lib/auth";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
+
+const MATCH_RECOMPUTE_DELAY_MS = 10_000;
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
@@ -133,5 +136,70 @@ export const updateStickerList = mutation({
     }
 
     await ctx.db.patch(user._id, patch);
+
+    await ctx.scheduler.runAfter(
+      MATCH_RECOMPUTE_DELAY_MS,
+      internal.matches.recomputeMatchCache,
+      { userId: user._id }
+    );
+  },
+});
+
+export const toggleSticker = mutation({
+  args: {
+    number: v.number(),
+    target: v.union(
+      v.literal("missing"),
+      v.literal("duplicate"),
+      v.literal("clear")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) throw new Error("Unauthorized");
+
+    const config = await ctx.db.query("albumConfig").first();
+    const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+
+    const n = args.number;
+    if (!Number.isInteger(n) || n < 1 || n > maxSticker) {
+      throw new Error(`Número inválido (1-${maxSticker})`);
+    }
+
+    const currentDup = new Set<number>(user.duplicates ?? []);
+    const currentMiss = new Set<number>(user.missing ?? []);
+
+    if (args.target === "clear") {
+      currentDup.delete(n);
+      currentMiss.delete(n);
+    } else if (args.target === "duplicate") {
+      currentMiss.delete(n);
+      currentDup.add(n);
+    } else {
+      currentDup.delete(n);
+      currentMiss.add(n);
+    }
+
+    const nextDup = [...currentDup].sort((a, b) => a - b);
+    const nextMiss = [...currentMiss].sort((a, b) => a - b);
+
+    const totalStickersOwned = maxSticker - nextMiss.length;
+    const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
+
+    await ctx.db.patch(user._id, {
+      duplicates: nextDup,
+      missing: nextMiss,
+      albumProgress,
+      totalStickersOwned,
+      lastActiveAt: Date.now(),
+    });
+
+    await ctx.scheduler.runAfter(
+      MATCH_RECOMPUTE_DELAY_MS,
+      internal.matches.recomputeMatchCache,
+      { userId: user._id }
+    );
+
+    return { duplicates: nextDup, missing: nextMiss };
   },
 });

@@ -75,6 +75,7 @@
   --landing-on-surface: var(--on-surface);
   --landing-on-surface-variant: var(--on-surface-variant);
   --landing-outline-variant: var(--outline-variant);
+  --landing-sweep-color: color-mix(in srgb, var(--landing-secondary) 40%, transparent);
 
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
@@ -91,6 +92,13 @@
   --shadow-stadium: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* Glass overlays (mockup 06-mapa.html: rgba(13,19,35,.85) e .9) — herdadas em .dark */
+  --glass-surface: rgba(13, 19, 35, 0.85);
+  --glass-surface-strong: rgba(13, 19, 35, 0.9);
+
+  /* Altura do MobileBottomNav (h-16 = 4rem). Consumida pelo nav e pela bottom-sheet do mapa */
+  --mobile-nav-height: 4rem;
 }
 
 .dark {
@@ -161,6 +169,7 @@
   --landing-on-surface: var(--on-surface);
   --landing-on-surface-variant: var(--on-surface-variant);
   --landing-outline-variant: var(--outline-variant);
+  --landing-sweep-color: color-mix(in srgb, var(--landing-secondary) 40%, transparent);
 
   --muted: #1e253b;
   --muted-foreground: #a6aabf;
@@ -459,10 +468,9 @@
     pointer-events: none;
     background: conic-gradient(
       from 0deg,
-      transparent 0deg,
-      rgba(79, 243, 37, 0.55) 30deg,
-      rgba(79, 243, 37, 0.18) 55deg,
-      transparent 75deg
+      transparent 85%,
+      var(--landing-sweep-color) 95%,
+      transparent 100%
     );
     transform: rotate(0deg);
     transform-origin: 50% 50%;
@@ -471,6 +479,13 @@
   }
   .radar-sweep[data-speed="fast"] {
     animation-duration: 1.5s;
+  }
+}
+
+@supports not (color: color-mix(in srgb, red, blue)) {
+  :root,
+  .dark {
+    --landing-sweep-color: rgba(79, 243, 37, 0.4);
   }
 }
 

@@ -28,6 +28,7 @@ import type * as lib_types from "../lib/types.js";
 import type * as lib_userCoords from "../lib/userCoords.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_whatsapp from "../lib/whatsapp.js";
+import type * as matches from "../matches.js";
 import type * as permissions from "../permissions.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
@@ -71,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   "lib/userCoords": typeof lib_userCoords;
   "lib/utils": typeof lib_utils;
   "lib/whatsapp": typeof lib_whatsapp;
+  matches: typeof matches;
   permissions: typeof permissions;
   seedAlbumConfig: typeof seedAlbumConfig;
   "seeds/seedCities": typeof seeds_seedCities;

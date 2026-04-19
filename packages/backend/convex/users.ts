@@ -318,6 +318,33 @@ export const setAvatar = mutation({
   },
 });
 
+export const getMyFavoriteTradePointIds = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return [];
+    return user.favoriteTradePointIds ?? [];
+  },
+});
+
+export const toggleFavoriteTradePoint = mutation({
+  args: { tradePointId: v.id("tradePoints") },
+  handler: async (ctx, { tradePointId }) => {
+    const user = await requireAuth(ctx);
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "approved") {
+      throw new Error("Point unavailable");
+    }
+    const current = user.favoriteTradePointIds ?? [];
+    const has = current.includes(tradePointId);
+    const next = has
+      ? current.filter((id) => id !== tradePointId)
+      : [...current, tradePointId];
+    await ctx.db.patch(user._id, { favoriteTradePointIds: next });
+    return { isFavorite: !has };
+  },
+});
+
 export const setLocation = mutation({
   args: {
     cityId: v.id("cities"),
