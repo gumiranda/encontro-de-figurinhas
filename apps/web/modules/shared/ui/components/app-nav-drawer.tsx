@@ -46,14 +46,14 @@ interface RenderedNavGroup {
   items: RenderedNavItem[];
 }
 
-const ONBOARDING_ALLOWED_HREFS = new Set<string>(["/cadastrar-figurinhas"]);
+const ONBOARDING_ALLOWED_HREFS = new Set<string>([
+  "/cadastrar-figurinhas",
+  "/cadastrar-figurinhas/quick",
+]);
 
 export function useAppNavGroups(): RenderedNavGroup[] {
   const { isAuthenticated } = useConvexAuth();
-  const navContext = useQuery(
-    api.users.getNavContext,
-    isAuthenticated ? {} : "skip"
-  );
+  const navContext = useQuery(api.users.getNavContext, isAuthenticated ? {} : "skip");
 
   return useMemo<RenderedNavGroup[]>(() => {
     const isSuperadminOrCeo =
@@ -70,7 +70,11 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         items: [
           { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
           { label: "Meu Álbum", href: "/album", icon: StickyNote },
-          { label: "Cadastrar figurinhas", href: "/cadastrar-figurinhas", icon: ListPlus },
+          {
+            label: "Cadastrar figurinhas",
+            href: "/cadastrar-figurinhas/quick",
+            icon: ListPlus,
+          },
           { label: "Encontrar trocas", href: "/encontrar-trocas", icon: ArrowLeftRight },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
