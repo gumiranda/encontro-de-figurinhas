@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -26,8 +27,17 @@ export function SpotCard({
   canFavorite,
   onSelect,
 }: SpotCardProps) {
+  const router = useRouter();
   const status = derivePointStatus(point);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
+
+  const handleClick = () => {
+    if (selected) {
+      router.push(`/points/${point._id}`);
+    } else {
+      onSelect();
+    }
+  };
 
   return (
     <article
@@ -41,7 +51,7 @@ export function SpotCard({
       <div className="flex items-start justify-between gap-3">
         <button
           type="button"
-          onClick={onSelect}
+          onClick={handleClick}
           className="flex flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
           aria-pressed={selected}
         >

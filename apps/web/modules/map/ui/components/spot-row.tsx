@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { derivePointStatus } from "../../lib/derive-point-status";
@@ -24,7 +25,16 @@ export function SpotRow({
   canFavorite,
   onSelect,
 }: SpotRowProps) {
+  const router = useRouter();
   const status = derivePointStatus(point);
+
+  const handleClick = () => {
+    if (selected) {
+      router.push(`/points/${point._id}`);
+    } else {
+      onSelect();
+    }
+  };
 
   return (
     <div
@@ -37,7 +47,7 @@ export function SpotRow({
     >
       <button
         type="button"
-        onClick={onSelect}
+        onClick={handleClick}
         aria-pressed={selected}
         aria-label={`Selecionar ${point.name}, ${formatDistance(point.distanceKm)}`}
         className="flex flex-1 cursor-pointer items-start gap-3 text-left"

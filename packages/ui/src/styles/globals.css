@@ -768,6 +768,18 @@
   .btn-primary-gradient:active {
     transform: none;
   }
+  .animate-fade-in-up,
+  .animate-fade-in-scale,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-float-pin,
+  .animate-glow-pulse,
+  .animate-number-pop,
+  .arena-ring {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Accessibility Enhancements */
