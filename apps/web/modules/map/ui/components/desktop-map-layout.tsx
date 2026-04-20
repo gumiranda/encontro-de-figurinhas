@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import type L from "leaflet";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Input } from "@workspace/ui/components/input";
+import { AppNavDrawer } from "@/modules/shared/ui/components/app-nav-drawer";
 import type { TradePointMapItem } from "../../lib/use-arena-map";
 import type { ArenaFilter } from "../../lib/use-arena-map-filters";
 import type { FavoriteSet } from "../../lib/use-my-favorites";
@@ -53,10 +54,13 @@ export function DesktopMapLayout({
     <div className="grid h-[100dvh] grid-cols-[380px_1fr]">
       <aside className="flex flex-col overflow-hidden border-r border-outline-variant bg-surface-container-low">
         <header className="border-b border-outline-variant px-5 py-4">
-          <h2 className="font-headline text-2xl font-extrabold leading-tight text-on-surface">
-            Pontos em{" "}
-            <span className="text-primary">{cityName ?? "sua cidade"}</span>
-          </h2>
+          <div className="mb-3 flex items-center gap-3">
+            <AppNavDrawer variant="outline" />
+            <h2 className="font-headline text-xl font-extrabold leading-tight text-on-surface">
+              Pontos em{" "}
+              <span className="text-primary">{cityName ?? "sua cidade"}</span>
+            </h2>
+          </div>
           <p
             aria-live="polite"
             className="mt-1 font-mono text-xs text-on-surface-variant"

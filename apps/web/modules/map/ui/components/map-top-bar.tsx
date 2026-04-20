@@ -1,9 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
+import { AppNavDrawer } from "@/modules/shared/ui/components/app-nav-drawer";
 
 type MapTopBarProps = {
   query: string;
@@ -12,8 +12,6 @@ type MapTopBarProps = {
 };
 
 export function MapTopBar({ query, onQueryChange, className }: MapTopBarProps) {
-  const router = useRouter();
-
   return (
     <div
       className={cn(
@@ -21,16 +19,10 @@ export function MapTopBar({ query, onQueryChange, className }: MapTopBarProps) {
         className,
       )}
     >
-      <Button
-        type="button"
+      <AppNavDrawer
         variant="outline"
-        size="icon"
-        aria-label="Voltar"
-        onClick={() => router.back()}
         className="size-10 shrink-0 border-outline-variant bg-[var(--glass-surface)] text-on-surface backdrop-blur-md"
-      >
-        <ChevronLeft aria-hidden="true" className="size-5" />
-      </Button>
+      />
 
       <div className="relative flex-1">
         <Search
