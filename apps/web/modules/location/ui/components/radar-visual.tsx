@@ -24,8 +24,7 @@ interface RadarConfig {
 const MOBILE: RadarConfig = {
   containerClass: "mx-auto h-60 w-60",
   ringInsets: [70, 40],
-  meDotClass:
-    "h-4 w-4 shadow-[0_0_0_6px_rgba(149,170,255,0.25),0_0_20px_rgba(149,170,255,0.6)]",
+  meDotClass: "h-4 w-4 shadow-radar-me-mobile",
   pinSizeClass: "h-2 w-2",
   pins: [
     { id: "mobile-tl", tone: "secondary", top: "30%", left: "22%" },
@@ -38,8 +37,7 @@ const MOBILE: RadarConfig = {
 const DESKTOP: RadarConfig = {
   containerClass: "h-[420px] w-[420px]",
   ringInsets: [75, 50, 25],
-  meDotClass:
-    "h-6 w-6 shadow-[0_0_0_10px_rgba(149,170,255,0.2),0_0_30px_rgba(149,170,255,0.6)]",
+  meDotClass: "h-6 w-6 shadow-radar-me",
   pinSizeClass: "h-3 w-3",
   pins: [
     { id: "desktop-tl", tone: "secondary", top: "25%", left: "28%" },
@@ -50,9 +48,9 @@ const DESKTOP: RadarConfig = {
 };
 
 const PIN_TONE_CLASS: Record<PinTone, string> = {
-  primary: "bg-[var(--primary)] shadow-[0_0_10px_rgba(149,170,255,0.6)]",
-  secondary: "bg-[var(--secondary)] shadow-[0_0_10px_rgba(79,243,37,0.6)]",
-  tertiary: "bg-[var(--tertiary)] shadow-[0_0_10px_rgba(255,201,101,0.6)]",
+  primary: "bg-primary shadow-pin-primary",
+  secondary: "bg-secondary shadow-pin-success",
+  tertiary: "bg-tertiary shadow-pin-tertiary",
 };
 
 interface RadarProps {

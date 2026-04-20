@@ -112,7 +112,7 @@ function ArenaVisual() {
       <div className="absolute inset-[34%] rounded-full border border-[var(--tertiary)]/20" />
 
       <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dim)] shadow-[0_0_40px_rgba(149,170,255,0.45)]">
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-dim shadow-arena-center">
           <Landmark
             className="h-10 w-10 text-[var(--on-primary)]"
             aria-hidden="true"

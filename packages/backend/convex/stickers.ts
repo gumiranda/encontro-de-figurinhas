@@ -2,7 +2,7 @@ import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { getAuthenticatedUser } from "./lib/auth";
+import { requireAuth } from "./lib/auth";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
 
@@ -32,8 +32,7 @@ type UserPatch = Partial<
 export const getUserStickers = query({
   args: {},
   handler: async (ctx) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Unauthorized");
+    const user = await requireAuth(ctx);
 
     const albumConfig = await ctx.db.query("albumConfig").first();
     return {
@@ -53,8 +52,7 @@ export const updateStickerList = mutation({
     finalize: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Unauthorized");
+    const user = await requireAuth(ctx);
 
     if (
       args.duplicates.length > MAX_STICKER_ARRAY_SIZE ||
@@ -159,8 +157,7 @@ export const toggleSticker = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Unauthorized");
+    const user = await requireAuth(ctx);
 
     const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
     if (timeSinceLastUpdate < TOGGLE_RATE_LIMIT_MS) {

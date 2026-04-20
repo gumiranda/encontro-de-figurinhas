@@ -23,9 +23,9 @@ const STATE_CLASSES: Record<TileState, string> = {
   none:
     "bg-surface-container border-outline-variant text-outline hover:border-outline",
   have:
-    "bg-gradient-to-br from-[rgba(79,243,37,0.15)] to-[rgba(23,110,0,0.25)] border-secondary text-secondary",
+    "sticker-have-gradient border-secondary text-secondary",
   need:
-    "bg-gradient-to-br from-[rgba(255,201,101,0.12)] to-[rgba(254,183,0,0.2)] border-tertiary text-tertiary",
+    "sticker-need-gradient border-tertiary text-tertiary",
   blocked:
     "bg-surface-container-highest border-outline-variant text-muted-foreground",
 };

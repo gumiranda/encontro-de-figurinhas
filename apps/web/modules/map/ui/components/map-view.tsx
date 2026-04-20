@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import type { Id } from "@workspace/backend/_generated/dataModel";
-import { BRAND_COLORS } from "@workspace/ui/lib/design-tokens";
+import { BRAND_COLORS, BRAND_SHADOWS } from "@workspace/ui/lib/design-tokens";
 import { derivePointStatus, type PinStatus } from "../../lib/derive-point-status";
 import type { TradePointMapItem } from "../../lib/use-arena-map";
 
@@ -21,7 +21,7 @@ type MapViewProps = {
 };
 
 const userIcon = L.divIcon({
-  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:9999px;background:${BRAND_COLORS.primary};color:${BRAND_COLORS.onPrimary};font-size:10px;font-weight:800;letter-spacing:0.05em;box-shadow:0 0 0 4px rgba(149,170,255,0.25),0 0 16px rgba(149,170,255,0.45);">VOCÊ</div>`,
+  html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:9999px;background:${BRAND_COLORS.primary};color:${BRAND_COLORS.onPrimary};font-size:10px;font-weight:800;letter-spacing:0.05em;box-shadow:${BRAND_SHADOWS.markerPrimary};">VOCÊ</div>`,
   className: "",
   iconSize: [40, 40],
   iconAnchor: [20, 20],
@@ -33,16 +33,16 @@ function createBubbleIcon(index: number, status: PinStatus, selected: boolean) {
       ? {
           bg: BRAND_COLORS.secondary,
           fg: BRAND_COLORS.onSecondary,
-          shadow: "rgba(79,243,37,.35)",
+          shadow: BRAND_SHADOWS.markerSuccess,
         }
       : {
           bg: BRAND_COLORS.surfaceContainerHigh,
           fg: BRAND_COLORS.onSurfaceVariant,
-          shadow: "rgba(0,0,0,.4)",
+          shadow: BRAND_SHADOWS.markerMuted,
         };
   const ring = selected
-    ? `box-shadow:0 0 0 3px rgba(149,170,255,.45),0 8px 20px ${palette.shadow};`
-    : `box-shadow:0 8px 20px ${palette.shadow};`;
+    ? `box-shadow:0 0 0 3px rgba(149,170,255,.45),${palette.shadow};`
+    : `box-shadow:${palette.shadow};`;
   return L.divIcon({
     className: "",
     iconSize: [40, 42],
@@ -57,7 +57,7 @@ function createBubbleIcon(index: number, status: PinStatus, selected: boolean) {
 
 function createClusterIcon(count: number) {
   return L.divIcon({
-    html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9999px;background:${BRAND_COLORS.primary};color:${BRAND_COLORS.onPrimary};font-size:14px;font-weight:800;box-shadow:0 0 0 5px rgba(149,170,255,0.25),0 6px 14px rgba(0,0,0,0.45);"><span>${count}</span></div>`,
+    html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9999px;background:${BRAND_COLORS.primary};color:${BRAND_COLORS.onPrimary};font-size:14px;font-weight:800;box-shadow:${BRAND_SHADOWS.cluster};"><span>${count}</span></div>`,
     className: "",
     iconSize: [44, 44],
     iconAnchor: [22, 22],

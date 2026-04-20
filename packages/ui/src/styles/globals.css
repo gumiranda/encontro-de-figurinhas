@@ -223,6 +223,35 @@
   --shadow-lift: 0 12px 28px -6px rgba(0, 0, 0, 0.45);
   --shadow-glow-primary: 0 0 20px rgba(149, 170, 255, 0.35);
   --shadow-glow-success: 0 0 20px rgba(79, 243, 37, 0.35);
+  --shadow-glow-tertiary: 0 0 20px rgba(255, 201, 101, 0.35);
+
+  /* Ring/halo effects for markers and interactive elements */
+  --shadow-ring-primary: 0 0 0 4px rgba(149, 170, 255, 0.25);
+  --shadow-ring-primary-strong: 0 0 0 5px rgba(149, 170, 255, 0.25);
+  --shadow-marker-primary: 0 0 0 4px rgba(149, 170, 255, 0.25), 0 0 16px rgba(149, 170, 255, 0.45);
+  --shadow-marker-success: 0 8px 20px rgba(79, 243, 37, 0.35);
+  --shadow-marker-muted: 0 8px 20px rgba(0, 0, 0, 0.4);
+  --shadow-cluster: 0 0 0 5px rgba(149, 170, 255, 0.25), 0 6px 14px rgba(0, 0, 0, 0.45);
+
+  /* Gradient backgrounds for sticker states */
+  --gradient-sticker-have: linear-gradient(to bottom right, rgba(79, 243, 37, 0.15), rgba(23, 110, 0, 0.25));
+  --gradient-sticker-need: linear-gradient(to bottom right, rgba(255, 201, 101, 0.12), rgba(254, 183, 0, 0.2));
+
+  /* Radar/location visual effects */
+  --shadow-radar-me: 0 0 0 10px rgba(149, 170, 255, 0.2), 0 0 30px rgba(149, 170, 255, 0.6);
+  --shadow-radar-me-mobile: 0 0 0 6px rgba(149, 170, 255, 0.25), 0 0 20px rgba(149, 170, 255, 0.6);
+  --shadow-pin-primary: 0 0 10px rgba(149, 170, 255, 0.6);
+  --shadow-pin-success: 0 0 10px rgba(79, 243, 37, 0.6);
+  --shadow-pin-tertiary: 0 0 10px rgba(255, 201, 101, 0.6);
+
+  /* Header and navigation */
+  --shadow-header: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-logo-glow: 0 0 24px rgba(149, 170, 255, 0.35);
+  --drop-shadow-nav-active: 0 0 8px rgba(79, 243, 37, 0.5);
+
+  /* Avatar and hero visuals */
+  --shadow-avatar: 0 10px 30px rgba(149, 170, 255, 0.35);
+  --shadow-arena-center: 0 0 40px rgba(149, 170, 255, 0.45);
 }
 
 @theme inline {
@@ -324,6 +353,22 @@
   --shadow-lift: var(--shadow-lift);
   --shadow-glow-primary: var(--shadow-glow-primary);
   --shadow-glow-success: var(--shadow-glow-success);
+  --shadow-glow-tertiary: var(--shadow-glow-tertiary);
+  --shadow-ring-primary: var(--shadow-ring-primary);
+  --shadow-ring-primary-strong: var(--shadow-ring-primary-strong);
+  --shadow-marker-primary: var(--shadow-marker-primary);
+  --shadow-marker-success: var(--shadow-marker-success);
+  --shadow-marker-muted: var(--shadow-marker-muted);
+  --shadow-cluster: var(--shadow-cluster);
+  --shadow-radar-me: var(--shadow-radar-me);
+  --shadow-radar-me-mobile: var(--shadow-radar-me-mobile);
+  --shadow-pin-primary: var(--shadow-pin-primary);
+  --shadow-pin-success: var(--shadow-pin-success);
+  --shadow-pin-tertiary: var(--shadow-pin-tertiary);
+  --shadow-header: var(--shadow-header);
+  --shadow-logo-glow: var(--shadow-logo-glow);
+  --shadow-avatar: var(--shadow-avatar);
+  --shadow-arena-center: var(--shadow-arena-center);
 }
 
 @layer base {
@@ -407,6 +452,50 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+  }
+
+  /* Sticker state gradients */
+  .sticker-have-gradient {
+    background: var(--gradient-sticker-have);
+  }
+  .sticker-need-gradient {
+    background: var(--gradient-sticker-need);
+  }
+
+  /* Radar pin shadows */
+  .shadow-pin-primary {
+    box-shadow: var(--shadow-pin-primary);
+  }
+  .shadow-pin-success {
+    box-shadow: var(--shadow-pin-success);
+  }
+  .shadow-pin-tertiary {
+    box-shadow: var(--shadow-pin-tertiary);
+  }
+  .shadow-radar-me {
+    box-shadow: var(--shadow-radar-me);
+  }
+  .shadow-radar-me-mobile {
+    box-shadow: var(--shadow-radar-me-mobile);
+  }
+
+  /* Header and navigation shadows */
+  .shadow-header {
+    box-shadow: var(--shadow-header);
+  }
+  .shadow-logo-glow {
+    box-shadow: var(--shadow-logo-glow);
+  }
+  .drop-shadow-nav-active {
+    filter: drop-shadow(var(--drop-shadow-nav-active));
+  }
+
+  /* Avatar and hero shadows */
+  .shadow-avatar {
+    box-shadow: var(--shadow-avatar);
+  }
+  .shadow-arena-center {
+    box-shadow: var(--shadow-arena-center);
   }
 
   /* Botão primário com gradiente (CTA da landing/trocas) */
