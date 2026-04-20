@@ -1,7 +1,35 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { checkAuth } from "./lib/auth";
 import { FREE_USER_MAX_POINTS } from "./lib/limits";
+
+export const getMyPoints = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") return [];
+
+    const memberships = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
+      .collect();
+
+    const points = await Promise.all(
+      memberships.map(async (m) => {
+        const point = await ctx.db.get(m.tradePointId);
+        if (!point) return null;
+        const city = point.cityId ? await ctx.db.get(point.cityId) : null;
+        return {
+          ...point,
+          joinedAt: m.joinedAt,
+          cityName: city?.name ?? null,
+        };
+      })
+    );
+
+    return points.filter((p): p is NonNullable<typeof p> => p !== null);
+  },
+});
 
 export const join = mutation({
   args: { tradePointId: v.id("tradePoints") },
