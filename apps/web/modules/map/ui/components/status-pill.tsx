@@ -3,8 +3,8 @@ import { cn } from "@workspace/ui/lib/utils";
 import type { PinStatus } from "../../lib/derive-point-status";
 
 const COPY: Record<PinStatus, string> = {
-  active: "Ativo agora",
-  idle: "Sem gente",
+  active: "Com gente",
+  idle: "Aguardando",
 };
 
 export function StatusPill({

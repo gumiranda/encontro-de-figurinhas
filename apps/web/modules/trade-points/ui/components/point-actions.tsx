@@ -5,6 +5,7 @@ import { LogOut, MapPin, UserMinus, UserPlus, Users } from "lucide-react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { api } from "@workspace/backend/_generated/api";
+import { celebrateToast } from "@/components/delight";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -47,9 +48,12 @@ export const PointActions = memo(function PointActions({
     try {
       const res = await join({ tradePointId });
       if (res.ok) {
-        toast.success("Você entrou neste ponto");
+        celebrateToast("Você entrou no ponto!", {
+          description: "Agora é só combinar as trocas.",
+          level: "small",
+        });
       } else if (res.error === "limit-reached") {
-        toast.error("Você atingiu o limite de 3 pontos no plano gratuito");
+        toast.error("Limite de 3 pontos atingido. Atualize para Premium ou saia de outro ponto.");
       } else if (res.error === "already-member") {
         toast.info("Você já participa deste ponto");
       } else if (res.error === "point-unavailable") {
@@ -104,11 +108,20 @@ export const PointActions = memo(function PointActions({
           });
           if (res.ok) {
             if (res.renewed) {
-              toast.success("Check-in renovado por mais 2h");
+              celebrateToast("Check-in renovado!", {
+                description: "Mais 2 horas na arena.",
+                level: "small",
+              });
             } else if (res.replacedPrevious) {
-              toast.success("Check-in movido para este ponto");
+              celebrateToast("Check-in movido!", {
+                description: "Você está neste ponto agora.",
+                level: "small",
+              });
             } else {
-              toast.success("Check-in confirmado");
+              celebrateToast("Check-in confirmado!", {
+                description: "Você está na arena. Boas trocas!",
+                level: "medium",
+              });
             }
           } else if (res.error === "too-far") {
             toast.error(

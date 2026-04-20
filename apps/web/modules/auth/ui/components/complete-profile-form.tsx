@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { celebrateMilestone } from "@/components/delight";
 
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -72,7 +73,7 @@ export function CompleteProfileForm() {
         birthDate: data.birthDate.getTime(),
       });
 
-      toast.success("Perfil completo! Bem-vindo à Arena.");
+      celebrateMilestone("profileComplete");
       router.push("/cadastrar-figurinhas");
     } catch (error) {
       if (error instanceof Error) {

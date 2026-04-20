@@ -538,6 +538,47 @@
   .arena-ring-2 { animation-delay: 150ms; }
   .arena-ring-3 { animation-delay: 300ms; }
 
+  /* DELIGHT UTILITIES — Celebration effects */
+  .animate-bounce-in {
+    animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-shake-celebrate {
+    animation: shake-celebrate 0.6s ease-in-out;
+  }
+  .animate-sparkle {
+    animation: sparkle 1.5s ease-in-out infinite;
+  }
+  .animate-trophy-shine {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: trophy-shine 2s ease-in-out infinite;
+  }
+
+  /* Success checkmark animation */
+  .success-check-circle {
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    animation: success-circle 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .success-check-path {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: success-check 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  /* Confetti piece */
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+
   /* Botão primário com gradiente (CTA da landing/trocas) — BOLD VERSION */
   .btn-primary-gradient {
     height: 3.5rem;
@@ -755,6 +796,91 @@
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* DELIGHT ANIMATIONS — Celebration and joy */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes success-check {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes success-circle {
+  0% {
+    stroke-dashoffset: 314;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake-celebrate {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  10% { transform: translateX(-2px) rotate(-2deg); }
+  20% { transform: translateX(2px) rotate(2deg); }
+  30% { transform: translateX(-2px) rotate(-1deg); }
+  40% { transform: translateX(2px) rotate(1deg); }
+  50% { transform: translateX(-1px) rotate(-1deg); }
+  60% { transform: translateX(1px) rotate(1deg); }
+  70% { transform: translateX(-1px) rotate(0); }
+  80% { transform: translateX(1px) rotate(0); }
+  90% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes trophy-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
   }
 }
 

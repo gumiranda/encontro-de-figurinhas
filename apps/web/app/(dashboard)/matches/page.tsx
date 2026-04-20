@@ -24,11 +24,11 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Badge } from "@workspace/ui/components/badge";
 
 const DISTANCE_LABELS: Record<string, string> = {
-  near: "Muito perto",
-  close: "Perto",
-  mid: "Média distância",
-  far: "Longe",
-  unknown: "Distância desconhecida",
+  near: "A poucos passos",
+  close: "No seu bairro",
+  mid: "Na sua cidade",
+  far: "Região próxima",
+  unknown: "Localização pendente",
 };
 
 export default function MatchesPage() {
@@ -52,10 +52,10 @@ export default function MatchesPage() {
     return (
       <EmptyState
         icon={MapPin}
-        title="Selecione sua cidade"
-        description="Para encontrar matches, precisamos saber sua localização."
+        title="Onde você troca?"
+        description="Informe sua cidade para encontrar colecionadores perto de você."
         ctaHref="/selecionar-localizacao"
-        ctaLabel="Selecionar cidade"
+        ctaLabel="Informar minha cidade"
       />
     );
   }
@@ -64,10 +64,10 @@ export default function MatchesPage() {
     return (
       <EmptyState
         icon={ListPlus}
-        title="Cadastre suas figurinhas"
-        description="Para encontrar matches, primeiro cadastre as figurinhas que você tem e precisa."
+        title="Quais figurinhas você tem?"
+        description="Cadastre suas repetidas e faltantes. Leva menos de 1 minuto."
         ctaHref="/cadastrar-figurinhas/quick"
-        ctaLabel="Cadastrar figurinhas"
+        ctaLabel="Cadastrar minhas figurinhas"
       />
     );
   }
@@ -80,8 +80,8 @@ export default function MatchesPage() {
     return (
       <EmptyState
         icon={Sparkles}
-        title="Nenhum match encontrado"
-        description="Ainda não encontramos usuários com figurinhas compatíveis na sua região. Tente novamente mais tarde."
+        title="Seus matches estão a caminho"
+        description="Novos colecionadores entram todo dia. Volte em breve ou atualize suas figurinhas para ampliar as chances."
       />
     );
   }
@@ -175,13 +175,33 @@ function EmptyState({
   description,
   ctaHref,
   ctaLabel,
+  personality = "encouraging",
 }: {
   icon: typeof Sparkles;
   title: string;
   description: string;
   ctaHref?: string;
   ctaLabel?: string;
+  personality?: "encouraging" | "playful" | "calm";
 }) {
+  const personalityStyles = {
+    encouraging: {
+      iconBg: "bg-gradient-to-br from-secondary/20 to-secondary-dim/30",
+      iconColor: "text-secondary",
+      glow: "shadow-[0_0_30px_rgba(79,243,37,0.15)]",
+    },
+    playful: {
+      iconBg: "bg-gradient-to-br from-tertiary/20 to-tertiary-dim/30",
+      iconColor: "text-tertiary",
+      glow: "shadow-[0_0_30px_rgba(255,201,101,0.15)]",
+    },
+    calm: {
+      iconBg: "bg-gradient-to-br from-primary/15 to-primary-dim/25",
+      iconColor: "text-primary",
+      glow: "shadow-[0_0_30px_rgba(149,170,255,0.15)]",
+    },
+  }[personality];
+
   return (
     <div className="space-y-6">
       <div>
@@ -191,15 +211,19 @@ function EmptyState({
         </p>
       </div>
 
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <Icon className="mb-4 size-12 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+      <Card className="border-dashed animate-fade-in-up">
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <div
+            className={`mb-6 flex h-20 w-20 items-center justify-center rounded-2xl ${personalityStyles.iconBg} ${personalityStyles.glow}`}
+          >
+            <Icon className={`size-10 ${personalityStyles.iconColor}`} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-xl font-headline font-bold">{title}</h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground leading-relaxed">
             {description}
           </p>
           {ctaHref && ctaLabel && (
-            <Button asChild className="mt-6">
+            <Button asChild className="mt-8 btn-primary-gradient">
               <Link href={ctaHref}>{ctaLabel}</Link>
             </Button>
           )}

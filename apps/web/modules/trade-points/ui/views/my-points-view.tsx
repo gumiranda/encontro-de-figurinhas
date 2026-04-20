@@ -67,12 +67,12 @@ export function MyPointsView() {
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <MapPin className="mb-4 size-12 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold">Nenhum ponto ainda</h3>
+            <h3 className="text-lg font-semibold">Encontre seu ponto de troca</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Explore o mapa e participe de pontos de troca perto de você.
+              Pontos são locais verificados onde colecionadores se encontram. Escolha um perto de você no mapa.
             </p>
             <Button asChild className="mt-4">
-              <Link href="/map">Ver mapa</Link>
+              <Link href="/map">Explorar pontos no mapa</Link>
             </Button>
           </CardContent>
         </Card>

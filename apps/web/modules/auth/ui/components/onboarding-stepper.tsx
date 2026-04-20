@@ -4,9 +4,9 @@ import { Check, Landmark } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
 
 const STEPS = [
-  { index: 1, title: "Conta criada", description: "Email verificado" },
-  { index: 2, title: "Seu perfil", description: "Nome, foto, contato" },
-  { index: 3, title: "Cidade", description: "Onde você troca" },
+  { index: 1, title: "Conta criada", description: "Pronto para começar" },
+  { index: 2, title: "Seu perfil", description: "Como outros te veem" },
+  { index: 3, title: "Sua cidade", description: "Encontrar trocas perto" },
 ] as const;
 
 type StepState = "done" | "active" | "pending";

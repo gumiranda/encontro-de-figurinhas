@@ -28,8 +28,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           </h1>
 
           <p className="max-w-xl text-lg leading-relaxed text-on-surface-variant sm:text-xl animate-fade-in-up opacity-0 delay-200">
-            Cadastre suas figurinhas em 30 segundos. O sistema encontra quem tem
-            o que você precisa — e precisa do que você tem.
+            Cadastre suas repetidas, encontre quem precisa delas — e quem tem as que você procura. Match automático, troca presencial.
           </p>
 
           <div className="rounded-2xl border border-outline-variant/30 bg-surface-container p-5 shadow-soft animate-fade-in-up opacity-0 delay-300">
@@ -52,7 +51,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
               href="/sign-up"
               className="btn-primary-gradient btn-primary-gradient-xl flex items-center justify-center px-10 text-center"
             >
-              Encontrar trocas na minha cidade
+              Começar a trocar agora
             </Link>
             <Link
               href="/como-funciona"
@@ -256,11 +255,7 @@ function AeoExplainer() {
         O que é o Figurinha Fácil?
       </h2>
       <p className="text-[var(--on-surface-variant)]">
-        Figurinha Fácil é a maior rede brasileira de troca de figurinhas do álbum
-        da Copa do Mundo 2026. Colecionadores cadastram repetidas e faltantes, o
-        sistema encontra matches em cidades próximas e conecta via WhatsApp em
-        pontos verificados. Gratuito, sem cadastro para buscar. São 670
-        figurinhas no álbum e milhares de colecionadores ativos em todo o país.
+        A rede de troca de figurinhas da Copa 2026. Cadastre repetidas e faltantes, encontre matches perto de você, combine via WhatsApp. 670 figurinhas no álbum, milhares de colecionadores ativos. Gratuito.
       </p>
     </div>
   );
