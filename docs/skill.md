@@ -43,8 +43,6 @@ npx skills add https://github.com/coreyhaines31/marketingskills --skill launch-s
 npx skills add https://github.com/addyosmani/web-quality-skills --skill seo
 [20/04/2026, 18:04:14] Gustavo: usar e instalar skill somente no claude code de forma global
 
-npx skills add https://github.com/yaklang/hack-skills --skill crlf-injection
-
 npx skills add https://github.com/onewave-ai/claude-skills --skill landing-page-copywriter
 
 npx skills add https://github.com/resciencelab/opc-skills --skill seo-geo
