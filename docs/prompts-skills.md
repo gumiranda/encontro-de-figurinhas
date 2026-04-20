@@ -1,79 +1,79 @@
 [20/04/2026, 18:01:11] Gustavo: usar e instalar skill somente no claude code de forma global
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /polish
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /polish
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /bolder
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /bolder
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /delight
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /delight
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /copywriting
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /copywriting
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /distill
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /distill
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /quieter
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /quieter
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /caveman
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /caveman
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /overdrive
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /overdrive
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /ai-seo
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /ai-seo
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /caveman-review
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /caveman-review
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /next-cache-components
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /next-cache-components
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /high-end-visual-design
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /high-end-visual-design
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /redesign-existing-projects
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /redesign-existing-projects
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /minimalist-ui
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /minimalist-ui
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)-geo-claude-skills /backlink-analyzer
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)-geo-claude-skills /backlink-analyzer
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /site-architecture
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /site-architecture
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)-better /make-interfaces-feel-better
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)-better /make-interfaces-feel-better
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /animate
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /animate
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /launch-strategy
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /launch-strategy
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /seo
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /seo
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /landing-page-copywriter
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /landing-page-copywriter
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /seo-geo
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /seo-geo
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /social-content
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /social-content
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /marketing-ideas
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /marketing-ideas
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /content-strategy
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /content-strategy
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /marketing-psychology
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /marketing-psychology
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /react-doctor
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /react-doctor
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /component-refactoring
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /technical-blog-writing
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /landing-page-design
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /component-refactoring
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /technical-blog-writing
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /landing-page-design
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /seo-aeo-best-practices
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /seo-aeo-best-practices
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /audit-website
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /audit-website
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /using-superpowers
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /using-superpowers
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /content-strategy
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /content-strategy
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /marketing-ideas
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /marketing-ideas
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /marketing-psychology
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /marketing-psychology
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /next-best-practices
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /next-best-practices
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)skill /reducing-entropy
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)skill /reducing-entropy
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /frontend-design
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp) /frontend-design
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial)-max-skill /ui-ux-pro-max
+usar serena mcp - em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) (usar serena mcp)-max-skill /ui-ux-pro-max
