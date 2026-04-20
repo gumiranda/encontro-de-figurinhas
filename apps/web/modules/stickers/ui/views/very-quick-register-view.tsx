@@ -237,7 +237,7 @@ export function VeryQuickRegisterView() {
           <Button
             onClick={handleFinalize}
             disabled={!canFinalize}
-            className="w-full bg-gradient-to-r from-primary to-primary-dim text-primary-foreground py-4 h-auto rounded-xl font-headline font-bold text-lg uppercase tracking-widest active:scale-[0.98] transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-3"
+            className="w-full bg-primary text-primary-foreground h-14 rounded-xl font-headline font-bold text-lg uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-3"
           >
             {isSaving ? (
               <span className="animate-pulse">Salvando...</span>

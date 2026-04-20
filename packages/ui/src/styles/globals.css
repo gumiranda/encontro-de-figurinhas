@@ -218,40 +218,40 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --shadow-stadium: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
 
-  /* Copa 2026 glows */
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lift: 0 12px 28px -6px rgba(0, 0, 0, 0.45);
-  --shadow-glow-primary: 0 0 20px rgba(149, 170, 255, 0.35);
-  --shadow-glow-success: 0 0 20px rgba(79, 243, 37, 0.35);
-  --shadow-glow-tertiary: 0 0 20px rgba(255, 201, 101, 0.35);
+  /* Copa 2026 glows — refined for sophistication */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 10px 24px -6px rgba(0, 0, 0, 0.35);
+  --shadow-glow-primary: 0 0 12px rgba(149, 170, 255, 0.2);
+  --shadow-glow-success: 0 0 12px rgba(79, 243, 37, 0.2);
+  --shadow-glow-tertiary: 0 0 12px rgba(255, 201, 101, 0.2);
 
-  /* Ring/halo effects for markers and interactive elements */
-  --shadow-ring-primary: 0 0 0 4px rgba(149, 170, 255, 0.25);
-  --shadow-ring-primary-strong: 0 0 0 5px rgba(149, 170, 255, 0.25);
-  --shadow-marker-primary: 0 0 0 4px rgba(149, 170, 255, 0.25), 0 0 16px rgba(149, 170, 255, 0.45);
-  --shadow-marker-success: 0 8px 20px rgba(79, 243, 37, 0.35);
-  --shadow-marker-muted: 0 8px 20px rgba(0, 0, 0, 0.4);
-  --shadow-cluster: 0 0 0 5px rgba(149, 170, 255, 0.25), 0 6px 14px rgba(0, 0, 0, 0.45);
+  /* Ring/halo effects for markers and interactive elements — refined */
+  --shadow-ring-primary: 0 0 0 3px rgba(149, 170, 255, 0.15);
+  --shadow-ring-primary-strong: 0 0 0 4px rgba(149, 170, 255, 0.18);
+  --shadow-marker-primary: 0 0 0 3px rgba(149, 170, 255, 0.15), 0 0 10px rgba(149, 170, 255, 0.25);
+  --shadow-marker-success: 0 6px 16px rgba(79, 243, 37, 0.2);
+  --shadow-marker-muted: 0 6px 16px rgba(0, 0, 0, 0.3);
+  --shadow-cluster: 0 0 0 4px rgba(149, 170, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.35);
 
   /* Gradient backgrounds for sticker states */
   --gradient-sticker-have: linear-gradient(to bottom right, rgba(79, 243, 37, 0.15), rgba(23, 110, 0, 0.25));
   --gradient-sticker-need: linear-gradient(to bottom right, rgba(255, 201, 101, 0.12), rgba(254, 183, 0, 0.2));
 
-  /* Radar/location visual effects */
-  --shadow-radar-me: 0 0 0 10px rgba(149, 170, 255, 0.2), 0 0 30px rgba(149, 170, 255, 0.6);
-  --shadow-radar-me-mobile: 0 0 0 6px rgba(149, 170, 255, 0.25), 0 0 20px rgba(149, 170, 255, 0.6);
-  --shadow-pin-primary: 0 0 10px rgba(149, 170, 255, 0.6);
-  --shadow-pin-success: 0 0 10px rgba(79, 243, 37, 0.6);
-  --shadow-pin-tertiary: 0 0 10px rgba(255, 201, 101, 0.6);
+  /* Radar/location visual effects — refined */
+  --shadow-radar-me: 0 0 0 6px rgba(149, 170, 255, 0.12), 0 0 16px rgba(149, 170, 255, 0.3);
+  --shadow-radar-me-mobile: 0 0 0 4px rgba(149, 170, 255, 0.15), 0 0 12px rgba(149, 170, 255, 0.35);
+  --shadow-pin-primary: 0 0 6px rgba(149, 170, 255, 0.35);
+  --shadow-pin-success: 0 0 6px rgba(79, 243, 37, 0.35);
+  --shadow-pin-tertiary: 0 0 6px rgba(255, 201, 101, 0.35);
 
-  /* Header and navigation */
-  --shadow-header: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-logo-glow: 0 0 24px rgba(149, 170, 255, 0.35);
-  --drop-shadow-nav-active: 0 0 8px rgba(79, 243, 37, 0.5);
+  /* Header and navigation — refined */
+  --shadow-header: 0 6px 24px rgba(0, 0, 0, 0.3);
+  --shadow-logo-glow: 0 0 16px rgba(149, 170, 255, 0.2);
+  --drop-shadow-nav-active: 0 0 6px rgba(79, 243, 37, 0.35);
 
-  /* Avatar and hero visuals */
-  --shadow-avatar: 0 10px 30px rgba(149, 170, 255, 0.35);
-  --shadow-arena-center: 0 0 40px rgba(149, 170, 255, 0.45);
+  /* Avatar and hero visuals — refined */
+  --shadow-avatar: 0 8px 24px rgba(149, 170, 255, 0.2);
+  --shadow-arena-center: 0 0 24px rgba(149, 170, 255, 0.25);
 }
 
 @theme inline {
@@ -498,27 +498,27 @@
     box-shadow: var(--shadow-arena-center);
   }
 
-  /* BOLD ANIMATION UTILITIES — Dramatic entrances */
+  /* REFINED ANIMATION UTILITIES — Subtle, sophisticated entrances */
   .animate-fade-in-up {
-    animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-fade-in-scale {
-    animation: fade-in-scale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fade-in-scale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-slide-in-left {
-    animation: slide-in-left 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slide-in-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-slide-in-right {
-    animation: slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-float-pin {
-    animation: float-pin 3s ease-in-out infinite;
+    animation: float-pin 4s ease-in-out infinite;
   }
   .animate-glow-pulse {
-    animation: glow-pulse 2.5s ease-in-out infinite;
+    animation: glow-pulse 3.5s ease-in-out infinite;
   }
   .animate-number-pop {
-    animation: number-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: number-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Staggered animation delays */
@@ -530,33 +530,33 @@
   .delay-600 { animation-delay: 600ms; }
   .delay-700 { animation-delay: 700ms; }
 
-  /* Arena ring animations */
+  /* Arena ring animations — refined */
   .arena-ring {
-    animation: ring-expand 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: ring-expand 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .arena-ring-1 { animation-delay: 0ms; }
-  .arena-ring-2 { animation-delay: 150ms; }
-  .arena-ring-3 { animation-delay: 300ms; }
+  .arena-ring-2 { animation-delay: 100ms; }
+  .arena-ring-3 { animation-delay: 200ms; }
 
-  /* DELIGHT UTILITIES — Celebration effects */
+  /* DELIGHT UTILITIES — Refined celebration effects */
   .animate-bounce-in {
-    animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: bounce-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-shake-celebrate {
-    animation: shake-celebrate 0.6s ease-in-out;
+    animation: shake-celebrate 0.4s ease-in-out;
   }
   .animate-sparkle {
-    animation: sparkle 1.5s ease-in-out infinite;
+    animation: sparkle 2s ease-in-out infinite;
   }
   .animate-trophy-shine {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0.25) 50%,
       transparent 100%
     );
     background-size: 200% 100%;
-    animation: trophy-shine 2s ease-in-out infinite;
+    animation: trophy-shine 2.5s ease-in-out infinite;
   }
 
   /* Success checkmark animation */
@@ -579,69 +579,46 @@
     animation: confetti-fall 3s ease-out forwards;
   }
 
-  /* Botão primário com gradiente (CTA da landing/trocas) — BOLD VERSION */
+  /* Botão primário com gradiente (CTA da landing/trocas) — refined */
   .btn-primary-gradient {
-    height: 3.5rem;
-    border-radius: 1rem;
-    padding: 0 2rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    padding: 0 1.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.625rem;
+    gap: 0.5rem;
     background-image: linear-gradient(
       135deg,
       var(--primary-dim) 0%,
-      var(--primary) 50%,
-      var(--primary-container) 100%
+      var(--primary) 100%
     );
-    background-size: 200% 200%;
+    background-size: 100% 100%;
     color: var(--on-primary);
     font-family: var(--font-headline), var(--font-body), sans-serif;
-    font-weight: 800;
+    font-weight: 600;
     font-size: 0.875rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    box-shadow:
-      0 0 0 1px rgba(149, 170, 255, 0.2),
-      0 4px 12px rgba(149, 170, 255, 0.3),
-      0 12px 32px -8px rgba(149, 170, 255, 0.4);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-primary-gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(149, 170, 255, 0.2);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-primary-gradient:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow:
-      0 0 0 1px rgba(149, 170, 255, 0.3),
-      0 8px 20px rgba(149, 170, 255, 0.4),
-      0 20px 48px -12px rgba(149, 170, 255, 0.5);
-    background-position: 100% 100%;
-  }
-  .btn-primary-gradient:hover::before {
-    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(149, 170, 255, 0.25);
   }
   .btn-primary-gradient:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow:
-      0 0 0 1px rgba(149, 170, 255, 0.3),
-      0 2px 8px rgba(149, 170, 255, 0.3);
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(149, 170, 255, 0.2);
   }
 
-  /* Extra large CTA variant */
+  /* Extra large CTA variant — refined */
   .btn-primary-gradient-xl {
-    height: 4rem;
-    padding: 0 2.5rem;
-    font-size: 1rem;
-    border-radius: 1.25rem;
-    gap: 0.75rem;
+    height: 3.25rem;
+    padding: 0 2rem;
+    font-size: 0.9375rem;
+    border-radius: 0.875rem;
+    gap: 0.625rem;
   }
 
   /* Pulse dot — bulletinho verde pulsante */
@@ -702,11 +679,11 @@
   }
 }
 
-/* BOLD ANIMATIONS — Dramatic entrance and emphasis effects */
+/* REFINED ANIMATIONS — Subtle, sophisticated entrances */
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -717,7 +694,7 @@
 @keyframes fade-in-scale {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
@@ -728,7 +705,7 @@
 @keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: translateX(-16px);
   }
   to {
     opacity: 1;
@@ -739,7 +716,7 @@
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(16px);
   }
   to {
     opacity: 1;
@@ -752,7 +729,7 @@
     transform: translateY(0) translateX(-50%) translateY(-50%);
   }
   50% {
-    transform: translateY(-8px) translateX(-50%) translateY(-50%);
+    transform: translateY(-4px) translateX(-50%) translateY(-50%);
   }
 }
 
@@ -761,16 +738,16 @@
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: translate(-50%, calc(-50% - 6px)) scale(1.05);
+    transform: translate(-50%, calc(-50% - 3px)) scale(1.02);
   }
 }
 
 @keyframes glow-pulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(149, 170, 255, 0.4), 0 0 40px rgba(149, 170, 255, 0.2);
+    box-shadow: 0 0 12px rgba(149, 170, 255, 0.2), 0 0 24px rgba(149, 170, 255, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(149, 170, 255, 0.6), 0 0 60px rgba(149, 170, 255, 0.3);
+    box-shadow: 0 0 16px rgba(149, 170, 255, 0.3), 0 0 32px rgba(149, 170, 255, 0.15);
   }
 }
 
@@ -787,11 +764,11 @@
 
 @keyframes number-pop {
   0% {
-    transform: scale(0.5);
+    transform: scale(0.9);
     opacity: 0;
   }
-  60% {
-    transform: scale(1.1);
+  70% {
+    transform: scale(1.03);
   }
   100% {
     transform: scale(1);

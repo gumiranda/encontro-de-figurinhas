@@ -18,22 +18,19 @@ interface DelightfulEmptyStateProps {
 
 const PERSONALITY_STYLES = {
   encouraging: {
-    iconBg: "bg-gradient-to-br from-secondary/20 to-secondary-dim/30",
+    iconBg: "bg-secondary/10",
     iconColor: "text-secondary",
     titleColor: "text-on-surface",
-    glow: "shadow-[0_0_30px_rgba(79,243,37,0.15)]",
   },
   playful: {
-    iconBg: "bg-gradient-to-br from-tertiary/20 to-tertiary-dim/30",
+    iconBg: "bg-tertiary/10",
     iconColor: "text-tertiary",
     titleColor: "text-on-surface",
-    glow: "shadow-[0_0_30px_rgba(255,201,101,0.15)]",
   },
   calm: {
-    iconBg: "bg-gradient-to-br from-primary/15 to-primary-dim/25",
+    iconBg: "bg-primary/8",
     iconColor: "text-primary",
     titleColor: "text-on-surface",
-    glow: "shadow-[0_0_30px_rgba(149,170,255,0.15)]",
   },
 };
 
@@ -59,44 +56,39 @@ export function DelightfulEmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-16 px-6 text-center animate-fade-in-up",
+        "flex flex-col items-center justify-center py-12 px-6 text-center",
         className
       )}
     >
       <div
         className={cn(
-          "mb-6 flex h-24 w-24 items-center justify-center rounded-3xl",
-          styles.iconBg,
-          styles.glow
+          "mb-5 flex h-16 w-16 items-center justify-center rounded-xl",
+          styles.iconBg
         )}
       >
         <Icon
-          className={cn("h-12 w-12", styles.iconColor)}
+          className={cn("h-8 w-8", styles.iconColor)}
           strokeWidth={1.5}
           aria-hidden="true"
         />
       </div>
 
-      <h3 className={cn("font-headline text-2xl font-bold mb-3", styles.titleColor)}>
+      <h3 className={cn("font-headline text-xl font-semibold mb-2", styles.titleColor)}>
         {title}
       </h3>
 
-      <p className="text-on-surface-variant max-w-md mb-8 leading-relaxed">
+      <p className="text-on-surface-variant max-w-md mb-6 text-sm leading-relaxed">
         {description}
       </p>
 
       {ctaHref && ctaLabel && (
-        <Button
-          asChild
-          className="btn-primary-gradient animate-bounce-in"
-          style={{ animationDelay: "200ms" }}
-        >
+        <Button asChild className="btn-primary-gradient">
           <Link href={ctaHref}>{ctaLabel}</Link>
         </Button>
       )}
 
       {secondaryAction && (
-        <div className="mt-4 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+        <div className="mt-3">
           {secondaryAction}
         </div>
       )}

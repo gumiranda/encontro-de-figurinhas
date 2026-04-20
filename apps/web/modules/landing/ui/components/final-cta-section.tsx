@@ -32,38 +32,33 @@ type FinalCTASectionProps = {
 export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
   const suggestAnchorCity = cityName ?? "perto de você";
   return (
-    <section className="px-6 py-32 relative overflow-hidden">
-      {/* Bold gradient background with multiple layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-dim via-primary to-primary-container" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(79,243,37,0.15),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,201,101,0.1),transparent_60%)]" />
-
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h2 className="font-headline font-black text-4xl md:text-6xl lg:text-7xl tracking-tight mb-8 text-on-primary leading-[0.95]">
+    <section className="px-6 py-24 relative overflow-hidden bg-primary">
+      <div className="max-w-3xl mx-auto text-center relative z-10">
+        <h2 className="font-headline font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight mb-6 text-on-primary leading-tight">
           {copaCountdownLead()}{" "}
-          <span className="block mt-2 text-tertiary">E as suas figurinhas?</span>
+          <span className="block mt-1 text-tertiary">E as suas figurinhas?</span>
         </h2>
-        <p className="text-on-primary/90 text-xl md:text-2xl mb-12 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-on-primary/85 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
           Enquanto você espera, alguém está trocando. Entre agora e complete seu álbum.
         </p>
-        <div className="flex flex-col sm:flex-row gap-5 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/sign-up"
-            className="w-full sm:w-auto px-12 py-6 bg-on-primary text-primary-dim font-black rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_48px_rgba(0,0,0,0.4)] transition-all flex items-center justify-center gap-3 text-lg uppercase tracking-wider hover:scale-[1.03] hover:-translate-y-1"
+            className="w-full sm:w-auto px-8 py-4 bg-on-primary text-primary-dim font-semibold rounded-lg shadow-md transition-colors flex items-center justify-center gap-2 text-sm uppercase tracking-wide hover:bg-on-primary/95"
           >
-            QUERO COMPLETAR MEU ÁLBUM
-            <Rocket className="w-6 h-6" aria-hidden="true" />
+            Quero completar meu álbum
+            <Rocket className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
-        <p className="text-on-primary/70 text-sm mt-8 uppercase tracking-widest font-semibold">
+        <p className="text-on-primary/60 text-xs mt-6 uppercase tracking-wide font-medium">
           Sem cartão de crédito · 100% gratuito
         </p>
-        <p className="text-on-primary/80 text-base mt-12">
+        <p className="text-on-primary/75 text-sm mt-10">
           <Link
             href="/ponto/solicitar"
-            className="underline decoration-2 underline-offset-4 hover:decoration-tertiary hover:text-tertiary transition-all inline-flex items-center gap-2 font-semibold"
+            className="underline decoration-1 underline-offset-4 hover:text-tertiary transition-colors inline-flex items-center gap-1.5 font-medium"
           >
-            <MapPinPlus className="w-5 h-5" aria-hidden="true" />
+            <MapPinPlus className="w-4 h-4" aria-hidden="true" />
             Sugerir novo ponto de troca {suggestAnchorCity ? `em ${suggestAnchorCity}` : "perto de você"}
           </Link>
         </p>

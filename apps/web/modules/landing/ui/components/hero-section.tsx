@@ -21,7 +21,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
 
           <h1
             id="hero-heading"
-            className="font-headline text-5xl font-black leading-[0.95] tracking-tighter text-on-surface sm:text-6xl lg:text-7xl xl:text-8xl animate-fade-in-up opacity-0 delay-100"
+            className="font-headline text-4xl font-bold leading-tight tracking-tight text-on-surface sm:text-5xl lg:text-6xl animate-fade-in-up opacity-0 delay-100"
           >
             Pare de acumular repetidas.{" "}
             <span className="text-gradient-primary block sm:inline">Comece a trocar hoje.</span>
@@ -55,7 +55,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
             </Link>
             <Link
               href="/como-funciona"
-              className="flex h-14 items-center justify-center rounded-xl border-2 border-outline-variant/50 px-8 font-bold uppercase tracking-wider text-on-surface transition-all hover:bg-surface-variant hover:border-primary/40 hover:scale-[1.02]"
+              className="flex h-12 items-center justify-center rounded-lg border border-outline-variant/40 px-6 font-semibold text-sm uppercase tracking-wide text-on-surface transition-colors hover:bg-surface-variant hover:border-outline-variant/60"
             >
               Como funciona
             </Link>
@@ -86,31 +86,28 @@ function StatHero({
   const toneStyles = {
     primary: {
       text: "text-primary",
-      bg: "bg-gradient-to-br from-primary/15 to-primary-dim/25",
-      border: "border-primary/30",
-      glow: "shadow-[0_0_20px_rgba(149,170,255,0.2)]",
+      bg: "bg-primary/8",
+      border: "border-primary/20",
     },
     secondary: {
       text: "text-secondary",
-      bg: "bg-gradient-to-br from-secondary/10 to-secondary-dim/20",
-      border: "border-secondary/25",
-      glow: "shadow-[0_0_20px_rgba(79,243,37,0.15)]",
+      bg: "bg-secondary/6",
+      border: "border-secondary/15",
     },
     tertiary: {
       text: "text-tertiary",
-      bg: "bg-gradient-to-br from-tertiary/10 to-tertiary-dim/20",
-      border: "border-tertiary/25",
-      glow: "shadow-[0_0_20px_rgba(255,201,101,0.15)]",
+      bg: "bg-tertiary/6",
+      border: "border-tertiary/15",
     },
   }[tone];
 
   if (featured) {
     return (
-      <div className={`rounded-2xl border-2 ${toneStyles.border} ${toneStyles.bg} p-5 text-center ${toneStyles.glow} row-span-1`}>
-        <dd className={`font-headline text-4xl font-black ${toneStyles.text} animate-number-pop`}>
+      <div className={`rounded-xl border ${toneStyles.border} ${toneStyles.bg} p-4 text-center row-span-1`}>
+        <dd className={`font-headline text-3xl font-bold ${toneStyles.text} animate-number-pop`}>
           {value}
         </dd>
-        <dt className="mt-2 text-xs uppercase tracking-widest text-on-surface-variant font-semibold">
+        <dt className="mt-1.5 text-xs uppercase tracking-wide text-on-surface-variant font-medium">
           {label}
         </dt>
       </div>
@@ -118,11 +115,11 @@ function StatHero({
   }
 
   return (
-    <div className={`rounded-xl border ${toneStyles.border} ${toneStyles.bg} p-4 text-center`}>
-      <dd className={`font-headline text-2xl font-black ${toneStyles.text}`}>
+    <div className={`rounded-lg border ${toneStyles.border} ${toneStyles.bg} p-3 text-center`}>
+      <dd className={`font-headline text-xl font-bold ${toneStyles.text}`}>
         {value}
       </dd>
-      <dt className="mt-1 text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">
+      <dt className="mt-1 text-[0.6875rem] uppercase tracking-wide text-on-surface-variant">
         {label}
       </dt>
     </div>
@@ -141,27 +138,27 @@ function Stat({
   const toneStyles = {
     primary: {
       text: "text-primary",
-      bg: "bg-gradient-to-br from-primary/10 to-primary-dim/15",
-      border: "border-primary/20",
+      bg: "bg-primary/6",
+      border: "border-primary/15",
     },
     secondary: {
       text: "text-secondary",
-      bg: "bg-gradient-to-br from-secondary/10 to-secondary-dim/15",
-      border: "border-secondary/20",
+      bg: "bg-secondary/5",
+      border: "border-secondary/12",
     },
     tertiary: {
       text: "text-tertiary",
-      bg: "bg-gradient-to-br from-tertiary/10 to-tertiary-dim/15",
-      border: "border-tertiary/20",
+      bg: "bg-tertiary/5",
+      border: "border-tertiary/12",
     },
   }[tone];
 
   return (
-    <div className={`rounded-xl border ${toneStyles.border} ${toneStyles.bg} p-4 text-center`}>
-      <dd className={`font-headline text-2xl font-black ${toneStyles.text}`}>
+    <div className={`rounded-lg border ${toneStyles.border} ${toneStyles.bg} p-3 text-center`}>
+      <dd className={`font-headline text-xl font-bold ${toneStyles.text}`}>
         {value}
       </dd>
-      <dt className="mt-1 text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">
+      <dt className="mt-1 text-[0.6875rem] uppercase tracking-wide text-on-surface-variant">
         {label}
       </dt>
     </div>
@@ -171,37 +168,37 @@ function Stat({
 function ArenaVisual() {
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-lg"
+      className="relative mx-auto aspect-square w-full max-w-md"
       role="img"
       aria-label="Arena visual com colecionadores ativos em cidades próximas"
     >
-      {/* Background glow */}
-      <div className="absolute inset-0 rounded-full stadium-glow" />
+      {/* Background glow — refined */}
+      <div className="absolute inset-0 rounded-full stadium-glow opacity-60" />
 
-      {/* Animated rings */}
-      <div className="absolute inset-[5%] rounded-full border-2 border-primary/30 arena-ring arena-ring-1" />
-      <div className="absolute inset-[18%] rounded-full border border-secondary/25 arena-ring arena-ring-2" />
-      <div className="absolute inset-[32%] rounded-full border border-tertiary/20 arena-ring arena-ring-3" />
+      {/* Animated rings — refined opacity */}
+      <div className="absolute inset-[5%] rounded-full border border-primary/20 arena-ring arena-ring-1" />
+      <div className="absolute inset-[18%] rounded-full border border-secondary/15 arena-ring arena-ring-2" />
+      <div className="absolute inset-[32%] rounded-full border border-tertiary/12 arena-ring arena-ring-3" />
 
       {/* Radar sweep */}
-      <div className="radar-sweep" aria-hidden="true" />
+      <div className="radar-sweep opacity-70" aria-hidden="true" />
 
-      {/* Center landmark - BOLD with glow pulse */}
+      {/* Center landmark — refined */}
       <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-        <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary via-primary-container to-primary-dim shadow-arena-center animate-glow-pulse">
+        <div className="relative flex h-18 w-18 items-center justify-center rounded-full bg-primary shadow-lg">
           <Landmark
-            className="h-12 w-12 text-on-primary"
+            className="h-9 w-9 text-on-primary"
             aria-hidden="true"
-            strokeWidth={2.5}
+            strokeWidth={2}
           />
         </div>
       </div>
 
-      {/* Floating pins with staggered animations */}
-      <PeripheralPin top="10%" left="55%" value="12" tone="secondary" delay={0} />
-      <PeripheralPin top="60%" left="12%" value="8" tone="tertiary" delay={200} />
-      <PeripheralPin top="75%" left="78%" value="23" tone="primary" delay={400} />
-      <PeripheralPin top="30%" left="85%" value="5" tone="secondary" delay={600} />
+      {/* Floating pins — refined */}
+      <PeripheralPin top="10%" left="55%" value="12" tone="secondary" />
+      <PeripheralPin top="60%" left="12%" value="8" tone="tertiary" />
+      <PeripheralPin top="75%" left="78%" value="23" tone="primary" />
+      <PeripheralPin top="30%" left="85%" value="5" tone="secondary" />
     </div>
   );
 }
@@ -211,36 +208,22 @@ function PeripheralPin({
   left,
   value,
   tone,
-  delay = 0,
 }: {
   top: string;
   left: string;
   value: string;
   tone: "primary" | "secondary" | "tertiary";
-  delay?: number;
 }) {
   const toneStyles = {
-    primary: {
-      bg: "bg-gradient-to-br from-primary to-primary-dim",
-      text: "text-on-primary",
-      shadow: "shadow-[0_4px_20px_rgba(149,170,255,0.5)]",
-    },
-    secondary: {
-      bg: "bg-gradient-to-br from-secondary to-secondary-dim",
-      text: "text-on-secondary",
-      shadow: "shadow-[0_4px_20px_rgba(79,243,37,0.5)]",
-    },
-    tertiary: {
-      bg: "bg-gradient-to-br from-tertiary to-tertiary-dim",
-      text: "text-on-tertiary",
-      shadow: "shadow-[0_4px_20px_rgba(255,201,101,0.5)]",
-    },
+    primary: { bg: "bg-primary", text: "text-on-primary" },
+    secondary: { bg: "bg-secondary", text: "text-on-secondary" },
+    tertiary: { bg: "bg-tertiary", text: "text-on-tertiary" },
   }[tone];
 
   return (
     <div
-      className={`absolute flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-headline text-base font-black animate-float-pin ${toneStyles.bg} ${toneStyles.text} ${toneStyles.shadow}`}
-      style={{ top, left, animationDelay: `${delay}ms` }}
+      className={`absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-headline text-sm font-bold shadow-md animate-float-pin ${toneStyles.bg} ${toneStyles.text}`}
+      style={{ top, left }}
       aria-hidden="true"
     >
       {value}

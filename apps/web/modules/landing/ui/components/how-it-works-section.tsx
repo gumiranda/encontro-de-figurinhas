@@ -24,50 +24,50 @@ const STEPS = [
 export function HowItWorksSection() {
   return (
     <section
-      className="px-6 py-32 bg-surface relative overflow-hidden"
+      className="px-6 py-24 bg-surface relative overflow-hidden"
       aria-labelledby="how-it-works-heading"
     >
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(149,170,255,0.08),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(79,243,37,0.05),transparent_50%)]" />
+      {/* Subtle background pattern — refined */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(149,170,255,0.04),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(79,243,37,0.03),transparent_50%)]" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-20">
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="text-center mb-16">
           <h2
             id="how-it-works-heading"
-            className="font-headline font-black text-4xl md:text-6xl tracking-tight mb-6 text-on-surface"
+            className="font-headline font-bold text-3xl md:text-4xl tracking-tight mb-4 text-on-surface"
           >
             Como funciona
           </h2>
-          <p className="text-on-surface-variant max-w-2xl mx-auto text-lg md:text-xl">
+          <p className="text-on-surface-variant max-w-xl mx-auto text-base md:text-lg">
             Em 3 passos simples você encontra as figurinhas que faltam e completa seu álbum.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-3 gap-8">
           {STEPS.map((step, index) => {
             const Icon = step.icon;
             const colorSchemes = [
-              { bg: "from-primary/20 to-primary-dim/30", icon: "text-primary", number: "bg-gradient-to-br from-primary to-primary-dim", glow: "shadow-[0_0_30px_rgba(149,170,255,0.3)]" },
-              { bg: "from-secondary/15 to-secondary-dim/25", icon: "text-secondary", number: "bg-gradient-to-br from-secondary to-secondary-dim", glow: "shadow-[0_0_30px_rgba(79,243,37,0.25)]" },
-              { bg: "from-tertiary/15 to-tertiary-dim/25", icon: "text-tertiary", number: "bg-gradient-to-br from-tertiary to-tertiary-dim", glow: "shadow-[0_0_30px_rgba(255,201,101,0.25)]" },
-            ][index] ?? { bg: "from-primary/20 to-primary-dim/30", icon: "text-primary", number: "bg-primary", glow: "" };
+              { bg: "bg-primary/6", icon: "text-primary", number: "bg-primary" },
+              { bg: "bg-secondary/5", icon: "text-secondary", number: "bg-secondary" },
+              { bg: "bg-tertiary/5", icon: "text-tertiary", number: "bg-tertiary" },
+            ][index] ?? { bg: "bg-primary/6", icon: "text-primary", number: "bg-primary" };
 
             return (
               <div
                 key={step.number}
-                className={`relative bg-gradient-to-br ${colorSchemes.bg} rounded-3xl p-10 border border-outline-variant/15 text-center transition-transform hover:scale-[1.02] hover:-translate-y-1 ${colorSchemes.glow}`}
+                className={`relative ${colorSchemes.bg} rounded-2xl p-8 border border-outline-variant/10 text-center`}
               >
-                <div className={`absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full ${colorSchemes.number} text-on-primary flex items-center justify-center font-headline font-black text-lg shadow-lg`}>
+                <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full ${colorSchemes.number} text-on-primary flex items-center justify-center font-headline font-bold text-sm shadow-sm`}>
                   {step.number}
                 </div>
-                <div className={`w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-8 mt-4 ${colorSchemes.icon}`}>
-                  <Icon className="w-10 h-10" aria-hidden="true" />
+                <div className={`w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center mx-auto mb-6 mt-2 ${colorSchemes.icon}`}>
+                  <Icon className="w-7 h-7" aria-hidden="true" />
                 </div>
-                <h3 className="font-headline font-bold text-2xl mb-4 text-on-surface">
+                <h3 className="font-headline font-semibold text-xl mb-3 text-on-surface">
                   {step.title}
                 </h3>
-                <p className="text-on-surface-variant leading-relaxed">
+                <p className="text-on-surface-variant text-sm leading-relaxed">
                   {step.description}
                 </p>
               </div>

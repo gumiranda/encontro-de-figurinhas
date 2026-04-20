@@ -68,7 +68,7 @@ export function LandingHeader() {
           <Button
             asChild
             size="lg"
-            className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] px-4 text-xs font-bold uppercase tracking-wider text-[var(--on-primary-container)] shadow-none hover:opacity-95 active:scale-95 sm:px-6 sm:text-sm"
+            className="rounded-lg bg-primary px-4 text-xs font-bold uppercase tracking-wider text-on-primary sm:px-6 sm:text-sm"
           >
             <Link href="/sign-up" className="whitespace-nowrap">
               Criar conta

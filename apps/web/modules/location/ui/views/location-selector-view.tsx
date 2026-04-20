@@ -208,15 +208,15 @@ export function LocationSelectorView({
 
       {/* Desktop */}
       <section className="hidden min-h-screen grid-cols-2 md:grid">
-        <div className="flex flex-col justify-center gap-6 bg-[radial-gradient(500px_400px_at_30%_30%,rgba(55,102,255,0.15),transparent_60%)] px-14 py-16">
+        <div className="flex flex-col justify-center gap-6 bg-[radial-gradient(400px_300px_at_30%_30%,rgba(55,102,255,0.08),transparent_60%)] px-14 py-16">
           <div className="flex items-center gap-2.5">
             <span
-              className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] shadow-[0_0_20px_rgba(149,170,255,0.3)]"
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-[var(--on-primary)] shadow-sm"
               aria-hidden="true"
             >
-              <Landmark className="h-5 w-5" strokeWidth={2.5} />
+              <Landmark className="h-4 w-4" strokeWidth={2} />
             </span>
-            <span className="font-[var(--font-headline)] text-base font-extrabold tracking-tight text-[var(--on-surface)]">
+            <span className="font-[var(--font-headline)] text-base font-semibold tracking-tight text-[var(--on-surface)]">
               Figurinha Fácil
             </span>
           </div>
@@ -226,13 +226,13 @@ export function LocationSelectorView({
           </span>
 
           <div className="space-y-3">
-            <h1 className="text-5xl font-black leading-none tracking-tight text-[var(--on-surface)]">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight text-[var(--on-surface)]">
               Onde você{" "}
-              <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
+              <span className="text-primary">
                 troca?
               </span>
             </h1>
-            <p className="max-w-[440px] text-[15px] text-[var(--on-surface-variant)]">
+            <p className="max-w-[440px] text-sm text-[var(--on-surface-variant)]">
               {SHARED_SUBTITLE}
             </p>
           </div>

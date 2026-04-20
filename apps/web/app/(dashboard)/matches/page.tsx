@@ -186,19 +186,16 @@ function EmptyState({
 }) {
   const personalityStyles = {
     encouraging: {
-      iconBg: "bg-gradient-to-br from-secondary/20 to-secondary-dim/30",
+      iconBg: "bg-secondary/10",
       iconColor: "text-secondary",
-      glow: "shadow-[0_0_30px_rgba(79,243,37,0.15)]",
     },
     playful: {
-      iconBg: "bg-gradient-to-br from-tertiary/20 to-tertiary-dim/30",
+      iconBg: "bg-tertiary/10",
       iconColor: "text-tertiary",
-      glow: "shadow-[0_0_30px_rgba(255,201,101,0.15)]",
     },
     calm: {
-      iconBg: "bg-gradient-to-br from-primary/15 to-primary-dim/25",
+      iconBg: "bg-primary/8",
       iconColor: "text-primary",
-      glow: "shadow-[0_0_30px_rgba(149,170,255,0.15)]",
     },
   }[personality];
 
@@ -211,19 +208,19 @@ function EmptyState({
         </p>
       </div>
 
-      <Card className="border-dashed animate-fade-in-up">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+      <Card className="border-dashed">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <div
-            className={`mb-6 flex h-20 w-20 items-center justify-center rounded-2xl ${personalityStyles.iconBg} ${personalityStyles.glow}`}
+            className={`mb-5 flex h-16 w-16 items-center justify-center rounded-xl ${personalityStyles.iconBg}`}
           >
-            <Icon className={`size-10 ${personalityStyles.iconColor}`} strokeWidth={1.5} />
+            <Icon className={`size-8 ${personalityStyles.iconColor}`} strokeWidth={1.5} />
           </div>
-          <h2 className="text-xl font-headline font-bold">{title}</h2>
+          <h2 className="text-lg font-headline font-semibold">{title}</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground leading-relaxed">
             {description}
           </p>
           {ctaHref && ctaLabel && (
-            <Button asChild className="mt-8 btn-primary-gradient">
+            <Button asChild className="mt-6 btn-primary-gradient">
               <Link href={ctaHref}>{ctaLabel}</Link>
             </Button>
           )}
