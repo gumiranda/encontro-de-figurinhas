@@ -1,7 +1,5 @@
 [20/04/2026, 18:01:11] Gustavo: usar e instalar skill somente no claude code de forma global
 
-em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /soultrace
-
 em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /polish
 
 em @packages/backend/ @apps/web/ eu quero que voce aplique a skill a seguir (explorando ao máximo seu potencial) /bolder
