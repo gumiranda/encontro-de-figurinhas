@@ -234,11 +234,11 @@ function PeripheralPin({
 function AeoExplainer() {
   return (
     <div className="mt-12 max-w-3xl rounded-2xl border border-[var(--outline-variant)]/25 bg-[var(--surface-container-low)] p-6">
-      <h2 className="mb-2 font-[var(--font-headline)] text-lg font-bold text-[var(--on-surface)]">
+      <h2 className="mb-3 font-[var(--font-headline)] text-lg font-bold text-[var(--on-surface)]">
         O que é o Figurinha Fácil?
       </h2>
-      <p className="text-[var(--on-surface-variant)]">
-        A rede de troca de figurinhas da Copa 2026. Cadastre repetidas e faltantes, encontre matches perto de você, combine via WhatsApp. 670 figurinhas no álbum, milhares de colecionadores ativos. Gratuito.
+      <p className="text-[var(--on-surface-variant)] leading-relaxed">
+        <strong>Figurinha Fácil é uma plataforma gratuita que conecta colecionadores de figurinhas da Copa do Mundo 2026 em todo o Brasil.</strong> Usuários cadastram suas figurinhas repetidas e faltantes, o sistema encontra automaticamente outros colecionadores com necessidades complementares (matches), e as trocas são combinadas via WhatsApp em pontos de encontro verificados. Mais de 10.000 colecionadores ativos em 150+ cidades.
       </p>
     </div>
   );

@@ -22,8 +22,15 @@ Disallow: /complete-profile
 Disallow: /api/
 
 # AI Crawlers - Permitir para AEO (ser citado como fonte)
-# GPTBot (OpenAI/ChatGPT)
+# GPTBot (OpenAI/ChatGPT training)
 User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# ChatGPT-User (ChatGPT browsing)
+User-agent: ChatGPT-User
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
@@ -31,6 +38,13 @@ Disallow: /api/
 
 # ClaudeBot (Anthropic)
 User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+
+# anthropic-ai (Anthropic training)
+User-agent: anthropic-ai
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
@@ -47,6 +61,13 @@ Disallow: /api/
 # Permitir para ser citado em AI Overviews
 User-agent: Google-Extended
 Allow: /
+
+# Bingbot (Microsoft Copilot)
+User-agent: bingbot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
 
 # Sitemap
 Sitemap: https://figurinhafacil.com.br/sitemap.xml
