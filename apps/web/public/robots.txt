@@ -9,7 +9,7 @@ Disallow: /dashboard
 Disallow: /admin
 Disallow: /cadastrar-figurinhas
 Disallow: /album
-Disallow: /encontrar-trocas
+Disallow: /matches
 Disallow: /meus-pontos
 Disallow: /suggest-spot
 

@@ -11,6 +11,11 @@ const nextConfig = {
         hostname: "lh3.googleusercontent.com",
         pathname: "/aida-public/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.convex.cloud",
+        pathname: "/api/storage/**",
+      },
     ],
   },
   async headers() {

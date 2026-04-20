@@ -1,6 +1,27 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const distanceBucketValidator = v.union(
+  v.literal("near"),
+  v.literal("close"),
+  v.literal("mid"),
+  v.literal("far"),
+  v.literal("unknown")
+);
+
+const cachedMatchValidator = v.object({
+  otherUserId: v.id("users"),
+  ihaveCount: v.number(),
+  ineedCount: v.number(),
+  distanceMeters: v.union(v.number(), v.null()),
+  distanceBucket: distanceBucketValidator,
+  ihaveSample: v.array(v.number()),
+  ineedSample: v.array(v.number()),
+  score: v.number(),
+  hasSpecial: v.boolean(),
+  otherAcceptsMail: v.boolean(),
+});
+
 export default defineSchema({
   users: defineTable({
     name: v.string(),
@@ -80,7 +101,8 @@ export default defineSchema({
     .index("by_role", ["role"])
     .index("by_nickname", ["nickname"])
     .index("by_city", ["cityId"])
-    .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"]),
+    .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"])
+    .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"]),
 
   cities: defineTable({
     name: v.string(),
@@ -197,54 +219,43 @@ export default defineSchema({
   userMatchCache: defineTable({
     userId: v.id("users"),
     cityId: v.id("cities"),
-    matches: v.array(
-      v.object({
-        otherUserId: v.id("users"),
-        ihaveCount: v.number(),
-        ineedCount: v.number(),
-        distanceMeters: v.union(v.number(), v.null()),
-        distanceBucket: v.union(
-          v.literal("near"),
-          v.literal("close"),
-          v.literal("mid"),
-          v.literal("far"),
-          v.literal("unknown")
-        ),
-        ihaveSample: v.array(v.number()),
-        ineedSample: v.array(v.number()),
-        score: v.number(),
-        hasSpecial: v.boolean(),
-        otherAcceptsMail: v.boolean(),
-      })
-    ),
+    matches: v.array(cachedMatchValidator),
     recomputeCursor: v.union(v.string(), v.null()),
-    partialMatches: v.union(
-      v.null(),
-      v.array(
-        v.object({
-          otherUserId: v.id("users"),
-          ihaveCount: v.number(),
-          ineedCount: v.number(),
-          distanceMeters: v.union(v.number(), v.null()),
-          distanceBucket: v.union(
-            v.literal("near"),
-            v.literal("close"),
-            v.literal("mid"),
-            v.literal("far"),
-            v.literal("unknown")
-          ),
-          ihaveSample: v.array(v.number()),
-          ineedSample: v.array(v.number()),
-          score: v.number(),
-          hasSpecial: v.boolean(),
-          otherAcceptsMail: v.boolean(),
-        })
-      )
-    ),
+    partialMatches: v.union(v.null(), v.array(cachedMatchValidator)),
     recomputedAt: v.number(),
     recomputeStartedAt: v.union(v.number(), v.null()),
     stale: v.boolean(),
   })
     .index("by_user", ["userId"])
     .index("by_city", ["cityId"]),
+
+  blogPosts: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    excerpt: v.string(),
+    content: v.string(),
+    coverImage: v.optional(v.string()),
+    category: v.string(),
+    tags: v.array(v.string()),
+    readingTime: v.number(),
+    status: v.union(v.literal("draft"), v.literal("published")),
+    author: v.object({
+      name: v.string(),
+      avatar: v.optional(v.string()),
+    }),
+    seoTitle: v.optional(v.string()),
+    seoDescription: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status_publishedAt", ["status", "publishedAt"])
+    .index("by_category_status", ["category", "status"]),
+
+  siteStats: defineTable({
+    matchRecomputeEnabled: v.optional(v.boolean()),
+    hardDeleteOversizedCount: v.optional(v.number()),
+    lastReconcileAt: v.optional(v.number()),
+  }),
 });

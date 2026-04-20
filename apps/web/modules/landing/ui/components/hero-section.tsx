@@ -16,20 +16,20 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
         <div className="z-10 space-y-6">
           <span className="tag-chip">
             <span className="pulse-dot" aria-hidden="true" />
-            Ao vivo · 12.4k trocando agora
+            12.400+ trocas realizadas · 847 cidades
           </span>
 
           <h1
             id="hero-heading"
             className="font-[var(--font-headline)] text-4xl font-black leading-tight tracking-tighter text-[var(--on-surface)] sm:text-5xl lg:text-6xl"
           >
-            Sua figurinha perdida{" "}
-            <em className="not-italic text-gradient-primary">está aqui perto.</em>
+            Pare de acumular repetidas.{" "}
+            <span className="text-gradient-primary">Comece a trocar hoje.</span>
           </h1>
 
           <p className="max-w-lg text-lg leading-relaxed text-[var(--on-surface-variant)]">
-            A maior rede de troca do Brasil. Encontre colecionadores e pontos
-            verificados na sua cidade em segundos — grátis.
+            Cadastre suas figurinhas em 30 segundos. O sistema encontra quem tem
+            o que você precisa — e precisa do que você tem.
           </p>
 
           <div className="rounded-2xl border border-[var(--outline-variant)]/30 bg-[var(--surface-container)] p-4 shadow-soft">
@@ -51,7 +51,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
               href="/sign-up"
               className="btn-primary-gradient flex items-center justify-center px-8 text-center"
             >
-              Começar grátis
+              Encontrar trocas na minha cidade
             </Link>
             <Link
               href="/como-funciona"

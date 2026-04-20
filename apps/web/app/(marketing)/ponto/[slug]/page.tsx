@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
@@ -46,7 +46,7 @@ import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
   generateTradePointMetadata,
   generateBreadcrumbSchema,
-  generatePlaceSchema,
+  generateTradePointPlaceSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -55,11 +55,22 @@ interface PontoPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const loadTradePoint = cache((slug: string) =>
-  fetchQuery(api.tradePoints.getBySlug, { slug })
-);
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+const loadTradePoint = (slug: string) =>
+  unstable_cache(
+    async (s: string) => fetchQuery(api.tradePoints.getBySlug, { slug: s }),
+    ["ponto-by-slug"],
+    { tags: [`ponto:${slug}`], revalidate: 3600 }
+  )(slug);
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+export async function generateStaticParams() {
+  const slugs = await fetchQuery(api.tradePoints.listTopForSSG, {});
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -101,20 +112,23 @@ export default async function PontoPage({ params }: PontoPageProps) {
     { name: point.name },
   ]);
 
-  const localBusinessSchema = generatePlaceSchema(
-    point.name,
-    point.city.name,
-    point.city.state,
-    point.lat,
-    point.lng
-  );
+  const placeSchema = generateTradePointPlaceSchema({
+    name: point.name,
+    slug,
+    address: point.address,
+    city: point.city.name,
+    state: point.city.state,
+    lat: point.lat,
+    lng: point.lng,
+    description: point.description ?? undefined,
+  });
 
   const shareUrl = `${BASE_URL}/ponto/${slug}`;
 
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={localBusinessSchema} />
+      <JsonLd data={placeSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}

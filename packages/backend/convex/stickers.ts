@@ -11,8 +11,11 @@ const MATCH_RECOMPUTE_DELAY_MS = 10_000;
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
 
-/** Mínimo entre atualizações que alteram dados (mitiga alternância A↔B + recompute). */
+/** Mínimo entre atualizações batch (mitiga alternância A↔B + recompute). */
 const RATE_LIMIT_MS = 5000;
+
+/** Mínimo entre toggles individuais (previne spam de scheduler jobs). */
+const TOGGLE_RATE_LIMIT_MS = 1000;
 
 type UserPatch = Partial<
   Pick<
@@ -26,7 +29,6 @@ type UserPatch = Partial<
   >
 >;
 
-// Query
 export const getUserStickers = query({
   args: {},
   handler: async (ctx) => {
@@ -99,7 +101,7 @@ export const updateStickerList = mutation({
       setsEqual(currentMiss, newMiss) &&
       !args.finalize
     ) {
-      return;
+      return null;
     }
 
     const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
@@ -142,6 +144,8 @@ export const updateStickerList = mutation({
       internal.matches.recomputeMatchCache,
       { userId: user._id }
     );
+
+    return null;
   },
 });
 
@@ -157,6 +161,11 @@ export const toggleSticker = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) throw new Error("Unauthorized");
+
+    const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
+    if (timeSinceLastUpdate < TOGGLE_RATE_LIMIT_MS) {
+      throw new Error("Aguarde um momento antes de continuar");
+    }
 
     const config = await ctx.db.query("albumConfig").first();
     const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;

@@ -99,6 +99,9 @@
 
   /* Altura do MobileBottomNav (h-16 = 4rem). Consumida pelo nav e pela bottom-sheet do mapa */
   --mobile-nav-height: 4rem;
+
+  /* Offset do FAB mobile sobre o bottom nav (nav-height + gap de 1.25rem = 84px) */
+  --mobile-fab-offset: calc(var(--mobile-nav-height) + 1.25rem);
 }
 
 .dark {
@@ -438,11 +441,6 @@
     transform: scale(0.98);
   }
 
-  /* Pulse ring — badge "ao vivo" */
-  .pulse-ring {
-    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
   /* Pulse dot — bulletinho verde pulsante */
   .pulse-dot {
     display: inline-block;
@@ -452,12 +450,6 @@
     background: var(--secondary);
     box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5);
     animation: pulse-dot 1.8s ease-in-out infinite;
-  }
-
-  /* Radar bars — ondinhas que sobem/descem */
-  .bar-wave {
-    transform-origin: bottom;
-    animation: bar-wave 1.2s ease-in-out infinite;
   }
 
   /* Radar sweep — conic GPS rodando */
@@ -489,17 +481,6 @@
   }
 }
 
-@keyframes pulse-ring {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
-}
 @keyframes pulse-dot {
   0%,
   100% {
@@ -507,15 +488,6 @@
   }
   50% {
     box-shadow: 0 0 0 6px rgba(79, 243, 37, 0);
-  }
-}
-@keyframes bar-wave {
-  0%,
-  100% {
-    transform: scaleY(0.68);
-  }
-  50% {
-    transform: scaleY(1);
   }
 }
 @keyframes radar-sweep {
@@ -528,9 +500,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulse-ring,
-  .pulse-dot,
-  .bar-wave {
+  .pulse-dot {
     animation: none;
   }
   .radar-sweep {

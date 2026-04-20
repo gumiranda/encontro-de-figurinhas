@@ -80,12 +80,12 @@ export function StickerListGrouped({
                     ? "text-secondary"
                     : "text-primary";
 
-                const borderStyle = isExtra ? "border-l-4 border-tertiary" : "";
+                const extraStyle = isExtra ? "ring-1 ring-inset ring-tertiary/30" : "";
 
                 return (
                   <div
                     key={num}
-                    className={`bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors ${borderStyle}`}
+                    className={`bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors ${extraStyle}`}
                   >
                     <span className={`font-headline font-bold ${textColor}`}>
                       {display}

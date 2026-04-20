@@ -17,14 +17,15 @@ import {
   generateHowToSchema,
   generateSportsEventSchema,
   generateCombinedSchema,
+  GEO_OPTIMIZED_FAQS,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Figurinha Fácil - Troca de Figurinhas Copa 2026",
+  title: "Figurinha Fácil - Troque Figurinhas da Copa 2026 Perto de Você",
   description:
-    "A maior rede de troca de figurinhas do Brasil. Encontre colecionadores perto de você, troque figurinhas repetidas e complete seu álbum da Copa 2026.",
+    "O álbum da Copa 2026 tem 980 figurinhas. Economize até R$ 5.000 trocando com colecionadores em mais de 100 cidades. Cadastre suas repetidas e encontre quem tem as que você precisa.",
   alternates: {
     canonical: BASE_URL,
   },
@@ -35,63 +36,34 @@ export const metadata: Metadata = {
 };
 
 const FAQ_DATA = [
+  ...GEO_OPTIMIZED_FAQS,
   {
-    question: "Como funciona a troca de figurinhas no Figurinha Fácil?",
+    question: "Preciso pagar para usar o Figurinha Fácil?",
     answer:
-      "Cadastre suas figurinhas repetidas e as que você precisa. Nossa plataforma conecta você com outros colecionadores na sua cidade que têm as figurinhas que você procura.",
+      "Não. Figurinha Fácil é 100% gratuito para colecionadores. Você pode cadastrar figurinhas, encontrar trocas e usar o mapa sem custo algum.",
   },
   {
-    question: "O Figurinha Fácil é gratuito?",
+    question: "Funciona na minha cidade?",
     answer:
-      "Sim! O cadastro e uso básico da plataforma são totalmente gratuitos. Você pode cadastrar suas figurinhas, encontrar colecionadores e combinar trocas sem custo.",
-  },
-  {
-    question: "Em quais cidades posso trocar figurinhas?",
-    answer:
-      "O Figurinha Fácil está disponível em todas as capitais brasileiras e principais cidades como São Paulo, Rio de Janeiro, Belo Horizonte, Brasília, Salvador, Curitiba, entre outras.",
-  },
-  {
-    question: "Quais álbuns de figurinhas posso trocar?",
-    answer:
-      "Você pode trocar figurinhas de qualquer álbum, incluindo Copa do Mundo 2026, álbuns Panini, e outras coleções populares.",
-  },
-  {
-    question: "Como encontro pontos de troca presenciais?",
-    answer:
-      "Use nosso mapa interativo para encontrar pontos de troca na sua cidade. São locais públicos onde colecionadores se encontram para realizar trocas de forma segura.",
-  },
-  {
-    question: "Quanto tempo leva para analisar uma sugestão de ponto de troca?",
-    answer:
-      "A análise leva de 24 a 48 horas. Nossa equipe verifica segurança do local, movimento e adequação antes de aprovar.",
-  },
-  {
-    question: "Posso sugerir qualquer local como ponto de troca?",
-    answer:
-      "Priorize locais públicos e movimentados como shoppings, praças de alimentação e parques. Evitamos pontos em residências, ruas isoladas ou estabelecimentos privados sem acesso livre.",
-  },
-  {
-    question: "Quantas sugestões de novos pontos posso enviar?",
-    answer:
-      "Usuários com Reliability Score abaixo de 5 podem ter até 2 sugestões pendentes simultaneamente. Contribuições aprovadas aumentam seu score e liberam envios ilimitados.",
+      "Estamos em mais de 100 cidades brasileiras e crescendo. Se sua cidade não aparece, cadastre-se — você ajuda a expandir a rede e será notificado quando houver colecionadores próximos.",
   },
 ];
 
 const HOW_TO_STEPS = [
   {
-    title: "Cadastre-se grátis",
+    title: "Crie sua conta em 30 segundos",
     description:
-      "Crie sua conta em segundos e informe quais figurinhas você tem repetidas e quais precisa.",
+      "Cadastro rápido, sem burocracia. Use seu e-mail ou conta Google.",
   },
   {
-    title: "Encontre matches",
+    title: "Cadastre repetidas e faltantes",
     description:
-      "Nossa plataforma conecta você automaticamente com colecionadores que têm o que você precisa.",
+      "Marque as figurinhas que você tem de sobra e as que precisa completar.",
   },
   {
-    title: "Troque e complete",
+    title: "Encontre trocas e combine",
     description:
-      "Combine um ponto de encontro seguro na sua cidade e realize a troca presencialmente.",
+      "Veja no mapa quem está perto e combine o encontro para realizar a troca.",
   },
 ];
 

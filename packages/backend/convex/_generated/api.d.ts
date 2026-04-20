@@ -9,6 +9,8 @@
  */
 
 import type * as _helpers_pagination from "../_helpers/pagination.js";
+import type * as album from "../album.js";
+import type * as blog from "../blog.js";
 import type * as checkins from "../checkins.js";
 import type * as cities from "../cities.js";
 import type * as crons from "../crons.js";
@@ -30,8 +32,12 @@ import type * as lib_utils from "../lib/utils.js";
 import type * as lib_whatsapp from "../lib/whatsapp.js";
 import type * as matches from "../matches.js";
 import type * as permissions from "../permissions.js";
+import type * as revalidate from "../revalidate.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
+import type * as seedBlog from "../seedBlog.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
+import type * as siteStats from "../siteStats.js";
+import type * as states from "../states.js";
 import type * as stickers from "../stickers.js";
 import type * as tradePoints from "../tradePoints.js";
 import type * as userTradePoints from "../userTradePoints.js";
@@ -53,6 +59,8 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "_helpers/pagination": typeof _helpers_pagination;
+  album: typeof album;
+  blog: typeof blog;
   checkins: typeof checkins;
   cities: typeof cities;
   crons: typeof crons;
@@ -74,8 +82,12 @@ declare const fullApi: ApiFromModules<{
   "lib/whatsapp": typeof lib_whatsapp;
   matches: typeof matches;
   permissions: typeof permissions;
+  revalidate: typeof revalidate;
   seedAlbumConfig: typeof seedAlbumConfig;
+  seedBlog: typeof seedBlog;
   "seeds/seedCities": typeof seeds_seedCities;
+  siteStats: typeof siteStats;
+  states: typeof states;
   stickers: typeof stickers;
   tradePoints: typeof tradePoints;
   userTradePoints: typeof userTradePoints;

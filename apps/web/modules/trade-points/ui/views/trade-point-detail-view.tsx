@@ -26,6 +26,8 @@ export function TradePointDetailView({ tradePointId }: Props) {
   const router = useRouter();
   const share = useShare();
 
+  // NÃO mover pra middleware: `data.state` vem do hook useTradePoint, que depende
+  // de queries reativas do Convex. Servidor não vê esse estado client-side.
   useEffect(() => {
     if (data?.state === "needs-auth") {
       router.replace("/sign-in");

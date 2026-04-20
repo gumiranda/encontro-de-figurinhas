@@ -11,15 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
 import {
   AlertCircle,
-  Check,
   Info,
   Landmark,
-  LocateFixed,
-  MapPin,
   RefreshCw,
   X,
 } from "lucide-react";
@@ -29,20 +25,11 @@ import { toast } from "sonner";
 import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
 import type { CityWithCoords } from "../../lib/location-constants";
 import { resolveSetLocationToastMessage } from "../../lib/resolve-set-location-toast";
-import {
-  type LocationSource,
-  useLocationFlow,
-} from "../../lib/use-location-flow";
+import { stateCardSpec } from "../../lib/state-card-spec";
+import { useLocationFlow } from "../../lib/use-location-flow";
+import { CityList } from "../components/city-list";
 import { Radar } from "../components/radar-visual";
-
-type GpsStatus =
-  | "idle"
-  | "checking"
-  | "prompting"
-  | "granted"
-  | "denied"
-  | "unavailable"
-  | "timeout";
+import { StateCard } from "../components/state-card";
 
 interface LocationSelectorViewProps {
   cities: CityWithCoords[];
@@ -83,6 +70,8 @@ export function LocationSelectorView({
     ? cities.find((c) => c._id === selectedCityId) ?? null
     : null;
 
+  const spec = stateCardSpec(selectedCity, locationSource, gpsStatus);
+
   const radarMode: "idle" | "searching" =
     gpsStatus === "checking" ? "searching" : "idle";
 
@@ -120,22 +109,7 @@ export function LocationSelectorView({
 
   const primaryAction = selectedCity ? handleConfirmLocation : requestPermission;
 
-  const primaryDisabled = isSubmitting || gpsStatus === "checking";
-
-  const showRefresh =
-    gpsStatus !== "checking" &&
-    (!selectedCityId ||
-      locationSource === "ip" ||
-      gpsStatus === "denied" ||
-      gpsStatus === "timeout" ||
-      gpsStatus === "unavailable");
-
-  const showMobileRetry =
-    gpsStatus !== "checking" &&
-    (!!selectedCityId ||
-      gpsStatus === "denied" ||
-      gpsStatus === "timeout" ||
-      gpsStatus === "unavailable");
+  const primaryDisabled = spec.primaryDisabledByState || isSubmitting;
 
   const sharedBanners = (
     <>
@@ -200,9 +174,9 @@ export function LocationSelectorView({
         <div className="space-y-2 text-center">
           <h1 className="text-[28px] font-black leading-[1.05] tracking-tight text-[var(--on-surface)]">
             Onde você{" "}
-            <em className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text not-italic text-transparent">
+            <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
               troca?
-            </em>
+            </span>
           </h1>
           <p className="text-[13px] text-[var(--on-surface-variant)]">
             {SHARED_SUBTITLE}
@@ -213,14 +187,12 @@ export function LocationSelectorView({
 
         <StateCard
           size="mobile"
-          city={selectedCity}
-          locationSource={locationSource}
-          gpsStatus={gpsStatus}
+          spec={spec}
           onPrimary={primaryAction}
           primaryDisabled={primaryDisabled}
         />
 
-        {showMobileRetry && <RetryGpsLink onClick={requestPermission} />}
+        {spec.showRetryLink && <RetryGpsLink onClick={requestPermission} />}
 
         <OrDivider>ou escolher outra</OrDivider>
 
@@ -256,9 +228,9 @@ export function LocationSelectorView({
           <div className="space-y-3">
             <h1 className="text-5xl font-black leading-none tracking-tight text-[var(--on-surface)]">
               Onde você{" "}
-              <em className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text not-italic text-transparent">
+              <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
                 troca?
-              </em>
+              </span>
             </h1>
             <p className="max-w-[440px] text-[15px] text-[var(--on-surface-variant)]">
               {SHARED_SUBTITLE}
@@ -269,13 +241,11 @@ export function LocationSelectorView({
 
           <StateCard
             size="desktop"
-            city={selectedCity}
-            locationSource={locationSource}
-            gpsStatus={gpsStatus}
+            spec={spec}
             onPrimary={primaryAction}
             primaryDisabled={primaryDisabled}
             refreshSlot={
-              showRefresh ? (
+              spec.showRefresh ? (
                 <RefreshGpsButton onClick={requestPermission} />
               ) : null
             }
@@ -334,203 +304,6 @@ export function LocationSelectorView({
   );
 }
 
-interface StateCardProps {
-  size: "mobile" | "desktop";
-  city: CityWithCoords | null;
-  locationSource: LocationSource;
-  gpsStatus: GpsStatus;
-  onPrimary: () => void;
-  primaryDisabled: boolean;
-  refreshSlot?: React.ReactNode;
-}
-
-function StateCard({
-  size,
-  city,
-  locationSource,
-  gpsStatus,
-  onPrimary,
-  primaryDisabled,
-  refreshSlot,
-}: StateCardProps) {
-  const spec = stateCardSpec(city, locationSource, gpsStatus);
-
-  const iconTileSize =
-    size === "desktop" ? "h-12 w-12 rounded-[14px]" : "h-10 w-10 rounded-xl";
-  const iconInnerSize = size === "desktop" ? "h-7 w-7" : "h-5 w-5";
-  const titleSize = size === "desktop" ? "text-[17px]" : "text-[15px]";
-
-  return (
-    <div className="space-y-3">
-      <div
-        className={cn(
-          "flex items-center gap-3 rounded-2xl border bg-[var(--surface-container)] p-4",
-          spec.borderClass
-        )}
-      >
-        <div
-          className={cn(
-            "flex shrink-0 items-center justify-center",
-            iconTileSize,
-            spec.iconTileClass
-          )}
-        >
-          <spec.Icon className={iconInnerSize} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div
-            className={cn(
-              "font-[var(--font-headline)] font-bold text-[var(--on-surface)]",
-              titleSize
-            )}
-          >
-            {spec.title}
-          </div>
-          <div className="mt-0.5 text-xs text-[var(--on-surface-variant)]">
-            {spec.subtitle}
-          </div>
-        </div>
-        {spec.pill && (
-          <Pill tone={spec.pill.tone} pulseDot={spec.pill.pulseDot}>
-            {spec.pill.label}
-          </Pill>
-        )}
-      </div>
-
-      <div className="flex items-stretch gap-2.5">
-        <Button
-          type="button"
-          onClick={onPrimary}
-          disabled={primaryDisabled}
-          className="btn-primary-gradient h-[52px] flex-1 gap-2 rounded-[14px] text-sm"
-        >
-          <spec.PrimaryIcon className="h-5 w-5" />
-          {spec.primaryLabel}
-        </Button>
-        {refreshSlot}
-      </div>
-    </div>
-  );
-}
-
-interface StateCardSpec {
-  Icon: typeof LocateFixed;
-  PrimaryIcon: typeof Check;
-  title: string;
-  subtitle: string;
-  primaryLabel: string;
-  borderClass: string;
-  iconTileClass: string;
-  pill: { label: string; tone: PillTone; pulseDot?: boolean } | null;
-}
-
-function stateCardSpec(
-  city: CityWithCoords | null,
-  locationSource: LocationSource,
-  gpsStatus: GpsStatus
-): StateCardSpec {
-  if (city && locationSource === "gps") {
-    return {
-      Icon: LocateFixed,
-      PrimaryIcon: Check,
-      title: `Detectamos: ${city.name}`,
-      subtitle: `GPS · ${city.state}`,
-      primaryLabel: "Usar essa cidade",
-      borderClass: "border-[var(--secondary)]",
-      iconTileClass:
-        "bg-[color-mix(in_srgb,var(--secondary)_15%,transparent)] text-[var(--secondary)]",
-      pill: { label: "Detectado", tone: "success" },
-    };
-  }
-  if (city && locationSource === "ip") {
-    return {
-      Icon: LocateFixed,
-      PrimaryIcon: Check,
-      title: `Detectamos: ${city.name}`,
-      subtitle: `IP · ${city.state} · próximo a você`,
-      primaryLabel: "Usar essa cidade",
-      borderClass: "border-[var(--tertiary)]",
-      iconTileClass:
-        "bg-[color-mix(in_srgb,var(--tertiary)_15%,transparent)] text-[var(--tertiary)]",
-      pill: { label: "Aproximado", tone: "warn" },
-    };
-  }
-  if (city) {
-    return {
-      Icon: MapPin,
-      PrimaryIcon: Check,
-      title: `Selecionado: ${city.name}`,
-      subtitle: city.state,
-      primaryLabel: "Usar essa cidade",
-      borderClass: "border-[var(--primary)]",
-      iconTileClass:
-        "bg-[color-mix(in_srgb,var(--primary)_15%,transparent)] text-[var(--primary)]",
-      pill: { label: "Selecionado", tone: "primary" },
-    };
-  }
-  if (gpsStatus === "checking") {
-    return {
-      Icon: LocateFixed,
-      PrimaryIcon: LocateFixed,
-      title: "Procurando você...",
-      subtitle: "Isso leva alguns segundos",
-      primaryLabel: "Buscando",
-      borderClass: "border-[var(--outline-variant)]",
-      iconTileClass:
-        "bg-[color-mix(in_srgb,var(--primary)_15%,transparent)] text-[var(--primary)]",
-      pill: { label: "Buscando", tone: "primary", pulseDot: true },
-    };
-  }
-  return {
-    Icon: LocateFixed,
-    PrimaryIcon: LocateFixed,
-    title: "Ative sua localização",
-    subtitle: "Ou escolha uma cidade abaixo",
-    primaryLabel: "Ativar GPS",
-    borderClass: "border-[var(--outline-variant)]",
-    iconTileClass: "bg-[var(--surface-container-high)] text-[var(--primary)]",
-    pill: null,
-  };
-}
-
-type PillTone = "success" | "warn" | "primary";
-
-function Pill({
-  tone,
-  children,
-  pulseDot,
-}: {
-  tone: PillTone;
-  children: React.ReactNode;
-  pulseDot?: boolean;
-}) {
-  const toneClass = {
-    success:
-      "bg-[color-mix(in_srgb,var(--secondary)_15%,transparent)] text-[var(--secondary)] border border-[color-mix(in_srgb,var(--secondary)_30%,transparent)]",
-    warn: "bg-[color-mix(in_srgb,var(--tertiary)_12%,transparent)] text-[var(--tertiary)] border border-[color-mix(in_srgb,var(--tertiary)_30%,transparent)]",
-    primary:
-      "bg-[color-mix(in_srgb,var(--primary)_15%,transparent)] text-[var(--primary)] border border-[color-mix(in_srgb,var(--primary)_30%,transparent)]",
-  }[tone];
-
-  return (
-    <span
-      className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-[var(--font-headline)] text-[10px] font-bold uppercase tracking-[0.12em]",
-        toneClass
-      )}
-    >
-      {pulseDot && (
-        <span
-          className="pulse-dot"
-          style={{ background: "var(--primary)" }}
-          aria-hidden="true"
-        />
-      )}
-      {children}
-    </span>
-  );
-}
-
 function OrDivider({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2.5 font-[var(--font-headline)] text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--outline)]">
@@ -538,57 +311,6 @@ function OrDivider({ children }: { children: React.ReactNode }) {
       {children}
       <span className="h-px flex-1 bg-[var(--outline-variant)]" />
     </div>
-  );
-}
-
-function CityList({
-  cities,
-  selectedCityId,
-  onSelect,
-  max,
-}: {
-  cities: CityWithCoords[];
-  selectedCityId: Id<"cities"> | null;
-  onSelect: (id: Id<"cities"> | null) => void;
-  max: number;
-}) {
-  const visible = cities.slice(0, max);
-  if (visible.length === 0) return null;
-
-  return (
-    <ul className="flex flex-col gap-1.5">
-      {visible.map((city) => {
-        const selected = selectedCityId === city._id;
-        return (
-          <li key={city._id}>
-            <button
-              type="button"
-              onClick={() => onSelect(city._id)}
-              aria-pressed={selected}
-              className={cn(
-                "flex w-full cursor-pointer items-center gap-3 rounded-xl border bg-[var(--surface-container)] p-3 text-left transition-colors hover:border-[var(--primary)]",
-                selected
-                  ? "border-[var(--primary)]"
-                  : "border-[var(--outline-variant)]"
-              )}
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[var(--surface-container-high)] text-[var(--primary)]">
-                <MapPin className="h-[18px] w-[18px]" />
-              </span>
-              <span className="flex-1 font-[var(--font-headline)] text-sm font-bold text-[var(--on-surface)]">
-                {city.name}
-                <span className="block text-[11px] font-medium text-[var(--on-surface-variant)]">
-                  {city.state}
-                </span>
-              </span>
-              <span className="font-mono text-[11px] text-[var(--outline)]">
-                →
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
   );
 }
 

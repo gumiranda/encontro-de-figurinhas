@@ -14,19 +14,23 @@ import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
   generateBreadcrumbSchema,
   generateFAQSchema,
+  GEO_OPTIMIZED_FAQS,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Como Funciona",
+  title: "Como Funciona | Troque Figurinhas da Copa 2026",
   description:
-    "Saiba como trocar figurinhas no Figurinha Fácil. Cadastre suas figurinhas, encontre colecionadores perto de você e complete seu álbum.",
+    "Saiba como trocar figurinhas da Copa 2026 no Figurinha Fácil. Com 980 figurinhas no álbum, trocar é essencial. Cadastre suas repetidas, encontre colecionadores perto de você e economize até R$ 5.000.",
   keywords: [
     "como trocar figurinhas",
+    "como trocar figurinhas copa 2026",
     "troca de figurinhas online",
     "encontrar colecionadores",
     "trocar figurinhas repetidas",
+    "onde trocar figurinhas",
+    "app troca figurinhas",
   ],
   openGraph: {
     title: "Como Funciona | Figurinha Fácil",
@@ -44,33 +48,7 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: "Como Funciona" },
 ]);
 
-const faqSchema = generateFAQSchema([
-  {
-    question: "Preciso pagar para usar o Figurinha Fácil?",
-    answer:
-      "Não! O cadastro e uso básico da plataforma são totalmente gratuitos. Você pode cadastrar suas figurinhas, encontrar colecionadores e combinar trocas sem custo.",
-  },
-  {
-    question: "Como cadastro minhas figurinhas?",
-    answer:
-      "Após criar sua conta, acesse a área de cadastro de figurinhas. Você pode informar os números das figurinhas que tem repetidas e as que precisa para completar seu álbum.",
-  },
-  {
-    question: "Como encontro pessoas para trocar?",
-    answer:
-      "Nossa plataforma automaticamente conecta você com colecionadores próximos que têm as figurinhas que você precisa e que precisam das suas repetidas.",
-  },
-  {
-    question: "É seguro trocar figurinhas pelo Figurinha Fácil?",
-    answer:
-      "Sim! Recomendamos sempre realizar trocas em locais públicos e seguros. Nossa plataforma mostra pontos de troca bem avaliados pela comunidade.",
-  },
-  {
-    question: "Posso trocar figurinhas de qualquer álbum?",
-    answer:
-      "Sim! O Figurinha Fácil suporta álbuns de diversas coleções, incluindo Copa do Mundo 2026, campeonatos brasileiros e outras coleções Panini.",
-  },
-]);
+const faqSchema = generateFAQSchema(GEO_OPTIMIZED_FAQS);
 
 const steps = [
   {
@@ -265,12 +243,10 @@ export default function ComoFuncionaPage() {
             </h2>
 
             <div className="max-w-3xl mx-auto space-y-6">
-              {faqSchema.mainEntity.map((item) => (
-                <div key={item.name} className="bg-background rounded-lg p-6">
-                  <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
-                  <p className="text-muted-foreground">
-                    {item.acceptedAnswer.text}
-                  </p>
+              {GEO_OPTIMIZED_FAQS.map((item) => (
+                <div key={item.question} className="bg-background rounded-lg p-6">
+                  <h3 className="font-semibold text-lg mb-2">{item.question}</h3>
+                  <p className="text-muted-foreground">{item.answer}</p>
                 </div>
               ))}
             </div>

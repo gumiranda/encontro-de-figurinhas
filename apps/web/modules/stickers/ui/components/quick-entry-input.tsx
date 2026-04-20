@@ -92,6 +92,7 @@ export function QuickEntryInput({
           placeholder={isLoading ? "Carregando álbum…" : placeholder}
           disabled={isLoading}
           aria-label="Entrada rápida de figurinhas"
+          aria-describedby="quick-entry-hint"
           className="h-9 flex-1 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
         />
         <Button
@@ -105,7 +106,7 @@ export function QuickEntryInput({
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 text-[11px] text-on-surface-variant">
+      <div id="quick-entry-hint" className="flex items-center gap-2 text-[11px] text-on-surface-variant">
         <Keyboard aria-hidden="true" className="size-3.5 text-outline" />
         <span>Separar por vírgula ·</span>
         <kbd className="inline-flex items-center rounded border border-outline-variant bg-surface-container-high px-1.5 py-0.5 font-mono text-[10px] text-on-surface-variant line-through">

@@ -30,7 +30,7 @@ export function OnboardingProgress({
           const step = i + 1;
           return (
             <div
-              key={i}
+              key={`step-${step}-of-${totalSteps}`}
               className={cn(
                 "h-1.5 flex-1 rounded-full transition-colors",
                 step < currentStep && "bg-[var(--secondary)]",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import Image from "next/image";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { useMutation } from "convex/react";
@@ -123,16 +124,19 @@ export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
       <div className="relative shrink-0">
-        <div
-          className="flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface-container-low)] bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)] lg:size-36"
-          role="img"
-          aria-label={imageUrl ? `Avatar de ${nickname ?? "você"}` : "Avatar padrão"}
-        >
+        <div className="relative flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface-container-low)] bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)] lg:size-36">
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageUrl} alt="" className="size-full object-cover" />
+            <Image
+              src={imageUrl}
+              alt={nickname ? `Avatar de ${nickname}` : "Seu avatar"}
+              fill
+              sizes="(min-width: 1024px) 144px, 112px"
+              className="object-cover"
+            />
           ) : (
-            initials
+            <span aria-label={`Avatar padrão${nickname ? ` de ${nickname}` : ""}`}>
+              {initials}
+            </span>
           )}
         </div>
         <button

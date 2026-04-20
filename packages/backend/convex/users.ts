@@ -327,6 +327,10 @@ export const getMyFavoriteTradePointIds = query({
   },
 });
 
+// Cap duro de favoritos por user. MVP: mesmo valor para todos.
+// Ramp-up para 200 quando premium gating entrar (schema ganhar premiumExpiresAt).
+export const MAX_FAVORITE_TRADE_POINTS = 50;
+
 export const toggleFavoriteTradePoint = mutation({
   args: { tradePointId: v.id("tradePoints") },
   handler: async (ctx, { tradePointId }) => {
@@ -337,6 +341,9 @@ export const toggleFavoriteTradePoint = mutation({
     }
     const current = user.favoriteTradePointIds ?? [];
     const has = current.includes(tradePointId);
+    if (!has && current.length >= MAX_FAVORITE_TRADE_POINTS) {
+      throw new Error("FAVORITE_LIMIT_REACHED");
+    }
     const next = has
       ? current.filter((id) => id !== tradePointId)
       : [...current, tradePointId];

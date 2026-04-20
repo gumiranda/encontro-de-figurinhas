@@ -3,6 +3,27 @@ import type { Metadata } from "next";
 export const BASE_URL = "https://figurinhafacil.com.br";
 export const SITE_NAME = "Figurinha Fácil";
 
+// Content Freshness - GEO optimization requires updates every 7-14 days
+export const CONTENT_VERSION = "2026.04.19";
+export const LAST_CONTENT_UPDATE = "2026-04-19T00:00:00Z";
+
+export function getContentFreshnessHeaders() {
+  return {
+    "X-Content-Version": CONTENT_VERSION,
+    "X-Last-Modified": LAST_CONTENT_UPDATE,
+  };
+}
+
+export function generateFreshnessMetadata(): Partial<Metadata> {
+  return {
+    other: {
+      "article:modified_time": LAST_CONTENT_UPDATE,
+      "og:updated_time": LAST_CONTENT_UPDATE,
+      "content-version": CONTENT_VERSION,
+    },
+  };
+}
+
 // Generate combined schema using @graph pattern for AEO optimization
 export function generateCombinedSchema(schemas: Record<string, unknown>[]) {
   return {
@@ -239,4 +260,620 @@ export function generateTradePointMetadata(
     },
   };
 }
+
+export function generateTeamMetadata(
+  teamName: string,
+  teamSlug: string,
+  flagEmoji: string,
+  stickerCount: number
+): Metadata {
+  const title = `Figurinhas ${teamName} ${flagEmoji} Copa 2026 | ${SITE_NAME}`;
+  const description = `Encontre e troque figurinhas da seleção ${teamName} para a Copa do Mundo 2026. São ${stickerCount} figurinhas da ${teamName}. Veja quais você precisa e encontre quem tem.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      `figurinhas ${teamName}`,
+      `figurinhas ${teamName} copa 2026`,
+      `troca figurinhas ${teamName}`,
+      `álbum copa 2026 ${teamName}`,
+      `seleção ${teamName} figurinhas`,
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/selecao/${teamSlug}`,
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `${BASE_URL}/selecao/${teamSlug}`,
+    },
+  };
+}
+
+export function generateSportsTeamSchema(
+  teamName: string,
+  teamCode: string,
+  stickerRange: { start: number; end: number }
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SportsTeam",
+    name: `Seleção ${teamName}`,
+    sport: "Association Football",
+    memberOf: {
+      "@type": "SportsOrganization",
+      name: "FIFA",
+    },
+    event: {
+      "@type": "SportsEvent",
+      name: "Copa do Mundo FIFA 2026",
+      startDate: "2026-06-11",
+      endDate: "2026-07-19",
+    },
+    subjectOf: {
+      "@type": "CollectionPage",
+      name: `Figurinhas ${teamName} - Copa 2026`,
+      description: `Coleção de figurinhas da seleção ${teamName} para o álbum da Copa do Mundo 2026. Números ${stickerRange.start} a ${stickerRange.end}.`,
+      url: `${BASE_URL}/selecao/${teamCode.toLowerCase()}`,
+    },
+  };
+}
+
+export function generateStickerMetadata(
+  number: number,
+  teamName: string,
+  flagEmoji: string,
+  isGolden: boolean,
+  isLegend: boolean,
+  legendName?: string
+): Metadata {
+  const specialLabel = isLegend
+    ? ` - ${legendName}`
+    : isGolden
+      ? " (Dourada)"
+      : "";
+  const title = `Figurinha ${number} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
+  const description = isLegend
+    ? `Figurinha ${number} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
+    : isGolden
+      ? `Figurinha dourada ${number} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
+      : `Figurinha ${number} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      `figurinha ${number}`,
+      `figurinha ${number} copa 2026`,
+      `figurinha ${teamName} ${number}`,
+      ...(isLegend && legendName ? [`figurinha ${legendName}`] : []),
+      ...(isGolden ? [`figurinha dourada ${number}`] : []),
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/figurinha/${number}`,
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `${BASE_URL}/figurinha/${number}`,
+    },
+  };
+}
+
+export function generateProductSchema(
+  number: number,
+  teamName: string,
+  isGolden: boolean,
+  isLegend: boolean,
+  legendName?: string
+) {
+  const specialLabel = isLegend
+    ? ` - ${legendName}`
+    : isGolden
+      ? " (Dourada)"
+      : "";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `Figurinha ${number} - ${teamName}${specialLabel}`,
+    description: `Figurinha número ${number} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
+    category: "Figurinhas Colecionáveis",
+    brand: {
+      "@type": "Brand",
+      name: "Panini",
+    },
+    isRelatedTo: {
+      "@type": "SportsEvent",
+      name: "Copa do Mundo FIFA 2026",
+    },
+    offers: {
+      "@type": "Offer",
+      availability: "https://schema.org/InStock",
+      priceCurrency: "BRL",
+      price: "0",
+      description: "Troca gratuita entre colecionadores",
+    },
+  };
+}
+
+export function generateStateMetadata(
+  stateName: string,
+  stateSlug: string,
+  citiesCount: number,
+  collectorsCount: number
+): Metadata {
+  const title = `Troca de Figurinhas em ${stateName} | ${SITE_NAME}`;
+  const description =
+    collectorsCount > 0
+      ? `Encontre ${collectorsCount} colecionadores em ${citiesCount} cidades de ${stateName}. Troque figurinhas da Copa 2026 perto de você.`
+      : `Troque figurinhas da Copa 2026 em ${stateName}. ${citiesCount} cidades disponíveis para encontrar colecionadores.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      `figurinhas ${stateName}`,
+      `troca de figurinhas ${stateName}`,
+      `colecionadores ${stateName}`,
+      `pontos de troca ${stateName}`,
+      `álbum copa 2026 ${stateName}`,
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/estado/${stateSlug}`,
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `${BASE_URL}/estado/${stateSlug}`,
+    },
+  };
+}
+
+export function generateStateSchema(stateName: string, stateSlug: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "State",
+    name: stateName,
+    containedInPlace: {
+      "@type": "Country",
+      name: "Brasil",
+    },
+    subjectOf: {
+      "@type": "WebPage",
+      name: `Troca de Figurinhas em ${stateName}`,
+      url: `${BASE_URL}/estado/${stateSlug}`,
+    },
+  };
+}
+
+export function generateBlogPostMetadata(
+  title: string,
+  slug: string,
+  excerpt: string,
+  coverImage?: string,
+  seoTitle?: string,
+  seoDescription?: string
+): Metadata {
+  const finalTitle = seoTitle || `${title} | Blog ${SITE_NAME}`;
+  const finalDescription = seoDescription || excerpt;
+
+  return {
+    title: finalTitle,
+    description: finalDescription,
+    openGraph: {
+      title: finalTitle,
+      description: finalDescription,
+      url: `${BASE_URL}/blog/${slug}`,
+      type: "article",
+      ...(coverImage && { images: [{ url: coverImage }] }),
+    },
+    twitter: {
+      card: coverImage ? "summary_large_image" : "summary",
+      title: finalTitle,
+      description: finalDescription,
+      ...(coverImage && { images: [coverImage] }),
+    },
+    alternates: {
+      canonical: `${BASE_URL}/blog/${slug}`,
+    },
+  };
+}
+
+export function generateArticleSchema(
+  title: string,
+  slug: string,
+  excerpt: string,
+  publishedAt: number,
+  updatedAt?: number,
+  author?: { name: string; avatar?: string },
+  coverImage?: string
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description: excerpt,
+    url: `${BASE_URL}/blog/${slug}`,
+    datePublished: new Date(publishedAt).toISOString(),
+    ...(updatedAt && { dateModified: new Date(updatedAt).toISOString() }),
+    ...(coverImage && { image: coverImage }),
+    author: {
+      "@type": "Person",
+      name: author?.name || SITE_NAME,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+      logo: `${BASE_URL}/logo.svg`,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${slug}`,
+    },
+  };
+}
+
+export function generateBlogListMetadata(
+  category?: string,
+  page?: number
+): Metadata {
+  const title = category
+    ? `${category} | Blog ${SITE_NAME}`
+    : `Blog | ${SITE_NAME}`;
+  const description = category
+    ? `Artigos sobre ${category} para colecionadores de figurinhas. Dicas, novidades e guias.`
+    : "Blog do Figurinha Fácil. Dicas de troca, novidades da Copa 2026 e guias para colecionadores.";
+
+  const url = category
+    ? `${BASE_URL}/blog/categoria/${category.toLowerCase()}`
+    : `${BASE_URL}/blog`;
+
+  return {
+    title: page && page > 1 ? `${title} - Página ${page}` : title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
+// Enhanced LocalBusiness Schema for Trade Points (GEO Optimized)
+export function generateTradePointPlaceSchema(point: {
+  name: string;
+  slug: string;
+  address: string;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+  description?: string;
+}) {
+  const streetAddress = point.address.trim();
+  const postalAddress: Record<string, unknown> = {
+    "@type": "PostalAddress",
+    addressLocality: point.city,
+    addressRegion: point.state,
+    addressCountry: "BR",
+  };
+  if (streetAddress.length > 0) {
+    postalAddress.streetAddress = streetAddress;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Place",
+    "@id": `${BASE_URL}/ponto/${point.slug}`,
+    name: point.name,
+    description:
+      point.description ||
+      `Ponto de troca de figurinhas da Copa 2026 em ${point.city}, ${point.state}.`,
+    url: `${BASE_URL}/ponto/${point.slug}`,
+    address: postalAddress,
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: point.lat,
+      longitude: point.lng,
+    },
+  };
+}
+
+export function generateCityItemListSchema(
+  citySlug: string,
+  cityName: string,
+  points: Array<{ slug: string; name: string }>
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${BASE_URL}/cidade/${citySlug}#points`,
+    name: `Pontos de troca em ${cityName}`,
+    numberOfItems: points.length,
+    itemListElement: points.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${BASE_URL}/ponto/${p.slug}`,
+      name: p.name,
+    })),
+  };
+}
+
+export function generateLocalBusinessSchema(point: {
+  name: string;
+  slug: string;
+  address: string;
+  city: string;
+  state: string;
+  lat?: number;
+  lng?: number;
+  suggestedHours?: string;
+  description?: string;
+  participantCount?: number;
+  confidenceScore?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": `${BASE_URL}/ponto/${point.slug}`,
+    name: point.name,
+    description:
+      point.description ||
+      `Ponto de troca de figurinhas da Copa 2026 em ${point.city}, ${point.state}. Local para colecionadores trocarem figurinhas repetidas.`,
+    url: `${BASE_URL}/ponto/${point.slug}`,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: point.address,
+      addressLocality: point.city,
+      addressRegion: point.state,
+      addressCountry: "BR",
+    },
+    ...(point.lat &&
+      point.lng && {
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: point.lat,
+          longitude: point.lng,
+        },
+      }),
+    ...(point.suggestedHours && {
+      openingHoursSpecification: {
+        "@type": "OpeningHoursSpecification",
+        description: point.suggestedHours,
+      },
+    }),
+    ...(point.participantCount &&
+      point.participantCount > 0 && {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: Math.min(5, (point.confidenceScore || 5) / 2),
+          reviewCount: point.participantCount,
+          bestRating: 5,
+        },
+      }),
+    priceRange: "Gratuito",
+    currenciesAccepted: "BRL",
+    areaServed: {
+      "@type": "City",
+      name: point.city,
+    },
+  };
+}
+
+// Article Schema for Content Pages (GEO Optimized)
+export function generateGeoArticleSchema(article: {
+  title: string;
+  description: string;
+  slug: string;
+  publishedDate: string;
+  modifiedDate: string;
+  images?: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    url: `${BASE_URL}/${article.slug}`,
+    datePublished: article.publishedDate,
+    dateModified: article.modifiedDate,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/logo.svg`,
+      },
+    },
+    ...(article.images?.length && {
+      image: article.images,
+    }),
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/${article.slug}`,
+    },
+    inLanguage: "pt-BR",
+    isAccessibleForFree: true,
+  };
+}
+
+// CollectionPage Schema for Album Page (GEO Optimized)
+export function generateCollectionPageSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Álbum de Figurinhas Copa do Mundo 2026",
+    description:
+      "Coleção completa com 980 figurinhas do álbum oficial Panini da Copa do Mundo FIFA 2026. Inclui 68 figurinhas especiais metalizadas, 48 Legends e 20 Iconic Moments.",
+    url: `${BASE_URL}/album-copa-do-mundo-2026`,
+    about: {
+      "@type": "SportsEvent",
+      name: "Copa do Mundo FIFA 2026",
+      startDate: "2026-06-11",
+      endDate: "2026-07-19",
+    },
+    numberOfItems: 980,
+    mainEntity: {
+      "@type": "ProductCollection",
+      name: "Figurinhas Copa 2026",
+      brand: {
+        "@type": "Brand",
+        name: "Panini",
+      },
+      numberOfItems: 980,
+    },
+  };
+}
+
+// Hub Pages Metadata
+export function generateCitiesHubMetadata(): Metadata {
+  const title = `Cidades com Troca de Figurinhas | ${SITE_NAME}`;
+  const description =
+    "Encontre colecionadores de figurinhas da Copa 2026 em mais de 500 cidades brasileiras. Veja onde trocar figurinhas perto de você.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "cidades figurinhas",
+      "onde trocar figurinhas",
+      "troca de figurinhas brasil",
+      "colecionadores perto de mim",
+    ],
+    openGraph: { title, description, url: `${BASE_URL}/cidades`, type: "website" },
+    alternates: { canonical: `${BASE_URL}/cidades` },
+  };
+}
+
+export function generateStatesHubMetadata(): Metadata {
+  const title = `Estados com Troca de Figurinhas | ${SITE_NAME}`;
+  const description =
+    "Troque figurinhas da Copa 2026 em todos os 27 estados brasileiros. Encontre colecionadores e pontos de troca no seu estado.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "estados figurinhas",
+      "troca de figurinhas por estado",
+      "colecionadores brasil",
+    ],
+    openGraph: { title, description, url: `${BASE_URL}/estados`, type: "website" },
+    alternates: { canonical: `${BASE_URL}/estados` },
+  };
+}
+
+export function generateTeamsHubMetadata(): Metadata {
+  const title = `Seleções da Copa 2026 - Todas as Figurinhas | ${SITE_NAME}`;
+  const description =
+    "Veja todas as 48 seleções do álbum da Copa do Mundo 2026. Encontre figurinhas douradas, lendas e complete sua coleção.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "seleções copa 2026",
+      "figurinhas seleções",
+      "times copa do mundo",
+      "álbum copa 2026 seleções",
+    ],
+    openGraph: { title, description, url: `${BASE_URL}/selecoes`, type: "website" },
+    alternates: { canonical: `${BASE_URL}/selecoes` },
+  };
+}
+
+export function generateStickersHubMetadata(): Metadata {
+  const title = `Todas as 980 Figurinhas da Copa 2026 | ${SITE_NAME}`;
+  const description =
+    "Lista completa das 980 figurinhas do álbum Copa do Mundo 2026. Encontre figurinhas douradas, lendas e raras. Troque com colecionadores.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "figurinhas copa 2026",
+      "lista figurinhas copa",
+      "figurinhas raras",
+      "figurinhas douradas",
+      "980 figurinhas",
+    ],
+    openGraph: { title, description, url: `${BASE_URL}/figurinhas`, type: "website" },
+    alternates: { canonical: `${BASE_URL}/figurinhas` },
+  };
+}
+
+export function generateTradePointsHubMetadata(): Metadata {
+  const title = `Pontos de Troca de Figurinhas | ${SITE_NAME}`;
+  const description =
+    "Encontre pontos de troca de figurinhas da Copa 2026 perto de você. Shoppings, praças, escolas e eventos em todo o Brasil.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "pontos de troca figurinhas",
+      "onde trocar figurinhas",
+      "eventos troca figurinhas",
+      "locais troca figurinhas",
+    ],
+    openGraph: { title, description, url: `${BASE_URL}/pontos`, type: "website" },
+    alternates: { canonical: `${BASE_URL}/pontos` },
+  };
+}
+
+// GEO-Optimized FAQs with Statistics (Princeton Method)
+export const GEO_OPTIMIZED_FAQS = [
+  {
+    question: "Quantas figurinhas tem o álbum da Copa 2026?",
+    answer:
+      "O álbum da Copa do Mundo 2026 tem 980 figurinhas, sendo o maior da história. Desse total, 68 são figurinhas especiais com acabamento metalizado, incluindo as categorias Legend (48) e Iconic Moments (20). São 48 seleções participantes, com 20 figurinhas para cada time.",
+  },
+  {
+    question: "Quanto custa completar o álbum da Copa 2026?",
+    answer:
+      "Para completar o álbum sem trocas, o custo estimado é de R$ 7.000 a R$ 8.000, considerando que cada pacote custa R$ 7 e vem com 7 figurinhas. Com trocas estratégicas, esse valor pode cair para R$ 1.500 a R$ 2.500. No Figurinha Fácil, você encontra colecionadores próximos para trocar gratuitamente.",
+  },
+  {
+    question: "Onde trocar figurinhas da Copa 2026?",
+    answer:
+      "Você pode trocar figurinhas da Copa 2026 em pontos de troca cadastrados no Figurinha Fácil, que conecta colecionadores em mais de 100 cidades brasileiras. Praças, shoppings, livrarias e escolas também organizam eventos de troca presenciais.",
+  },
+  {
+    question: "Como funciona a troca de figurinhas online?",
+    answer:
+      "No Figurinha Fácil, você cadastra suas figurinhas repetidas e faltantes. O sistema encontra automaticamente colecionadores próximos com matches perfeitos (você tem o que eles precisam e vice-versa). Você combina o encontro pelo WhatsApp e realiza a troca presencialmente.",
+  },
+  {
+    question: "Quais são as figurinhas mais raras da Copa 2026?",
+    answer:
+      "As figurinhas mais raras são as 68 especiais metalizadas: 48 Legends (uma lenda por seleção, como Pelé para o Brasil) e 20 Iconic Moments (momentos históricos das Copas). A probabilidade de tirar uma Legend é de aproximadamente 1 em 50 pacotes.",
+  },
+]
 

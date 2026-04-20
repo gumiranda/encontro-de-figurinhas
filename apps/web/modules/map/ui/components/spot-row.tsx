@@ -12,6 +12,7 @@ type SpotRowProps = {
   index: number;
   selected: boolean;
   isFavorite: boolean;
+  canFavorite: boolean;
   onSelect: () => void;
 };
 
@@ -20,6 +21,7 @@ export function SpotRow({
   index,
   selected,
   isFavorite,
+  canFavorite,
   onSelect,
 }: SpotRowProps) {
   const status = derivePointStatus(point);
@@ -38,7 +40,7 @@ export function SpotRow({
         onClick={onSelect}
         aria-pressed={selected}
         aria-label={`Selecionar ${point.name}, ${formatDistance(point.distanceKm)}`}
-        className="flex flex-1 items-start gap-3 text-left"
+        className="flex flex-1 cursor-pointer items-start gap-3 text-left"
       >
         <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-surface-container-high font-headline text-xs font-extrabold text-primary">
           {index}
@@ -72,11 +74,13 @@ export function SpotRow({
         <span className="font-mono text-[11px] text-outline">
           {formatDistance(point.distanceKm)}
         </span>
-        <FavoriteButton
-          tradePointId={point._id as Id<"tradePoints">}
-          isFavorite={isFavorite}
-          pointName={point.name}
-        />
+        {canFavorite && (
+          <FavoriteButton
+            tradePointId={point._id as Id<"tradePoints">}
+            isFavorite={isFavorite}
+            pointName={point.name}
+          />
+        )}
       </div>
     </div>
   );

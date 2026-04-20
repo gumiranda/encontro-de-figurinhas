@@ -3,7 +3,7 @@ import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
-import { authErrorValidators, checkAuth } from "./lib/auth";
+import { checkAuth } from "./lib/auth";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
   CHECKIN_DURATION_MS,
@@ -20,22 +20,6 @@ export const create = mutation({
     lat: v.float64(),
     lng: v.float64(),
   },
-  returns: v.union(
-    v.object({
-      ok: v.literal(true),
-      expiresAt: v.number(),
-      replacedPrevious: v.boolean(),
-      renewed: v.boolean(),
-    }),
-    ...authErrorValidators,
-    v.object({
-      ok: v.literal(false),
-      error: v.literal("too-far"),
-      distanceMeters: v.number(),
-    }),
-    v.object({ ok: v.literal(false), error: v.literal("not-member") }),
-    v.object({ ok: v.literal(false), error: v.literal("point-unavailable") })
-  ),
   handler: async (ctx, { tradePointId, lat, lng }) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
@@ -181,10 +165,6 @@ export const create = mutation({
 
 export const cancelMine = mutation({
   args: {},
-  returns: v.union(
-    v.object({ ok: v.literal(true), cancelled: v.boolean() }),
-    ...authErrorValidators
-  ),
   handler: async (ctx) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
@@ -222,7 +202,6 @@ const EXPIRE_BATCH_SIZE = 50;
 
 export const expireCheckins = internalMutation({
   args: {},
-  returns: v.object({ expired: v.number() }),
   handler: async (ctx) => {
     const now = Date.now();
     const expired = await ctx.db
@@ -230,6 +209,7 @@ export const expireCheckins = internalMutation({
       .withIndex("by_expiresAt", (q) => q.lte("expiresAt", now))
       .take(EXPIRE_BATCH_SIZE);
 
+    // Collect decrements per tradePoint (already consolidated)
     const decrements = new Map<Id<"tradePoints">, number>();
     for (const checkin of expired) {
       if (checkin.countedInPublic) {
@@ -238,20 +218,25 @@ export const expireCheckins = internalMutation({
           (decrements.get(checkin.tradePointId) ?? 0) + 1
         );
       }
-      await ctx.db.delete(checkin._id);
     }
 
-    for (const [tradePointId, count] of decrements) {
-      const point = await ctx.db.get(tradePointId);
-      if (point) {
-        await ctx.db.patch(tradePointId, {
-          activeCheckinsCount: Math.max(
-            0,
-            (point.activeCheckinsCount ?? 0) - count
-          ),
+    // BARRIER 1: Delete all checkins in parallel
+    await Promise.all(expired.map((c) => ctx.db.delete(c._id)));
+
+    // BARRIER 2: Batch get+patch for each unique tradePoint (after deletes complete)
+    const tradePointIds = [...decrements.keys()];
+    const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
+
+    await Promise.all(
+      tradePointIds.map((id, i) => {
+        const point = points[i];
+        if (!point) return;
+        const count = decrements.get(id) ?? 0;
+        return ctx.db.patch(id, {
+          activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
         });
-      }
-    }
+      })
+    );
 
     if (expired.length === EXPIRE_BATCH_SIZE) {
       await ctx.scheduler.runAfter(0, internal.checkins.expireCheckins, {});
@@ -283,11 +268,6 @@ export const cleanupForShadowBannedUser = internalMutation({
     ),
     chunk: v.optional(v.number()),
   },
-  returns: v.object({
-    deleted: v.number(),
-    phase: v.string(),
-    rescheduled: v.boolean(),
-  }),
   handler: async (ctx, { userId, phase = "checkins", chunk = 0 }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("cleanup-user-not-found");
@@ -319,6 +299,7 @@ export const cleanupForShadowBannedUser = internalMutation({
         )
         .take(CLEANUP_BATCH);
 
+      // Collect decrements per tradePoint
       const decrements = new Map<Id<"tradePoints">, number>();
       for (const c of batch) {
         if (c.countedInPublic) {
@@ -327,19 +308,25 @@ export const cleanupForShadowBannedUser = internalMutation({
             (decrements.get(c.tradePointId) ?? 0) + 1
           );
         }
-        await ctx.db.delete(c._id);
       }
-      for (const [pid, n] of decrements) {
-        const p = await ctx.db.get(pid);
-        if (p) {
-          await ctx.db.patch(pid, {
-            activeCheckinsCount: Math.max(
-              0,
-              (p.activeCheckinsCount ?? 0) - n
-            ),
+
+      // BARRIER 1: Delete all checkins in parallel
+      await Promise.all(batch.map((c) => ctx.db.delete(c._id)));
+
+      // BARRIER 2: Batch get+patch for each unique tradePoint
+      const tradePointIds = [...decrements.keys()];
+      const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
+
+      await Promise.all(
+        tradePointIds.map((id, i) => {
+          const point = points[i];
+          if (!point) return;
+          const count = decrements.get(id) ?? 0;
+          return ctx.db.patch(id, {
+            activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
           });
-        }
-      }
+        })
+      );
 
       if (batch.length === CLEANUP_BATCH) {
         const result = await rescheduleIfMore(ctx, {
@@ -371,7 +358,9 @@ export const cleanupForShadowBannedUser = internalMutation({
       .query("scoreBumps")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .take(CLEANUP_BATCH);
-    for (const r of scoreBumpBatch) await ctx.db.delete(r._id);
+
+    // Batch delete all scoreBumps in parallel
+    await Promise.all(scoreBumpBatch.map((r) => ctx.db.delete(r._id)));
 
     if (scoreBumpBatch.length === CLEANUP_BATCH) {
       const result = await rescheduleIfMore(ctx, {
@@ -409,14 +398,14 @@ export const decayPeakHours = internalMutation({
     cursor: v.optional(v.string()),
     chunk: v.optional(v.number()),
   },
-  returns: v.object({ processed: v.number(), rescheduled: v.boolean() }),
   handler: async (ctx, { cursor, chunk = 0 }) => {
     const page = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .paginate({ numItems: DECAY_BATCH, cursor: cursor ?? null });
 
-    let processed = 0;
+    // Collect patches to apply
+    const patches: { id: Id<"tradePoints">; peakHours: number[] }[] = [];
     for (const point of page.page) {
       if (!point.peakHours || point.peakHours.length === 0) continue;
       const decayed = point.peakHours.map((h) => {
@@ -425,9 +414,14 @@ export const decayPeakHours = internalMutation({
         const next = Math.floor(original * PEAK_HOURS_DECAY_FACTOR);
         return Math.max(next, PEAK_HOURS_FLOOR_AFTER_ACTIVITY);
       });
-      await ctx.db.patch(point._id, { peakHours: decayed });
-      processed++;
+      patches.push({ id: point._id, peakHours: decayed });
     }
+
+    // Batch apply all patches in parallel
+    await Promise.all(
+      patches.map((p) => ctx.db.patch(p.id, { peakHours: p.peakHours }))
+    );
+    const processed = patches.length;
 
     if (!page.isDone) {
       const result = await rescheduleIfMore(ctx, {
@@ -451,10 +445,6 @@ const PRUNE_MAX_CHUNKS = 100;
 
 export const pruneScoreBumps = internalMutation({
   args: { chunk: v.optional(v.number()) },
-  returns: v.object({
-    deleted: v.number(),
-    aborted: v.optional(v.boolean()),
-  }),
   handler: async (ctx, { chunk }) => {
     const cutoff = Date.now() - SCOREBUMP_RETENTION_MS;
     const expired = await ctx.db
@@ -462,9 +452,8 @@ export const pruneScoreBumps = internalMutation({
       .withIndex("by_at", (q) => q.lt("at", cutoff))
       .take(PRUNE_BATCH);
 
-    for (const row of expired) {
-      await ctx.db.delete(row._id);
-    }
+    // Batch delete all expired scoreBumps in parallel
+    await Promise.all(expired.map((row) => ctx.db.delete(row._id)));
 
     if (expired.length === PRUNE_BATCH) {
       const nextChunk = (chunk ?? 0) + 1;

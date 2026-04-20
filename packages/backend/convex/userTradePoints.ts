@@ -1,17 +1,10 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { authErrorValidators, checkAuth } from "./lib/auth";
+import { checkAuth } from "./lib/auth";
 import { FREE_USER_MAX_POINTS } from "./lib/limits";
 
 export const join = mutation({
   args: { tradePointId: v.id("tradePoints") },
-  returns: v.union(
-    v.object({ ok: v.literal(true) }),
-    ...authErrorValidators,
-    v.object({ ok: v.literal(false), error: v.literal("already-member") }),
-    v.object({ ok: v.literal(false), error: v.literal("limit-reached") }),
-    v.object({ ok: v.literal(false), error: v.literal("point-unavailable") })
-  ),
   handler: async (ctx, { tradePointId }) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
@@ -56,11 +49,6 @@ export const join = mutation({
 
 export const leave = mutation({
   args: { tradePointId: v.id("tradePoints") },
-  returns: v.union(
-    v.object({ ok: v.literal(true) }),
-    ...authErrorValidators,
-    v.object({ ok: v.literal(false), error: v.literal("not-member") })
-  ),
   handler: async (ctx, { tradePointId }) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {

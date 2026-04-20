@@ -209,7 +209,7 @@ export function RequestTradePointView({
           </Text>
         </section>
 
-        <Announcement className="w-full items-start justify-start gap-3 rounded-xl border-l-4 border-l-primary bg-card p-4">
+        <Announcement className="w-full items-start justify-start gap-3 rounded-xl bg-primary/5 p-4 ring-1 ring-inset ring-primary/20">
           <AnnouncementTag>
             <TriangleAlert className="h-4 w-4" aria-hidden="true" />
           </AnnouncementTag>

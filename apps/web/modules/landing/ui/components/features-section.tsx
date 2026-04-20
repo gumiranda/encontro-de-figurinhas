@@ -46,12 +46,11 @@ export function FeaturesSection() {
               id="features-heading"
               className="font-[var(--font-headline)] font-black text-4xl md:text-6xl leading-tight text-[var(--on-surface)]"
             >
-              Preparado para completar seu{" "}
-              <span className="text-[var(--secondary)]">álbum?</span>
+              Figurinha Fácil{" "}
+              <span className="text-[var(--secondary)]">resolve.</span>
             </h2>
             <p className="text-[var(--on-surface-variant)] text-lg font-[var(--font-body)]">
-              Junte-se a milhares de colecionadores e transforme sua jornada em uma
-              experiência de elite.
+              Encontre quem tem o que você precisa — e precisa do que você tem — em minutos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link

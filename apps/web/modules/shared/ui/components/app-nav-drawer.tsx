@@ -75,7 +75,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             href: "/cadastrar-figurinhas/quick",
             icon: ListPlus,
           },
-          { label: "Encontrar trocas", href: "/encontrar-trocas", icon: ArrowLeftRight },
+          { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
       },

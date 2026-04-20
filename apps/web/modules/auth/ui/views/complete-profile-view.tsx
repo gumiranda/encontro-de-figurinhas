@@ -28,7 +28,10 @@ export function CompleteProfileView() {
     }
   }, [isAuthenticated, currentUser, createUser]);
 
-  // Already onboarded - redirect to dashboard
+  // Already onboarded - redirect to dashboard.
+  // NÃO mover pra middleware: `currentUser.hasCompletedOnboarding` vem de useQuery
+  // do Convex, que hidrata no cliente. O modelo reativo do Convex não expõe esse
+  // estado no server/edge sem duplicar a camada de auth.
   useEffect(() => {
     if (currentUser?.hasCompletedOnboarding) {
       router.replace("/cadastrar-figurinhas");

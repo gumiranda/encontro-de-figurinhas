@@ -62,7 +62,7 @@ export function StickerTabs({
             aria-selected={isActive}
             onClick={() => onChange(key)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-lg font-headline text-[11px] font-bold uppercase tracking-widest transition-colors",
+              "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg font-headline text-[11px] font-bold uppercase tracking-widest transition-colors",
               variant === "desktop-inline" ? "px-3 py-1.5" : "px-3 py-2.5",
               isActive
                 ? activeClass

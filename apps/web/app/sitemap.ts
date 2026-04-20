@@ -1,11 +1,65 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { unstable_cache } from "next/cache";
+import { convexServer, api } from "@/lib/convex-server";
 
 const BASE_URL = "https://figurinhafacil.com.br";
+
+const loadCitiesForSitemap = unstable_cache(
+  async () => convexServer.query(api.cities.listForSitemap, {}),
+  ["sitemap-cities"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
+
+const loadTradePointsForSitemap = unstable_cache(
+  async () => {
+    const all: Array<{ slug: string; updatedAt: number }> = [];
+    let cursor: string | null = null;
+    for (let i = 0; i < 20; i++) {
+      const result: {
+        page: Array<{ slug: string; updatedAt: number }>;
+        continueCursor: string | null;
+        isDone: boolean;
+      } = await convexServer.query(api.tradePoints.listApprovedForSitemapPage, {
+        cursor,
+        pageSize: 5000,
+      });
+      all.push(...result.page);
+      if (result.isDone) break;
+      cursor = result.continueCursor;
+    }
+    return all;
+  },
+  ["sitemap-trade-points"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
+
+const loadStatesForSitemap = unstable_cache(
+  async () => convexServer.query(api.states.listForSitemap, {}),
+  ["sitemap-states"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
+
+const loadStickersForSitemap = unstable_cache(
+  async () => convexServer.query(api.album.listStickersForSitemap, {}),
+  ["sitemap-stickers"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
+
+const loadTeamsForSitemap = unstable_cache(
+  async () => convexServer.query(api.album.getAllSectionSlugs, {}),
+  ["sitemap-teams"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
+
+const loadBlogForSitemap = unstable_cache(
+  async () => convexServer.query(api.blog.listForSitemap, {}),
+  ["sitemap-blog"],
+  { tags: ["sitemap"], revalidate: 86400 }
+);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  // Páginas estáticas principais
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -49,56 +103,104 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
-  ];
-
-  // Páginas de cidades principais (SEO keywords)
-  const majorCities = [
-    "sao-paulo",
-    "rio-de-janeiro",
-    "belo-horizonte",
-    "brasilia",
-    "salvador",
-    "fortaleza",
-    "curitiba",
-    "recife",
-    "porto-alegre",
-    "manaus",
-    "goiania",
-    "campinas",
-    "santos",
-    "guarulhos",
-    "niteroi",
-  ];
-
-  const cityPages: MetadataRoute.Sitemap = majorCities.map((city) => ({
-    url: `${BASE_URL}/cidade/${city}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.9,
-  }));
-
-  // Pontos de troca conhecidos (será expandido dinamicamente)
-  const tradePoints = [
-    "praca-da-se-sp",
-    "parque-ibirapuera-sp",
-  ];
-
-  const tradePointPages: MetadataRoute.Sitemap = tradePoints.map((point) => ({
-    url: `${BASE_URL}/ponto/${point}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
-
-  // Páginas de arena pública
-  const arenaPages: MetadataRoute.Sitemap = [
+    // Hub pages
     {
-      url: `${BASE_URL}/arena/map`,
+      url: `${BASE_URL}/cidades`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/estados`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/selecoes`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/figurinhas`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/pontos`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/blog`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.8,
     },
   ];
 
-  return [...staticPages, ...cityPages, ...tradePointPages, ...arenaPages];
+  const [cities, tradePoints, states, stickers, teams, blogPosts] =
+    await Promise.all([
+      loadCitiesForSitemap(),
+      loadTradePointsForSitemap(),
+      loadStatesForSitemap(),
+      loadStickersForSitemap(),
+      loadTeamsForSitemap(),
+      loadBlogForSitemap(),
+    ]);
+
+  const cityPages: MetadataRoute.Sitemap = cities.map((c) => ({
+    url: `${BASE_URL}/cidade/${c.slug}`,
+    lastModified: new Date(c.updatedAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const tradePointPages: MetadataRoute.Sitemap = tradePoints.map((p) => ({
+    url: `${BASE_URL}/ponto/${p.slug}`,
+    lastModified: new Date(p.updatedAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  const statePages: MetadataRoute.Sitemap = states.map((s) => ({
+    url: `${BASE_URL}/estado/${s.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const stickerPages: MetadataRoute.Sitemap = stickers.map((s) => ({
+    url: `${BASE_URL}/figurinha/${s.number}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const teamPages: MetadataRoute.Sitemap = teams.map((slug) => ({
+    url: `${BASE_URL}/selecao/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${BASE_URL}/blog/${post.slug}`,
+    lastModified: post.updatedAt ? new Date(post.updatedAt) : now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  return [
+    ...staticPages,
+    ...cityPages,
+    ...statePages,
+    ...teamPages,
+    ...stickerPages,
+    ...tradePointPages,
+    ...blogPages,
+  ];
 }

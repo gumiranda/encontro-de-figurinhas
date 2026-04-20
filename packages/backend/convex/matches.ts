@@ -296,11 +296,20 @@ export const findUserMatches = query({
     const myDupSet = new Set<number>(me.duplicates ?? []);
     const myMissSet = new Set<number>(me.missing ?? []);
 
+    // Batch fetch all users upfront to avoid N+1 queries
+    const userIds = top.map((m) => m.otherUserId);
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const userMap = new Map(
+      users
+        .filter((u): u is NonNullable<typeof u> => u !== null)
+        .map((u) => [u._id, u])
+    );
+
     const enriched: MatchView[] = [];
     for (let i = 0; i < top.length; i++) {
       const m = top[i];
       if (!m) continue;
-      const other = await ctx.db.get(m.otherUserId);
+      const other = userMap.get(m.otherUserId);
       if (!other) continue;
 
       let ihaveCount = m.ihaveCount;
@@ -367,16 +376,25 @@ export type MatchView = {
   hasSpecial: boolean;
 };
 
+const BACKFILL_BATCH = 200;
+const BACKFILL_MAX_CHUNKS = 100;
+
 /**
  * Admin/dev: one-shot backfill of pointType + acceptsMail defaults for existing tradePoints.
  * Run with: npx convex run matches:backfillTradePointType
  */
 export const backfillTradePointType = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const points = await ctx.db.query("tradePoints").collect();
+  args: {
+    cursor: v.optional(v.string()),
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const page = await ctx.db
+      .query("tradePoints")
+      .paginate({ numItems: BACKFILL_BATCH, cursor: cursor ?? null });
+
     let touched = 0;
-    for (const p of points) {
+    for (const p of page.page) {
       const patch: { pointType?: "fixed"; acceptsMail?: boolean } = {};
       if (p.pointType === undefined) patch.pointType = "fixed";
       if (p.acceptsMail === undefined) patch.acceptsMail = false;
@@ -385,6 +403,21 @@ export const backfillTradePointType = internalMutation({
         touched += 1;
       }
     }
-    return { touched, total: points.length };
+
+    if (!page.isDone) {
+      const nextChunk = chunk + 1;
+      if (nextChunk >= BACKFILL_MAX_CHUNKS) {
+        console.error("backfillTradePointType: hit MAX_CHUNKS guard", {
+          chunk: nextChunk,
+        });
+        return { touched, aborted: true };
+      }
+      await ctx.scheduler.runAfter(0, internal.matches.backfillTradePointType, {
+        cursor: page.continueCursor,
+        chunk: nextChunk,
+      });
+    }
+
+    return { touched, done: page.isDone };
   },
 });

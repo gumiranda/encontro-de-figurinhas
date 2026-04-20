@@ -1,5 +1,5 @@
 "use client";
-import { useId, type ReactNode, type RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import { Search } from "lucide-react";
 import type L from "leaflet";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -24,9 +24,12 @@ type DesktopMapLayoutProps = {
   onFilterChange: (next: ArenaFilter) => void;
   points: TradePointMapItem[];
   favorites: FavoriteSet;
+  canFavorite: boolean;
   selectedId: Id<"tradePoints"> | null;
   onSelect: (id: Id<"tradePoints">) => void;
 };
+
+const LIST_ID = "points-list";
 
 export function DesktopMapLayout({
   mapNode,
@@ -41,10 +44,10 @@ export function DesktopMapLayout({
   onFilterChange,
   points,
   favorites,
+  canFavorite,
   selectedId,
   onSelect,
 }: DesktopMapLayoutProps) {
-  const listId = useId();
 
   return (
     <div className="grid h-[100dvh] grid-cols-[380px_1fr]">
@@ -72,13 +75,14 @@ export function DesktopMapLayout({
               onChange={(e) => onQueryChange(e.target.value)}
               placeholder="Buscar por nome ou endereço..."
               aria-label="Buscar ponto na lista"
-              aria-controls={listId}
+              aria-controls={LIST_ID}
               className="h-10 border-outline-variant pl-9"
             />
           </div>
           <MapFilterChips
             value={filter}
             onChange={onFilterChange}
+            canFavorite={canFavorite}
             layout="wrap"
             className="mt-3"
           />
@@ -91,7 +95,7 @@ export function DesktopMapLayout({
             </p>
           ) : (
             <ul
-              id={listId}
+              id={LIST_ID}
               role="listbox"
               aria-label="Pontos de troca"
               className="flex flex-col gap-1"
@@ -103,6 +107,7 @@ export function DesktopMapLayout({
                     index={idx + 1}
                     selected={selectedId === p._id}
                     isFavorite={favorites.has(p._id as Id<"tradePoints">)}
+                    canFavorite={canFavorite}
                     onSelect={() => onSelect(p._id as Id<"tradePoints">)}
                   />
                 </li>

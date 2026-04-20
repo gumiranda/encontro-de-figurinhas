@@ -16,6 +16,9 @@ const isPublicRoute = createRouteMatcher([
   "/icon(.*)",
   "/apple-icon(.*)",
 
+  // Ponte de invalidação Convex→Next (autenticada via REVALIDATE_SECRET)
+  "/api/revalidate",
+
   // Páginas marketing públicas (SEO)
   "/sobre",
   "/como-funciona",
@@ -47,7 +50,11 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
+    // Autenticado: precisa passar pelo Clerk (auth() em server components).
+    "/ponto/solicitar/:path*",
+    // Excluir rotas públicas ISR (sem auth needs) + assets + endpoints metadata.
+    "/((?!_next|ponto|cidade|sobre|como-funciona|termos|privacidade|contato|album-copa-do-mundo-2026|sitemap|robots|favicon|apple-icon|opengraph-image|twitter-image|icon|manifest\\.webmanifest|api/revalidate|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // API/trpc mantêm middleware Clerk, exceto /api/revalidate (secret-based).
+    "/(api(?!/revalidate)|trpc)(.*)",
   ],
 };

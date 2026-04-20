@@ -10,24 +10,31 @@ crons.interval(
   {}
 );
 
-crons.weekly(
+crons.cron(
   "decay peakHours",
-  { dayOfWeek: "monday", hourUTC: 3, minuteUTC: 0 },
+  "0 3 * * 1",
   internal.checkins.decayPeakHours,
   {}
 );
 
-crons.weekly(
+crons.cron(
   "prune scoreBumps",
-  { dayOfWeek: "monday", hourUTC: 4, minuteUTC: 0 },
+  "0 4 * * 1",
   internal.checkins.pruneScoreBumps,
   {}
 );
 
-crons.daily(
+crons.cron(
   "expire pending trade points",
-  { hourUTC: 6, minuteUTC: 0 },
+  "0 6 * * *",
   internal.tradePoints.expireStalePending,
+  {}
+);
+
+crons.cron(
+  "reconcile activeCheckinsCount (drift detection)",
+  "0 5 * * *",
+  internal.tradePoints.reconcileActiveCheckinsCount,
   {}
 );
 

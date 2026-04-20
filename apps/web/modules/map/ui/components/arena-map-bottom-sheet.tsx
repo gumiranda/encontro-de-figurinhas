@@ -8,6 +8,7 @@ import { SpotCard } from "./spot-card";
 type ArenaMapBottomSheetProps = {
   points: TradePointMapItem[];
   favorites: FavoriteSet;
+  canFavorite: boolean;
   selectedId: Id<"tradePoints"> | null;
   onSelect: (id: Id<"tradePoints">) => void;
   totalCount: number;
@@ -18,6 +19,7 @@ type ArenaMapBottomSheetProps = {
 export function ArenaMapBottomSheet({
   points,
   favorites,
+  canFavorite,
   selectedId,
   onSelect,
   totalCount,
@@ -26,6 +28,7 @@ export function ArenaMapBottomSheet({
 }: ArenaMapBottomSheetProps) {
   return (
     <section
+      id="points-list"
       role="region"
       aria-label="Lista de pontos próximos"
       className={cn(
@@ -54,7 +57,7 @@ export function ArenaMapBottomSheet({
           Nenhum ponto bate com o filtro atual.
         </p>
       ) : (
-        <div className="-mx-5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-16px),transparent)] [&::-webkit-scrollbar]:hidden">
           {points.map((p, idx) => (
             <SpotCard
               key={p._id}
@@ -62,6 +65,7 @@ export function ArenaMapBottomSheet({
               index={idx + 1}
               selected={selectedId === p._id}
               isFavorite={favorites.has(p._id as Id<"tradePoints">)}
+              canFavorite={canFavorite}
               onSelect={() => onSelect(p._id as Id<"tradePoints">)}
             />
           ))}

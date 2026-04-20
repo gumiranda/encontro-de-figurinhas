@@ -61,6 +61,7 @@ export function NicknameInput({ value, onChange, onBlur, error }: NicknameInputP
           onBlur={onBlur}
           placeholder="Artilheiro2026"
           aria-invalid={!!error}
+          aria-describedby="nickname-hint"
           className="h-14 w-full rounded border-none bg-[var(--surface-container-highest)] pl-9 pr-24 font-body text-[var(--on-surface)] placeholder:text-[var(--outline)] focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40 dark:bg-[var(--surface-container-highest)]"
         />
         <div className="absolute inset-y-0 right-3 flex items-center">
@@ -81,7 +82,7 @@ export function NicknameInput({ value, onChange, onBlur, error }: NicknameInputP
           )}
         </div>
       </div>
-      <p className="mt-2 px-1 font-mono text-xs text-[var(--landing-outline)]">
+      <p id="nickname-hint" className="mt-2 px-1 font-mono text-xs text-[var(--landing-outline)]">
         {value.length}/20 caracteres · letras, números, underscore
       </p>
     </div>

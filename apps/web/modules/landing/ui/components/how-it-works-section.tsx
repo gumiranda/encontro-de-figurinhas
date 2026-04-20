@@ -4,20 +4,20 @@ const STEPS = [
   {
     number: 1,
     icon: UserPlus,
-    title: "Cadastre-se grátis",
-    description: "Crie sua conta em segundos e informe quais figurinhas você tem repetidas e quais precisa.",
+    title: "Crie sua conta em 30 segundos",
+    description: "Cadastro rápido, sem burocracia. Use seu e-mail ou conta Google.",
   },
   {
     number: 2,
     icon: ListChecks,
-    title: "Encontre matches",
-    description: "Nossa plataforma conecta você automaticamente com colecionadores que têm o que você precisa.",
+    title: "Cadastre repetidas e faltantes",
+    description: "Marque as figurinhas que você tem de sobra e as que precisa completar.",
   },
   {
     number: 3,
     icon: Handshake,
-    title: "Troque e complete",
-    description: "Combine um ponto de encontro seguro na sua cidade e realize a troca presencialmente.",
+    title: "Encontre trocas e combine",
+    description: "Veja no mapa quem está perto e combine o encontro para realizar a troca.",
   },
 ];
 
@@ -36,7 +36,7 @@ export function HowItWorksSection() {
             Como funciona
           </h2>
           <p className="text-[var(--on-surface-variant)] max-w-2xl mx-auto font-[var(--font-body)]">
-            Em apenas 3 passos simples você encontra as figurinhas que faltam no seu álbum.
+            Em 3 passos simples você encontra as figurinhas que faltam e completa seu álbum.
           </p>
         </div>
 

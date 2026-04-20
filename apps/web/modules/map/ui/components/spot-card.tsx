@@ -14,6 +14,7 @@ type SpotCardProps = {
   index: number;
   selected: boolean;
   isFavorite: boolean;
+  canFavorite: boolean;
   onSelect: () => void;
 };
 
@@ -22,6 +23,7 @@ export function SpotCard({
   index,
   selected,
   isFavorite,
+  canFavorite,
   onSelect,
 }: SpotCardProps) {
   const status = derivePointStatus(point);
@@ -40,7 +42,7 @@ export function SpotCard({
         <button
           type="button"
           onClick={onSelect}
-          className="flex flex-1 flex-col items-start gap-0.5 text-left"
+          className="flex flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
           aria-pressed={selected}
         >
           <span className="font-headline text-sm font-bold leading-tight text-on-surface">
@@ -52,11 +54,13 @@ export function SpotCard({
         </button>
         <div className="flex shrink-0 items-center gap-1">
           <StatusPill status={status} />
-          <FavoriteButton
-            tradePointId={point._id as Id<"tradePoints">}
-            isFavorite={isFavorite}
-            pointName={point.name}
-          />
+          {canFavorite && (
+            <FavoriteButton
+              tradePointId={point._id as Id<"tradePoints">}
+              isFavorite={isFavorite}
+              pointName={point.name}
+            />
+          )}
         </div>
       </div>
 

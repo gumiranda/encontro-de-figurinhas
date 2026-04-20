@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useConvexAuth } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import type L from "leaflet";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -70,6 +71,8 @@ function EmptyPointsCta() {
 
 export function ArenaMapFrame() {
   const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+  const canFavorite = isAuthenticated && !authLoading;
   const { status, userCoords, mapCenter, points, cityName } = useArenaMap();
   const favorites = useMyFavorites();
   const { query, setQuery, filter, setFilter, filtered, activeCount } =
@@ -78,9 +81,16 @@ export function ArenaMapFrame() {
   const mapRef = useRef<L.Map | null>(null);
   const isDesktop = useIsDesktop();
 
+  // NÃO mover pra middleware: `status.kind` vem do hook useArenaMap, que depende
+  // de queries reativas do Convex + refs do mapa Leaflet. Servidor não vê esse
+  // estado. react-doctor flagga, mas é o padrão correto pra client-only state.
   useEffect(() => {
     if (status.kind === "needs-bootstrap") router.replace("/bootstrap");
   }, [status.kind, router]);
+
+  useEffect(() => {
+    if (!canFavorite && filter === "favorites") setFilter("all");
+  }, [canFavorite, filter, setFilter]);
 
   if (
     status.kind === "needs-bootstrap" ||
@@ -107,34 +117,49 @@ export function ArenaMapFrame() {
     />
   );
 
+  const skipLink = (
+    <a
+      href="#points-list"
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
+    >
+      Pular para lista de pontos
+    </a>
+  );
+
   if (isDesktop) {
     return (
-      <DesktopMapLayout
-        mapNode={mapNode}
-        mapRef={mapRef}
-        userLocation={userCoords}
-        cityName={cityName}
-        totalCount={filtered.length}
-        activeCount={activeCount}
-        query={query}
-        onQueryChange={setQuery}
-        filter={filter}
-        onFilterChange={setFilter}
-        points={filtered}
-        favorites={favorites}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-      />
+      <>
+        {skipLink}
+        <DesktopMapLayout
+          mapNode={mapNode}
+          mapRef={mapRef}
+          userLocation={userCoords}
+          cityName={cityName}
+          totalCount={filtered.length}
+          activeCount={activeCount}
+          query={query}
+          onQueryChange={setQuery}
+          filter={filter}
+          onFilterChange={setFilter}
+          points={filtered}
+          favorites={favorites}
+          canFavorite={canFavorite}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+      </>
     );
   }
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-background text-foreground">
+      {skipLink}
       <div className="absolute inset-0">{mapNode}</div>
       <MapTopBar query={query} onQueryChange={setQuery} />
       <MapFilterChips
         value={filter}
         onChange={setFilter}
+        canFavorite={canFavorite}
         layout="scroll"
         className="absolute inset-x-4 top-[116px] z-20"
       />
@@ -144,6 +169,7 @@ export function ArenaMapFrame() {
         <ArenaMapBottomSheet
           points={filtered}
           favorites={favorites}
+          canFavorite={canFavorite}
           selectedId={selectedId}
           onSelect={setSelectedId}
           totalCount={filtered.length}

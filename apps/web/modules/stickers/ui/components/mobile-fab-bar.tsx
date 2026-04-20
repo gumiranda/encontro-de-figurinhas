@@ -30,7 +30,7 @@ export function MobileFabBar({
   return (
     <div
       className={cn(
-        "fixed inset-x-4 bottom-[84px] z-30 flex items-center gap-2 rounded-2xl border border-outline-variant/60 bg-surface-container-highest/90 p-2 shadow-lg backdrop-blur-md lg:hidden",
+        "fixed inset-x-4 bottom-[var(--mobile-fab-offset)] z-30 flex items-center gap-2 rounded-2xl border border-outline-variant/60 bg-surface-container-highest/90 p-2 shadow-lg backdrop-blur-md lg:hidden",
         className
       )}
     >
