@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import Image from "next/image";
 import { Clock, ArrowRight } from "lucide-react";
@@ -21,16 +21,14 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = generateBlogListMetadata();
 
-const loadPosts = () =>
-  unstable_cache(
-    async () => convexServer.query(api.blog.getPublished, { limit: 20 }),
-    ["blog-posts"],
-    { tags: ["blog"], revalidate: 3600 }
-  )();
+async function loadPosts() {
+  "use cache";
+  cacheTag("blog");
+  cacheLife("hours");
+  return convexServer.query(api.blog.getPublished, { limit: 20 });
+}
 
 function formatDate(timestamp: number) {
   return new Intl.DateTimeFormat("pt-BR", {

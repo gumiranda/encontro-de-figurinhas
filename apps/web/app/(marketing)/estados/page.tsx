@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { Map, ArrowRight, Users } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -19,16 +19,14 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = generateStatesHubMetadata();
 
-const loadStates = () =>
-  unstable_cache(
-    async () => convexServer.query(api.states.getAllStates, {}),
-    ["all-states"],
-    { tags: ["states"], revalidate: 3600 }
-  )();
+async function loadStates() {
+  "use cache";
+  cacheTag("states");
+  cacheLife("hours");
+  return convexServer.query(api.states.getAllStates, {});
+}
 
 export default async function StatesHubPage() {
   const states = await loadStates();

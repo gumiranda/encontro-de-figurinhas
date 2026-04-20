@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { MapPin, Users, ArrowRight, Store, Building2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -25,29 +25,26 @@ interface StatePageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 3600;
+async function loadState(slug: string) {
+  "use cache";
+  cacheTag(`estado:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.states.getBySlug, { slug });
+}
 
-const loadState = (slug: string) =>
-  unstable_cache(
-    async (s: string) => convexServer.query(api.states.getBySlug, { slug: s }),
-    ["estado-by-slug"],
-    { tags: [`estado:${slug}`], revalidate: 3600 }
-  )(slug);
+async function loadStateStats(slug: string) {
+  "use cache";
+  cacheTag(`estado:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.states.getStatsBySlug, { slug });
+}
 
-const loadStateStats = (slug: string) =>
-  unstable_cache(
-    async (s: string) =>
-      convexServer.query(api.states.getStatsBySlug, { slug: s }),
-    ["estado-stats-by-slug"],
-    { tags: [`estado:${slug}`], revalidate: 3600 }
-  )(slug);
-
-const loadAllStates = () =>
-  unstable_cache(
-    async () => convexServer.query(api.states.getAllStates, {}),
-    ["estados-all"],
-    { tags: ["estados"], revalidate: 86400 }
-  )();
+async function loadAllStates() {
+  "use cache";
+  cacheTag("estados");
+  cacheLife("days");
+  return convexServer.query(api.states.getAllStates, {});
+}
 
 export async function generateMetadata({
   params,

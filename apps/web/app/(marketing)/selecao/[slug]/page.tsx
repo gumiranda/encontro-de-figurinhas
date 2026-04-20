@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Star, Trophy } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -26,22 +26,19 @@ interface TeamPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 86400;
+async function loadSection(slug: string) {
+  "use cache";
+  cacheTag(`selecao:${slug}`);
+  cacheLife("days");
+  return convexServer.query(api.album.getSectionBySlug, { slug });
+}
 
-const loadSection = (slug: string) =>
-  unstable_cache(
-    async (s: string) =>
-      convexServer.query(api.album.getSectionBySlug, { slug: s }),
-    ["selecao-by-slug"],
-    { tags: [`selecao:${slug}`], revalidate: 86400 }
-  )(slug);
-
-const loadAllSections = () =>
-  unstable_cache(
-    async () => convexServer.query(api.album.getSections, {}),
-    ["selecao-all"],
-    { tags: ["selecao"], revalidate: 86400 }
-  )();
+async function loadAllSections() {
+  "use cache";
+  cacheTag("selecao");
+  cacheLife("days");
+  return convexServer.query(api.album.getSections, {});
+}
 
 export async function generateMetadata({
   params,

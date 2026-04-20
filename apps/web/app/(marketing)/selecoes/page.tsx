@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { ArrowRight, Star, Trophy } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -20,16 +20,14 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = generateTeamsHubMetadata();
 
-const loadTeams = () =>
-  unstable_cache(
-    async () => convexServer.query(api.album.getSections, {}),
-    ["all-teams"],
-    { tags: ["album"], revalidate: 3600 }
-  )();
+async function loadTeams() {
+  "use cache";
+  cacheTag("album");
+  cacheLife("hours");
+  return convexServer.query(api.album.getSections, {});
+}
 
 export default async function TeamsHubPage() {
   const teams = await loadTeams();

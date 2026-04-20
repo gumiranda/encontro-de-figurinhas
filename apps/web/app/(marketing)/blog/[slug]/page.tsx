@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import Image from "next/image";
 import { Clock, Calendar, ArrowLeft, ArrowRight } from "lucide-react";
@@ -28,22 +28,19 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 3600;
+async function loadPost(slug: string) {
+  "use cache";
+  cacheTag(`blog:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.blog.getBySlug, { slug });
+}
 
-const loadPost = (slug: string) =>
-  unstable_cache(
-    async (s: string) => convexServer.query(api.blog.getBySlug, { slug: s }),
-    ["blog-post-by-slug"],
-    { tags: [`blog:${slug}`], revalidate: 3600 }
-  )(slug);
-
-const loadRelated = (slug: string) =>
-  unstable_cache(
-    async (s: string) =>
-      convexServer.query(api.blog.getRelated, { slug: s, limit: 3 }),
-    ["blog-related"],
-    { tags: [`blog:${slug}`], revalidate: 3600 }
-  )(slug);
+async function loadRelated(slug: string) {
+  "use cache";
+  cacheTag(`blog:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.blog.getRelated, { slug, limit: 3 });
+}
 
 export async function generateStaticParams() {
   const slugs = await convexServer.query(api.blog.getAllSlugs, {});

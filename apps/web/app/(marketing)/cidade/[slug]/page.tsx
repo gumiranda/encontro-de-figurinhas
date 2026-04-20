@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { MapPin, Users, ArrowRight, Calendar, Store, Navigation } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -21,36 +21,32 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { stateCodeToSlug, stateCodeToName } from "@/lib/states";
 
 interface CityPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 3600;
-export const dynamicParams = true;
+async function loadCity(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.cities.getBySlug, { slug });
+}
 
-const loadCity = (slug: string) =>
-  unstable_cache(
-    async (s: string) => convexServer.query(api.cities.getBySlug, { slug: s }),
-    ["cidade-by-slug"],
-    { tags: [`cidade:${slug}`], revalidate: 3600 }
-  )(slug);
+async function loadCityStats(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.cities.getStatsBySlug, { slug });
+}
 
-const loadCityStats = (slug: string) =>
-  unstable_cache(
-    async (s: string) =>
-      convexServer.query(api.cities.getStatsBySlug, { slug: s }),
-    ["cidade-stats-by-slug"],
-    { tags: [`cidade:${slug}`], revalidate: 3600 }
-  )(slug);
-
-const loadCityTopPoints = (slug: string) =>
-  unstable_cache(
-    async (s: string) =>
-      convexServer.query(api.tradePoints.listTopByCity, { citySlug: s, limit: 20 }),
-    ["cidade-top-points"],
-    { tags: [`cidade:${slug}`], revalidate: 3600 }
-  )(slug);
+async function loadCityTopPoints(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.tradePoints.listTopByCity, { citySlug: slug, limit: 20 });
+}
 
 export async function generateMetadata({
   params,
@@ -89,9 +85,13 @@ export default async function CityPage({ params }: CityPageProps) {
   const visiblePoints = topPoints.slice(0, 20);
   const hasMorePoints = tradePointsCount > visiblePoints.length;
 
+  const stateSlug = stateCodeToSlug(city.state);
+  const stateName = stateCodeToName(city.state) ?? city.state;
+
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
-    { name: "Cidades", url: `${BASE_URL}/cidades` },
+    { name: "Estados", url: `${BASE_URL}/estados` },
+    ...(stateSlug ? [{ name: stateName, url: `${BASE_URL}/estado/${stateSlug}` }] : []),
     { name: city.name },
   ]);
 
@@ -119,12 +119,28 @@ export default async function CityPage({ params }: CityPageProps) {
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
           <div className="container mx-auto px-4">
             <nav className="mb-8 text-sm text-muted-foreground">
-              <ol className="flex items-center gap-2">
+              <ol className="flex items-center gap-2 flex-wrap">
                 <li>
                   <Link href="/" className="hover:text-primary">
                     Início
                   </Link>
                 </li>
+                <li>/</li>
+                <li>
+                  <Link href="/estados" className="hover:text-primary">
+                    Estados
+                  </Link>
+                </li>
+                {stateSlug && (
+                  <>
+                    <li>/</li>
+                    <li>
+                      <Link href={`/estado/${stateSlug}`} className="hover:text-primary">
+                        {stateName}
+                      </Link>
+                    </li>
+                  </>
+                )}
                 <li>/</li>
                 <li className="text-foreground font-medium">{city.name}</li>
               </ol>
@@ -133,7 +149,9 @@ export default async function CityPage({ params }: CityPageProps) {
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 text-primary mb-4">
                 <MapPin className="h-5 w-5" />
-                <span className="text-sm font-medium">{city.state}</span>
+                <Link href={stateSlug ? `/estado/${stateSlug}` : "/estados"} className="text-sm font-medium hover:underline">
+                  {stateName}
+                </Link>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">

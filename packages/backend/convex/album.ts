@@ -149,3 +149,50 @@ export const listStickersForSitemap = query({
     return stickers;
   },
 });
+
+export const getRelatedStickers = query({
+  args: { number: v.number(), limit: v.optional(v.number()) },
+  handler: async (ctx, { number, limit = 8 }) => {
+    const config = await ctx.db.query("albumConfig").first();
+    if (!config) return null;
+
+    const section = config.sections.find(
+      (s) => number >= s.startNumber && number <= s.endNumber
+    );
+    if (!section) return null;
+
+    const goldenSet = new Set(section.goldenNumbers ?? []);
+    const legendMap = new Map(
+      (section.legendNumbers ?? []).map((l) => [l.number, l.name])
+    );
+
+    const allNumbers: number[] = [];
+    for (let n = section.startNumber; n <= section.endNumber; n++) {
+      if (n !== number) allNumbers.push(n);
+    }
+
+    const specialNumbers = allNumbers.filter(
+      (n) => goldenSet.has(n) || legendMap.has(n)
+    );
+    const regularNumbers = allNumbers.filter(
+      (n) => !goldenSet.has(n) && !legendMap.has(n)
+    );
+
+    const selectedNumbers = [
+      ...specialNumbers.slice(0, Math.min(3, limit)),
+      ...regularNumbers.slice(0, limit - Math.min(3, specialNumbers.length)),
+    ].slice(0, limit);
+
+    return {
+      teamName: section.name,
+      teamSlug: section.code.toLowerCase(),
+      flagEmoji: section.flagEmoji,
+      stickers: selectedNumbers.map((n) => ({
+        number: n,
+        isGolden: goldenSet.has(n),
+        isLegend: legendMap.has(n),
+        legendName: legendMap.get(n),
+      })),
+    };
+  },
+});

@@ -1,5 +1,12 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cacheComponents: true,
   transpilePackages: ["@workspace/ui", "@workspace/backend"],
   devIndicators: false,
   trailingSlash: false,
@@ -86,4 +93,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

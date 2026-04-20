@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Star, ArrowLeft, ArrowRightIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -21,20 +21,26 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { RelatedStickers } from "@/components/related-stickers";
 
 interface StickerPageProps {
   params: Promise<{ number: string }>;
 }
 
-export const revalidate = 86400;
+async function loadSticker(number: number) {
+  "use cache";
+  cacheTag(`figurinha:${number}`);
+  cacheLife("days");
+  return convexServer.query(api.album.getStickerByNumber, { number });
+}
 
-const loadSticker = (number: number) =>
-  unstable_cache(
-    async (n: number) =>
-      convexServer.query(api.album.getStickerByNumber, { number: n }),
-    ["figurinha-by-number"],
-    { tags: [`figurinha:${number}`], revalidate: 86400 }
-  )(number);
+async function loadRelatedStickers(number: number) {
+  "use cache";
+  cacheTag(`figurinha:${number}`);
+  cacheLife("days");
+  return convexServer.query(api.album.getRelatedStickers, { number, limit: 8 });
+}
 
 export async function generateMetadata({
   params,
@@ -75,11 +81,20 @@ export default async function StickerPage({ params }: StickerPageProps) {
     notFound();
   }
 
-  const sticker = await loadSticker(number);
+  const [sticker, relatedStickers] = await Promise.all([
+    loadSticker(number),
+    loadRelatedStickers(number),
+  ]);
 
   if (!sticker) {
     notFound();
   }
+
+  const breadcrumbItems = [
+    { label: "Figurinhas", href: "/figurinhas" },
+    { label: sticker.teamName, href: `/selecao/${sticker.teamSlug}` },
+    { label: `#${number}` },
+  ];
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
@@ -108,35 +123,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <nav className="mb-8 text-sm text-muted-foreground">
-              <ol className="flex items-center gap-2 flex-wrap">
-                <li>
-                  <Link href="/" className="hover:text-primary">
-                    Início
-                  </Link>
-                </li>
-                <li>/</li>
-                <li>
-                  <Link
-                    href="/album-copa-do-mundo-2026"
-                    className="hover:text-primary"
-                  >
-                    Álbum
-                  </Link>
-                </li>
-                <li>/</li>
-                <li>
-                  <Link
-                    href={`/selecao/${sticker.teamSlug}`}
-                    className="hover:text-primary"
-                  >
-                    {sticker.teamName}
-                  </Link>
-                </li>
-                <li>/</li>
-                <li className="text-foreground font-medium">#{number}</li>
-              </ol>
-            </nav>
+            <Breadcrumbs items={breadcrumbItems} className="mb-8" />
 
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-4 flex-wrap">
@@ -354,6 +341,17 @@ export default async function StickerPage({ params }: StickerPageProps) {
             </div>
           </div>
         </section>
+
+        {/* Related Stickers Section */}
+        {relatedStickers && relatedStickers.stickers.length > 0 && (
+          <RelatedStickers
+            teamName={relatedStickers.teamName}
+            teamSlug={relatedStickers.teamSlug}
+            flagEmoji={relatedStickers.flagEmoji}
+            stickers={relatedStickers.stickers}
+            currentNumber={number}
+          />
+        )}
 
         {/* CTA Section */}
         <section className="py-16 md:py-24">

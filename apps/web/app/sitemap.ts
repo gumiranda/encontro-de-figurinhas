@@ -1,61 +1,65 @@
 import type { MetadataRoute } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { convexServer, api } from "@/lib/convex-server";
 
 const BASE_URL = "https://figurinhafacil.com.br";
 
-const loadCitiesForSitemap = unstable_cache(
-  async () => convexServer.query(api.cities.listForSitemap, {}),
-  ["sitemap-cities"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadCitiesForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  return convexServer.query(api.cities.listForSitemap, {});
+}
 
-const loadTradePointsForSitemap = unstable_cache(
-  async () => {
-    const all: Array<{ slug: string; updatedAt: number }> = [];
-    let cursor: string | null = null;
-    for (let i = 0; i < 20; i++) {
-      const result: {
-        page: Array<{ slug: string; updatedAt: number }>;
-        continueCursor: string | null;
-        isDone: boolean;
-      } = await convexServer.query(api.tradePoints.listApprovedForSitemapPage, {
-        cursor,
-        pageSize: 5000,
-      });
-      all.push(...result.page);
-      if (result.isDone) break;
-      cursor = result.continueCursor;
-    }
-    return all;
-  },
-  ["sitemap-trade-points"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadTradePointsForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  const all: Array<{ slug: string; updatedAt: number }> = [];
+  let cursor: string | null = null;
+  for (let i = 0; i < 20; i++) {
+    const result: {
+      page: Array<{ slug: string; updatedAt: number }>;
+      continueCursor: string | null;
+      isDone: boolean;
+    } = await convexServer.query(api.tradePoints.listApprovedForSitemapPage, {
+      cursor,
+      pageSize: 5000,
+    });
+    all.push(...result.page);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return all;
+}
 
-const loadStatesForSitemap = unstable_cache(
-  async () => convexServer.query(api.states.listForSitemap, {}),
-  ["sitemap-states"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadStatesForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  return convexServer.query(api.states.listForSitemap, {});
+}
 
-const loadStickersForSitemap = unstable_cache(
-  async () => convexServer.query(api.album.listStickersForSitemap, {}),
-  ["sitemap-stickers"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadStickersForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  return convexServer.query(api.album.listStickersForSitemap, {});
+}
 
-const loadTeamsForSitemap = unstable_cache(
-  async () => convexServer.query(api.album.getAllSectionSlugs, {}),
-  ["sitemap-teams"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadTeamsForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  return convexServer.query(api.album.getAllSectionSlugs, {});
+}
 
-const loadBlogForSitemap = unstable_cache(
-  async () => convexServer.query(api.blog.listForSitemap, {}),
-  ["sitemap-blog"],
-  { tags: ["sitemap"], revalidate: 86400 }
-);
+async function loadBlogForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheLife("days");
+  return convexServer.query(api.blog.listForSitemap, {});
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

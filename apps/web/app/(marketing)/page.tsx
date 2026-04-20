@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { headers } from "next/headers";
 import { isbot } from "isbot";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
@@ -31,7 +32,6 @@ export const metadata: Metadata = {
   },
   other: {
     "article:published_time": "2025-01-01T00:00:00Z",
-    "article:modified_time": new Date().toISOString(),
   },
 };
 
@@ -85,9 +85,7 @@ const combinedSchema = generateCombinedSchema([
   sportsEventSchema,
 ]);
 
-export default async function LandingPage() {
-  const totalTrocas = null;
-
+async function DynamicFinalCTA() {
   const h = await headers();
   const ua = h.get("user-agent") ?? "";
   const ipCity = h.get("x-vercel-ip-city");
@@ -96,6 +94,33 @@ export default async function LandingPage() {
     : ipCity
       ? decodeURIComponent(ipCity)
       : null;
+
+  return <FinalCTASection cityName={cityName} />;
+}
+
+function FinalCTASkeleton() {
+  return (
+    <section className="px-4 py-32 sm:px-6 md:py-40 relative overflow-hidden bg-primary">
+      <div className="absolute inset-0 bg-[radial-gradient(800px_500px_at_50%_0%,rgba(255,255,255,0.08),transparent_60%)]" />
+      <div className="max-w-3xl mx-auto text-center relative z-10">
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-on-primary/10 text-on-primary/90 text-[0.625rem] font-medium uppercase tracking-[0.15em] mb-8">
+          <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
+          Contagem regressiva
+        </span>
+        <div className="h-12 md:h-14 lg:h-16 bg-on-primary/10 rounded-lg animate-pulse mb-6 max-w-xl mx-auto" />
+        <p className="text-on-primary/80 text-base md:text-lg mb-12 max-w-lg mx-auto leading-[1.7]">
+          Enquanto você espera, alguém está trocando. Entre agora e complete seu álbum.
+        </p>
+        <div className="flex justify-center">
+          <div className="h-14 w-64 bg-on-primary/20 rounded-full animate-pulse" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function LandingPage() {
+  const totalTrocas = null;
 
   return (
     <>
@@ -114,8 +139,10 @@ export default async function LandingPage() {
         <CitiesSection />
         {/* 6. FAQ - Handle objections */}
         <FAQSection faqs={FAQ_DATA} />
-        {/* 7. Final CTA - Capture remainders */}
-        <FinalCTASection cityName={cityName} />
+        {/* 7. Final CTA - Capture remainders (dynamic - streams in) */}
+        <Suspense fallback={<FinalCTASkeleton />}>
+          <DynamicFinalCTA />
+        </Suspense>
       </main>
       <LandingFooter />
     </>

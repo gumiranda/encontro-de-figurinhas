@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { MapPin, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { convexServer, api } from "@/lib/convex-server";
@@ -19,17 +12,17 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
-
-export const revalidate = 3600;
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { CitiesHubClient } from "@/components/cities-hub-client";
 
 export const metadata: Metadata = generateCitiesHubMetadata();
 
-const loadCities = () =>
-  unstable_cache(
-    async () => convexServer.query(api.cities.listAllGroupedByState, {}),
-    ["cities-grouped"],
-    { tags: ["cities"], revalidate: 3600 }
-  )();
+async function loadCities() {
+  "use cache";
+  cacheTag("cities");
+  cacheLife("hours");
+  return convexServer.query(api.cities.listAllGroupedByState, {});
+}
 
 export default async function CitiesHubPage() {
   const citiesByState = await loadCities();
@@ -51,17 +44,7 @@ export default async function CitiesHubPage() {
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <nav className="mb-8 text-sm text-muted-foreground">
-              <ol className="flex items-center gap-2">
-                <li>
-                  <Link href="/" className="hover:text-primary">
-                    Início
-                  </Link>
-                </li>
-                <li>/</li>
-                <li className="text-foreground font-medium">Cidades</li>
-              </ol>
-            </nav>
+            <Breadcrumbs items={[{ label: "Cidades" }]} className="mb-8" />
 
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
@@ -79,35 +62,7 @@ export default async function CitiesHubPage() {
 
         <section className="py-12">
           <div className="container mx-auto px-4">
-            <div className="grid gap-8">
-              {citiesByState.map((group) => (
-                <Card key={group.state}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5 text-primary" />
-                      {group.state}
-                      <Badge variant="secondary" className="ml-2">
-                        {group.cities.length} cidades
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {group.cities.map((city) => (
-                        <Link key={city.slug} href={`/cidade/${city.slug}`}>
-                          <Badge
-                            variant="outline"
-                            className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
-                          >
-                            {city.name}
-                          </Badge>
-                        </Link>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <CitiesHubClient citiesByState={citiesByState} showMap />
           </div>
         </section>
 

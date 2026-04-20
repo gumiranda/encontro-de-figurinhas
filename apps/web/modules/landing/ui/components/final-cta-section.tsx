@@ -1,27 +1,28 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, MapPinPlus } from "lucide-react";
+import { useMemo } from "react";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
 const COPA_2026_START = new Date(2026, 5, 11);
 
-function getDaysUntilCopa2026(): number {
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfEvent = new Date(
-    COPA_2026_START.getFullYear(),
-    COPA_2026_START.getMonth(),
-    COPA_2026_START.getDate(),
-  );
-  return Math.floor((startOfEvent.getTime() - startOfToday.getTime()) / MS_PER_DAY);
-}
+function useCopaCountdownLead(): string {
+  return useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfEvent = new Date(
+      COPA_2026_START.getFullYear(),
+      COPA_2026_START.getMonth(),
+      COPA_2026_START.getDate(),
+    );
+    const days = Math.floor((startOfEvent.getTime() - startOfToday.getTime()) / MS_PER_DAY);
 
-function copaCountdownLead(): string {
-  const days = getDaysUntilCopa2026();
-  if (days < 0) return "A Copa já começou.";
-  if (days === 0) return "A Copa começa hoje.";
-  if (days === 1) return "Falta 1 dia para a Copa.";
-  return `Faltam ${days} dias para a Copa.`;
+    if (days < 0) return "A Copa já começou.";
+    if (days === 0) return "A Copa começa hoje.";
+    if (days === 1) return "Falta 1 dia para a Copa.";
+    return `Faltam ${days} dias para a Copa.`;
+  }, []);
 }
 
 type FinalCTASectionProps = {
@@ -29,6 +30,7 @@ type FinalCTASectionProps = {
 };
 
 export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
+  const countdownLead = useCopaCountdownLead();
   const suggestAnchorCity = cityName ?? "perto de você";
   return (
     <section className="px-4 py-32 sm:px-6 md:py-40 relative overflow-hidden bg-primary">
@@ -42,7 +44,7 @@ export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
         </span>
 
         <h2 className="font-headline font-semibold text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.75rem] tracking-[-0.02em] mb-6 text-on-primary leading-[1.15]">
-          {copaCountdownLead()}{" "}
+          {countdownLead}{" "}
           <span className="block mt-2 text-tertiary">E as suas figurinhas?</span>
         </h2>
 

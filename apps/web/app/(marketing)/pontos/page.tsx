@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { MapPin, ArrowRight, Store } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -20,16 +20,14 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = generateTradePointsHubMetadata();
 
-const loadTradePoints = () =>
-  unstable_cache(
-    async () => convexServer.query(api.tradePoints.listApprovedGroupedByCity, {}),
-    ["trade-points-grouped"],
-    { tags: ["trade-points"], revalidate: 3600 }
-  )();
+async function loadTradePoints() {
+  "use cache";
+  cacheTag("trade-points");
+  cacheLife("hours");
+  return convexServer.query(api.tradePoints.listApprovedGroupedByCity, {});
+}
 
 export default async function TradePointsHubPage() {
   const groupedPoints = await loadTradePoints();
