@@ -113,6 +113,10 @@ export const create = mutation({
       expiresAt,
       createdAt: now,
       countedInPublic,
+      // Denormalized fields for listPresentMatchesAtPoint (avoids N+1 reads)
+      displayNickname: user.displayNickname ?? user.nickname ?? user.name,
+      avatarSeed: user.nickname ?? user._id,
+      duplicates: user.duplicates ?? [],
     });
 
     if (countedInPublic) {
@@ -535,5 +539,176 @@ export const pruneScoreBumps = internalMutation({
       });
     }
     return { deleted: expired.length };
+  },
+});
+
+const BACKFILL_BATCH = 50;
+
+/**
+ * Backfill denormalized fields (displayNickname, avatarSeed, duplicates) for existing check-ins.
+ * Idempotent: only patches rows missing the fields. Run once manually via dashboard.
+ */
+export const backfillCheckinDenormFields = internalMutation({
+  args: { cursor: v.optional(v.string()) },
+  handler: async (ctx, { cursor }) => {
+    const now = Date.now();
+    const page = await ctx.db
+      .query("checkins")
+      .withIndex("by_expiresAt", (q) => q.gt("expiresAt", now))
+      .paginate({ numItems: BACKFILL_BATCH, cursor: cursor ?? null });
+
+    const needsBackfill = page.page.filter(
+      (c) =>
+        c.displayNickname === undefined ||
+        c.avatarSeed === undefined ||
+        c.duplicates === undefined
+    );
+
+    if (needsBackfill.length === 0 && page.isDone) {
+      return { patched: 0, done: true };
+    }
+
+    const userIds = [...new Set(needsBackfill.map((c) => c.userId))];
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const userMap = new Map(
+      users.filter(Boolean).map((u) => [u!._id, u!])
+    );
+
+    await Promise.all(
+      needsBackfill.map((c) => {
+        const user = userMap.get(c.userId);
+        if (!user) return;
+        return ctx.db.patch(c._id, {
+          displayNickname: user.displayNickname ?? user.nickname ?? user.name,
+          avatarSeed: user.nickname ?? user._id,
+          duplicates: user.duplicates ?? [],
+        });
+      })
+    );
+
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(0, internal.checkins.backfillCheckinDenormFields, {
+        cursor: page.continueCursor,
+      });
+      return { patched: needsBackfill.length, done: false };
+    }
+
+    return { patched: needsBackfill.length, done: true };
+  },
+});
+
+const PRESENT_MATCHES_CAP = 50;
+const STICKER_SAMPLE_LIMIT = 20;
+
+const listPresentMatchesReturn = v.union(
+  v.object({ state: v.literal("needs-auth") }),
+  v.object({ state: v.literal("banned") }),
+  v.object({ state: v.literal("no-stickers") }),
+  v.object({ state: v.literal("no-needs") }),
+  v.object({ state: v.literal("not-found") }),
+  v.object({
+    state: v.literal("ready"),
+    matches: v.array(
+      v.object({
+        checkinId: v.id("checkins"),
+        displayNickname: v.string(),
+        avatarSeed: v.string(),
+        checkinAt: v.number(),
+        matchingStickers: v.array(v.number()),
+        totalMatches: v.number(),
+      })
+    ),
+    truncated: v.boolean(),
+  })
+);
+
+/**
+ * List users present at a trade point who have stickers the caller needs.
+ * Uses denormalized fields on check-ins to avoid N+1 reads.
+ */
+export const listPresentMatchesAtPoint = query({
+  args: { tradePointId: v.id("tradePoints") },
+  returns: listPresentMatchesReturn,
+  handler: async (ctx, { tradePointId }) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state === "needs-auth") {
+      return { state: "needs-auth" as const };
+    }
+    if (auth.state === "banned") {
+      return { state: "banned" as const };
+    }
+    if (auth.state !== "ok") {
+      return { state: "needs-auth" as const };
+    }
+    const user = auth.user;
+
+    if (!user.hasCompletedStickerSetup) {
+      return { state: "no-stickers" as const };
+    }
+
+    const myMissing = user.missing ?? [];
+    if (myMissing.length === 0) {
+      return { state: "no-needs" as const };
+    }
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "approved") {
+      return { state: "not-found" as const };
+    }
+
+    const myMissingSet = new Set(myMissing);
+    const now = Date.now();
+
+    const checkins = await ctx.db
+      .query("checkins")
+      .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+        q
+          .eq("tradePointId", tradePointId)
+          .eq("countedInPublic", true)
+          .gt("expiresAt", now)
+      )
+      .take(PRESENT_MATCHES_CAP);
+
+    const truncated = checkins.length === PRESENT_MATCHES_CAP;
+
+    const matchRows: {
+      checkinId: Id<"checkins">;
+      displayNickname: string;
+      avatarSeed: string;
+      checkinAt: number;
+      matchingStickers: number[];
+      totalMatches: number;
+    }[] = [];
+
+    for (const c of checkins) {
+      if (c.userId === user._id) continue;
+
+      const theirDuplicates = c.duplicates ?? [];
+      const matching = theirDuplicates.filter((n) => myMissingSet.has(n));
+
+      if (matching.length === 0) continue;
+
+      matchRows.push({
+        checkinId: c._id,
+        displayNickname: c.displayNickname ?? "Colecionador",
+        avatarSeed: c.avatarSeed ?? c.userId,
+        checkinAt: c.createdAt,
+        matchingStickers: matching.slice(0, STICKER_SAMPLE_LIMIT),
+        totalMatches: matching.length,
+      });
+    }
+
+    matchRows.sort((a, b) => {
+      if (b.totalMatches !== a.totalMatches) {
+        return b.totalMatches - a.totalMatches;
+      }
+      return b.checkinAt - a.checkinAt;
+    });
+
+    return {
+      state: "ready" as const,
+      matches: matchRows,
+      truncated,
+    };
   },
 });

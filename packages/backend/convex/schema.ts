@@ -178,6 +178,12 @@ export default defineSchema({
     .index("by_tradePoint", ["tradePointId"])
     .index("by_user_point", ["userId", "tradePointId"]),
 
+  /**
+   * Check-ins at trade points.
+   * Denormalized fields (displayNickname, avatarSeed, duplicates) are snapshots
+   * from the user at check-in time. Staleness up to 2h (TTL) is acceptable.
+   * This avoids N+1 reads and reactivity storms when querying present users.
+   */
   checkins: defineTable({
     userId: v.id("users"),
     tradePointId: v.id("tradePoints"),
@@ -187,6 +193,10 @@ export default defineSchema({
     expiresAt: v.number(),
     createdAt: v.number(),
     countedInPublic: v.boolean(),
+    // Denormalized from user at check-in time (optional during backfill)
+    displayNickname: v.optional(v.string()),
+    avatarSeed: v.optional(v.string()),
+    duplicates: v.optional(v.array(v.number())),
   })
     .index("by_tradePoint_active", ["tradePointId", "expiresAt"])
     .index("by_user", ["userId"])

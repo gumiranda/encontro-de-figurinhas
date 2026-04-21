@@ -29,6 +29,7 @@ import { useTradePoint } from "../../lib/use-trade-point";
 import { BannedState } from "../components/banned-state";
 import { ConfidenceGaugeCard } from "../components/confidence-gauge-card";
 import { MatchesSection } from "../components/matches-section";
+import { PresentMatchesSection } from "../components/present-matches-section";
 import { PeakHoursChart } from "../components/peak-hours-chart";
 import { PointActions } from "../components/point-actions";
 import { PointDetailIdentity } from "../components/point-detail-identity";
@@ -409,7 +410,10 @@ export function TradePointDetailView({ tradePointId }: Props) {
           <PointLifecycleCard />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <PeakHoursChart peakHours={stablePeakHours} />
-            <MatchesSection tradePointId={point._id} />
+            <div className="space-y-4">
+              <PresentMatchesSection tradePointId={point._id} />
+              <MatchesSection tradePointId={point._id} />
+            </div>
           </div>
           <PointStatsStrip
             confidenceScore={point.confidenceScore}
