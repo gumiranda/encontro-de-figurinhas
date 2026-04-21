@@ -4,7 +4,7 @@ import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 import { OnboardingProgress } from "../components/onboarding-progress";
 import { OnboardingStepper } from "../components/onboarding-stepper";
@@ -18,24 +18,51 @@ export function CompleteProfileView() {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const createUser = useMutation(api.users.createUser);
-  const called = useRef(false);
 
-  // Create user if authenticated but doesn't exist in Convex
+  // Create user if authenticated but doesn't exist in Convex. Retries with backoff:
+  // a primeira chamada pode retornar null se a identidade Clerk ainda não estiver
+  // visível no mutation handler (comum após router.back / transição de rota).
+  // O ref antigo `called` impedia qualquer nova tentativa → loading infinito.
   useEffect(() => {
-    if (isAuthenticated && currentUser === null && !called.current) {
-      called.current = true;
-      createUser();
+    if (!isAuthenticated || currentUser !== null || currentUser === undefined) {
+      return;
     }
+
+    let cancelled = false;
+
+    const run = async () => {
+      const maxAttempts = 6;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (cancelled) return;
+        try {
+          await createUser();
+        } catch {
+          // Convex refetch; próxima tentativa cobre identity delay
+        }
+        if (cancelled) return;
+        await new Promise((r) => setTimeout(r, 200 * (attempt + 1)));
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, currentUser, createUser]);
 
-  // Already onboarded - redirect to dashboard.
-  // NÃO mover pra middleware: `currentUser.hasCompletedOnboarding` vem de useQuery
-  // do Convex, que hidrata no cliente. O modelo reativo do Convex não expõe esse
-  // estado no server/edge sem duplicar a camada de auth.
-  useEffect(() => {
-    if (currentUser?.hasCompletedOnboarding) {
-      router.replace("/cadastrar-figurinhas");
-    }
+  // Perfil já completo — alinhar ao dashboard-shell (próximo passo do funil ou dashboard).
+  // useLayoutEffect reduz flash de loader antes do replace.
+  useLayoutEffect(() => {
+    if (!currentUser?.hasCompletedOnboarding) return;
+
+    const next =
+      currentUser.hasCompletedStickerSetup !== true
+        ? "/cadastrar-figurinhas"
+        : !currentUser.locationSource
+          ? "/selecionar-localizacao"
+          : "/dashboard";
+
+    router.replace(next);
   }, [currentUser, router]);
 
   // Middleware handles auth redirect to /sign-in

@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { ArrowLeft, Crosshair, ImagePlus, TriangleAlert, X } from "lucide-react";
+import dynamic from "next/dynamic";
+import { ArrowLeft, Crosshair, ImagePlus, Loader2, MapPin, TriangleAlert, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
@@ -31,9 +32,18 @@ import {
 } from "@workspace/ui/components/kibo-ui/banner";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { useGeolocation } from "@/modules/location/lib/use-geolocation";
+import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
 import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
 import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
 import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
+
+const LocationPickerMap = dynamic(
+  () =>
+    import("@/modules/trade-points/ui/components/location-picker-map").then(
+      (mod) => mod.LocationPickerMap
+    ),
+  { ssr: false, loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-surface-container-highest" /> }
+);
 
 const formSchema = z.object({
   name: z
@@ -114,7 +124,29 @@ export function RequestTradePointView({
     requestPermission,
   } = useGeolocation();
   const isChecking = geoStatus === "checking" || geoStatus === "prompting";
-  const effectiveCoords = coords ?? { lat: defaultLat, lng: defaultLng };
+
+  const {
+    setQuery: setGeoQuery,
+    result: geoResult,
+    isLoading: isGeocoding,
+  } = useNominatimGeocoder();
+
+  const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number }>({
+    lat: defaultLat,
+    lng: defaultLng,
+  });
+
+  useEffect(() => {
+    if (coords) {
+      setSelectedCoords({ lat: coords.lat, lng: coords.lng });
+    }
+  }, [coords]);
+
+  useEffect(() => {
+    if (geoResult) {
+      setSelectedCoords({ lat: geoResult.lat, lng: geoResult.lng });
+    }
+  }, [geoResult]);
 
   const lastToastedErrorRef = useRef<string | null>(null);
   useEffect(() => {
@@ -192,8 +224,8 @@ export function RequestTradePointView({
       name: data.name.trim(),
       address: data.address.trim(),
       cityId,
-      lat: effectiveCoords.lat,
-      lng: effectiveCoords.lng,
+      lat: selectedCoords.lat,
+      lng: selectedCoords.lng,
       description: description || undefined,
       whatsappLink: whatsappLink || undefined,
       coverStorageId,
@@ -317,36 +349,56 @@ export function RequestTradePointView({
                   <FormControl>
                     <div className="relative">
                       <Input
-                        className={`${fieldInputClass} pr-12`}
+                        className={`${fieldInputClass} pr-24`}
                         placeholder="Rua, número, bairro, referências"
                         autoComplete="street-address"
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setGeoQuery(e.target.value);
+                        }}
                       />
-                      <button
-                        type="button"
-                        aria-label="Usar minha localização atual"
-                        aria-busy={isChecking}
-                        disabled={isChecking}
-                        onClick={() => requestPermission()}
-                        className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-md p-2 text-primary transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                      >
-                        {isChecking ? (
-                          <Spinner variant="circle-filled" size={20} />
-                        ) : (
-                          <Crosshair className="h-5 w-5" aria-hidden="true" />
+                      <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                        {isGeocoding && (
+                          <Loader2 className="h-4 w-4 animate-spin text-primary/60" aria-label="Buscando endereço" />
                         )}
-                      </button>
+                        <button
+                          type="button"
+                          aria-label="Usar minha localização atual"
+                          aria-busy={isChecking}
+                          disabled={isChecking}
+                          onClick={() => requestPermission()}
+                          className="inline-flex items-center justify-center rounded-md p-2 text-primary transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                        >
+                          {isChecking ? (
+                            <Spinner variant="circle-filled" size={20} />
+                          ) : (
+                            <Crosshair className="h-5 w-5" aria-hidden="true" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </FormControl>
-                  <FormDescription>
-                    Coordenadas: {effectiveCoords.lat.toFixed(5)},{" "}
-                    {effectiveCoords.lng.toFixed(5)} · clique no ícone para usar
-                    sua posição atual.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="space-y-2">
+              <LocationPickerMap
+                lat={selectedCoords.lat}
+                lng={selectedCoords.lng}
+                onLocationChange={(lat, lng) => setSelectedCoords({ lat, lng })}
+              />
+              <div className="flex items-center gap-2 text-sm text-on-surface-variant">
+                <MapPin className="h-4 w-4 flex-shrink-0 text-primary" />
+                <span>
+                  {selectedCoords.lat.toFixed(5)}, {selectedCoords.lng.toFixed(5)}
+                  {" · "}
+                  <span className="text-outline">arraste o marcador para ajustar</span>
+                </span>
+              </div>
+            </div>
 
             <FormField
               control={form.control}
