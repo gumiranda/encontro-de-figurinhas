@@ -3,7 +3,7 @@
  * Use these patterns to prevent unnecessary re-renders and expensive computations
  */
 
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useRef, type DependencyList } from "react";
 
 /**
  * Memoize array equality check by reference
@@ -29,7 +29,7 @@ export const useMemoizedObject = <T extends Record<string, unknown>>(
  */
 export const useStableCallback = <T extends (...args: any[]) => any>(
   callback: T,
-  deps: React.DependencyList
+  deps: DependencyList
 ): T => {
   return useCallback(callback, deps) as T;
 };
@@ -41,7 +41,7 @@ export const useStableCallback = <T extends (...args: any[]) => any>(
 export const useFilteredList = <T,>(
   list: T[],
   filterFn: (item: T) => boolean,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ) => {
   return useMemo(
     () => list.filter(filterFn),
@@ -56,7 +56,7 @@ export const useFilteredList = <T,>(
 export const useSortedList = <T,>(
   list: T[],
   compareFn: (a: T, b: T) => number,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ) => {
   return useMemo(
     () => [...list].sort(compareFn),
@@ -71,7 +71,7 @@ export const useSortedList = <T,>(
 export const useMappedList = <T, U>(
   list: T[],
   mapFn: (item: T, index: number) => U,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ) => {
   return useMemo(
     () => list.map(mapFn),
@@ -86,9 +86,9 @@ export const useMappedList = <T, U>(
 export const useDebouncedCallback = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ): T => {
-  const timeoutRef = React.useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   return useCallback(
     (...args: Parameters<T>) => {
@@ -111,10 +111,10 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(
 export const useThrottledCallback = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ): T => {
-  const lastCallRef = React.useRef(0);
-  const timeoutRef = React.useRef<NodeJS.Timeout>();
+  const lastCallRef = useRef(0);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   return useCallback(
     (...args: Parameters<T>) => {

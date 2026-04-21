@@ -16,6 +16,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateTeamsHubMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -37,9 +39,21 @@ export default async function TeamsHubPage() {
     { name: "Seleções" },
   ]);
 
+  const itemListSchema = generateItemListSchema(
+    "Seleções da Copa do Mundo 2026",
+    "Todas as 48 seleções do álbum de figurinhas da Copa do Mundo FIFA 2026.",
+    teams.map((t) => ({
+      name: `${t.flagEmoji} ${t.name}`,
+      url: `${BASE_URL}/selecao/${t.slug}`,
+      description: `${t.stickerCount} figurinhas da seleção ${t.name}`,
+    }))
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">

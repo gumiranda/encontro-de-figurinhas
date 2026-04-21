@@ -76,7 +76,7 @@ function StickerGridBase({
         const state = getState(num);
 
         const buttonClasses = cn(
-          "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95",
+          "h-10 w-full rounded-lg font-bold text-sm transition-transform duration-150 active:scale-[0.96]",
           {
             "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
               state === "duplicate",

@@ -52,15 +52,15 @@ function StickerTileBase({
     <button
       type="button"
       data-sticker-num={num}
+      data-state={state}
       onClick={onClick}
       disabled={isBlocked}
       aria-disabled={isBlocked || undefined}
       aria-pressed={state === "have" || state === "need" || undefined}
       aria-label={`Figurinha ${num}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       className={cn(
-        "relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold transition-all duration-150",
-        STATE_CLASSES[state],
-        !isBlocked && "active:scale-95"
+        "sticker-spring relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
+        STATE_CLASSES[state]
       )}
     >
       {relativeNum}

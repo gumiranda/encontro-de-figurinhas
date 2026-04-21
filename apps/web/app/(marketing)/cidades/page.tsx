@@ -9,6 +9,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateCitiesHubMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -32,6 +34,22 @@ export default async function CitiesHubPage() {
     { name: "Cidades" },
   ]);
 
+  const allCities = citiesByState.flatMap((s) =>
+    s.cities.map((c) => ({
+      name: `${c.name}, ${s.state}`,
+      url: `${BASE_URL}/cidade/${c.slug}`,
+      description: `Pontos de troca de figurinhas em ${c.name}`,
+    }))
+  );
+
+  const itemListSchema = generateItemListSchema(
+    "Cidades com Troca de Figurinhas da Copa 2026",
+    "Lista de cidades brasileiras com pontos de troca de figurinhas e colecionadores ativos.",
+    allCities.slice(0, 100)
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   const totalCities = citiesByState.reduce(
     (acc, s) => acc + s.cities.length,
     0
@@ -39,7 +57,7 @@ export default async function CitiesHubPage() {
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">

@@ -15,6 +15,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateStatesHubMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -36,9 +38,21 @@ export default async function StatesHubPage() {
     { name: "Estados" },
   ]);
 
+  const itemListSchema = generateItemListSchema(
+    "Estados Brasileiros com Troca de Figurinhas",
+    "Todos os 27 estados do Brasil com pontos de troca de figurinhas da Copa do Mundo 2026.",
+    states.map((s) => ({
+      name: s.name,
+      url: `${BASE_URL}/estado/${s.slug}`,
+      description: `Cidades e pontos de troca em ${s.name}`,
+    }))
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono, Space_Grotesk, Manrope } from "next/font/google";
 
 import "@workspace/ui/globals.css";
@@ -124,10 +125,12 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontHeadline.variable} ${fontBody.variable} font-body antialiased`}
       >
-        <Providers>
-          <Toaster />
-          {children}
-        </Providers>
+        <Suspense>
+          <Providers>
+            <Toaster />
+            {children}
+          </Providers>
+        </Suspense>
       </body>
     </html>
   );

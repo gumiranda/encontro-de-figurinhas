@@ -111,7 +111,7 @@ function StickerListGroupedBase({
             </div>
           </div>
         );
-      })}}
+      })}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateStickersHubMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -33,13 +35,25 @@ export default async function StickersHubPage() {
     { name: "Figurinhas" },
   ]);
 
+  const itemListSchema = generateItemListSchema(
+    "Figurinhas da Copa do Mundo 2026",
+    "Lista completa das 980 figurinhas do álbum oficial Panini da Copa do Mundo FIFA 2026, organizadas por seleção.",
+    teams.map((t) => ({
+      name: `Figurinhas ${t.name} ${t.flagEmoji}`,
+      url: `${BASE_URL}/selecao/${t.slug}`,
+      description: `${t.stickerCount} figurinhas, ${t.goldenNumbers.length} douradas`,
+    }))
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   const totalStickers = teams.reduce((acc, t) => acc + t.stickerCount, 0);
   const totalGolden = teams.reduce((acc, t) => acc + t.goldenNumbers.length, 0);
   const totalLegends = teams.reduce((acc, t) => acc + t.legendNumbers.length, 0);
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">

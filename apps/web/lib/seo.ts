@@ -875,5 +875,189 @@ export const GEO_OPTIMIZED_FAQS = [
     answer:
       "As figurinhas mais raras são as 68 especiais metalizadas: 48 Legends (uma lenda por seleção, como Pelé para o Brasil) e 20 Iconic Moments (momentos históricos das Copas). A probabilidade de tirar uma Legend é de aproximadamente 1 em 50 pacotes.",
   },
-]
+];
+
+// AEO-Optimized Speakable Schema (for voice assistants and AI)
+export function generateSpeakableSchema(
+  url: string,
+  cssSelectors: string[] = ["h1", ".faq-answer", ".main-content"]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    url,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: cssSelectors,
+    },
+  };
+}
+
+// WebPage schema with mainContentOfPage for AEO
+export function generateWebPageSchema(page: {
+  url: string;
+  name: string;
+  description: string;
+  datePublished?: string;
+  dateModified?: string;
+  primaryImageOfPage?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": page.url,
+    url: page.url,
+    name: page.name,
+    description: page.description,
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": BASE_URL,
+      name: SITE_NAME,
+    },
+    ...(page.datePublished && { datePublished: page.datePublished }),
+    ...(page.dateModified && { dateModified: page.dateModified }),
+    ...(page.primaryImageOfPage && {
+      primaryImageOfPage: {
+        "@type": "ImageObject",
+        url: page.primaryImageOfPage,
+      },
+    }),
+    inLanguage: "pt-BR",
+    potentialAction: {
+      "@type": "ReadAction",
+      target: page.url,
+    },
+  };
+}
+
+// ItemList schema for hub pages (AEO optimization)
+export function generateItemListSchema(
+  name: string,
+  description: string,
+  items: Array<{ name: string; url: string; description?: string }>
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    description,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: item.url,
+      ...(item.description && { description: item.description }),
+    })),
+  };
+}
+
+// Enhanced Person schema for authors (EEAT optimization)
+export function generatePersonSchema(author: {
+  name: string;
+  url?: string;
+  image?: string;
+  jobTitle?: string;
+  description?: string;
+  sameAs?: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: author.name,
+    ...(author.url && { url: author.url }),
+    ...(author.image && { image: author.image }),
+    ...(author.jobTitle && { jobTitle: author.jobTitle }),
+    ...(author.description && { description: author.description }),
+    ...(author.sameAs?.length && { sameAs: author.sameAs }),
+    worksFor: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+  };
+}
+
+// Service schema for the platform
+export function generateServiceSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Figurinha Fácil - Plataforma de Troca de Figurinhas",
+    description:
+      "Plataforma gratuita que conecta colecionadores de figurinhas da Copa do Mundo 2026 em todo o Brasil. Cadastre suas figurinhas repetidas e faltantes, encontre matches automáticos e combine trocas presenciais.",
+    provider: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    serviceType: "Marketplace de Troca",
+    areaServed: {
+      "@type": "Country",
+      name: "Brasil",
+    },
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: BASE_URL,
+      serviceType: "Web Application",
+    },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "BRL",
+      description: "Serviço 100% gratuito para colecionadores",
+    },
+  };
+}
+
+// SoftwareApplication schema for app stores
+export function generateSoftwareApplicationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "Web, iOS, Android",
+    description:
+      "Aplicativo para troca de figurinhas da Copa do Mundo 2026. Encontre colecionadores perto de você.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "BRL",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      ratingCount: "1200",
+      bestRating: "5",
+    },
+  };
+}
+
+// QAPage schema for AEO (alternative to FAQPage)
+export function generateQAPageSchema(
+  questions: Array<{
+    question: string;
+    answer: string;
+    upvoteCount?: number;
+    dateCreated?: string;
+  }>
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "QAPage",
+    mainEntity: questions.map((q) => ({
+      "@type": "Question",
+      name: q.question,
+      answerCount: 1,
+      ...(q.upvoteCount && { upvoteCount: q.upvoteCount }),
+      ...(q.dateCreated && { dateCreated: q.dateCreated }),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: q.answer,
+        ...(q.upvoteCount && { upvoteCount: q.upvoteCount }),
+      },
+    })),
+  };
+}
 

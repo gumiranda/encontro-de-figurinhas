@@ -31,7 +31,7 @@ import { CityList } from "../components/city-list";
 import { Radar } from "../components/radar-visual";
 import { StateCard } from "../components/state-card";
 
-interface LocationSelectorViewProps {
+export interface LocationSelectorViewProps {
   cities: CityWithCoords[];
   suggestedCities: CityWithCoords[];
   citiesError?: string;

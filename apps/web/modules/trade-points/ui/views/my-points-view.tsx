@@ -98,7 +98,7 @@ export function MyPointsView() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 tabular-nums">
                     <Users className="size-4" />
                     {point.participantCount ?? 0}
                   </span>

@@ -54,6 +54,21 @@ export default function robots(): MetadataRoute.Robots {
         disallow: DISALLOWED_PATHS,
       },
       {
+        userAgent: "Applebot-Extended",
+        allow: "/",
+        disallow: DISALLOWED_PATHS,
+      },
+      {
+        userAgent: "CCBot",
+        allow: "/",
+        disallow: DISALLOWED_PATHS,
+      },
+      {
+        userAgent: "cohere-ai",
+        allow: "/",
+        disallow: DISALLOWED_PATHS,
+      },
+      {
         userAgent: "*",
         allow: "/",
         disallow: DISALLOWED_PATHS,

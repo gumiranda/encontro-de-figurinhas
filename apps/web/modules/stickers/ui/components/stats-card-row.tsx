@@ -52,7 +52,7 @@ export function StatsCardRow({
         >
           <p
             className={cn(
-              "font-headline text-[26px] font-black leading-none",
+              "font-headline text-[26px] font-black leading-none tabular-nums",
               TONE_CLASS[tone]
             )}
           >

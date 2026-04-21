@@ -2,9 +2,6 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
 const ALLOWED_TAG_PREFIXES = ["ponto:", "cidade:", "sitemap"];
 
 function isAllowedTag(tag: string): boolean {

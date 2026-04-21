@@ -55,7 +55,7 @@ export function RelatedStickers({
                 <Badge
                   variant={sticker.isGolden || sticker.isLegend ? "default" : "outline"}
                   className={`
-                    cursor-pointer transition-all hover:scale-105 text-base px-3 py-1.5
+                    cursor-pointer transition-transform duration-200 hover:scale-105 text-base px-3 py-1.5
                     ${sticker.isGolden ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}
                     ${sticker.isLegend ? "bg-purple-600 hover:bg-purple-700" : ""}
                     ${!sticker.isGolden && !sticker.isLegend ? "hover:bg-primary hover:text-primary-foreground" : ""}

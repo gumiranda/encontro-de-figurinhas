@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 import { Button } from "@workspace/ui/components/button";
 
-interface AvatarPickerProps {
+export interface AvatarPickerProps {
   nickname?: string;
   imageUrl?: string | null;
 }

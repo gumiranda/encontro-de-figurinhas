@@ -70,7 +70,7 @@ export const TradePointCard = memo(function TradePointCard({
   return (
     <Card
       className={cn(
-        "transition-all duration-200 hover:shadow-lg hover:scale-105",
+        "transition-[box-shadow,transform] duration-200 hover:shadow-lg hover:scale-105 active:scale-[0.96]",
         isSelected && "ring-2 ring-primary"
       )}
     >

@@ -18,6 +18,8 @@ import {
   generateBreadcrumbSchema,
   generatePlaceSchema,
   generateCityItemListSchema,
+  generateSpeakableSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -108,11 +110,18 @@ export default async function CityPage({ params }: CityPageProps) {
       ? generateCityItemListSchema(city.slug, city.name, visiblePoints)
       : null;
 
+  const speakableSchema = generateSpeakableSchema(
+    `${BASE_URL}/cidade/${city.slug}`,
+    ["h1", "h2", "h3", ".prose p", ".prose ul", ".prose ol"]
+  );
+
+  const schemas = [breadcrumbSchema, placeSchema, speakableSchema];
+  if (itemListSchema) schemas.push(itemListSchema);
+  const combinedSchema = generateCombinedSchema(schemas);
+
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={placeSchema} />
-      {itemListSchema && <JsonLd data={itemListSchema} />}
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}

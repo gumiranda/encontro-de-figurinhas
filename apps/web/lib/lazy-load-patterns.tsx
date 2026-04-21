@@ -12,7 +12,7 @@ import type React from "react";
  * Pages: /arena, /(arena)/map, /(marketing)/cidade
  */
 export const LazyMapView = dynamic(
-  () => import("@/modules/map/ui/views/arena-map-view"),
+  () => import("@/modules/map/ui/views/map-arena-view").then((mod) => mod.MapArenaView),
   {
     loading: () => (
       <div className="w-full h-screen bg-muted flex items-center justify-center">
@@ -31,7 +31,7 @@ export const LazyMapView = dynamic(
  * Only needed on user profile pages and settings
  */
 export const LazyAvatarPicker = dynamic(
-  () => import("@/modules/auth/ui/components/avatar-picker"),
+  () => import("@/modules/auth/ui/components/avatar-picker").then((mod) => mod.AvatarPicker),
   {
     loading: () => (
       <div className="w-full h-48 bg-muted animate-pulse rounded-lg" />
@@ -66,7 +66,7 @@ export const LazyMatchesView = dynamic(
  * Lazy-load location selector for complex geolocation flows
  */
 export const LazyLocationSelector = dynamic(
-  () => import("@/modules/location/ui/views/location-selector-view"),
+  () => import("@/modules/location/ui/views/location-selector-view").then((mod) => mod.LocationSelectorView),
   {
     loading: () => (
       <div className="w-full h-64 bg-muted animate-pulse rounded-lg" />
@@ -80,7 +80,7 @@ export const LazyLocationSelector = dynamic(
  * This is the heaviest component - Leaflet + clustering
  */
 export const LazyArenaMap = dynamic(
-  () => import("@/modules/map/ui/views/arena-map-view"),
+  () => import("@/modules/map/ui/views/map-arena-view").then((mod) => mod.MapArenaView),
   {
     loading: () => (
       <div className="w-full h-full min-h-screen bg-muted flex items-center justify-center">

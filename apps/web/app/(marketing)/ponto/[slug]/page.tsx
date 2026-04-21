@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
@@ -48,6 +49,8 @@ import {
   generateTradePointMetadata,
   generateBreadcrumbSchema,
   generateTradePointPlaceSchema,
+  generateSpeakableSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -98,6 +101,7 @@ export async function generateMetadata({
 }
 
 export default async function PontoPage({ params }: PontoPageProps) {
+  await connection();
   const { slug } = await params;
   const point = await loadTradePoint(slug);
 
@@ -131,12 +135,22 @@ export default async function PontoPage({ params }: PontoPageProps) {
     description: point.description ?? undefined,
   });
 
+  const speakableSchema = generateSpeakableSchema(
+    `${BASE_URL}/ponto/${slug}`,
+    ["h1", "h2", ".typography p", ".typography ol", ".typography ul"]
+  );
+
+  const combinedSchema = generateCombinedSchema([
+    breadcrumbSchema,
+    placeSchema,
+    speakableSchema,
+  ]);
+
   const shareUrl = `${BASE_URL}/ponto/${slug}`;
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={placeSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}
