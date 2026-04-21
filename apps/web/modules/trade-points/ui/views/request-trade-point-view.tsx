@@ -31,7 +31,10 @@ import {
 } from "@workspace/ui/components/kibo-ui/banner";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { useGeolocation } from "@/modules/location/lib/use-geolocation";
-import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
+import {
+  useNominatimGeocoder,
+  type GeocodingSuggestion,
+} from "@/modules/location/lib/use-nominatim-geocoder";
 import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
 import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
 import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
@@ -126,14 +129,16 @@ export function RequestTradePointView({
 
   const {
     setQuery: setGeoQuery,
-    result: geoResult,
+    suggestions,
     isLoading: isGeocoding,
+    clearSuggestions,
   } = useNominatimGeocoder(cityLabel);
 
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number }>({
     lat: defaultLat,
     lng: defaultLng,
   });
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     if (coords) {
@@ -142,10 +147,10 @@ export function RequestTradePointView({
   }, [coords]);
 
   useEffect(() => {
-    if (geoResult) {
-      setSelectedCoords({ lat: geoResult.lat, lng: geoResult.lng });
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
     }
-  }, [geoResult]);
+  }, [suggestions]);
 
   const lastToastedErrorRef = useRef<string | null>(null);
   useEffect(() => {
@@ -350,11 +355,17 @@ export function RequestTradePointView({
                       <Input
                         className={`${fieldInputClass} pr-24`}
                         placeholder="Rua, número, bairro, referências"
-                        autoComplete="street-address"
+                        autoComplete="off"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e);
                           setGeoQuery(e.target.value);
+                        }}
+                        onFocus={() => {
+                          if (suggestions.length > 0) setShowSuggestions(true);
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => setShowSuggestions(false), 200);
                         }}
                       />
                       <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -376,6 +387,29 @@ export function RequestTradePointView({
                           )}
                         </button>
                       </div>
+                      {showSuggestions && suggestions.length > 0 && (
+                        <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-outline-variant/30 bg-surface-container-high shadow-lg">
+                          {suggestions.map((suggestion) => (
+                            <li key={suggestion.id}>
+                              <button
+                                type="button"
+                                className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm text-on-surface transition-colors hover:bg-surface-container-highest focus:bg-surface-container-highest focus:outline-none"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => {
+                                  const shortName = suggestion.displayName.split(",").slice(0, 3).join(",");
+                                  field.onChange(shortName);
+                                  setSelectedCoords({ lat: suggestion.lat, lng: suggestion.lng });
+                                  setShowSuggestions(false);
+                                  clearSuggestions();
+                                }}
+                              >
+                                <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                                <span className="line-clamp-2">{suggestion.displayName}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />

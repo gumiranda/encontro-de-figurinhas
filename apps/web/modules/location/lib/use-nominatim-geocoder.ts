@@ -2,27 +2,29 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type GeocodingResult = {
+export type GeocodingSuggestion = {
+  id: string;
   lat: number;
   lng: number;
   displayName: string;
 };
 
-type NominatimResponse = {
+type NominatimItem = {
+  place_id: number;
   lat: string;
   lon: string;
   display_name: string;
-}[];
+};
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const DEBOUNCE_MS = 600;
-const MIN_QUERY_LENGTH = 5;
+const DEBOUNCE_MS = 500;
+const MIN_QUERY_LENGTH = 4;
+const MAX_SUGGESTIONS = 5;
 
 export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState<GeocodingResult | null>(null);
+  const [suggestions, setSuggestions] = useState<GeocodingSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -35,13 +37,12 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
 
       const trimmed = q.trim();
       if (trimmed.length < MIN_QUERY_LENGTH) {
-        setResult(null);
+        setSuggestions([]);
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
-      setError(null);
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -54,7 +55,7 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
         const params = new URLSearchParams({
           q: queryParts.join(", "),
           format: "json",
-          limit: "1",
+          limit: String(MAX_SUGGESTIONS),
           addressdetails: "0",
         });
 
@@ -69,26 +70,21 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
           throw new Error(`Nominatim error: ${res.status}`);
         }
 
-        const data: NominatimResponse = await res.json();
+        const data: NominatimItem[] = await res.json();
 
-        const first = data[0];
-        if (!first) {
-          setResult(null);
-          setError("Endereco nao encontrado");
-        } else {
-          setResult({
-            lat: parseFloat(first.lat),
-            lng: parseFloat(first.lon),
-            displayName: first.display_name,
-          });
-          setError(null);
-        }
+        setSuggestions(
+          data.map((item) => ({
+            id: String(item.place_id),
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lon),
+            displayName: item.display_name,
+          }))
+        );
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
           return;
         }
-        setError("Erro ao buscar endereco");
-        setResult(null);
+        setSuggestions([]);
       } finally {
         setIsLoading(false);
       }
@@ -122,9 +118,8 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
 
   return {
     setQuery,
-    result,
+    suggestions,
     isLoading,
-    error,
-    clearResult: () => setResult(null),
+    clearSuggestions: () => setSuggestions([]),
   };
 }

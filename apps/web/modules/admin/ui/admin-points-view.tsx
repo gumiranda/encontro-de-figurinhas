@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -32,8 +32,13 @@ import {
   Shield,
   Star,
   Landmark,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AdminEditPendingPointDialog,
+  type AdminEditPendingSavePayload,
+} from "@/modules/admin/ui/admin-edit-pending-point-dialog";
 
 type Tab = "pending" | "approved" | "suspended";
 
@@ -53,11 +58,16 @@ type Row = {
   cityName: string;
   cityState: string;
   citySlug: string;
+  coverImageUrl?: string;
 };
 
+/** Mesmo padrão de `point-hero` — serviço estático do OSM costuma falhar intermitentemente; há fallback na UI. */
 function staticMapUrl(lat: number, lng: number) {
-  const z = 16;
-  return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${z}&size=640x480&maptype=mapnik&markers=${lat},${lng},red-pushpin`;
+  return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=16&size=640x480&markers=${lat},${lng},red`;
+}
+
+function externalMapHref(lat: number, lng: number) {
+  return `https://www.openstreetmap.org/#map=16/${lat}/${lng}`;
 }
 
 function initials(name: string) {
@@ -79,6 +89,9 @@ function formatConvexError(err: unknown): string {
         "Link inválido. Use um convite no formato https://chat.whatsapp.com/…",
       "invalid-point": "Este ponto não está mais pendente ou não existe.",
       "invalid-reason": "Informe um motivo com 3 a 2000 caracteres.",
+      "invalid-fields":
+        "Verifique nome, endereço e textos (tamanhos permitidos).",
+      "invalid-coordinates": "As coordenadas precisam estar no Brasil.",
     };
     return map[err.data] ?? err.data;
   }
@@ -91,9 +104,11 @@ export function AdminPointsView() {
   const rows = useQuery(api.tradePoints.adminListTradePoints, { filter: tab });
   const approve = useMutation(api.tradePoints.adminApprovePendingPoint);
   const reject = useMutation(api.tradePoints.adminRejectPendingPoint);
+  const updatePending = useMutation(api.tradePoints.adminUpdatePendingPoint);
 
   const [approveOpen, setApproveOpen] = useState<Row | null>(null);
   const [rejectOpen, setRejectOpen] = useState<Row | null>(null);
+  const [editOpen, setEditOpen] = useState<Row | null>(null);
   const [wa, setWa] = useState("");
   const [reason, setReason] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -106,6 +121,10 @@ export function AdminPointsView() {
   const openReject = useCallback((row: Row) => {
     setReason("");
     setRejectOpen(row);
+  }, []);
+
+  const openEdit = useCallback((row: Row) => {
+    setEditOpen(row);
   }, []);
 
   const onApprove = async () => {
@@ -129,6 +148,27 @@ export function AdminPointsView() {
       await reject({ tradePointId: rejectOpen._id, reason });
       toast.success("Solicitação recusada.");
       setRejectOpen(null);
+    } catch (e) {
+      toast.error(formatConvexError(e));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const onSaveEdit = async (payload: AdminEditPendingSavePayload) => {
+    setBusyId(String(payload.tradePointId));
+    try {
+      await updatePending({
+        tradePointId: payload.tradePointId,
+        name: payload.name,
+        address: payload.address,
+        lat: payload.lat,
+        lng: payload.lng,
+        description: payload.description,
+        suggestedHours: payload.suggestedHours,
+      });
+      toast.success("Ponto atualizado.");
+      setEditOpen(null);
     } catch (e) {
       toast.error(formatConvexError(e));
     } finally {
@@ -289,6 +329,7 @@ export function AdminPointsView() {
                   row={featured}
                   onApprove={openApprove}
                   onReject={openReject}
+                  onEdit={openEdit}
                 />
               ) : null}
               {compact ? (
@@ -296,6 +337,7 @@ export function AdminPointsView() {
                   row={compact}
                   onApprove={openApprove}
                   onReject={openReject}
+                  onEdit={openEdit}
                 />
               ) : null}
               {rest.map((row) => (
@@ -304,6 +346,7 @@ export function AdminPointsView() {
                   row={row}
                   onApprove={openApprove}
                   onReject={openReject}
+                  onEdit={openEdit}
                 />
               ))}
             </div>
@@ -414,6 +457,14 @@ export function AdminPointsView() {
         </DialogContent>
       </Dialog>
 
+      <AdminEditPendingPointDialog
+        row={editOpen}
+        open={!!editOpen}
+        onOpenChange={(o) => !o && setEditOpen(null)}
+        onSave={onSaveEdit}
+        busy={busyId !== null}
+      />
+
       <Dialog open={!!rejectOpen} onOpenChange={(o) => !o && setRejectOpen(null)}>
         <DialogContent className="border-[var(--ap-outline)]/20 bg-[#13192b] text-[#e1e4fa] sm:max-w-md">
           <DialogHeader>
@@ -453,25 +504,71 @@ export function AdminPointsView() {
   );
 }
 
+function PendingHeroImage({ row }: { row: Row }) {
+  const mapSrc = staticMapUrl(row.lat, row.lng);
+  const [mode, setMode] = useState<"cover" | "map" | "none">(
+    row.coverImageUrl ? "cover" : "map"
+  );
+
+  useEffect(() => {
+    setMode(row.coverImageUrl ? "cover" : "map");
+  }, [row._id, row.coverImageUrl]);
+
+  const src =
+    mode === "cover" && row.coverImageUrl
+      ? row.coverImageUrl
+      : mode === "map"
+        ? mapSrc
+        : null;
+
+  return (
+    <>
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover grayscale-[40%] transition-all duration-700 group-hover:grayscale-0"
+          onError={() => {
+            if (mode === "cover") setMode("map");
+            else setMode("none");
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#13192b] px-6 text-center">
+          <MapPin className="h-10 w-10 text-[var(--ap-primary)]/50" aria-hidden />
+          <p className="text-xs text-[var(--ap-muted)]">
+            Mapa estático indisponível. Abra a localização no mapa externo.
+          </p>
+          <a
+            href={externalMapHref(row.lat, row.lng)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-[var(--ap-primary)] underline underline-offset-2"
+          >
+            Ver no OpenStreetMap
+          </a>
+        </div>
+      )}
+    </>
+  );
+}
+
 function PendingFeaturedCard({
   row,
   onApprove,
   onReject,
+  onEdit,
 }: {
   row: Row;
   onApprove: (r: Row) => void;
   onReject: (r: Row) => void;
+  onEdit: (r: Row) => void;
 }) {
-  const mapSrc = staticMapUrl(row.lat, row.lng);
   return (
     <div className="group relative overflow-hidden rounded-[2rem] border border-[var(--ap-outline)]/10 bg-[var(--ap-surface-low)] shadow-2xl transition-all duration-500 hover:border-[var(--ap-primary)]/40 lg:col-span-8">
       <div className="grid h-full grid-cols-1 md:grid-cols-2">
         <div className="relative min-h-[280px] md:min-h-[300px]">
-          <img
-            src={mapSrc}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover grayscale-[40%] transition-all duration-700 group-hover:grayscale-0"
-          />
+          <PendingHeroImage key={row._id} row={row} />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--ap-surface-low)] via-[var(--ap-surface-low)]/20 to-transparent" />
           <div className="absolute bottom-6 left-6">
             <span className="mb-2 inline-block rounded-full bg-[var(--ap-secondary)] px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-[#105500]">
@@ -525,11 +622,20 @@ function PendingFeaturedCard({
               </p>
             ) : null}
           </div>
-          <div className="mt-8 flex gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onEdit(row)}
+              className="flex items-center justify-center gap-2 rounded-xl border-[var(--ap-outline)]/40 py-6 font-[family-name:var(--font-headline)] text-sm font-bold uppercase tracking-widest text-[#e1e4fa] hover:bg-[#181f33]"
+            >
+              <Pencil className="h-4 w-4" />
+              Editar
+            </Button>
             <Button
               type="button"
               onClick={() => onApprove(row)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--ap-secondary)] py-6 font-[family-name:var(--font-headline)] text-sm font-black uppercase tracking-widest text-[#105500] shadow-[0_10px_20px_-10px_rgba(79,243,37,0.4)] hover:scale-[1.02] hover:bg-[#3ee40c] active:scale-95"
+              className="flex min-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--ap-secondary)] py-6 font-[family-name:var(--font-headline)] text-sm font-black uppercase tracking-widest text-[#105500] shadow-[0_10px_20px_-10px_rgba(79,243,37,0.4)] hover:scale-[1.02] hover:bg-[#3ee40c] active:scale-95"
             >
               <CheckCircle2 className="h-5 w-5" />
               Aprovar
@@ -553,10 +659,12 @@ function PendingCompactCard({
   row,
   onApprove,
   onReject,
+  onEdit,
 }: {
   row: Row;
   onApprove: (r: Row) => void;
   onReject: (r: Row) => void;
+  onEdit: (r: Row) => void;
 }) {
   const stars = reliabilityStars(row.reliabilityScore);
   return (
@@ -596,6 +704,17 @@ function PendingCompactCard({
       <div className="space-y-3">
         <Button
           type="button"
+          variant="outline"
+          onClick={() => onEdit(row)}
+          className="w-full rounded-xl border-[var(--ap-outline)]/40 py-6 font-[family-name:var(--font-headline)] text-sm font-bold uppercase tracking-widest text-[#e1e4fa] hover:bg-[#181f33]"
+        >
+          <span className="inline-flex items-center justify-center gap-2">
+            <Pencil className="h-4 w-4" />
+            Editar
+          </span>
+        </Button>
+        <Button
+          type="button"
           onClick={() => onApprove(row)}
           className="w-full rounded-xl bg-[var(--ap-secondary)] py-6 font-[family-name:var(--font-headline)] text-sm font-black uppercase tracking-widest text-[#105500] shadow-[0_8px_16px_-8px_rgba(79,243,37,0.3)] hover:brightness-110"
         >
@@ -618,14 +737,21 @@ function PendingRestCard({
   row,
   onApprove,
   onReject,
+  onEdit,
 }: {
   row: Row;
   onApprove: (r: Row) => void;
   onReject: (r: Row) => void;
+  onEdit: (r: Row) => void;
 }) {
   return (
     <div className="lg:col-span-12">
-      <PendingFeaturedCard row={row} onApprove={onApprove} onReject={onReject} />
+      <PendingFeaturedCard
+        row={row}
+        onApprove={onApprove}
+        onReject={onReject}
+        onEdit={onEdit}
+      />
     </div>
   );
 }

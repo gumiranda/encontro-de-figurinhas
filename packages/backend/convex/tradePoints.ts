@@ -885,6 +885,7 @@ export const adminListTradePoints = query({
         createdAt: p.createdAt,
         suggestedHours: p.suggestedHours,
         whatsappLink: p.whatsappLink,
+        coverImageUrl: p.coverImageUrl,
         requesterNickname:
           r?.nickname ?? r?.displayNickname ?? r?.name ?? "—",
         reliabilityScore: r?.reliabilityScore ?? 0,
@@ -893,6 +894,73 @@ export const adminListTradePoints = query({
         citySlug: city?.slug ?? "",
       };
     });
+  },
+});
+
+export const adminUpdatePendingPoint = mutation({
+  args: {
+    tradePointId: v.id("tradePoints"),
+    name: v.string(),
+    address: v.string(),
+    lat: v.float64(),
+    lng: v.float64(),
+    description: v.optional(v.string()),
+    suggestedHours: v.optional(v.string()),
+  },
+  returns: v.object({ ok: v.literal(true) }),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const point = await ctx.db.get(args.tradePointId);
+    if (!point || point.status !== "pending") {
+      throw new ConvexError("invalid-point");
+    }
+
+    const trimmedName = args.name.trim();
+    const trimmedAddress = args.address.trim();
+    if (
+      trimmedName.length < 2 ||
+      trimmedName.length > 120 ||
+      trimmedAddress.length < 5 ||
+      trimmedAddress.length > 300
+    ) {
+      throw new ConvexError("invalid-fields");
+    }
+
+    if (!isInBrazil(args.lat, args.lng)) {
+      throw new ConvexError("invalid-coordinates");
+    }
+
+    const suggestedHours = args.suggestedHours?.trim();
+    const description = args.description?.trim();
+    if (
+      (suggestedHours && suggestedHours.length > 120) ||
+      (description && description.length > 600)
+    ) {
+      throw new ConvexError("invalid-fields");
+    }
+
+    const city = await ctx.db.get(point.cityId);
+    if (!city) {
+      throw new ConvexError("invalid-point");
+    }
+
+    let nextSlug = point.slug;
+    if (trimmedName !== point.name) {
+      nextSlug = await generateTradePointSlug(ctx, trimmedName, city.slug);
+    }
+
+    await ctx.db.patch(args.tradePointId, {
+      name: trimmedName,
+      address: trimmedAddress,
+      lat: args.lat,
+      lng: args.lng,
+      suggestedHours: suggestedHours || undefined,
+      description: description || undefined,
+      slug: nextSlug,
+    });
+
+    return { ok: true as const };
   },
 });
 
