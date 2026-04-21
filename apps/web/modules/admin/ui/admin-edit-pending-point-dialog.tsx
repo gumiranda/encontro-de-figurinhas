@@ -1,9 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Crosshair, Loader2, MapPin } from "lucide-react";
-import { toast } from "sonner";
+import { useGeolocation } from "@/modules/location/lib/use-geolocation";
+import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -15,11 +13,13 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
+import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
-import { useGeolocation } from "@/modules/location/lib/use-geolocation";
-import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
+import { Crosshair, Loader2, MapPin } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const LocationPickerMap = dynamic(
   () =>
@@ -67,12 +67,7 @@ type FormProps = {
   busy: boolean;
 };
 
-function AdminEditPendingPointForm({
-  row,
-  onCancel,
-  onSave,
-  busy,
-}: FormProps) {
+function AdminEditPendingPointForm({ row, onCancel, onSave, busy }: FormProps) {
   const [name, setName] = useState(row.name);
   const [address, setAddress] = useState(row.address);
   const [description, setDescription] = useState(row.description ?? "");
@@ -87,6 +82,7 @@ function AdminEditPendingPointForm({
     setQuery: setGeoQuery,
     suggestions,
     isLoading: isGeocoding,
+    hasSearched,
     clearSuggestions,
   } = useNominatimGeocoder(cityBias || undefined);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -102,11 +98,7 @@ function AdminEditPendingPointForm({
   const lastToastedErrorRef = useRef<string | null>(null);
   useEffect(() => {
     if (!geoError) return;
-    if (
-      geoStatus !== "denied" &&
-      geoStatus !== "unavailable" &&
-      geoStatus !== "timeout"
-    )
+    if (geoStatus !== "denied" && geoStatus !== "unavailable" && geoStatus !== "timeout")
       return;
     if (lastToastedErrorRef.current === geoError) return;
     lastToastedErrorRef.current = geoError;
@@ -124,10 +116,10 @@ function AdminEditPendingPointForm({
   }, [coords]);
 
   useEffect(() => {
-    if (suggestions.length > 0) {
+    if (suggestions.length > 0 || hasSearched) {
       setShowSuggestions(true);
     }
-  }, [suggestions]);
+  }, [suggestions, hasSearched]);
 
   const handleSubmit = useCallback(async () => {
     await onSave({
@@ -160,8 +152,8 @@ function AdminEditPendingPointForm({
           Editar solicitação
         </DialogTitle>
         <DialogDescription className="text-[var(--ap-muted)]">
-          Mesmo fluxo da solicitação: busque o endereço, use o GPS ou arraste o
-          marcador. O slug público é atualizado se o nome mudar.
+          Mesmo fluxo da solicitação: busque o endereço, use o GPS ou arraste o marcador.
+          O slug público é atualizado se o nome mudar.
         </DialogDescription>
       </DialogHeader>
 
@@ -218,46 +210,64 @@ function AdminEditPendingPointForm({
                 )}
               </button>
             </div>
-            {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-auto rounded-xl border border-[var(--ap-outline)]/30 bg-[#090e1c] shadow-lg">
-                {suggestions.map((suggestion) => (
-                  <li key={suggestion.id}>
-                    <button
-                      type="button"
-                      className="flex w-full items-start gap-3 px-4 py-2.5 text-left text-sm text-[#e1e4fa] transition-colors hover:bg-[#181f33] focus:bg-[#181f33] focus:outline-none"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => {
-                        const shortName = suggestion.displayName.split(",").slice(0, 3).join(",");
-                        setAddress(shortName);
-                        setSelectedCoords({ lat: suggestion.lat, lng: suggestion.lng });
-                        setShowSuggestions(false);
-                        clearSuggestions();
-                      }}
-                    >
-                      <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--ap-primary)]" />
-                      <span className="line-clamp-2">{suggestion.displayName}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {showSuggestions &&
+              (suggestions.length > 0 || (hasSearched && !isGeocoding)) && (
+                <ul
+                  role="listbox"
+                  className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-auto rounded-xl border border-[var(--ap-outline)]/30 bg-[#090e1c] shadow-lg animate-in fade-in-0 slide-in-from-top-2 duration-150"
+                >
+                  {suggestions.length > 0 ? (
+                    suggestions.map((suggestion) => (
+                      <li key={suggestion.id} role="option">
+                        <button
+                          type="button"
+                          className="flex w-full items-start gap-3 px-4 py-2.5 text-left text-sm text-[#e1e4fa] transition-colors hover:bg-[#181f33] focus:bg-[#181f33] focus:outline-none"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setSelectedCoords({
+                              lat: suggestion.lat,
+                              lng: suggestion.lng,
+                            });
+                            setShowSuggestions(false);
+                            clearSuggestions();
+                            toast.info(
+                              "Posição aproximada. Arraste o marcador para o local exato.",
+                              { duration: 4000 }
+                            );
+                          }}
+                        >
+                          <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--ap-primary)]" />
+                          <span className="line-clamp-2">{suggestion.displayName}</span>
+                        </button>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-4 py-2.5 text-sm text-[var(--ap-muted)]">
+                      Nenhum resultado encontrado
+                    </li>
+                  )}
+                </ul>
+              )}
           </div>
         </div>
 
         <div className="space-y-2">
-          <LocationPickerMap
-            lat={selectedCoords.lat}
-            lng={selectedCoords.lng}
-            onLocationChange={(lat, lng) => setSelectedCoords({ lat, lng })}
-          />
+          <div className="relative">
+            <LocationPickerMap
+              lat={selectedCoords.lat}
+              lng={selectedCoords.lng}
+              onLocationChange={(lat, lng) => setSelectedCoords({ lat, lng })}
+            />
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-2">
+              <div className="flex items-center gap-1.5 rounded-full bg-[#090e1c]/90 px-3 py-1.5 text-xs font-medium text-[#e1e4fa] shadow-md backdrop-blur-sm">
+                <MapPin className="h-3.5 w-3.5 text-[var(--ap-primary)]" />
+                Arraste o marcador para ajustar
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-2 text-xs text-[var(--ap-muted)]">
-            <MapPin className="h-4 w-4 shrink-0 text-[var(--ap-primary)]" />
             <span>
               {selectedCoords.lat.toFixed(5)}, {selectedCoords.lng.toFixed(5)}
-              <span className="text-[var(--ap-muted)]/80">
-                {" "}
-                · arraste o marcador para ajustar
-              </span>
             </span>
           </div>
         </div>

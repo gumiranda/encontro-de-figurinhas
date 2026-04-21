@@ -1,15 +1,11 @@
 "use client";
 
+import { useGeolocation } from "@/modules/location/lib/use-geolocation";
+import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
+import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
+import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
+import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "convex/react";
-import dynamic from "next/dynamic";
-import { ArrowLeft, Crosshair, ImagePlus, Loader2, MapPin, TriangleAlert, X } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -22,37 +18,44 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { Banner, BannerIcon, BannerTitle } from "@workspace/ui/components/kibo-ui/banner";
+import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Text } from "@workspace/ui/components/typography";
+import { useMutation } from "convex/react";
 import {
-  Banner,
-  BannerIcon,
-  BannerTitle,
-} from "@workspace/ui/components/kibo-ui/banner";
-import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
-import { useGeolocation } from "@/modules/location/lib/use-geolocation";
-import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
-import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
-import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
-import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
+  ArrowLeft,
+  Crosshair,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  TriangleAlert,
+  X,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const LocationPickerMap = dynamic(
   () =>
     import("@/modules/trade-points/ui/components/location-picker-map").then(
       (mod) => mod.LocationPickerMap
     ),
-  { ssr: false, loading: () => <div className="h-[200px] w-full animate-pulse rounded-xl bg-surface-container-highest" /> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[200px] w-full animate-pulse rounded-xl bg-surface-container-highest" />
+    ),
+  }
 );
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Mínimo 2 caracteres")
-    .max(120, "Máximo 120 caracteres"),
-  address: z
-    .string()
-    .min(5, "Descreva o endereço")
-    .max(300, "Máximo 300 caracteres"),
+  name: z.string().min(2, "Mínimo 2 caracteres").max(120, "Máximo 120 caracteres"),
+  address: z.string().min(5, "Descreva o endereço").max(300, "Máximo 300 caracteres"),
   description: z.string().max(500).optional(),
   whatsappLink: z
     .string()
@@ -128,6 +131,7 @@ export function RequestTradePointView({
     setQuery: setGeoQuery,
     suggestions,
     isLoading: isGeocoding,
+    hasSearched,
     clearSuggestions,
   } = useNominatimGeocoder(cityLabel);
 
@@ -144,19 +148,15 @@ export function RequestTradePointView({
   }, [coords]);
 
   useEffect(() => {
-    if (suggestions.length > 0) {
+    if (suggestions.length > 0 || hasSearched) {
       setShowSuggestions(true);
     }
-  }, [suggestions]);
+  }, [suggestions, hasSearched]);
 
   const lastToastedErrorRef = useRef<string | null>(null);
   useEffect(() => {
     if (!geoError) return;
-    if (
-      geoStatus !== "denied" &&
-      geoStatus !== "unavailable" &&
-      geoStatus !== "timeout"
-    )
+    if (geoStatus !== "denied" && geoStatus !== "unavailable" && geoStatus !== "timeout")
       return;
     if (lastToastedErrorRef.current === geoError) return;
     lastToastedErrorRef.current = geoError;
@@ -187,7 +187,9 @@ export function RequestTradePointView({
   function onCoverSelected(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (!COVER_ALLOWED_TYPES.includes(file.type as (typeof COVER_ALLOWED_TYPES)[number])) {
+    if (
+      !COVER_ALLOWED_TYPES.includes(file.type as (typeof COVER_ALLOWED_TYPES)[number])
+    ) {
       toast.error("Use PNG, JPG ou WebP.");
       if (coverInputRef.current) coverInputRef.current.value = "";
       return;
@@ -210,11 +212,7 @@ export function RequestTradePointView({
     if (coverFile) {
       try {
         const uploadUrl = await generateCoverUploadUrl();
-        coverStorageId = await uploadToConvex(
-          uploadUrl,
-          coverFile,
-          coverFile.type
-        );
+        coverStorageId = await uploadToConvex(uploadUrl, coverFile, coverFile.type);
       } catch {
         toast.error("Não foi possível enviar a foto de capa. Tente de novo.");
         return;
@@ -271,8 +269,7 @@ export function RequestTradePointView({
     toast.error("Revise os campos e tente novamente.");
   }
 
-  const ctaDisabled =
-    form.formState.isSubmitting || isBlocked || isLoadingQuota;
+  const ctaDisabled = form.formState.isSubmitting || isBlocked || isLoadingQuota;
 
   return (
     <div className="flex min-h-[100dvh] flex-col">
@@ -290,8 +287,8 @@ export function RequestTradePointView({
             </h1>
           </header>
           <Text variant="muted" className="text-base">
-            Ajude a comunidade a encontrar novos pontos de troca seguros e
-            movimentados em {cityLabel}.
+            Ajude a comunidade a encontrar novos pontos de troca seguros e movimentados em{" "}
+            {cityLabel}.
           </Text>
         </div>
 
@@ -309,8 +306,8 @@ export function RequestTradePointView({
                 Orientação de Segurança
               </BannerTitle>
               <Text variant="small" className="font-normal text-on-surface">
-                Escolha apenas locais públicos e movimentados como shoppings ou
-                praças de alimentação.
+                Escolha apenas locais públicos e movimentados como shoppings ou praças de
+                alimentação.
               </Text>
             </div>
           </div>
@@ -359,7 +356,8 @@ export function RequestTradePointView({
                           setGeoQuery(e.target.value);
                         }}
                         onFocus={() => {
-                          if (suggestions.length > 0) setShowSuggestions(true);
+                          if (suggestions.length > 0 || hasSearched)
+                            setShowSuggestions(true);
                         }}
                         onBlur={() => {
                           setTimeout(() => setShowSuggestions(false), 200);
@@ -367,7 +365,10 @@ export function RequestTradePointView({
                       />
                       <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
                         {isGeocoding && (
-                          <Loader2 className="h-4 w-4 animate-spin text-primary/60" aria-label="Buscando endereço" />
+                          <Loader2
+                            className="h-4 w-4 animate-spin text-primary/60"
+                            aria-label="Buscando endereço"
+                          />
                         )}
                         <button
                           type="button"
@@ -384,29 +385,46 @@ export function RequestTradePointView({
                           )}
                         </button>
                       </div>
-                      {showSuggestions && suggestions.length > 0 && (
-                        <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-outline-variant/30 bg-surface-container-high shadow-lg">
-                          {suggestions.map((suggestion) => (
-                            <li key={suggestion.id}>
-                              <button
-                                type="button"
-                                className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm text-on-surface transition-colors hover:bg-surface-container-highest focus:bg-surface-container-highest focus:outline-none"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => {
-                                  const shortName = suggestion.displayName.split(",").slice(0, 3).join(",");
-                                  field.onChange(shortName);
-                                  setSelectedCoords({ lat: suggestion.lat, lng: suggestion.lng });
-                                  setShowSuggestions(false);
-                                  clearSuggestions();
-                                }}
-                              >
-                                <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-                                <span className="line-clamp-2">{suggestion.displayName}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {showSuggestions &&
+                        (suggestions.length > 0 || (hasSearched && !isGeocoding)) && (
+                          <ul
+                            role="listbox"
+                            className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-outline-variant/30 bg-surface-container-high shadow-lg animate-in fade-in-0 slide-in-from-top-2 duration-150"
+                          >
+                            {suggestions.length > 0 ? (
+                              suggestions.map((suggestion) => (
+                                <li key={suggestion.id} role="option">
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm text-on-surface transition-colors hover:bg-surface-container-highest focus:bg-surface-container-highest focus:outline-none"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      setSelectedCoords({
+                                        lat: suggestion.lat,
+                                        lng: suggestion.lng,
+                                      });
+                                      setShowSuggestions(false);
+                                      clearSuggestions();
+                                      toast.info(
+                                        "Posição aproximada. Arraste o marcador para o local exato.",
+                                        { duration: 4000 }
+                                      );
+                                    }}
+                                  >
+                                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                                    <span className="line-clamp-2">
+                                      {suggestion.displayName}
+                                    </span>
+                                  </button>
+                                </li>
+                              ))
+                            ) : (
+                              <li className="px-4 py-3 text-sm text-on-surface-variant">
+                                Nenhum resultado encontrado
+                              </li>
+                            )}
+                          </ul>
+                        )}
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -415,17 +433,22 @@ export function RequestTradePointView({
             />
 
             <div className="space-y-2">
-              <LocationPickerMap
-                lat={selectedCoords.lat}
-                lng={selectedCoords.lng}
-                onLocationChange={(lat, lng) => setSelectedCoords({ lat, lng })}
-              />
+              <div className="relative">
+                <LocationPickerMap
+                  lat={selectedCoords.lat}
+                  lng={selectedCoords.lng}
+                  onLocationChange={(lat, lng) => setSelectedCoords({ lat, lng })}
+                />
+                <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-2">
+                  <div className="flex items-center gap-1.5 rounded-full bg-surface-container/90 px-3 py-1.5 text-xs font-medium text-on-surface shadow-md backdrop-blur-sm">
+                    <MapPin className="h-3.5 w-3.5 text-primary" />
+                    Arraste o marcador para ajustar a posição
+                  </div>
+                </div>
+              </div>
               <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <MapPin className="h-4 w-4 flex-shrink-0 text-primary" />
                 <span>
                   {selectedCoords.lat.toFixed(5)}, {selectedCoords.lng.toFixed(5)}
-                  {" · "}
-                  <span className="text-outline">arraste o marcador para ajustar</span>
                 </span>
               </div>
             </div>
@@ -455,8 +478,8 @@ export function RequestTradePointView({
                 Foto de capa (opcional)
               </p>
               <p className="text-sm text-on-surface-variant">
-                Aparece no topo da página do ponto após aprovação. Prefira foto
-                do local em dia claro.
+                Aparece no topo da página do ponto após aprovação. Prefira foto do local
+                em dia claro.
               </p>
               <input
                 ref={coverInputRef}

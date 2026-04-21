@@ -25,6 +25,7 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<GeocodingSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,17 +39,22 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
       const trimmed = q.trim();
       if (trimmed.length < MIN_QUERY_LENGTH) {
         setSuggestions([]);
+        setHasSearched(false);
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
+      setHasSearched(false);
 
       const controller = new AbortController();
       abortRef.current = controller;
 
       try {
-        const queryParts = [trimmed];
+        // Remove street numbers from query - Nominatim works better without them
+        // Matches: "144", "1500-A", "23B" at end of string
+        const streetQuery = trimmed.replace(/\s+\d+[\w-]*\s*$/, "").trim();
+        const queryParts = [streetQuery || trimmed];
         if (cityBias) queryParts.push(cityBias);
         queryParts.push(countryBias);
 
@@ -80,6 +86,7 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
             displayName: item.display_name,
           }))
         );
+        setHasSearched(true);
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
           return;
@@ -120,6 +127,10 @@ export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") 
     setQuery,
     suggestions,
     isLoading,
-    clearSuggestions: () => setSuggestions([]),
+    hasSearched,
+    clearSuggestions: () => {
+      setSuggestions([]);
+      setHasSearched(false);
+    },
   };
 }
