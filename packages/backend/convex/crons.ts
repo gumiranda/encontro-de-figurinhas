@@ -10,6 +10,13 @@ crons.interval(
   {}
 );
 
+crons.interval(
+  "batch recompute matches",
+  { hours: 6 },
+  internal.matches.batchRecomputeMatches,
+  {}
+);
+
 crons.cron(
   "decay peakHours",
   "0 3 * * 1",

@@ -4,12 +4,12 @@
 User-agent: *
 Allow: /
 
-# Rotas autenticadas
-Disallow: /dashboard
-Disallow: /admin
-Disallow: /cadastrar-figurinhas
-Disallow: /album
+# Rotas autenticadas (matches, dashboard, cadastro rápido)
 Disallow: /matches
+Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
+Disallow: /admin
+Disallow: /album
 Disallow: /meus-pontos
 Disallow: /suggest-spot
 
@@ -25,35 +25,45 @@ Disallow: /api/
 # GPTBot (OpenAI/ChatGPT training)
 User-agent: GPTBot
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 
 # ChatGPT-User (ChatGPT browsing)
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 
 # ClaudeBot (Anthropic)
 User-agent: ClaudeBot
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 
 # anthropic-ai (Anthropic training)
 User-agent: anthropic-ai
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 
 # PerplexityBot
 User-agent: PerplexityBot
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 
@@ -65,7 +75,9 @@ Allow: /
 # Bingbot (Microsoft Copilot)
 User-agent: bingbot
 Allow: /
+Disallow: /matches
 Disallow: /dashboard
+Disallow: /cadastrar-figurinhas
 Disallow: /admin
 Disallow: /api/
 

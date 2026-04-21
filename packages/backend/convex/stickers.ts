@@ -1,12 +1,10 @@
 import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
 import { requireAuth } from "./lib/auth";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
-
-const MATCH_RECOMPUTE_DELAY_MS = 10_000;
+import { scheduleDebouncedMatchRecompute } from "./matches";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
@@ -137,11 +135,7 @@ export const updateStickerList = mutation({
 
     await ctx.db.patch(user._id, patch);
 
-    await ctx.scheduler.runAfter(
-      MATCH_RECOMPUTE_DELAY_MS,
-      internal.matches.recomputeMatchCache,
-      { userId: user._id }
-    );
+    await scheduleDebouncedMatchRecompute(ctx, user._id);
 
     return null;
   },
@@ -200,11 +194,7 @@ export const toggleSticker = mutation({
       lastActiveAt: Date.now(),
     });
 
-    await ctx.scheduler.runAfter(
-      MATCH_RECOMPUTE_DELAY_MS,
-      internal.matches.recomputeMatchCache,
-      { userId: user._id }
-    );
+    await scheduleDebouncedMatchRecompute(ctx, user._id);
 
     return { duplicates: nextDup, missing: nextMiss };
   },

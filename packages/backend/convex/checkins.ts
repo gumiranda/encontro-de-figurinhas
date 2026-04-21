@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, mutation } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth } from "./lib/auth";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
@@ -195,6 +195,73 @@ export const cancelMine = mutation({
     }
     await ctx.db.delete(active._id);
     return { ok: true as const, cancelled: true };
+  },
+});
+
+/** User IDs with an active, public check-in at each of the caller's trade points (max 20 per point). */
+export const listPresentAtMyPoints = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") return { present: [] as Id<"users">[] };
+
+    const now = Date.now();
+
+    const myMemberships = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
+      .collect();
+
+    const presentUserIds: Id<"users">[] = [];
+
+    for (const m of myMemberships) {
+      const checkins = await ctx.db
+        .query("checkins")
+        .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+          q
+            .eq("tradePointId", m.tradePointId)
+            .eq("countedInPublic", true)
+            .gt("expiresAt", now)
+        )
+        .take(20);
+
+      for (const c of checkins) {
+        if (c.userId !== auth.user._id) {
+          presentUserIds.push(c.userId);
+        }
+      }
+    }
+
+    return { present: presentUserIds };
+  },
+});
+
+/** Active check-in for share CTA + “estou no ponto” empty states. */
+export const getMyActiveCheckinSummary = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return { hasActiveCheckin: false as const, tradePointSlug: null };
+    }
+
+    const now = Date.now();
+    const active = await ctx.db
+      .query("checkins")
+      .withIndex("by_user_active", (q) =>
+        q.eq("userId", auth.user._id).gt("expiresAt", now)
+      )
+      .first();
+
+    if (!active) {
+      return { hasActiveCheckin: false as const, tradePointSlug: null };
+    }
+
+    const point = await ctx.db.get(active.tradePointId);
+    return {
+      hasActiveCheckin: true as const,
+      tradePointSlug: point?.slug ?? null,
+    };
   },
 });
 

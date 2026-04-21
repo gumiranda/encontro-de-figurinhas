@@ -6,7 +6,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { getAuthenticatedUser } from "./lib/auth";
+import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { haversine } from "./lib/geo";
 
 const PAGE_SIZE = 500;
@@ -30,6 +30,10 @@ type CachedMatch = {
   hasSpecial: boolean;
   otherAcceptsMail: boolean;
 };
+
+function roundDistanceKmHalf(km: number): number {
+  return Math.round(km * 2) / 2;
+}
 
 function bucketOf(meters: number | null): DistanceBucket {
   if (meters === null) return "unknown";
@@ -224,6 +228,253 @@ export const recomputeMatchCache = internalMutation({
       recomputeStartedAt: null,
       stale: false,
     });
+  },
+});
+
+const MATCH_RECOMPUTE_SCHEDULE_DEBOUNCE_MS = 5000;
+const MATCH_RECOMPUTE_RUN_AFTER_MS = 5000;
+
+/**
+ * Idempotent debounce: repeated sticker updates within 5s schedule at most one
+ * {@link recomputeForUser} run (5s after the first qualifying patch).
+ */
+export async function scheduleDebouncedMatchRecompute(
+  ctx: MutationCtx,
+  userId: Id<"users">
+): Promise<void> {
+  const user = await ctx.db.get(userId);
+  if (!user) return;
+  const now = Date.now();
+  const lastScheduled = user.matchRecomputeScheduledAt ?? 0;
+  if (now - lastScheduled < MATCH_RECOMPUTE_SCHEDULE_DEBOUNCE_MS) {
+    return;
+  }
+  await ctx.db.patch(userId, { matchRecomputeScheduledAt: now });
+  await ctx.scheduler.runAfter(
+    MATCH_RECOMPUTE_RUN_AFTER_MS,
+    internal.matches.recomputeForUser,
+    { userId }
+  );
+}
+
+/** Scheduled after sticker-list changes (debounced). Kicks legacy cache; precomputedMatches fill lives here later. */
+export const recomputeForUser = internalMutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    await ctx.scheduler.runAfter(0, internal.matches.recomputeMatchCache, {
+      userId,
+    });
+  },
+});
+
+const BATCH_RECOMPUTE_ACTIVE_WINDOW_MS = 6 * 60 * 60 * 1000;
+/**
+ * When active users (last 6h) exceed this count, we only fan out per-city jobs — never one
+ * mutation that schedules everyone — so we stay within mutation time/write limits.
+ */
+const BATCH_RECOMPUTE_PARTITION_THRESHOLD = 1000;
+const BATCH_RECOMPUTE_PAGE_SIZE = 200;
+
+function userQualifiesForBatchRecompute(
+  u: Doc<"users">,
+  cutoff: number
+): boolean {
+  return (
+    u.cityId != null &&
+    u.hasCompletedStickerSetup === true &&
+    u.isBanned !== true &&
+    u.lastActiveAt != null &&
+    u.lastActiveAt >= cutoff
+  );
+}
+
+async function countActiveUsersInCity(
+  ctx: MutationCtx,
+  cityId: Id<"cities">,
+  cutoff: number
+): Promise<number> {
+  let count = 0;
+  let cursor: string | null = null;
+  for (;;) {
+    const page = await ctx.db
+      .query("users")
+      .withIndex("by_city", (q) => q.eq("cityId", cityId))
+      .paginate({ numItems: BATCH_RECOMPUTE_PAGE_SIZE, cursor });
+    for (const u of page.page) {
+      if (userQualifiesForBatchRecompute(u, cutoff)) count += 1;
+    }
+    if (page.isDone) break;
+    cursor = page.continueCursor;
+  }
+  return count;
+}
+
+/**
+ * Cron: refresh match caches for users active in the last 6h.
+ * If active user count exceeds {@link BATCH_RECOMPUTE_PARTITION_THRESHOLD}, fans out one
+ * continuation per city (partition by `cityId`) to stay within mutation time/write limits.
+ */
+export const batchRecomputeMatches = internalMutation({
+  args: {
+    cityId: v.optional(v.id("cities")),
+    cursor: v.optional(v.union(v.string(), v.null())),
+  },
+  handler: async (ctx, { cityId, cursor }) => {
+    const cutoff = Date.now() - BATCH_RECOMPUTE_ACTIVE_WINDOW_MS;
+
+    if (cityId !== undefined) {
+      const page = await ctx.db
+        .query("users")
+        .withIndex("by_city", (q) => q.eq("cityId", cityId))
+        .paginate({ numItems: BATCH_RECOMPUTE_PAGE_SIZE, cursor: cursor ?? null });
+
+      let scheduled = 0;
+      for (const u of page.page) {
+        if (!userQualifiesForBatchRecompute(u, cutoff)) continue;
+        await ctx.scheduler.runAfter(0, internal.matches.recomputeForUser, {
+          userId: u._id,
+        });
+        scheduled += 1;
+      }
+
+      if (!page.isDone) {
+        await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
+          cityId,
+          cursor: page.continueCursor,
+        });
+      }
+
+      return {
+        mode: "city" as const,
+        scheduledInPage: scheduled,
+        done: page.isDone,
+      };
+    }
+
+    const cities = await ctx.db.query("cities").collect();
+
+    let totalActive = 0;
+    const cityCounts = new Map<Id<"cities">, number>();
+    for (const city of cities) {
+      const n = await countActiveUsersInCity(ctx, city._id, cutoff);
+      cityCounts.set(city._id, n);
+      totalActive += n;
+    }
+
+    if (totalActive === 0) {
+      return {
+        mode: "scan" as const,
+        totalActive,
+        partitionedByCity: false,
+      };
+    }
+
+    const partitionedByCity = totalActive > BATCH_RECOMPUTE_PARTITION_THRESHOLD;
+
+    for (const city of cities) {
+      const n = cityCounts.get(city._id) ?? 0;
+      if (n === 0) continue;
+      await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
+        cityId: city._id,
+      });
+    }
+
+    return { mode: "scan" as const, totalActive, partitionedByCity };
+  },
+});
+
+export type ListMyMatchRow = {
+  matchedUserId: Id<"users">;
+  displayNickname: string;
+  /** Stable, non-sensitive seed for generated avatars (e.g. Kibo). */
+  avatarSeed: string;
+  albumCompletionPct: number;
+  confirmedTradesCount: number;
+  theyHaveINeed: number[];
+  iHaveTheyNeed: number[];
+  isBidirectional: boolean;
+  distanceKm: number;
+  layer: 1 | 2;
+  tradePointId: Id<"tradePoints">;
+};
+
+const MATCH_STICKER_SAMPLE = 5;
+
+/**
+ * Precomputed matches for the "Encontrar trocas" UI. Filters on the server only.
+ * Never returns whatsappLink, clerkId, reliabilityScore, reportCount, or pushSubscription.
+ */
+export const listMyMatches = query({
+  args: {
+    layer: v.union(v.literal(1), v.literal(2), v.null()),
+    bidirectionalOnly: v.boolean(),
+  },
+  handler: async (ctx, args): Promise<{ matches: ListMyMatchRow[] }> => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return { matches: [] };
+    }
+
+    const userId = auth.user._id;
+    const layers: (1 | 2)[] = args.layer === null ? [1, 2] : [args.layer];
+
+    const rows: Doc<"precomputedMatches">[] = [];
+    for (const layer of layers) {
+      const chunk = args.bidirectionalOnly
+        ? await ctx.db
+            .query("precomputedMatches")
+            .withIndex("by_user_layer_bidirectional", (q) =>
+              q
+                .eq("userId", userId)
+                .eq("layer", layer)
+                .eq("isBidirectional", true)
+            )
+            .collect()
+        : await ctx.db
+            .query("precomputedMatches")
+            .withIndex("by_user_layer", (q) =>
+              q.eq("userId", userId).eq("layer", layer)
+            )
+            .collect();
+      rows.push(...chunk);
+    }
+
+    rows.sort((a, b) => {
+      if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+      return b.computedAt - a.computedAt;
+    });
+
+    const matchedIds = [...new Set(rows.map((r) => r.matchedUserId))];
+    const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
+    const otherById = new Map(
+      others
+        .filter((u): u is Doc<"users"> => u !== null)
+        .map((u) => [u._id, u])
+    );
+
+    const matches: ListMyMatchRow[] = [];
+    for (const r of rows) {
+      const other = otherById.get(r.matchedUserId);
+      if (!other) continue;
+      if (other.isBanned === true || other.isShadowBanned === true) continue;
+
+      matches.push({
+        matchedUserId: r.matchedUserId,
+        displayNickname:
+          other.displayNickname ?? other.nickname ?? other.name,
+        avatarSeed: r.matchedUserId,
+        albumCompletionPct: other.albumProgress ?? 0,
+        confirmedTradesCount: other.totalTrades ?? 0,
+        theyHaveINeed: r.theyHaveINeed.slice(0, MATCH_STICKER_SAMPLE),
+        iHaveTheyNeed: r.iHaveTheyNeed.slice(0, MATCH_STICKER_SAMPLE),
+        isBidirectional: r.isBidirectional,
+        distanceKm: roundDistanceKmHalf(r.distanceKm),
+        layer: r.layer,
+        tradePointId: r.tradePointId,
+      });
+    }
+
+    return { matches };
   },
 });
 

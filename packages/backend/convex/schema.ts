@@ -85,6 +85,7 @@ export default defineSchema({
     hasSeenSafetyTips: v.optional(v.boolean()),
     isPremium: v.optional(v.boolean()),
     lastActiveAt: v.optional(v.number()),
+    matchRecomputeScheduledAt: v.optional(v.number()),
     createdAt: v.optional(v.number()),
     warningCount: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
@@ -189,6 +190,12 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_active", ["userId", "expiresAt"])
     .index("by_user_tradePoint_active", ["userId", "tradePointId", "expiresAt"])
+    // eq(tradePointId) + eq(countedInPublic) + range(expiresAt) — order required by Convex
+    .index("by_tradePoint_expiresAt_countedInPublic", [
+      "tradePointId",
+      "countedInPublic",
+      "expiresAt",
+    ])
     .index("by_expiresAt", ["expiresAt"]),
 
   scoreBumps: defineTable({
@@ -234,6 +241,23 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_city", ["cityId"]),
+
+  precomputedMatches: defineTable({
+    userId: v.id("users"),
+    matchedUserId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    theyHaveINeed: v.array(v.number()),
+    iHaveTheyNeed: v.array(v.number()),
+    isBidirectional: v.boolean(),
+    distanceKm: v.float64(),
+    layer: v.union(v.literal(1), v.literal(2)),
+    matchScore: v.number(),
+    computedAt: v.number(),
+  })
+    .index("by_user_layer", ["userId", "layer"])
+    .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])
+    .index("by_user_point", ["userId", "tradePointId"])
+    .index("by_matchedUser", ["matchedUserId"]),
 
   blogPosts: defineTable({
     title: v.string(),

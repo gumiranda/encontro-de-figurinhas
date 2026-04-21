@@ -17,3 +17,6 @@ export function useDebounce<T>(value: T, delay: number): T {
 
   return debouncedValue;
 }
+
+/** Alias for the same debounce behavior (e.g. filter state → Convex query args). */
+export const useDebouncedValue = useDebounce;
