@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import {
   query,
   internalMutation,
@@ -9,8 +9,79 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
+import {
+  MINOR_APPROACH_EXTRA_MIN,
+  REPORT_DEDUP_MS,
+  SAFETY_CATEGORIES,
+  countExtraStickersOwned,
+  reportCategoryValidator,
+  tradePointReportTargetKey,
+} from "./lib/reportCategories";
 import { generateTradePointSlug } from "./lib/slug";
 import { evaluateWhatsappAccess } from "./lib/whatsapp";
+
+const NON_PUBLIC_TRADE_POINT_STATUSES = new Set<string>([
+  "cancelled",
+  "suspended",
+  "inactive",
+]);
+
+const getByIdWhatsappValidator = v.union(
+  v.object({ state: v.literal("ok"), link: v.string() }),
+  v.object({ state: v.literal("blocked-link-invalid") }),
+  v.object({ state: v.literal("blocked-minor") }),
+  v.object({ state: v.literal("blocked-not-participant") })
+);
+
+const getByIdReadyPointValidator = v.object({
+  _id: v.id("tradePoints"),
+  name: v.string(),
+  slug: v.string(),
+  address: v.string(),
+  lat: v.float64(),
+  lng: v.float64(),
+  latitude: v.float64(),
+  longitude: v.float64(),
+  suggestedHours: v.optional(v.string()),
+  description: v.optional(v.string()),
+  confidenceScore: v.float64(),
+  lastActivityAt: v.number(),
+  confirmedTradesCount: v.number(),
+  peakHours: v.optional(v.array(v.number())),
+});
+
+const getByIdReturnsValidator = v.union(
+  v.object({ state: v.literal("needs-auth") }),
+  v.object({ state: v.literal("banned") }),
+  v.object({ state: v.literal("needs-onboarding") }),
+  v.object({ state: v.literal("not-found") }),
+  v.object({
+    state: v.literal("pending-owner"),
+    point: v.object({
+      name: v.string(),
+      createdAt: v.number(),
+    }),
+  }),
+  v.object({
+    state: v.literal("expired-owner"),
+    point: v.object({
+      name: v.string(),
+    }),
+  }),
+  v.object({
+    state: v.literal("ready"),
+    point: getByIdReadyPointValidator,
+    city: v.union(
+      v.null(),
+      v.object({ name: v.string(), slug: v.string() })
+    ),
+    participantCount: v.number(),
+    isParticipant: v.boolean(),
+    activeCheckinsCount: v.number(),
+    hasActiveCheckin: v.boolean(),
+    whatsapp: getByIdWhatsappValidator,
+  })
+);
 
 const RELIABILITY_UNLIMITED_THRESHOLD = 5;
 const MAX_PENDING_SUBMISSIONS = 2;
@@ -80,6 +151,7 @@ export const getMapView = query({
 
 export const getById = query({
   args: { id: v.id("tradePoints") },
+  returns: getByIdReturnsValidator,
   handler: async (ctx, { id }) => {
     const auth = await checkAuth(ctx);
     if (auth.state === "needs-auth") return { state: "needs-auth" as const };
@@ -90,7 +162,37 @@ export const getById = query({
 
     const user = auth.user;
     const point = await ctx.db.get(id);
-    if (!point || point.status !== "approved") {
+    if (!point) {
+      return { state: "not-found" as const };
+    }
+
+    if (NON_PUBLIC_TRADE_POINT_STATUSES.has(point.status)) {
+      return { state: "not-found" as const };
+    }
+
+    const isOwner = point.requestedBy === user._id;
+
+    if (point.status === "pending") {
+      if (isOwner) {
+        return {
+          state: "pending-owner" as const,
+          point: { name: point.name, createdAt: point.createdAt },
+        };
+      }
+      return { state: "not-found" as const };
+    }
+
+    if (point.status === "expired") {
+      if (isOwner) {
+        return {
+          state: "expired-owner" as const,
+          point: { name: point.name },
+        };
+      }
+      return { state: "not-found" as const };
+    }
+
+    if (point.status !== "approved") {
       return { state: "not-found" as const };
     }
 
@@ -111,14 +213,21 @@ export const getById = query({
       )
       .first());
 
+    const whatsapp = isParticipant
+      ? evaluateWhatsappAccess(user, point)
+      : ({ state: "blocked-not-participant" as const });
+
     return {
       state: "ready" as const,
       point: {
         _id: point._id,
         name: point.name,
+        slug: point.slug,
         address: point.address,
         lat: point.lat,
         lng: point.lng,
+        latitude: point.lat,
+        longitude: point.lng,
         suggestedHours: point.suggestedHours,
         description: point.description,
         confidenceScore: point.confidenceScore,
@@ -131,8 +240,37 @@ export const getById = query({
       isParticipant,
       activeCheckinsCount: point.activeCheckinsCount ?? 0,
       hasActiveCheckin,
-      whatsapp: evaluateWhatsappAccess(user, point),
+      whatsapp,
     };
+  },
+});
+
+export const cancelPendingPoint = mutation({
+  args: { tradePointId: v.id("tradePoints") },
+  returns: v.object({ ok: v.boolean() }),
+  handler: async (ctx, { tradePointId }) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      throw new ConvexError(auth.state);
+    }
+    const user = auth.user;
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.requestedBy !== user._id) {
+      throw new ConvexError("forbidden");
+    }
+    if (point.status !== "pending") {
+      throw new ConvexError("invalid-status");
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(tradePointId, {
+      status: "cancelled",
+      cancelledAt: now,
+    });
+    await decrementPendingCount(ctx, user._id);
+
+    return { ok: true as const };
   },
 });
 
@@ -231,7 +369,6 @@ export const submitRequest = mutation({
       confidenceScore: 0,
       lastActivityAt: now,
       confirmedTradesCount: 0,
-      reportCount: 0,
       createdAt: now,
       participantCount: 0,
       activeCheckinsCount: 0,
@@ -243,6 +380,86 @@ export const submitRequest = mutation({
     });
 
     return { ok: true as const, tradePointId };
+  },
+});
+
+export const submitReport = mutation({
+  args: {
+    tradePointId: v.id("tradePoints"),
+    category: reportCategoryValidator,
+    description: v.optional(v.string()),
+  },
+  returns: v.object({ ok: v.boolean() }),
+  handler: async (ctx, args) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      throw new ConvexError(auth.state);
+    }
+    const user = auth.user;
+
+    if (user.isShadowBanned === true) {
+      return { ok: true as const };
+    }
+
+    if (Math.floor(user.reliabilityScore) < 2) {
+      throw new ConvexError("reliability-too-low");
+    }
+
+    const point = await ctx.db.get(args.tradePointId);
+    if (!point || point.status !== "approved") {
+      throw new ConvexError("point-not-reportable");
+    }
+
+    const targetKey = tradePointReportTargetKey(args.tradePointId);
+    const cutoff = Date.now() - REPORT_DEDUP_MS;
+    const recentDuplicate = await ctx.db
+      .query("reports")
+      .withIndex("by_reporter_target_recent", (q) =>
+        q
+          .eq("reporterId", user._id)
+          .eq("targetKey", targetKey)
+          .gte("createdAt", cutoff)
+      )
+      .first();
+    if (recentDuplicate) {
+      throw new ConvexError("already-reported");
+    }
+
+    if (args.category === "minor_approach") {
+      const extraOwned = await countExtraStickersOwned(ctx, user);
+      if (Math.floor(extraOwned) < MINOR_APPROACH_EXTRA_MIN) {
+        throw new ConvexError("minor-approach-extra-requirement");
+      }
+    }
+
+    const now = Date.now();
+    const description =
+      args.description === undefined
+        ? undefined
+        : args.description.trim() || undefined;
+    await ctx.db.insert("reports", {
+      reporterId: user._id,
+      tradePointId: args.tradePointId,
+      targetKey,
+      category: args.category,
+      description,
+      status: "open",
+      isResolved: false,
+      createdAt: now,
+    });
+
+    if (args.category === "minor_approach") {
+      await ctx.db.patch(args.tradePointId, { requiresAdminReview: true });
+    }
+
+    const safetyLiterals = SAFETY_CATEGORIES as readonly string[];
+    if (safetyLiterals.includes(args.category)) {
+      await ctx.scheduler.runAfter(0, internal.reports.evaluateAutoAction, {
+        tradePointId: args.tradePointId,
+      });
+    }
+
+    return { ok: true as const };
   },
 });
 
@@ -568,7 +785,6 @@ export const seedForCity = internalMutation({
         confidenceScore: 6 + Math.random() * 3.5,
         lastActivityAt: now,
         confirmedTradesCount: Math.floor(Math.random() * 20),
-        reportCount: 0,
         createdAt: now,
         participantCount: 0,
         activeCheckinsCount: 0,

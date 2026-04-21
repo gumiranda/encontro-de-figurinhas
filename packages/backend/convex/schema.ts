@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { reportCategoryValidator } from "./lib/reportCategories";
 
 const distanceBucketValidator = v.union(
   v.literal("near"),
@@ -85,6 +86,7 @@ export default defineSchema({
     isPremium: v.optional(v.boolean()),
     lastActiveAt: v.optional(v.number()),
     createdAt: v.optional(v.number()),
+    warningCount: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
 
     locationSource: v.optional(
@@ -136,15 +138,19 @@ export default defineSchema({
       v.literal("approved"),
       v.literal("suspended"),
       v.literal("inactive"),
-      v.literal("expired")
+      v.literal("expired"),
+      v.literal("cancelled")
     ),
+    cancelledAt: v.optional(v.number()),
+    suspendedFromReportsAt: v.optional(v.number()),
+    lastSuspensionReason: v.optional(v.string()),
+    requiresAdminReview: v.optional(v.boolean()),
     rejectionReason: v.optional(v.string()),
     requestedBy: v.id("users"),
     confidenceScore: v.float64(),
     lastActivityAt: v.number(),
     peakHours: v.optional(v.array(v.number())),
     confirmedTradesCount: v.number(),
-    reportCount: v.number(),
     createdAt: v.number(),
     participantCount: v.optional(v.number()),
     activeCheckinsCount: v.optional(v.number()),
@@ -252,6 +258,32 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_status_publishedAt", ["status", "publishedAt"])
     .index("by_category_status", ["category", "status"]),
+
+  reports: defineTable({
+    reporterId: v.id("users"),
+    targetUserId: v.optional(v.id("users")),
+    tradePointId: v.optional(v.id("tradePoints")),
+    targetKey: v.string(),
+    category: reportCategoryValidator,
+    description: v.optional(v.string()),
+    status: v.union(
+      v.literal("open"),
+      v.literal("reviewing"),
+      v.literal("resolved"),
+      v.literal("dismissed")
+    ),
+    isResolved: v.boolean(),
+    resolvedAt: v.optional(v.number()),
+    adminNotes: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_reporter_target_recent", [
+      "reporterId",
+      "targetKey",
+      "createdAt",
+    ])
+    .index("by_target_category_recent", ["targetKey", "category", "createdAt"])
+    .index("by_target_unresolved", ["targetKey", "isResolved", "createdAt"]),
 
   siteStats: defineTable({
     matchRecomputeEnabled: v.optional(v.boolean()),

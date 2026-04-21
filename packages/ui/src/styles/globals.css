@@ -53,6 +53,8 @@
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.475rem;
+  --whatsapp-brand: #25d366;
+  --whatsapp-brand-dark: #128c7e;
 
   /* MD3 Surface Colors (light mode fallbacks) */
   --surface-dim: oklch(0.95 0 0);

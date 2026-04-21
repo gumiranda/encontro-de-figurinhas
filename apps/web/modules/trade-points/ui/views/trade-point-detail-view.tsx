@@ -47,6 +47,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
   }
   if (data.state === "banned") return <BannedState />;
   if (data.state === "not-found") notFound();
+  if (data.state !== "ready") notFound();
 
   const {
     point,
@@ -103,6 +104,10 @@ export function TradePointDetailView({ tradePointId }: Props) {
         address={point.address}
         suggestedHours={point.suggestedHours}
         cityName={city?.name ?? null}
+        confidenceScore={point.confidenceScore}
+        activeCheckinsCount={activeCheckinsCount}
+        lastActivityAt={point.lastActivityAt}
+        participantCount={participantCount}
       />
 
       <div className="px-4">
@@ -114,8 +119,6 @@ export function TradePointDetailView({ tradePointId }: Props) {
           tradePointId={point._id}
           isParticipant={isParticipant}
           hasActiveCheckin={hasActiveCheckin}
-          activeCheckinsCount={activeCheckinsCount}
-          participantCount={participantCount}
           pointLat={point.lat}
           pointLng={point.lng}
         />

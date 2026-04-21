@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useId, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -11,75 +11,121 @@ import { Text } from "@workspace/ui/components/typography";
 import { cn } from "@workspace/ui/lib/utils";
 
 type PeakHoursChartProps = {
-  peakHours: number[] | undefined;
+  peakHours: number[] | null | undefined;
 };
+
+function normalizePeakHours(peakHours: number[] | null | undefined): number[] {
+  return Array.from({ length: 24 }, (_, i) =>
+    Math.max(0, Math.floor(peakHours?.[i] ?? 0))
+  );
+}
 
 export const PeakHoursChart = memo(function PeakHoursChart({
   peakHours,
 }: PeakHoursChartProps) {
-  if (!peakHours || peakHours.length === 0) {
+  const chartLabelId = useId();
+
+  const safeHours = useMemo(
+    () => normalizePeakHours(peakHours),
+    [peakHours]
+  );
+
+  const max = useMemo(
+    () => Math.max(1, ...safeHours),
+    [safeHours]
+  );
+
+  const peakValue = useMemo(
+    () => safeHours.reduce((a, b) => Math.max(a, b), 0),
+    [safeHours]
+  );
+
+  const hasNoData =
+    peakHours === null ||
+    peakHours === undefined ||
+    safeHours.every((v) => v === 0);
+
+  if (hasNoData) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Horários movimentados</CardTitle>
         </CardHeader>
         <CardContent>
-          <Text variant="small" className="text-muted-foreground">
-            Sem dados de movimento ainda. Faça check-in para ajudar a comunidade.
-          </Text>
+          <p className="text-sm text-muted-foreground">Sem dados ainda.</p>
         </CardContent>
       </Card>
     );
   }
 
-  const max = Math.max(...peakHours, 1);
-  const peakHour = peakHours.indexOf(Math.max(...peakHours));
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Horários movimentados</CardTitle>
-        {max > 0 && (
+        {peakValue > 0 && (
           <Text variant="small" className="text-muted-foreground">
-            Pico às {peakHour.toString().padStart(2, "0")}h
+            Pico:{" "}
+            {safeHours
+              .map((v, h) => (v === peakValue ? h : -1))
+              .filter((h) => h >= 0)
+              .map((h) => `${h}h`)
+              .join(", ")}
           </Text>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-2">
+        <span id={chartLabelId} className="sr-only">
+          Distribuição de check-ins por hora
+        </span>
         <div
-          className="grid h-32 items-end gap-0.5"
-          style={{ gridTemplateColumns: `repeat(${peakHours.length}, 1fr)` }}
           role="img"
-          aria-label={`Heatmap de horários movimentados, pico às ${peakHour}h`}
+          aria-labelledby={chartLabelId}
+          className="grid h-36 items-end gap-0.5"
+          style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}
         >
-          {peakHours.map((value, hour) => {
-            const intensity = max > 0 ? value / max : 0;
-            const isPeak = value === max && value > 0;
+          {safeHours.map((value, hour) => {
+            const isPeak = value > 0 && value === peakValue;
+            const overHalf = value > max * 0.5;
+            const barColorClass = isPeak
+              ? "bg-secondary"
+              : overHalf
+                ? "bg-primary-dim"
+                : "bg-surface-container-highest";
+
+            const pct = max > 0 ? (value / max) * 100 : 0;
+            const heightPct = value > 0 ? Math.max(pct, 8) : 4;
+
+            const label = `${hour} horas, ${value} check-in${value === 1 ? "" : "s"}`;
+
             return (
               <div
                 key={hour}
-                className="flex flex-col items-center justify-end"
-                title={`${hour.toString().padStart(2, "0")}h: ${value} check-ins`}
+                className="flex h-full min-h-0 flex-col justify-end"
               >
                 <div
                   className={cn(
                     "w-full rounded-t-sm transition-colors",
-                    isPeak ? "bg-secondary" : "bg-primary/60"
+                    barColorClass
                   )}
-                  style={{ height: `${Math.max(intensity * 100, value > 0 ? 8 : 2)}%` }}
+                  style={{
+                    height: `${heightPct}%`,
+                    minHeight: value > 0 ? 4 : 2,
+                  }}
+                  title={`${hour.toString().padStart(2, "0")}h — ${value} check-ins`}
+                  aria-label={label}
                 />
               </div>
             );
           })}
         </div>
         <div
-          className="mt-1 grid gap-0.5 text-[10px] text-muted-foreground"
-          style={{ gridTemplateColumns: `repeat(${peakHours.length}, 1fr)` }}
+          className="grid gap-0.5 text-[10px] text-muted-foreground"
+          style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}
           aria-hidden="true"
         >
-          {peakHours.map((_, hour) => (
-            <span key={hour} className="text-center">
-              {hour % 3 === 0 ? hour : ""}
+          {safeHours.map((_, hour) => (
+            <span key={hour} className="min-w-0 truncate text-center">
+              {hour % 3 === 0 ? `${hour}h` : ""}
             </span>
           ))}
         </div>
