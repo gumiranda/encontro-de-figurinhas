@@ -18,7 +18,7 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const DEBOUNCE_MS = 600;
 const MIN_QUERY_LENGTH = 5;
 
-export function useNominatimGeocoder(countryBias = "Brazil") {
+export function useNominatimGeocoder(cityBias?: string, countryBias = "Brazil") {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<GeocodingResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,8 +47,12 @@ export function useNominatimGeocoder(countryBias = "Brazil") {
       abortRef.current = controller;
 
       try {
+        const queryParts = [trimmed];
+        if (cityBias) queryParts.push(cityBias);
+        queryParts.push(countryBias);
+
         const params = new URLSearchParams({
-          q: `${trimmed}, ${countryBias}`,
+          q: queryParts.join(", "),
           format: "json",
           limit: "1",
           addressdetails: "0",
@@ -89,7 +93,7 @@ export function useNominatimGeocoder(countryBias = "Brazil") {
         setIsLoading(false);
       }
     },
-    [countryBias]
+    [cityBias, countryBias]
   );
 
   useEffect(() => {

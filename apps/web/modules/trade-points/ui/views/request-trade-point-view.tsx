@@ -16,7 +16,6 @@ import { Button } from "@workspace/ui/components/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -129,7 +128,7 @@ export function RequestTradePointView({
     setQuery: setGeoQuery,
     result: geoResult,
     isLoading: isGeocoding,
-  } = useNominatimGeocoder();
+  } = useNominatimGeocoder(cityLabel);
 
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number }>({
     lat: defaultLat,
