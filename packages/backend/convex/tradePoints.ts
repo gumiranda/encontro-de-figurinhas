@@ -470,14 +470,22 @@ export const getSubmissionQuota = query({
     if (!user) return null;
     const unlimited =
       user.reliabilityScore >= RELIABILITY_UNLIMITED_THRESHOLD;
+    const remaining = unlimited
+      ? MAX_PENDING_SUBMISSIONS
+      : Math.max(
+          0,
+          MAX_PENDING_SUBMISSIONS - user.pendingSubmissionsCount
+        );
+
+    const tier =
+      unlimited || remaining === MAX_PENDING_SUBMISSIONS
+        ? ("available" as const)
+        : remaining > 0
+          ? ("limited" as const)
+          : ("blocked" as const);
+
     return {
-      remaining: unlimited
-        ? MAX_PENDING_SUBMISSIONS
-        : Math.max(
-            0,
-            MAX_PENDING_SUBMISSIONS - user.pendingSubmissionsCount
-          ),
-      limit: MAX_PENDING_SUBMISSIONS,
+      tier,
       unlimited,
       lastSubmissionAt: user.lastSubmissionAt ?? null,
     };

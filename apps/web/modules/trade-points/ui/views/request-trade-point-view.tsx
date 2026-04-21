@@ -23,35 +23,17 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { Heading, Text } from "@workspace/ui/components/typography";
+import { Text } from "@workspace/ui/components/typography";
 import {
-  Announcement,
-  AnnouncementTitle,
-  AnnouncementTag,
-} from "@workspace/ui/components/kibo-ui/announcement";
-import {
-  Choicebox,
-  ChoiceboxItem,
-  ChoiceboxItemHeader,
-  ChoiceboxItemTitle,
-  ChoiceboxIndicator,
-} from "@workspace/ui/components/kibo-ui/choicebox";
+  Banner,
+  BannerIcon,
+  BannerTitle,
+} from "@workspace/ui/components/kibo-ui/banner";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { useGeolocation } from "@/modules/location/lib/use-geolocation";
 import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
 import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
 import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
-
-const HOUR_OPTIONS = [
-  { value: "manhas", label: "Manhãs" },
-  { value: "tardes", label: "Tardes" },
-  { value: "noites", label: "Noites" },
-  { value: "fins-de-semana", label: "Fins de semana" },
-] as const;
-
-const HOUR_LABEL_BY_VALUE = Object.fromEntries(
-  HOUR_OPTIONS.map((o) => [o.value, o.label])
-) as Record<string, string>;
 
 const formSchema = z.object({
   name: z
@@ -60,9 +42,8 @@ const formSchema = z.object({
     .max(120, "Máximo 120 caracteres"),
   address: z
     .string()
-    .min(5, "Descreva o endereço com mais detalhes")
+    .min(5, "Descreva o endereço")
     .max(300, "Máximo 300 caracteres"),
-  suggestedHours: z.string().optional(),
   description: z.string().max(500).optional(),
   whatsappLink: z
     .string()
@@ -70,7 +51,7 @@ const formSchema = z.object({
     .optional()
     .refine(
       (val) => !val?.trim() || /^https:\/\//i.test(val.trim()),
-      "O link deve começar com https://"
+      "Link deve começar com https://"
     ),
 });
 
@@ -82,6 +63,9 @@ type Props = {
   defaultLat: number;
   defaultLng: number;
 };
+
+const fieldInputClass =
+  "h-14 rounded-xl border-none bg-surface-container-highest px-5 text-on-surface placeholder:text-outline focus-visible:ring-2 focus-visible:ring-primary/40";
 
 export function RequestTradePointView({
   cityId,
@@ -125,7 +109,6 @@ export function RequestTradePointView({
     defaultValues: {
       name: "",
       address: "",
-      suggestedHours: "",
       description: "",
       whatsappLink: "",
     },
@@ -134,9 +117,6 @@ export function RequestTradePointView({
   async function onSubmit(data: FormValues) {
     const description = data.description?.trim();
     const whatsappLink = data.whatsappLink?.trim();
-    const suggestedHoursLabel = data.suggestedHours
-      ? (HOUR_LABEL_BY_VALUE[data.suggestedHours] ?? undefined)
-      : undefined;
 
     const result = await submitRequest({
       name: data.name.trim(),
@@ -144,14 +124,13 @@ export function RequestTradePointView({
       cityId,
       lat: effectiveCoords.lat,
       lng: effectiveCoords.lng,
-      suggestedHours: suggestedHoursLabel,
       description: description || undefined,
       whatsappLink: whatsappLink || undefined,
     });
 
     if (result.ok) {
       toast.success("Sugestão enviada — análise em 24 a 48 horas.");
-      router.push("/map");
+      router.push("/meus-pontos");
       return;
     }
 
@@ -191,38 +170,43 @@ export function RequestTradePointView({
     <div className="flex min-h-[100dvh] flex-col">
       <QuotaBanner />
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-8 px-4 pb-24 pt-[max(theme(spacing.4),env(safe-area-inset-top))]">
-        <header className="flex items-center">
-          <Button variant="ghost" size="icon" asChild aria-label="Voltar">
-            <Link href="/map">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-        </header>
-
-        <section className="space-y-3">
-          <Heading level={1} className="text-4xl text-primary md:text-5xl">
-            Amplie o Campo de Jogo.
-          </Heading>
+        <div className="space-y-3">
+          <header className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild aria-label="Voltar">
+              <Link href="/map">
+                <ArrowLeft className="h-5 w-5 text-primary" />
+              </Link>
+            </Button>
+            <h1 className="font-headline text-xl font-bold tracking-tight text-primary">
+              Sugerir Arena
+            </h1>
+          </header>
           <Text variant="muted" className="text-base">
             Ajude a comunidade a encontrar novos pontos de troca seguros e
             movimentados em {cityLabel}.
           </Text>
-        </section>
+        </div>
 
-        <Announcement className="w-full items-start justify-start gap-3 rounded-xl bg-primary/5 p-4 ring-1 ring-inset ring-primary/20">
-          <AnnouncementTag>
-            <TriangleAlert className="h-4 w-4" aria-hidden="true" />
-          </AnnouncementTag>
-          <div className="flex flex-col gap-1 text-left">
-            <AnnouncementTitle className="text-xs uppercase tracking-widest text-primary">
-              Orientação de segurança
-            </AnnouncementTitle>
-            <Text variant="small" className="font-normal">
-              Escolha apenas locais públicos e movimentados como shoppings,
-              praças de alimentação e parques.
-            </Text>
+        <Banner
+          inset
+          className="flex-col items-start gap-3 rounded-xl border-l-4 border-secondary/50 bg-surface-container-high p-4 text-on-surface shadow-lg"
+        >
+          <div className="flex items-start gap-3">
+            <BannerIcon
+              icon={TriangleAlert}
+              className="border-secondary/20 bg-secondary/10 text-secondary"
+            />
+            <div className="flex flex-col gap-1">
+              <BannerTitle className="font-headline flex-none text-xs font-bold uppercase tracking-widest text-secondary">
+                Orientação de Segurança
+              </BannerTitle>
+              <Text variant="small" className="font-normal text-on-surface">
+                Escolha apenas locais públicos e movimentados como shoppings ou
+                praças de alimentação.
+              </Text>
+            </div>
           </div>
-        </Announcement>
+        </Banner>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -231,9 +215,12 @@ export function RequestTradePointView({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do local</FormLabel>
+                  <FormLabel className="font-headline text-xs font-bold uppercase tracking-widest text-primary-dim">
+                    Nome do Local
+                  </FormLabel>
                   <FormControl>
                     <Input
+                      className={fieldInputClass}
                       placeholder="Ex.: Shopping Arena Central"
                       autoComplete="off"
                       {...field}
@@ -249,11 +236,13 @@ export function RequestTradePointView({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Endereço</FormLabel>
+                  <FormLabel className="font-headline text-xs font-bold uppercase tracking-widest text-primary-dim">
+                    Endereço
+                  </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        className="pr-12"
+                        className={`${fieldInputClass} pr-12`}
                         placeholder="Rua, número, bairro, referências"
                         autoComplete="street-address"
                         {...field}
@@ -286,48 +275,16 @@ export function RequestTradePointView({
 
             <FormField
               control={form.control}
-              name="suggestedHours"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Horário sugerido (opcional)</FormLabel>
-                  <FormControl>
-                    <Choicebox
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      className="grid grid-cols-2 gap-2"
-                    >
-                      {HOUR_OPTIONS.map((option) => (
-                        <ChoiceboxItem
-                          key={option.value}
-                          value={option.value}
-                          id={`hours-${option.value}`}
-                          className="cursor-pointer rounded-lg border p-3"
-                        >
-                          <ChoiceboxItemHeader>
-                            <ChoiceboxItemTitle>
-                              {option.label}
-                            </ChoiceboxItemTitle>
-                          </ChoiceboxItemHeader>
-                          <ChoiceboxIndicator id={`hours-${option.value}`} />
-                        </ChoiceboxItem>
-                      ))}
-                    </Choicebox>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Por que este é um bom ponto? (opcional)</FormLabel>
+                  <FormLabel className="font-headline text-xs font-bold uppercase tracking-widest text-primary-dim">
+                    Por que este é um bom ponto? (opcional)
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Descreva o local, acessibilidade e por que colecionadores devem ir até lá..."
-                      className="min-h-[96px] resize-y"
+                      className="min-h-[96px] resize-y rounded-xl border-none bg-surface-container-highest px-5 py-4 text-on-surface placeholder:text-outline focus-visible:ring-2 focus-visible:ring-primary/40"
                       {...field}
                     />
                   </FormControl>
@@ -341,9 +298,12 @@ export function RequestTradePointView({
               name="whatsappLink"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Link do grupo WhatsApp (opcional)</FormLabel>
+                  <FormLabel className="font-headline text-xs font-bold uppercase tracking-widest text-primary-dim">
+                    Link do grupo WhatsApp (opcional)
+                  </FormLabel>
                   <FormControl>
                     <Input
+                      className={fieldInputClass}
                       placeholder="https://chat.whatsapp.com/..."
                       inputMode="url"
                       autoComplete="url"
@@ -366,8 +326,7 @@ export function RequestTradePointView({
             <div className="space-y-3 pt-2">
               <Button
                 type="submit"
-                size="lg"
-                className="w-full uppercase tracking-tight"
+                className="btn-primary-gradient h-16 w-full rounded-xl font-headline text-lg font-extrabold uppercase tracking-tight"
                 disabled={ctaDisabled}
               >
                 {form.formState.isSubmitting ? (
@@ -376,7 +335,7 @@ export function RequestTradePointView({
                     Enviando…
                   </>
                 ) : (
-                  "Enviar sugestão"
+                  "Enviar Sugestão"
                 )}
               </Button>
               <Text
