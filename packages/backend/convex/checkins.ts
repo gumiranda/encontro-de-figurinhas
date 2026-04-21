@@ -246,7 +246,11 @@ export const getMyActiveCheckinSummary = query({
   handler: async (ctx) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
-      return { hasActiveCheckin: false as const, tradePointSlug: null };
+      return {
+        hasActiveCheckin: false as const,
+        tradePointSlug: null,
+        tradePointId: null,
+      };
     }
 
     const now = Date.now();
@@ -258,13 +262,18 @@ export const getMyActiveCheckinSummary = query({
       .first();
 
     if (!active) {
-      return { hasActiveCheckin: false as const, tradePointSlug: null };
+      return {
+        hasActiveCheckin: false as const,
+        tradePointSlug: null,
+        tradePointId: null,
+      };
     }
 
     const point = await ctx.db.get(active.tradePointId);
     return {
       hasActiveCheckin: true as const,
       tradePointSlug: point?.slug ?? null,
+      tradePointId: active.tradePointId,
     };
   },
 });
