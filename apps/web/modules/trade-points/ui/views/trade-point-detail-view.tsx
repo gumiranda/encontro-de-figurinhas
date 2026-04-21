@@ -27,11 +27,14 @@ import { useShare } from "../../lib/use-share";
 import { useStableValue } from "../../lib/use-stable-value";
 import { useTradePoint } from "../../lib/use-trade-point";
 import { BannedState } from "../components/banned-state";
+import { ConfidenceGaugeCard } from "../components/confidence-gauge-card";
 import { MatchesSection } from "../components/matches-section";
 import { PeakHoursChart } from "../components/peak-hours-chart";
 import { PointActions } from "../components/point-actions";
-import { PointHeader } from "../components/point-header";
+import { PointDetailIdentity } from "../components/point-detail-identity";
 import { PointHero } from "../components/point-hero";
+import { PointLifecycleCard } from "../components/point-lifecycle-card";
+import { PointStatsStrip } from "../components/point-stats-strip";
 import { WhatsappButton } from "../components/whatsapp-button";
 
 const REPORT_CATEGORIES = [
@@ -121,8 +124,8 @@ export function TradePointDetailView({ tradePointId }: Props) {
     }
 
     return (
-      <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 pb-24">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-outline-variant/20 bg-[color:var(--surface-container-low)] px-6 shadow-lg shadow-blue-950/25 backdrop-blur-xl">
           <Button
             variant="ghost"
             size="icon"
@@ -131,7 +134,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
+          <h2 className="line-clamp-1 flex-1 text-center font-headline text-base font-semibold uppercase tracking-tight text-primary">
             {point.name}
           </h2>
           <span className="size-10 shrink-0" aria-hidden />
@@ -169,8 +172,8 @@ export function TradePointDetailView({ tradePointId }: Props) {
     const { point } = data;
 
     return (
-      <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 pb-24">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-outline-variant/20 bg-[color:var(--surface-container-low)] px-6 shadow-lg shadow-blue-950/25 backdrop-blur-xl">
           <Button
             variant="ghost"
             size="icon"
@@ -179,7 +182,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
+          <h2 className="line-clamp-1 flex-1 text-center font-headline text-base font-semibold uppercase tracking-tight text-primary">
             {point.name}
           </h2>
           <span className="size-10 shrink-0" aria-hidden />
@@ -282,7 +285,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
+    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 pb-24">
       <Dialog
         open={reportOpen}
         onOpenChange={(open) => {
@@ -332,7 +335,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
         </DialogContent>
       </Dialog>
 
-      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-outline-variant/20 bg-[color:var(--surface-container-low)] px-6 shadow-lg shadow-blue-950/25 backdrop-blur-xl">
         <Button
           variant="ghost"
           size="icon"
@@ -341,13 +344,14 @@ export function TradePointDetailView({ tradePointId }: Props) {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
+        <h2 className="line-clamp-1 flex-1 text-center font-headline text-base font-semibold uppercase tracking-tight text-primary">
           {point.name}
         </h2>
         <div className="flex shrink-0 items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
+            className="text-primary hover:bg-primary/10"
             onClick={() => void handleShare()}
             aria-label="Compartilhar"
           >
@@ -356,6 +360,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
           <Button
             variant="ghost"
             size="icon"
+            className="text-primary hover:bg-primary/10"
             onClick={() => setReportOpen(true)}
             aria-label="Denunciar"
           >
@@ -371,8 +376,15 @@ export function TradePointDetailView({ tradePointId }: Props) {
         confidenceScore={point.confidenceScore}
       />
 
+      <PointDetailIdentity
+        name={point.name}
+        address={point.address}
+        cityName={city?.name ?? null}
+        suggestedHours={point.suggestedHours}
+      />
+
       {whatsapp.state === "blocked-not-participant" && (
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-low/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-foreground">
             Participe deste ponto para acessar o link do WhatsApp.
           </p>
@@ -391,41 +403,36 @@ export function TradePointDetailView({ tradePointId }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-4 px-4 md:px-0">
-          <PointHeader
-            name={point.name}
-            address={point.address}
-            suggestedHours={point.suggestedHours}
-            cityName={city?.name ?? null}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+        <div className="space-y-6 md:col-span-8">
+          <PointLifecycleCard />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <PeakHoursChart peakHours={stablePeakHours} />
+            <MatchesSection tradePointId={point._id} />
+          </div>
+          <PointStatsStrip
             confidenceScore={point.confidenceScore}
             activeCheckinsCount={activeCheckinsCount}
             lastActivityAt={point.lastActivityAt}
             participantCount={participantCount}
           />
-          <MatchesSection tradePointId={point._id} />
         </div>
-        <div className="px-4 md:px-0">
-          <PeakHoursChart peakHours={stablePeakHours} />
+        <div className="space-y-6 md:col-span-4">
+          <ConfidenceGaugeCard confidenceScore={point.confidenceScore} />
+          <WhatsappButton whatsapp={whatsapp} layout="card" />
         </div>
       </div>
 
-      <div className="px-4">
-        <WhatsappButton whatsapp={whatsapp} />
-      </div>
+      <PointActions
+        tradePointId={point._id}
+        isParticipant={isParticipant}
+        hasActiveCheckin={hasActiveCheckin}
+        pointLat={point.lat}
+        pointLng={point.lng}
+        joinButtonRef={joinButtonRef}
+      />
 
-      <div className="px-4">
-        <PointActions
-          tradePointId={point._id}
-          isParticipant={isParticipant}
-          hasActiveCheckin={hasActiveCheckin}
-          pointLat={point.lat}
-          pointLng={point.lng}
-          joinButtonRef={joinButtonRef}
-        />
-      </div>
-
-      <p className="text-xs text-outline-variant mt-20 pb-4 text-center">
+      <p className="mt-12 pb-4 text-center text-xs text-outline-variant">
         Ponto de Troca © 2024
       </p>
     </div>

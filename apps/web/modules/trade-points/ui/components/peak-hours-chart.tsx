@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils";
 
 type PeakHoursChartProps = {
   peakHours: number[] | null | undefined;
+  className?: string;
 };
 
 function normalizePeakHours(peakHours: number[] | null | undefined): number[] {
@@ -22,6 +23,7 @@ function normalizePeakHours(peakHours: number[] | null | undefined): number[] {
 
 export const PeakHoursChart = memo(function PeakHoursChart({
   peakHours,
+  className,
 }: PeakHoursChartProps) {
   const chartLabelId = useId();
 
@@ -47,7 +49,12 @@ export const PeakHoursChart = memo(function PeakHoursChart({
 
   if (hasNoData) {
     return (
-      <Card>
+      <Card
+        className={cn(
+          "rounded-2xl border-outline-variant/10 bg-surface-container-low shadow-xl",
+          className
+        )}
+      >
         <CardHeader>
           <CardTitle>Horários movimentados</CardTitle>
         </CardHeader>
@@ -59,7 +66,12 @@ export const PeakHoursChart = memo(function PeakHoursChart({
   }
 
   return (
-    <Card>
+    <Card
+      className={cn(
+        "rounded-2xl border-outline-variant/10 bg-surface-container-low shadow-xl",
+        className
+      )}
+    >
       <CardHeader>
         <CardTitle>Horários movimentados</CardTitle>
         {peakValue > 0 && (

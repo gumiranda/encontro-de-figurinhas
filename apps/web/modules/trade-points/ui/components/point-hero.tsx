@@ -62,7 +62,7 @@ export const PointHero = memo(function PointHero({
   const badgeLabel = confidenceLabelPt(confidence);
 
   return (
-    <div className="group relative h-64 overflow-hidden rounded-3xl">
+    <div className="group relative h-64 overflow-hidden rounded-2xl">
       {/* External OSM static map — dynamic query string; next/image adds little value */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

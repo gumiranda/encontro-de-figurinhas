@@ -12,22 +12,30 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Pill } from "@workspace/ui/components/kibo-ui/pill";
 import { Text } from "@workspace/ui/components/typography";
+import { cn } from "@workspace/ui/lib/utils";
 
 type MatchesSectionProps = {
   tradePointId: string;
   /** Quando a API de matches por ponto existir, passar o total. */
   matchCount?: number;
+  className?: string;
 };
 
 export const MatchesSection = memo(function MatchesSection({
   tradePointId,
   matchCount = 0,
+  className,
 }: MatchesSectionProps) {
   void tradePointId;
   const hasMatches = matchCount > 0;
 
   return (
-    <Card className="rounded-3xl bg-surface-container-low">
+    <Card
+      className={cn(
+        "rounded-2xl border border-outline-variant/10 bg-surface-container-low shadow-xl",
+        className
+      )}
+    >
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base font-semibold sm:text-lg">
