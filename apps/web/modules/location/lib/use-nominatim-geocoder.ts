@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type GeocodingSuggestion = {
+type GeocodingSuggestion = {
   id: string;
   lat: number;
   lng: number;

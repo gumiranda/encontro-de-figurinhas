@@ -31,10 +31,7 @@ import {
 } from "@workspace/ui/components/kibo-ui/banner";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { useGeolocation } from "@/modules/location/lib/use-geolocation";
-import {
-  useNominatimGeocoder,
-  type GeocodingSuggestion,
-} from "@/modules/location/lib/use-nominatim-geocoder";
+import { useNominatimGeocoder } from "@/modules/location/lib/use-nominatim-geocoder";
 import { useQuotaStatus } from "@/modules/trade-points/lib/use-quota-status";
 import { QuotaCard } from "@/modules/trade-points/ui/components/quota-card";
 import { QuotaBanner } from "@/modules/trade-points/ui/components/quota-banner";
