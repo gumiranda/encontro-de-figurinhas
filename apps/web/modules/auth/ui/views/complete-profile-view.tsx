@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
@@ -15,40 +16,39 @@ const TOTAL_STEPS = 3;
 
 export function CompleteProfileView() {
   const router = useRouter();
+  const { isLoaded: clerkLoaded, isSignedIn } = useAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+  // Clerk define sessão; a query pode retornar null enquanto o JWT Convex sincroniza.
+  // Não usar `isAuthenticated` no skip — senão `undefined` + loader bloqueado por `authLoading`.
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    clerkLoaded && isSignedIn ? {} : "skip"
+  );
   const createUser = useMutation(api.users.createUser);
 
-  // Create user if authenticated but doesn't exist in Convex. Retries with backoff:
-  // a primeira chamada pode retornar null se a identidade Clerk ainda não estiver
-  // visível no mutation handler (comum após router.back / transição de rota).
-  // O ref antigo `called` impedia qualquer nova tentativa → loading infinito.
+  // Cria linha em `users` só quando o JWT Convex está pronto; antes disso `createUser` pode
+  // retornar null (sem identity no mutation) e o efeito reexecuta quando `isAuthenticated` estabiliza.
   useEffect(() => {
-    if (!isAuthenticated || currentUser !== null || currentUser === undefined) {
+    if (
+      !clerkLoaded ||
+      !isSignedIn ||
+      authLoading ||
+      !isAuthenticated ||
+      currentUser !== null ||
+      currentUser === undefined
+    ) {
       return;
     }
 
-    let cancelled = false;
-
-    const run = async () => {
-      const maxAttempts = 6;
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        if (cancelled) return;
-        try {
-          await createUser();
-        } catch {
-          // Convex refetch; próxima tentativa cobre identity delay
-        }
-        if (cancelled) return;
-        await new Promise((r) => setTimeout(r, 200 * (attempt + 1)));
-      }
-    };
-
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated, currentUser, createUser]);
+    void createUser().catch(() => {});
+  }, [
+    clerkLoaded,
+    isSignedIn,
+    authLoading,
+    isAuthenticated,
+    currentUser,
+    createUser,
+  ]);
 
   // Perfil já completo — alinhar ao dashboard-shell (próximo passo do funil ou dashboard).
   // useLayoutEffect reduz flash de loader antes do replace.
@@ -65,11 +65,13 @@ export function CompleteProfileView() {
     router.replace(next);
   }, [currentUser, router]);
 
-  // Middleware handles auth redirect to /sign-in
-  // Wait for auth and user data
+  // Middleware handles auth redirect to /sign-in.
+  // Não condicionar o loader a `useConvexAuth`: após router.back o token pode re-sync com
+  // authLoading true por tempo indefinido enquanto Clerk já está logado → loader eterno.
+  // A mutação createUser continua guardada por !authLoading && isAuthenticated.
   if (
-    authLoading ||
-    !isAuthenticated ||
+    !clerkLoaded ||
+    !isSignedIn ||
     currentUser === undefined ||
     !currentUser ||
     currentUser.hasCompletedOnboarding
