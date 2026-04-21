@@ -27,7 +27,7 @@ import {
   AppSidebarContent,
   useAppNavGroups,
 } from "@/modules/shared/ui/components/app-nav-drawer";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,6 +35,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+
+  const onboardingGateRef = useRef({
+    isAuthenticated,
+    authLoading,
+    currentUser,
+  });
+  onboardingGateRef.current = { isAuthenticated, authLoading, currentUser };
 
   const isSuperadminOrCeo =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";
@@ -44,15 +51,27 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   // NÃO mover pra middleware: onboarding state vem de useQuery do Convex,
   // que hidrata apenas no cliente. Convex não expõe esse estado em server/edge
   // sem duplicar a camada de auth. react-doctor flagga, mas é o padrão correto.
+  //
+  // Debounce: após setLocation + router.replace("/dashboard"), o primeiro snapshot
+  // de getCurrentUser pode ser obsoleto por um frame e disparar redirect errado
+  // (ex.: volta para /cadastrar-figurinhas).
   useEffect(() => {
     if (!isAuthenticated || authLoading || currentUser === undefined) return;
-    if (currentUser === null || !currentUser.hasCompletedOnboarding) {
-      router.replace("/complete-profile");
-    } else if (!currentUser.hasCompletedStickerSetup) {
-      router.replace("/cadastrar-figurinhas");
-    } else if (!currentUser.locationSource) {
-      router.replace("/selecionar-localizacao");
-    }
+
+    const id = window.setTimeout(() => {
+      const { isAuthenticated: ia, authLoading: al, currentUser: u } =
+        onboardingGateRef.current;
+      if (!ia || al || u === undefined) return;
+      if (u === null || !u.hasCompletedOnboarding) {
+        router.replace("/complete-profile");
+      } else if (u.hasCompletedStickerSetup !== true) {
+        router.replace("/cadastrar-figurinhas");
+      } else if (!u.locationSource) {
+        router.replace("/selecionar-localizacao");
+      }
+    }, 120);
+
+    return () => window.clearTimeout(id);
   }, [isAuthenticated, authLoading, currentUser, router]);
 
   const isFullyOnboarded =

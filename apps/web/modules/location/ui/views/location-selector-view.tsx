@@ -99,7 +99,12 @@ export function LocationSelectorView({
           ? { ipLocationToken: ipToken }
           : {}),
       });
-      router.push("/dashboard");
+      // Deixa o cliente Convex aplicar o snapshot do user antes do DashboardShell
+      // avaliar getCurrentUser (evita redirect falso para /cadastrar-figurinhas).
+      await new Promise<void>((resolve) => {
+        queueMicrotask(() => queueMicrotask(resolve));
+      });
+      router.replace("/dashboard");
     } catch (error) {
       toast.error(resolveSetLocationToastMessage(error));
     } finally {
