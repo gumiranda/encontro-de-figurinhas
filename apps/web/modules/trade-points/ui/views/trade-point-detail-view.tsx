@@ -1,10 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
-import { ArrowLeft, Share2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { ArrowLeft, Flag, Share2 } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
+import { Label } from "@workspace/ui/components/label";
+import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { useShare } from "../../lib/use-share";
 import { useStableValue } from "../../lib/use-stable-value";
@@ -17,6 +34,35 @@ import { PointHeader } from "../components/point-header";
 import { PointHero } from "../components/point-hero";
 import { WhatsappButton } from "../components/whatsapp-button";
 
+const REPORT_CATEGORIES = [
+  "suspicious_behavior",
+  "private_contact_attempt",
+  "minor_approach",
+  "inappropriate_content",
+  "broken_whatsapp_link",
+  "inactive_point",
+  "other",
+] as const;
+
+type ReportCategory = (typeof REPORT_CATEGORIES)[number];
+
+const REPORT_CATEGORY_LABEL: Record<ReportCategory, string> = {
+  suspicious_behavior: "Comportamento suspeito",
+  private_contact_attempt: "Tentativa de contato privado",
+  minor_approach: "Abordagem a menores",
+  inappropriate_content: "Conteúdo inadequado",
+  broken_whatsapp_link: "Link do WhatsApp quebrado",
+  inactive_point: "Ponto inativo",
+  other: "Outro",
+};
+
+function reportErrorCode(error: unknown): string | undefined {
+  if (error instanceof ConvexError && typeof error.data === "string") {
+    return error.data;
+  }
+  return undefined;
+}
+
 type Props = {
   tradePointId: Id<"tradePoints">;
 };
@@ -25,9 +71,18 @@ export function TradePointDetailView({ tradePointId }: Props) {
   const data = useTradePoint(tradePointId);
   const router = useRouter();
   const share = useShare();
+  const joinButtonRef = useRef<HTMLButtonElement>(null);
 
-  // NÃO mover pra middleware: `data.state` vem do hook useTradePoint, que depende
-  // de queries reativas do Convex. Servidor não vê esse estado client-side.
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportCategory, setReportCategory] = useState<ReportCategory | null>(
+    null
+  );
+  const [reportBusy, setReportBusy] = useState(false);
+  const [cancelBusy, setCancelBusy] = useState(false);
+
+  const cancelPendingPoint = useMutation(api.tradePoints.cancelPendingPoint);
+  const submitReport = useMutation(api.tradePoints.submitReport);
+
   useEffect(() => {
     if (data?.state === "needs-auth") {
       router.replace("/sign-in");
@@ -36,7 +91,6 @@ export function TradePointDetailView({ tradePointId }: Props) {
     }
   }, [data?.state, router]);
 
-  // Always call hooks in same order — useStableValue runs even when data is loading.
   const stablePeakHours = useStableValue(
     data?.state === "ready" ? data.point.peakHours : undefined
   );
@@ -46,8 +100,126 @@ export function TradePointDetailView({ tradePointId }: Props) {
     return null;
   }
   if (data.state === "banned") return <BannedState />;
-  if (data.state === "not-found") notFound();
-  if (data.state !== "ready") notFound();
+
+  if (data.state === "pending-owner") {
+    const { point } = data;
+    const submittedAgo = formatDistanceToNow(point.createdAt, {
+      addSuffix: true,
+      locale: ptBR,
+    });
+
+    async function handleCancelPending() {
+      setCancelBusy(true);
+      try {
+        await cancelPendingPoint({ tradePointId });
+        router.push("/meus-pontos");
+      } catch {
+        toast.error("Não foi possível cancelar. Tente novamente.");
+      } finally {
+        setCancelBusy(false);
+      }
+    }
+
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
+            {point.name}
+          </h2>
+          <span className="size-10 shrink-0" aria-hidden />
+        </header>
+
+        <div className="rounded-xl border border-border bg-muted/40 px-4 py-4">
+          <p className="text-sm font-medium text-foreground">
+            Sua solicitação está aguardando análise.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Enviada {submittedAgo}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button
+              variant="destructive"
+              disabled={cancelBusy}
+              onClick={() => void handleCancelPending()}
+            >
+              {cancelBusy ? "Cancelando…" : "Cancelar solicitação"}
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/meus-pontos">Ver meus pontos</Link>
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-xs text-outline-variant mt-20 pb-4 text-center">
+          Ponto de Troca © 2024
+        </p>
+      </div>
+    );
+  }
+
+  if (data.state === "expired-owner") {
+    const { point } = data;
+
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
+            {point.name}
+          </h2>
+          <span className="size-10 shrink-0" aria-hidden />
+        </header>
+
+        <div className="rounded-xl border border-border bg-muted/40 px-4 py-4">
+          <p className="text-sm font-medium text-foreground">
+            Este ponto expirou e não aparece mais no mapa.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Envie uma nova solicitação para voltar a participar.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild>
+              <Link
+                href={`/ponto/solicitar?fromExpired=${tradePointId}`}
+              >
+                Re-submeter
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/meus-pontos">Ver meus pontos</Link>
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-xs text-outline-variant mt-20 pb-4 text-center">
+          Ponto de Troca © 2024
+        </p>
+      </div>
+    );
+  }
+
+  if (data.state === "not-found") {
+    notFound();
+  }
+
+  if (data.state !== "ready") {
+    notFound();
+  }
 
   const {
     point,
@@ -60,7 +232,9 @@ export function TradePointDetailView({ tradePointId }: Props) {
   } = data;
 
   async function handleShare() {
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${origin}/ponto/${point.slug}`;
     await share({
       title: point.name,
       text: `Confira o ponto de troca ${point.name}`,
@@ -68,9 +242,97 @@ export function TradePointDetailView({ tradePointId }: Props) {
     });
   }
 
+  async function handleReport() {
+    if (!reportCategory) return;
+    setReportBusy(true);
+    try {
+      await submitReport({
+        tradePointId: point._id,
+        category: reportCategory,
+      });
+      if (reportCategory === "minor_approach") {
+        toast.success("Nossa equipe revisará em até 24h");
+      } else {
+        toast.success(
+          "Denúncia enviada. Obrigado por ajudar a comunidade."
+        );
+      }
+      setReportOpen(false);
+      setReportCategory(null);
+    } catch (err) {
+      const code = reportErrorCode(err);
+      switch (code) {
+        case "already-reported":
+          toast.error("Você já denunciou este ponto recentemente.");
+          break;
+        case "reliability-too-low":
+          toast.error("Sua conta ainda não tem histórico suficiente");
+          break;
+        case "minor-approach-extra-requirement":
+          toast.error(
+            "Esta categoria exige conta com mais histórico"
+          );
+          break;
+        default:
+          toast.error("Não foi possível enviar a denúncia. Tente novamente.");
+      }
+    } finally {
+      setReportBusy(false);
+    }
+  }
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-24">
-      <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-border/40 bg-background/80 px-4 py-3 backdrop-blur">
+      <Dialog
+        open={reportOpen}
+        onOpenChange={(open) => {
+          setReportOpen(open);
+          if (!open) setReportCategory(null);
+        }}
+      >
+        <DialogContent className="max-h-[min(90vh,560px)] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Denunciar ponto</DialogTitle>
+            <DialogDescription>
+              Escolha o motivo. Denúncias falsas podem afetar sua conta.
+            </DialogDescription>
+          </DialogHeader>
+          <RadioGroup
+            className="gap-3"
+            value={reportCategory ?? undefined}
+            onValueChange={(v) => setReportCategory(v as ReportCategory)}
+          >
+            {REPORT_CATEGORIES.map((cat) => (
+              <div key={cat} className="flex items-center gap-3">
+                <RadioGroupItem value={cat} id={`report-${cat}`} />
+                <Label
+                  htmlFor={`report-${cat}`}
+                  className="cursor-pointer font-normal leading-snug"
+                >
+                  {REPORT_CATEGORY_LABEL[cat]}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setReportOpen(false)}
+              disabled={reportBusy}
+            >
+              Fechar
+            </Button>
+            <Button
+              onClick={() => void handleReport()}
+              disabled={reportBusy || !reportCategory}
+            >
+              {reportBusy ? "Enviando…" : "Enviar denúncia"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border/40 bg-[var(--background)]/80 px-6 backdrop-blur-xl">
         <Button
           variant="ghost"
           size="icon"
@@ -82,14 +344,24 @@ export function TradePointDetailView({ tradePointId }: Props) {
         <h2 className="line-clamp-1 flex-1 text-center text-base font-semibold uppercase tracking-tight">
           {point.name}
         </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleShare}
-          aria-label="Compartilhar"
-        >
-          <Share2 className="h-5 w-5" />
-        </Button>
+        <div className="flex shrink-0 items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => void handleShare()}
+            aria-label="Compartilhar"
+          >
+            <Share2 className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setReportOpen(true)}
+            aria-label="Denunciar"
+          >
+            <Flag className="h-5 w-5" />
+          </Button>
+        </div>
       </header>
 
       <PointHero
@@ -99,16 +371,44 @@ export function TradePointDetailView({ tradePointId }: Props) {
         confidenceScore={point.confidenceScore}
       />
 
-      <PointHeader
-        name={point.name}
-        address={point.address}
-        suggestedHours={point.suggestedHours}
-        cityName={city?.name ?? null}
-        confidenceScore={point.confidenceScore}
-        activeCheckinsCount={activeCheckinsCount}
-        lastActivityAt={point.lastActivityAt}
-        participantCount={participantCount}
-      />
+      {whatsapp.state === "blocked-not-participant" && (
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-foreground">
+            Participe deste ponto para acessar o link do WhatsApp.
+          </p>
+          <Button
+            type="button"
+            className="shrink-0"
+            onClick={() =>
+              joinButtonRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              })
+            }
+          >
+            Participar agora
+          </Button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-4 px-4 md:px-0">
+          <PointHeader
+            name={point.name}
+            address={point.address}
+            suggestedHours={point.suggestedHours}
+            cityName={city?.name ?? null}
+            confidenceScore={point.confidenceScore}
+            activeCheckinsCount={activeCheckinsCount}
+            lastActivityAt={point.lastActivityAt}
+            participantCount={participantCount}
+          />
+          <MatchesSection tradePointId={point._id} />
+        </div>
+        <div className="px-4 md:px-0">
+          <PeakHoursChart peakHours={stablePeakHours} />
+        </div>
+      </div>
 
       <div className="px-4">
         <WhatsappButton whatsapp={whatsapp} />
@@ -121,16 +421,13 @@ export function TradePointDetailView({ tradePointId }: Props) {
           hasActiveCheckin={hasActiveCheckin}
           pointLat={point.lat}
           pointLng={point.lng}
+          joinButtonRef={joinButtonRef}
         />
       </div>
 
-      <div className="px-4">
-        <PeakHoursChart peakHours={stablePeakHours} />
-      </div>
-
-      <div className="px-4">
-        <MatchesSection tradePointId={point._id} />
-      </div>
+      <p className="text-xs text-outline-variant mt-20 pb-4 text-center">
+        Ponto de Troca © 2024
+      </p>
     </div>
   );
 }
