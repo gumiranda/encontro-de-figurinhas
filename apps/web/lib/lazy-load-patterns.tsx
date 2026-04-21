@@ -149,7 +149,7 @@ export const BUNDLE_ANALYSIS_CHECKLIST = {
     usage: "[Avatar generation pages]",
     lazy: true,
   },
-  "react-leaflet-cluster": {
+  "leaflet.markercluster": {
     size: "~30KB",
     usage: "[Trade point maps]",
     lazy: true,
