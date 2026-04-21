@@ -9,11 +9,11 @@ import { scheduleDebouncedMatchRecompute } from "./matches";
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
 
-/** Mínimo entre atualizações batch (mitiga alternância A↔B + recompute). */
-const RATE_LIMIT_MS = 5000;
+/** Mínimo entre salvamentos batch (recompute já é debounced em matches). */
+const RATE_LIMIT_MS = 400;
 
-/** Mínimo entre toggles individuais (previne spam de scheduler jobs). */
-const TOGGLE_RATE_LIMIT_MS = 1000;
+/** Mínimo entre toggles — só evita double-click; recompute é debounced em matches. */
+const TOGGLE_RATE_LIMIT_MS = 100;
 
 type UserPatch = Partial<
   Pick<
