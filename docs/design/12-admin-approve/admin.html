@@ -1,0 +1,535 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ARENA ADMIN | Command Center</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              tertiary: "#ffc965",
+              "primary-fixed": "#829bff",
+              "error-dim": "#d73357",
+              "surface-tint": "#95aaff",
+              background: "#090e1c",
+              "secondary-fixed": "#4ff325",
+              outline: "#707588",
+              "on-tertiary": "#5f4200",
+              "on-primary-fixed-variant": "#002278",
+              "on-secondary": "#105500",
+              "surface-container-low": "#0d1323",
+              "tertiary-fixed-dim": "#ecaa00",
+              "surface-dim": "#090e1c",
+              surface: "#090e1c",
+              "outline-variant": "#434759",
+              "inverse-primary": "#004cef",
+              "on-secondary-container": "#e7ffd8",
+              "tertiary-dim": "#ecaa00",
+              "inverse-on-surface": "#505466",
+              "surface-container-high": "#181f33",
+              "surface-bright": "#242b43",
+              "secondary-fixed-dim": "#3ee40c",
+              "on-tertiary-fixed": "#392700",
+              "on-error": "#490013",
+              "on-surface-variant": "#a6aabf",
+              "on-background": "#e1e4fa",
+              "surface-variant": "#1e253b",
+              error: "#ff6e84",
+              "secondary-dim": "#3ee40c",
+              "primary-dim": "#3766ff",
+              "on-tertiary-fixed-variant": "#5f4200",
+              "on-secondary-fixed-variant": "#136000",
+              "on-primary-fixed": "#000000",
+              "on-tertiary-container": "#533a00",
+              "surface-container-highest": "#1e253b",
+              "surface-container-lowest": "#000000",
+              "secondary-container": "#176e00",
+              "inverse-surface": "#faf8ff",
+              "tertiary-fixed": "#feb700",
+              "surface-container": "#13192b",
+              primary: "#95aaff",
+              "error-container": "#a70138",
+              "on-secondary-fixed": "#0a4000",
+              "primary-container": "#829bff",
+              "primary-fixed-dim": "#6e8cff",
+              "on-primary-container": "#001a63",
+              "on-error-container": "#ffb2b9",
+              secondary: "#4ff325",
+              "on-surface": "#e1e4fa",
+              "on-primary": "#00247e",
+              "tertiary-container": "#feb700",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      body {
+        background-color: #090e1c;
+        color: #e1e4fa;
+        font-family: "Manrope", sans-serif;
+      }
+      .stadium-gradient {
+        background:
+          radial-gradient(circle at top right, rgba(0, 82, 255, 0.12), transparent),
+          radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.08), transparent);
+      }
+      .glass-panel {
+        backdrop-filter: blur(20px);
+        background: rgba(13, 19, 35, 0.8);
+      }
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="flex min-h-screen stadium-gradient bg-background">
+    <!-- Navigation Drawer -->
+    <aside
+      class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low shadow-2xl border-r border-outline-variant/10 z-50"
+    >
+      <div class="px-8 py-8">
+        <div class="flex items-center gap-3 mb-10">
+          <div
+            class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary"
+          >
+            <span class="material-symbols-outlined" data-icon="shield_person"
+              >shield_person</span
+            >
+          </div>
+          <h1
+            class="text-lg font-bold text-on-surface font-headline uppercase tracking-widest"
+          >
+            ARENA ADMIN
+          </h1>
+        </div>
+        <nav class="space-y-2">
+          <a
+            class="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-3 hover:bg-surface-container transition-all duration-200 font-['Manrope'] text-sm font-semibold group"
+            href="#"
+          >
+            <span
+              class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+              data-icon="dashboard"
+              >dashboard</span
+            >
+            <span>Overview</span>
+          </a>
+          <a
+            class="flex items-center gap-4 bg-primary/10 text-primary border-r-4 border-primary px-4 py-3 font-['Manrope'] text-sm font-semibold"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-icon="swap_horiz"
+              >swap_horiz</span
+            >
+            <span>Trade Requests</span>
+          </a>
+          <a
+            class="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-3 hover:bg-surface-container transition-all duration-200 font-['Manrope'] text-sm font-semibold group"
+            href="#"
+          >
+            <span
+              class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+              data-icon="gavel"
+              >gavel</span
+            >
+            <span>User Bans</span>
+          </a>
+          <a
+            class="flex items-center gap-4 text-on-surface-variant hover:text-primary px-4 py-3 hover:bg-surface-container transition-all duration-200 font-['Manrope'] text-sm font-semibold group"
+            href="#"
+          >
+            <span
+              class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+              data-icon="settings"
+              >settings</span
+            >
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+      <div class="mt-auto p-6 border-t border-outline-variant/10">
+        <div class="flex items-center gap-3">
+          <img
+            alt="Admin Profile"
+            class="w-10 h-10 rounded-full border-2 border-primary"
+            data-alt="Close up portrait of a professional male administrator in a dark studio setting with cinematic blue backlighting"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAxj7hhVJ831JRCAooVAF_pcq6124D9CrGJmMyXkP5QoR-MXb1ynA4OigabpOHxYO5NkrJP5_5podydT9_4j87PlFiNAb0rzdUfiCWKJkg1Dww5WNuidoB1KuRA5WjWyyGqwrD0uFcw7OLLblklDhn7GARoVayQJ3QMyiIUW2EU7Rc_0rlFizjcHxMV6jmE4C51f-ySMi0xj4CJbdEiWbErOocbfCxgm2IfnwCEXEvkyFOgiBGTBUORhYUCsZt3UV1LN0YOqVplWZk"
+          />
+          <div>
+            <p class="text-sm font-bold text-on-surface">Super Admin</p>
+            <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">
+              System Management • V2.0.4
+            </p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!-- Main Canvas -->
+    <main class="flex-1 md:ml-64 flex flex-col min-h-screen">
+      <!-- TopAppBar -->
+      <header
+        class="flex items-center justify-between px-8 py-4 w-full sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-outline-variant/5"
+      >
+        <div class="flex items-center gap-4">
+          <span class="material-symbols-outlined text-primary" data-icon="shield_person"
+            >shield_person</span
+          >
+          <span
+            class="text-2xl font-black text-primary tracking-widest font-['Space_Grotesk'] uppercase"
+            >ARENA ADMIN</span
+          >
+        </div>
+        <div class="flex items-center gap-6">
+          <div class="hidden lg:flex items-center gap-8 mr-8">
+            <span
+              class="text-primary font-bold font-['Space_Grotesk'] tracking-tighter uppercase cursor-pointer"
+              >Live Feed</span
+            >
+            <span
+              class="text-on-surface-variant font-medium font-['Space_Grotesk'] tracking-tighter uppercase cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors px-2 py-1 rounded"
+              >Security Log</span
+            >
+            <span
+              class="text-on-surface-variant font-medium font-['Space_Grotesk'] tracking-tighter uppercase cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors px-2 py-1 rounded"
+              >Terminal</span
+            >
+          </div>
+          <div
+            class="flex items-center gap-3 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/15"
+          >
+            <div
+              class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_12px_#4ff325]"
+            ></div>
+            <span
+              class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest"
+              >System Online</span
+            >
+          </div>
+          <div
+            class="w-10 h-10 rounded-full overflow-hidden border border-primary/30 hover:scale-95 active:scale-90 transition-transform cursor-pointer"
+          >
+            <img
+              alt="Admin"
+              data-alt="Professional admin user avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW6SVL-f_GGI38Z2U_5xAqrZSqq9WsWN9t1We11FEEE1ukGvKZ2VVLga2x7MfHlMTEKI5ror6glSywBVbGQS4FJ07u1lj9fFIf2MCcYM_nRDjQqVNjvxBjuJA-w23bgL60P1WDQInsPLJ-dZ3gkqiue_kdnmdEIvh8EVf-amU2ZVOr43MFCRnUBN-h5KjKsHNswCLhjqaaoXIp98_wRWroH-qf2AlnN8ZUjH8ARoLZWF-xbmzIF-ShRZl5ZQ7gav6Jm4mJ_vQHpgjm"
+            />
+          </div>
+        </div>
+      </header>
+      <!-- Page Content -->
+      <div class="p-8 lg:p-12 max-w-7xl mx-auto w-full">
+        <!-- Context Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <h2
+              class="text-5xl font-black font-headline tracking-tighter uppercase text-on-background mb-2"
+            >
+              Pending Approvals
+            </h2>
+            <p class="text-on-surface-variant font-body max-w-xl">
+              Reviewing new trade point submissions (F07 Protocol). Evaluate community
+              safety and spot accessibility before finalizing.
+            </p>
+          </div>
+          <!-- Status Tabs -->
+          <div
+            class="flex bg-surface-container-low p-1 rounded-xl border border-outline-variant/10"
+          >
+            <button
+              class="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-bold text-sm tracking-wide transition-all shadow-lg"
+            >
+              Pending
+            </button>
+            <button
+              class="px-6 py-2.5 rounded-lg text-on-surface-variant font-bold text-sm tracking-wide hover:text-on-surface transition-all"
+            >
+              Active
+            </button>
+            <button
+              class="px-6 py-2.5 rounded-lg text-on-surface-variant font-bold text-sm tracking-wide hover:text-on-surface transition-all"
+            >
+              Suspended
+            </button>
+          </div>
+        </div>
+        <!-- Bento-Style Review Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Submission Card 1 -->
+          <div
+            class="lg:col-span-8 group relative bg-surface-container-low rounded-[2rem] overflow-hidden border border-outline-variant/10 hover:border-primary/40 transition-all duration-500 shadow-2xl"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 h-full">
+              <div class="relative min-h-[300px]">
+                <img
+                  alt="Banca do Zé"
+                  class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700"
+                  data-alt="A vintage Brazilian street newsstand called Banca do Zé, decorated with colorful stickers and posters in a sunny urban neighborhood"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNy-ChJx5dNNyqyRY17kzEUPRLWSY64DFCjdgeqGmcf2gveVlRw64ORAY_bCtdLlA9blm8WGDG7MJ7gPcMfQeUVoTmqZcBrDtbKIaAXPkdSmM0l-g837rNhzKwmDIziizuAl4M3nZTui32MI6gCnHvA33nWfrzhlhRR580atjQKlCwWrJ83Rzm5I_BwxAB1DUlJ6pjAjmTzA_Yky4ELktyi16RUPZp8dMMjalpdVAzW5mGq_nTmrmOPwUVHtaYEdFxj0Lo0xhose_n"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-surface-container-low/20 to-transparent"
+                ></div>
+                <div class="absolute bottom-6 left-6">
+                  <span
+                    class="px-3 py-1 bg-secondary text-on-secondary rounded-full text-[10px] font-black uppercase tracking-tighter mb-2 inline-block"
+                    >High Activity Zone</span
+                  >
+                  <h3
+                    class="text-3xl font-black font-headline tracking-tighter text-on-background"
+                  >
+                    Banca do Zé
+                  </h3>
+                  <p
+                    class="text-on-surface-variant flex items-center gap-1 text-sm font-medium"
+                  >
+                    <span
+                      class="material-symbols-outlined text-xs"
+                      data-icon="location_on"
+                      >location_on</span
+                    >
+                    Rua das Palmeiras, 142 - SP
+                  </p>
+                </div>
+              </div>
+              <div class="p-8 flex flex-col">
+                <div class="flex items-center justify-between mb-8">
+                  <div class="flex flex-col">
+                    <span
+                      class="text-[10px] uppercase font-black text-outline tracking-[0.2em] mb-1"
+                      >PROPOSED BY</span
+                    >
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[10px] text-on-primary font-bold"
+                      >
+                        JD
+                      </div>
+                      <span class="text-sm font-bold text-on-surface">Joao_Duarte99</span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span
+                      class="text-[10px] uppercase font-black text-outline tracking-[0.2em] mb-1"
+                      >RELIABILITY</span
+                    >
+                    <div
+                      class="flex items-center gap-1 text-secondary font-black font-headline"
+                    >
+                      <span class="text-xl">9.8</span>
+                      <span
+                        class="material-symbols-outlined text-sm"
+                        data-icon="verified"
+                        data-weight="fill"
+                        >verified</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <span
+                    class="text-[10px] uppercase font-black text-primary tracking-[0.2em] mb-3 block"
+                    >JUSTIFICATION</span
+                  >
+                  <p
+                    class="text-on-surface-variant leading-relaxed font-body italic border-l-2 border-primary/30 pl-4"
+                  >
+                    "Classic neighborhood spot with 24/7 security from the building next
+                    door. Excellent lighting and a large awning for rain protection.
+                    Locals are already swapping stickers here informally."
+                  </p>
+                </div>
+                <div class="mt-8 flex gap-3">
+                  <button
+                    class="flex-1 py-4 bg-secondary text-on-secondary flex items-center justify-center gap-2 rounded-xl font-black font-headline tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_20px_-10px_rgba(79,243,37,0.4)] uppercase"
+                  >
+                    <span class="material-symbols-outlined" data-icon="check_circle"
+                      >check_circle</span
+                    >
+                    APPROVE
+                  </button>
+                  <button
+                    class="w-16 py-4 border border-error/30 flex items-center justify-center rounded-xl text-error hover:bg-error/10 transition-all"
+                  >
+                    <span class="material-symbols-outlined" data-icon="block">block</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Submission Card 2 -->
+          <div
+            class="lg:col-span-4 bg-surface-container-low rounded-[2rem] p-8 border border-outline-variant/10 flex flex-col justify-between shadow-xl"
+          >
+            <div>
+              <div class="flex justify-between items-start mb-6">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center border border-primary/20"
+                >
+                  <span
+                    class="material-symbols-outlined text-primary text-3xl"
+                    data-icon="stadium"
+                    >stadium</span
+                  >
+                </div>
+                <div class="text-right">
+                  <span
+                    class="text-[10px] font-black text-tertiary uppercase tracking-widest"
+                    >Reliability: 4.2</span
+                  >
+                  <div class="flex gap-0.5 justify-end mt-1 text-tertiary">
+                    <span
+                      class="material-symbols-outlined text-xs"
+                      data-icon="star"
+                      data-weight="fill"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-xs"
+                      data-icon="star"
+                      data-weight="fill"
+                      >star</span
+                    >
+                    <span class="material-symbols-outlined text-xs" data-icon="star"
+                      >star</span
+                    >
+                    <span class="material-symbols-outlined text-xs" data-icon="star"
+                      >star</span
+                    >
+                    <span class="material-symbols-outlined text-xs" data-icon="star"
+                      >star</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <h3
+                class="text-2xl font-black font-headline tracking-tighter text-on-background mb-1"
+              >
+                Arena Lounge Hub
+              </h3>
+              <p class="text-on-surface-variant text-sm mb-6">
+                Av. Principal, Plaza Mall, Piso 2
+              </p>
+              <div
+                class="bg-surface-container-highest/30 rounded-2xl p-5 mb-8 border border-outline-variant/5"
+              >
+                <span
+                  class="text-[9px] uppercase font-black text-primary tracking-[0.2em] mb-2 block"
+                  >QUICK JUSTIFICATION</span
+                >
+                <p class="text-xs text-on-surface-variant leading-relaxed">
+                  High foot traffic during match days. Inside a controlled mall
+                  environment. No specialized sticker zones yet.
+                </p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <button
+                class="w-full py-4 bg-secondary text-on-secondary font-black font-headline tracking-widest text-sm rounded-xl uppercase hover:brightness-110 transition-all shadow-[0_8px_16px_-8px_rgba(79,243,37,0.3)]"
+              >
+                APPROVE
+              </button>
+              <button
+                class="w-full py-4 bg-error-container/20 text-error font-black font-headline tracking-widest text-sm rounded-xl uppercase border border-error/20 hover:bg-error-container/40 transition-all"
+              >
+                BAN/REFUSE
+              </button>
+            </div>
+          </div>
+          <!-- Empty State Block -->
+          <div
+            class="lg:col-span-12 flex flex-col items-center justify-center py-20 bg-surface-container-low/40 rounded-[3rem] border-2 border-dashed border-outline-variant/20"
+          >
+            <div class="relative mb-8">
+              <div
+                class="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-6xl text-primary/40"
+                  data-icon="inbox_customize"
+                  >inbox_customize</span
+                >
+              </div>
+              <div
+                class="absolute -bottom-2 -right-2 w-12 h-12 bg-surface-container-high rounded-full border-4 border-background flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-secondary text-xl font-bold"
+                  data-icon="check"
+                  >check</span
+                >
+              </div>
+            </div>
+            <h4
+              class="text-2xl font-black font-headline tracking-tight text-on-background uppercase"
+            >
+              Protocol Clear
+            </h4>
+            <p class="text-on-surface-variant font-body mt-2">
+              All pending F07 submissions have been reviewed.
+            </p>
+            <button
+              class="mt-8 px-8 py-3 bg-surface-container-highest rounded-full text-on-surface font-bold text-sm tracking-wide border border-outline-variant/30 hover:bg-surface-bright transition-all"
+            >
+              Refresh Database
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Mobile Navigation Shell -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant/10 z-50 flex justify-around items-center px-4 py-3"
+    >
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+        <span class="text-[10px] font-bold uppercase tracking-tighter">Overview</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined" data-icon="swap_horiz" data-weight="fill"
+          >swap_horiz</span
+        >
+        <span class="text-[10px] font-bold uppercase tracking-tighter">Trades</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+        <span class="text-[10px] font-bold uppercase tracking-tighter">Bans</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="settings">settings</span>
+        <span class="text-[10px] font-bold uppercase tracking-tighter">Config</span>
+      </button>
+    </nav>
+  </body>
+</html>

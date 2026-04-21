@@ -2,10 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { ArrowLeft, Crosshair, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Crosshair, ImagePlus, TriangleAlert, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -67,6 +67,25 @@ type Props = {
 const fieldInputClass =
   "h-14 rounded-xl border-none bg-surface-container-highest px-5 text-on-surface placeholder:text-outline focus-visible:ring-2 focus-visible:ring-primary/40";
 
+const COVER_ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
+const COVER_MAX_BYTES = 5 * 1024 * 1024;
+
+async function uploadToConvex(
+  uploadUrl: string,
+  payload: Blob,
+  contentType: string
+): Promise<Id<"_storage">> {
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { "Content-Type": contentType },
+    body: payload,
+  });
+  if (!response.ok) throw new Error(`Upload falhou (${response.status})`);
+  const { storageId } = (await response.json()) as { storageId?: string };
+  if (!storageId) throw new Error("Resposta de upload inválida");
+  return storageId as Id<"_storage">;
+}
+
 export function RequestTradePointView({
   cityId,
   cityLabel,
@@ -75,7 +94,18 @@ export function RequestTradePointView({
 }: Props) {
   const router = useRouter();
   const submitRequest = useMutation(api.tradePoints.submitRequest);
+  const generateCoverUploadUrl = useMutation(api.tradePoints.generateCoverUploadUrl);
   const { isBlocked, isLoading: isLoadingQuota } = useQuotaStatus();
+
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    };
+  }, [coverPreviewUrl]);
 
   const {
     status: geoStatus,
@@ -114,9 +144,49 @@ export function RequestTradePointView({
     },
   });
 
+  function clearCover() {
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    setCoverPreviewUrl(null);
+    setCoverFile(null);
+    if (coverInputRef.current) coverInputRef.current.value = "";
+  }
+
+  function onCoverSelected(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!COVER_ALLOWED_TYPES.includes(file.type as (typeof COVER_ALLOWED_TYPES)[number])) {
+      toast.error("Use PNG, JPG ou WebP.");
+      if (coverInputRef.current) coverInputRef.current.value = "";
+      return;
+    }
+    if (file.size > COVER_MAX_BYTES) {
+      toast.error("Imagem muito grande. Use até 5MB.");
+      if (coverInputRef.current) coverInputRef.current.value = "";
+      return;
+    }
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    setCoverFile(file);
+    setCoverPreviewUrl(URL.createObjectURL(file));
+  }
+
   async function onSubmit(data: FormValues) {
     const description = data.description?.trim();
     const whatsappLink = data.whatsappLink?.trim();
+
+    let coverStorageId: Id<"_storage"> | undefined;
+    if (coverFile) {
+      try {
+        const uploadUrl = await generateCoverUploadUrl();
+        coverStorageId = await uploadToConvex(
+          uploadUrl,
+          coverFile,
+          coverFile.type
+        );
+      } catch {
+        toast.error("Não foi possível enviar a foto de capa. Tente de novo.");
+        return;
+      }
+    }
 
     const result = await submitRequest({
       name: data.name.trim(),
@@ -126,6 +196,7 @@ export function RequestTradePointView({
       lng: effectiveCoords.lng,
       description: description || undefined,
       whatsappLink: whatsappLink || undefined,
+      coverStorageId,
     });
 
     if (result.ok) {
@@ -158,6 +229,10 @@ export function RequestTradePointView({
     }
     if (result.error === "invalid-coordinates") {
       toast.error("Coordenadas fora do Brasil. Ajuste a localização.");
+      return;
+    }
+    if (result.error === "invalid-cover") {
+      toast.error("A foto de capa não foi aceita. Escolha outra imagem.");
       return;
     }
     toast.error("Revise os campos e tente novamente.");
@@ -292,6 +367,52 @@ export function RequestTradePointView({
                 </FormItem>
               )}
             />
+
+            <div className="space-y-2">
+              <p className="font-headline text-xs font-bold uppercase tracking-widest text-primary-dim">
+                Foto de capa (opcional)
+              </p>
+              <p className="text-sm text-on-surface-variant">
+                Aparece no topo da página do ponto após aprovação. Prefira foto
+                do local em dia claro.
+              </p>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={onCoverSelected}
+                className="hidden"
+                aria-hidden="true"
+                tabIndex={-1}
+              />
+              {coverPreviewUrl ? (
+                <div className="relative overflow-hidden rounded-xl border border-outline-variant/30">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverPreviewUrl}
+                    alt="Pré-visualização da foto de capa"
+                    className="aspect-[2/1] w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => clearCover()}
+                    className="absolute right-2 top-2 inline-flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                    aria-label="Remover foto"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-outline-variant/50 bg-surface-container-highest/50 px-4 py-8 text-sm font-medium text-on-surface-variant transition-colors hover:border-primary/40 hover:bg-surface-container-highest"
+                >
+                  <ImagePlus className="size-5 text-primary" aria-hidden />
+                  Adicionar foto
+                </button>
+              )}
+            </div>
 
             <FormField
               control={form.control}

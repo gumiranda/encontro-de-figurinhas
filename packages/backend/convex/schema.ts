@@ -160,6 +160,8 @@ export default defineSchema({
     pointType: v.optional(
       v.union(v.literal("fixed"), v.literal("event"), v.literal("mail"))
     ),
+    coverImageStorageId: v.optional(v.id("_storage")),
+    coverImageUrl: v.optional(v.string()),
   })
     .index("by_city_status", ["cityId", "status"])
     .index("by_status", ["status"])

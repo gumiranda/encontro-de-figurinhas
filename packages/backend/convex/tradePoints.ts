@@ -7,7 +7,11 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { checkAuth, getAuthenticatedUser } from "./lib/auth";
+import {
+  checkAuth,
+  getAuthenticatedUser,
+  requireAdmin,
+} from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
 import {
   MINOR_APPROACH_EXTRA_MIN,
@@ -44,6 +48,7 @@ const getByIdReadyPointValidator = v.object({
   longitude: v.float64(),
   suggestedHours: v.optional(v.string()),
   description: v.optional(v.string()),
+  coverImageUrl: v.optional(v.string()),
   confidenceScore: v.float64(),
   lastActivityAt: v.number(),
   confirmedTradesCount: v.number(),
@@ -230,6 +235,7 @@ export const getById = query({
         longitude: point.lng,
         suggestedHours: point.suggestedHours,
         description: point.description,
+        coverImageUrl: point.coverImageUrl,
         confidenceScore: point.confidenceScore,
         lastActivityAt: point.lastActivityAt,
         confirmedTradesCount: point.confirmedTradesCount,
@@ -242,6 +248,18 @@ export const getById = query({
       hasActiveCheckin,
       whatsapp,
     };
+  },
+});
+
+export const generateCoverUploadUrl = mutation({
+  args: {},
+  returns: v.string(),
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      throw new ConvexError(auth.state);
+    }
+    return await ctx.storage.generateUploadUrl();
   },
 });
 
@@ -284,6 +302,7 @@ export const submitRequest = mutation({
     suggestedHours: v.optional(v.string()),
     description: v.optional(v.string()),
     whatsappLink: v.optional(v.string()),
+    coverStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     const auth = await checkAuth(ctx);
@@ -351,6 +370,17 @@ export const submitRequest = mutation({
       return { ok: false as const, error: "invalid-fields" as const };
     }
 
+    let coverImageStorageId: Id<"_storage"> | undefined;
+    let coverImageUrl: string | undefined;
+    if (args.coverStorageId) {
+      const url = await ctx.storage.getUrl(args.coverStorageId);
+      if (!url) {
+        return { ok: false as const, error: "invalid-cover" as const };
+      }
+      coverImageStorageId = args.coverStorageId;
+      coverImageUrl = url;
+    }
+
     const slug = await generateTradePointSlug(ctx, trimmedName, city.slug);
     const now = Date.now();
     const tradePointId = await ctx.db.insert("tradePoints", {
@@ -364,6 +394,8 @@ export const submitRequest = mutation({
       whatsappLinkStatus: whatsappLink ? "active" : "invalid",
       suggestedHours: suggestedHours || undefined,
       description: description || undefined,
+      coverImageStorageId,
+      coverImageUrl,
       status: "pending",
       requestedBy: user._id,
       confidenceScore: 0,
@@ -809,5 +841,129 @@ export const seedForCity = internalMutation({
     });
 
     return { inserted: seedNames.length };
+  },
+});
+
+const adminTradePointFilterValidator = v.union(
+  v.literal("pending"),
+  v.literal("approved"),
+  v.literal("suspended")
+);
+
+export const adminListTradePoints = query({
+  args: { filter: adminTradePointFilterValidator },
+  handler: async (ctx, { filter }) => {
+    await requireAdmin(ctx);
+
+    const status = filter;
+    const points = await ctx.db
+      .query("tradePoints")
+      .withIndex("by_status_createdAt", (q) => q.eq("status", status))
+      .order("desc")
+      .take(50);
+
+    const userIds = [...new Set(points.map((p) => p.requestedBy))];
+    const cityIds = [...new Set(points.map((p) => p.cityId))];
+    const requesters = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));
+    const requesterMap = new Map(
+      requesters.filter(Boolean).map((u) => [u!._id, u!])
+    );
+    const cityMap = new Map(cities.filter(Boolean).map((c) => [c!._id, c!]));
+
+    return points.map((p) => {
+      const r = requesterMap.get(p.requestedBy);
+      const city = cityMap.get(p.cityId);
+      return {
+        _id: p._id,
+        slug: p.slug,
+        name: p.name,
+        address: p.address,
+        description: p.description,
+        lat: p.lat,
+        lng: p.lng,
+        createdAt: p.createdAt,
+        suggestedHours: p.suggestedHours,
+        whatsappLink: p.whatsappLink,
+        requesterNickname:
+          r?.nickname ?? r?.displayNickname ?? r?.name ?? "—",
+        reliabilityScore: r?.reliabilityScore ?? 0,
+        cityName: city?.name ?? "",
+        cityState: city?.state ?? "",
+        citySlug: city?.slug ?? "",
+      };
+    });
+  },
+});
+
+export const adminApprovePendingPoint = mutation({
+  args: {
+    tradePointId: v.id("tradePoints"),
+    whatsappLink: v.string(),
+  },
+  returns: v.object({ ok: v.literal(true) }),
+  handler: async (ctx, { tradePointId, whatsappLink }) => {
+    await requireAdmin(ctx);
+
+    const trimmed = whatsappLink.trim();
+    if (
+      !/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{20,24}$/.test(trimmed)
+    ) {
+      throw new ConvexError("invalid-whatsapp");
+    }
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "pending") {
+      throw new ConvexError("invalid-point");
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(tradePointId, {
+      status: "approved",
+      whatsappLink: trimmed,
+      whatsappLinkStatus: "active",
+      lastActivityAt: now,
+    });
+    await decrementPendingCount(ctx, point.requestedBy);
+
+    const city = await ctx.db.get(point.cityId);
+    const tags = new Set<string>([`ponto:${point.slug}`, "sitemap"]);
+    if (city) tags.add(`cidade:${city.slug}`);
+    await ctx.scheduler.runAfter(0, internal.revalidate.notifyBatch, {
+      tags: [...tags],
+    });
+
+    return { ok: true as const };
+  },
+});
+
+export const adminRejectPendingPoint = mutation({
+  args: {
+    tradePointId: v.id("tradePoints"),
+    reason: v.string(),
+  },
+  returns: v.object({ ok: v.literal(true) }),
+  handler: async (ctx, { tradePointId, reason }) => {
+    await requireAdmin(ctx);
+
+    const trimmed = reason.trim();
+    if (trimmed.length < 3 || trimmed.length > 2000) {
+      throw new ConvexError("invalid-reason");
+    }
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "pending") {
+      throw new ConvexError("invalid-point");
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(tradePointId, {
+      status: "cancelled",
+      cancelledAt: now,
+      rejectionReason: trimmed,
+    });
+    await decrementPendingCount(ctx, point.requestedBy);
+
+    return { ok: true as const };
   },
 });

@@ -374,6 +374,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
         lat={point.lat}
         lng={point.lng}
         confidenceScore={point.confidenceScore}
+        coverImageUrl={point.coverImageUrl}
       />
 
       <PointDetailIdentity

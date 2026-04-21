@@ -18,6 +18,7 @@ import {
   MapPin,
   MapPinPlus,
   Menu,
+  ShieldCheck,
   StickyNote,
   UserCog,
   type LucideIcon,
@@ -90,7 +91,10 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         ? [
             {
               title: "Admin",
-              items: [{ label: "Usuários", href: "/admin/users", icon: UserCog }],
+              items: [
+                { label: "Aprovar pontos", href: "/admin/points", icon: ShieldCheck },
+                { label: "Usuários", href: "/admin/users", icon: UserCog },
+              ],
             },
           ]
         : []),
