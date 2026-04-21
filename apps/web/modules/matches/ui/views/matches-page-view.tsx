@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { ListPlus, MapPin, Share2, Sparkles } from "lucide-react";
+import { ListPlus, MapPin, Share2, Sparkles, User } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
 import { api } from "@workspace/backend/_generated/api";
@@ -19,14 +19,29 @@ export function MatchesPageView() {
   const share = useShare();
 
   const findData = useQuery(api.matches.findUserMatches, {});
-  const ready = findData?.status === "ready";
 
-  const presentQ = useQuery(api.checkins.listPresentAtMyPoints, ready ? {} : "skip");
-  const checkinQ = useQuery(api.checkins.getMyActiveCheckinSummary, ready ? {} : "skip");
-  const listMatches = useQuery(api.matches.listMyMatches, ready ? queryArgs : "skip");
+  /** User has city + stickers; `findUserMatches` can stay `"computing"` forever while `userMatchCache` is stale — the page uses `listMyMatches` instead, so we must not block on `"ready"`. */
+  const canLoadMatches =
+    findData !== undefined &&
+    (findData.status === "ready" || findData.status === "computing");
+
+  const presentQ = useQuery(
+    api.checkins.listPresentAtMyPoints,
+    canLoadMatches ? {} : "skip"
+  );
+  const checkinQ = useQuery(
+    api.checkins.getMyActiveCheckinSummary,
+    canLoadMatches ? {} : "skip"
+  );
+  const listMatches = useQuery(
+    api.matches.listMyMatches,
+    canLoadMatches ? queryArgs : "skip"
+  );
   const layer1Matches = useQuery(
     api.matches.listMyMatches,
-    ready ? { layer: 1, bidirectionalOnly: queryArgs.bidirectionalOnly } : "skip"
+    canLoadMatches
+      ? { layer: 1, bidirectionalOnly: queryArgs.bidirectionalOnly }
+      : "skip"
   );
 
   const handleSharePoint = useCallback(async () => {
@@ -40,15 +55,31 @@ export function MatchesPageView() {
   }, [checkinQ?.tradePointSlug, share]);
 
   useEffect(() => {
-    if (ready && listMatches && process.env.NODE_ENV === "development") {
+    if (
+      findData?.status === "ready" &&
+      listMatches &&
+      process.env.NODE_ENV === "development"
+    ) {
       console.log("[analytics] matches_viewed", {
         count: listMatches.matches.length,
       });
     }
-  }, [ready, listMatches]);
+  }, [findData?.status, listMatches]);
 
   if (findData === undefined) {
     return <MatchesPageSkeleton />;
+  }
+
+  if (findData.status === "unauth") {
+    return (
+      <MatchesEmptyState
+        icon={User}
+        title="Entre na sua conta"
+        description="Faça login para ver matches e combinar trocas."
+        ctaHref="/sign-in"
+        ctaLabel="Entrar"
+      />
+    );
   }
 
   if (findData.status === "needs-city") {
@@ -73,10 +104,6 @@ export function MatchesPageView() {
         ctaLabel="Cadastrar minhas figurinhas"
       />
     );
-  }
-
-  if (findData.status === "computing") {
-    return <MatchesPageSkeleton showText />;
   }
 
   if (
@@ -161,15 +188,13 @@ export function MatchesPageView() {
   );
 }
 
-function MatchesPageSkeleton({ showText = false }: { showText?: boolean }) {
+function MatchesPageSkeleton() {
   return (
     <div className="space-y-6">
       <div>
         <Skeleton className="h-9 w-32" />
         <Skeleton className="mt-2 h-5 w-64" />
       </div>
-
-      {showText && <p className="text-sm text-muted-foreground">Calculando matches...</p>}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
