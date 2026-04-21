@@ -181,7 +181,8 @@ export default defineSchema({
   /**
    * Check-ins at trade points.
    * Denormalized fields (displayNickname, avatarSeed, duplicates) are snapshots
-   * from the user at check-in time. Staleness up to 2h (TTL) is acceptable.
+   * from the user at check-in time; duplicates/nickname are also refreshed when
+   * the user saves figurinhas while still checked in.
    * This avoids N+1 reads and reactivity storms when querying present users.
    */
   checkins: defineTable({

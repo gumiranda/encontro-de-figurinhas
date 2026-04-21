@@ -240,7 +240,7 @@ const PresentMatchCard = memo(function PresentMatchCard({
           </div>
 
           {visibleGroups.length > 0 && (
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
+            <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-4">
               {visibleGroups.map(([code, numbers]) => (
                 <StickerChip
                   key={code}
@@ -251,9 +251,9 @@ const PresentMatchCard = memo(function PresentMatchCard({
                 />
               ))}
               {hiddenGroupsCount > 0 && (
-                <span className="inline-flex items-center rounded-md bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
-                  +{hiddenGroupsCount}
-                </span>
+                <div className="flex items-center justify-center rounded-lg bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground">
+                  +{hiddenGroupsCount} países
+                </div>
               )}
             </div>
           )}
@@ -283,7 +283,7 @@ function StickerChip({ code, numbers, lookup, highlight = false }: StickerChipPr
   const section = lookup?.byCode.get(code);
   const flagEmoji = section?.flagEmoji ?? "";
 
-  const formatted = numbers.slice(0, 4).map((n) => {
+  const relativeNumbers = numbers.map((n) => {
     if (lookup) {
       const info = formatStickerNumber(n, lookup);
       return info.relativeNum;
@@ -291,24 +291,31 @@ function StickerChip({ code, numbers, lookup, highlight = false }: StickerChipPr
     return n;
   });
 
-  const hiddenCount = numbers.length - 4;
+  const visibleNumbers = relativeNumbers.slice(0, 6);
+  const hiddenCount = relativeNumbers.length - 6;
 
   return (
-    <span
+    <div
       className={cn(
-        "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs",
+        "rounded-lg px-2.5 py-1.5 text-xs",
         highlight
-          ? "bg-primary/10 text-primary"
-          : "bg-muted/80 text-muted-foreground"
+          ? "bg-primary/10 border border-primary/20"
+          : "bg-muted/60 border border-transparent"
       )}
     >
-      <span className="shrink-0">{flagEmoji}</span>
-      <span className="font-mono">
-        {formatted.join(", ")}
+      <div className="flex items-center gap-1.5 font-medium">
+        {flagEmoji && <span>{flagEmoji}</span>}
+        <span className={highlight ? "text-primary" : "text-foreground"}>{code}</span>
+      </div>
+      <div className={cn(
+        "font-mono text-[11px] mt-0.5",
+        highlight ? "text-primary/80" : "text-muted-foreground"
+      )}>
+        {visibleNumbers.join(", ")}
         {hiddenCount > 0 && (
-          <span className="opacity-70"> +{hiddenCount}</span>
+          <span className="opacity-60"> +{hiddenCount}</span>
         )}
-      </span>
-    </span>
+      </div>
+    </div>
   );
 }

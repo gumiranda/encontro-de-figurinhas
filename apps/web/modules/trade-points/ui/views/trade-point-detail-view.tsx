@@ -125,7 +125,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
     }
 
     return (
-      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 pb-24">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 pb-24 sm:px-6 xl:max-w-6xl 2xl:max-w-[90rem]">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-outline-variant/20 bg-[color:var(--surface-container-low)] px-6 shadow-lg shadow-blue-950/25 backdrop-blur-xl">
           <Button
             variant="ghost"
@@ -173,7 +173,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
     const { point } = data;
 
     return (
-      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 pb-24">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 pb-24 sm:px-6 xl:max-w-6xl 2xl:max-w-[90rem]">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-outline-variant/20 bg-[color:var(--surface-container-low)] px-6 shadow-lg shadow-blue-950/25 backdrop-blur-xl">
           <Button
             variant="ghost"
@@ -286,7 +286,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
   }
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 pb-24">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pb-24 sm:px-6 xl:max-w-6xl 2xl:max-w-[90rem]">
       <Dialog
         open={reportOpen}
         onOpenChange={(open) => {
@@ -408,9 +408,9 @@ export function TradePointDetailView({ tradePointId }: Props) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         <div className="space-y-6 md:col-span-8">
           <PointLifecycleCard />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start xl:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] xl:gap-6">
             <PeakHoursChart peakHours={stablePeakHours} />
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4">
               <PresentMatchesSection tradePointId={point._id} />
               <MatchesSection tradePointId={point._id} />
             </div>

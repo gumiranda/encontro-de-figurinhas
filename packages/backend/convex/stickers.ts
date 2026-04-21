@@ -1,5 +1,5 @@
-import { mutation, query } from "./_generated/server";
-import type { Doc } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
+import { mutation, query, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./lib/auth";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
@@ -26,6 +26,38 @@ type UserPatch = Partial<
     | "hasCompletedStickerSetup"
   >
 >;
+
+/**
+ * Present-matches reads denormalized `duplicates` on check-ins; keep in sync when the user edits stickers.
+ */
+async function syncActiveCheckinsStickerSnapshot(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  user: Doc<"users">,
+  duplicates: number[]
+) {
+  const now = Date.now();
+  const activeCheckins = await ctx.db
+    .query("checkins")
+    .withIndex("by_user_active", (q) =>
+      q.eq("userId", userId).gt("expiresAt", now)
+    )
+    .collect();
+
+  if (activeCheckins.length === 0) return;
+
+  const displayNickname =
+    user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador";
+  const avatarSeed = user.nickname ?? userId;
+
+  for (const c of activeCheckins) {
+    await ctx.db.patch(c._id, {
+      duplicates,
+      displayNickname,
+      avatarSeed,
+    });
+  }
+}
 
 export const getUserStickers = query({
   args: {},
@@ -135,6 +167,14 @@ export const updateStickerList = mutation({
 
     await ctx.db.patch(user._id, patch);
 
+    const mergedUser = { ...user, ...patch };
+    await syncActiveCheckinsStickerSnapshot(
+      ctx,
+      user._id,
+      mergedUser,
+      args.duplicates
+    );
+
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 
     return null;
@@ -193,6 +233,8 @@ export const toggleSticker = mutation({
       totalStickersOwned,
       lastActiveAt: Date.now(),
     });
+
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, user, nextDup);
 
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 

@@ -89,6 +89,8 @@ export const PeakHoursChart = memo(function PeakHoursChart({
         <span id={chartLabelId} className="sr-only">
           Distribuição de check-ins por hora
         </span>
+        <div className="-mx-1 overflow-x-auto px-1 sm:mx-0 sm:overflow-visible">
+          <div className="min-w-[520px] sm:min-w-0">
         <div
           role="img"
           aria-labelledby={chartLabelId}
@@ -131,15 +133,17 @@ export const PeakHoursChart = memo(function PeakHoursChart({
           })}
         </div>
         <div
-          className="grid gap-0.5 text-[10px] text-muted-foreground"
+          className="grid gap-0.5 text-[9px] text-muted-foreground tabular-nums sm:text-[10px]"
           style={{ gridTemplateColumns: "repeat(24, minmax(0, 1fr))" }}
           aria-hidden="true"
         >
           {safeHours.map((_, hour) => (
-            <span key={hour} className="min-w-0 truncate text-center">
+            <span key={hour} className="min-w-0 text-center sm:truncate">
               {hour % 3 === 0 ? `${hour}h` : ""}
             </span>
           ))}
+        </div>
+          </div>
         </div>
       </CardContent>
     </Card>
