@@ -5426,6 +5426,522 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável da Turquia na Copa 2026, técnico Vincenzo Montella, Grupo D, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
+  {
+    title: "Figurinhas Bósnia e Herzegovina Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-bosnia-e-herzegovina-copa-2026",
+    excerpt:
+      "Convocação provável da Bósnia e Herzegovina na Copa 2026, técnico Sergej Barbarez, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Bósnia e Herzegovina, conhecida como <strong>Zmajevi (Dragões)</strong>, sorteada no <strong>Grupo B</strong> ao lado de Canadá, Suíça e Catar. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Bósnia e Herzegovina.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 70º · Técnico: Sergej Barbarez · Última Copa: 2014 · Grupo: B</p></blockquote>
+
+<h2>Sobre a Seleção da Bósnia e Herzegovina</h2>
+
+<p>A Bósnia e Herzegovina retorna à Copa do Mundo após 12 anos, classificando-se de forma dramática ao eliminar a Itália nos pênaltis na repescagem. Sua única participação anterior foi em 2014 no Brasil, onde caiu na primeira fase com vitória sobre o Irã.</p>
+
+<h2>Provável Convocação da Bósnia e Herzegovina para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Bósnia e Herzegovina para o Mundial 2026, com base nas últimas convocações do técnico Sergej Barbarez, traz 19 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Nikola Vasilj (St. Pauli) · Ibrahim Šehić (Konyaspor) · Vladan Kovačević (Sporting)</p>
+
+<h3>Defensores</h3>
+<p>Sead Kolašinac (Atalanta) · Amar Dedić (Benfica) · Nihad Mujakić (Çaykur Rizespor) · Dennis Hadžikadunić (Famalicão) · Sanjin Prcić (Estrasburgo) · Stefan Kovač (Hammarby)</p>
+
+<h3>Meio-campistas</h3>
+<p>Miralem Pjanić (CSKA Moscou) · Rade Krunić (Fenerbahçe) · Ivan Bašić (PAS Lamia) · Anel Ahmedhodžić (Sheffield United)</p>
+
+<h3>Atacantes</h3>
+<p>Edin Džeko (Fenerbahçe) · Ermedin Demirović (Stuttgart) · Adnan Janjuzaj (PAOK) · Smail Prevljak (Sporting Charleroi) · Haris Hajradinović (Hatayspor)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Bósnia e Herzegovina na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Bósnia e Herzegovina que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Edin Džeko</strong> (Fenerbahçe)</li>
+<li><strong>Sead Kolašinac</strong> (Atalanta)</li>
+<li><strong>Ermedin Demirović</strong> (Stuttgart)</li>
+<li><strong>Amar Dedić</strong> (Benfica)</li>
+<li><strong>Adnan Janjuzaj</strong> (PAOK)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Sergej Barbarez</h2>
+
+<p><strong>Sergej Barbarez</strong> comanda a seleção da Bósnia e Herzegovina na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo B da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo B</strong>, Bósnia e Herzegovina terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Bósnia e Herzegovina × Canadá</td><td>Canadá</td></tr>
+<tr><td>Bósnia e Herzegovina × Suíça</td><td>Suíça</td></tr>
+<tr><td>Bósnia e Herzegovina × Catar</td><td>Catar</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Bósnia e Herzegovina em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase (2014)</li>
+<li><strong>Última participação antes de 2026:</strong> 2014</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Bósnia e Herzegovina no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta histórica dos Dragões — Džeko, eterno camisa 9, é a figurinha mais buscada.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Bósnia e Herzegovina mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Bósnia e Herzegovina</h2>
+
+<p>Para encontrar e completar suas figurinhas da Bósnia e Herzegovina, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Bósnia e Herzegovina (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Bósnia e Herzegovina na Copa do Mundo 2026?</h3>
+<p>O técnico da Bósnia e Herzegovina na Copa do Mundo 2026 é <strong>Sergej Barbarez</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Bósnia e Herzegovina caiu na Copa do Mundo 2026?</h3>
+<p>Bósnia e Herzegovina foi sorteada no <strong>Grupo B</strong> da Copa do Mundo 2026 e enfrentará Canadá, Suíça e Catar na fase de grupos.</p>
+
+<h3>Quantas vezes Bósnia e Herzegovina foi campeão da Copa do Mundo?</h3>
+<p>Bósnia e Herzegovina ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase (2014).</p>
+
+<h3>Quais são as figurinhas mais raras da Bósnia e Herzegovina no álbum da Copa 2026?</h3>
+<p>Volta histórica dos Dragões — Džeko, eterno camisa 9, é a figurinha mais buscada. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Bósnia e Herzegovina mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Bósnia e Herzegovina e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Bósnia e Herzegovina promete ser uma das atrações do <strong>Grupo B</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Bósnia e Herzegovina no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Bósnia e Herzegovina", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo B"],
+    seoTitle: "Figurinhas Bósnia e Herzegovina Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Bósnia e Herzegovina na Copa 2026, técnico Sergej Barbarez, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas África do Sul Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-africa-do-sul-copa-2026",
+    excerpt:
+      "Convocação provável da África do Sul na Copa 2026, técnico Hugo Broos, Grupo A, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está África do Sul, conhecida como <strong>Bafana Bafana</strong>, sorteada no <strong>Grupo A</strong> ao lado de México, Coreia do Sul e República Tcheca. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da África do Sul.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 55º · Técnico: Hugo Broos · Última Copa: 2010 (anfitriã) · Grupo: A</p></blockquote>
+
+<h2>Sobre a Seleção da África do Sul</h2>
+
+<p>A África do Sul retorna à Copa do Mundo após 16 anos de jejum, desde que sediou a edição de 2010. Os Bafana Bafana participaram de três edições (1998, 2002 e 2010), mas nunca passaram da primeira fase, sendo a única seleção anfitriã da história a cair na fase de grupos.</p>
+
+<h2>Provável Convocação da África do Sul para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da África do Sul para o Mundial 2026, com base nas últimas convocações do técnico Hugo Broos, traz 19 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Ronwen Williams (Mamelodi Sundowns) · Ricardo Goss (Sekhukhune United) · Sipho Chaine (Orlando Pirates)</p>
+
+<h3>Defensores</h3>
+<p>Siyanda Xulu (Sekhukhune) · Mothobi Mvala (Mamelodi Sundowns) · Khuliso Mudau (Sundowns) · Aubrey Modiba (Sundowns) · Nkosinathi Sibisi (Orlando Pirates) · Nyiko Mobbie (Sundowns)</p>
+
+<h3>Meio-campistas</h3>
+<p>Teboho Mokoena (Sundowns) · Themba Zwane (Sundowns) · Sphephelo Sithole (Tondela) · Bongokuhle Hlongwane (Minnesota United) · Mihlali Mayambela (Aris Limassol)</p>
+
+<h3>Atacantes</h3>
+<p>Lyle Foster (Burnley) · Percy Tau (Al Ahly) · Iqraam Rayners (Sundowns) · Monnapule Saleng (Orlando Pirates) · Oswin Appollis (Polokwane City)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da África do Sul na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da África do Sul que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Ronwen Williams</strong> (Mamelodi Sundowns)</li>
+<li><strong>Themba Zwane</strong> (Mamelodi Sundowns)</li>
+<li><strong>Lyle Foster</strong> (Burnley)</li>
+<li><strong>Percy Tau</strong> (Al Ahly)</li>
+<li><strong>Teboho Mokoena</strong> (Mamelodi Sundowns)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Hugo Broos</h2>
+
+<p><strong>Hugo Broos</strong> comanda a seleção da África do Sul na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo A da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo A</strong>, África do Sul terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>África do Sul × México</td><td>México</td></tr>
+<tr><td>África do Sul × Coreia do Sul</td><td>Coreia do Sul</td></tr>
+<tr><td>África do Sul × República Tcheca</td><td>República Tcheca</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da África do Sul em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase em todas as participações</li>
+<li><strong>Última participação antes de 2026:</strong> 2010 (anfitriã)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da África do Sul no Álbum da Copa do Mundo 2026</h2>
+
+<p>Reaparição rara dos sul-africanos no álbum, o que aumenta a busca por colecionadores que não viram suas figurinhas desde 2010.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da África do Sul mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da África do Sul</h2>
+
+<p>Para encontrar e completar suas figurinhas da África do Sul, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da África do Sul (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da África do Sul na Copa do Mundo 2026?</h3>
+<p>O técnico da África do Sul na Copa do Mundo 2026 é <strong>Hugo Broos</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo África do Sul caiu na Copa do Mundo 2026?</h3>
+<p>África do Sul foi sorteada no <strong>Grupo A</strong> da Copa do Mundo 2026 e enfrentará México, Coreia do Sul e República Tcheca na fase de grupos.</p>
+
+<h3>Quantas vezes África do Sul foi campeão da Copa do Mundo?</h3>
+<p>África do Sul ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase em todas as participações.</p>
+
+<h3>Quais são as figurinhas mais raras da África do Sul no álbum da Copa 2026?</h3>
+<p>Reaparição rara dos sul-africanos no álbum, o que aumenta a busca por colecionadores que não viram suas figurinhas desde 2010. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da África do Sul mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da África do Sul e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da África do Sul promete ser uma das atrações do <strong>Grupo A</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da África do Sul no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["África do Sul", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo A"],
+    seoTitle: "Figurinhas África do Sul Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da África do Sul na Copa 2026, técnico Hugo Broos, Grupo A, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Egito Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-egito-copa-2026",
+    excerpt:
+      "Convocação provável do Egito na Copa 2026, técnico Hossam Hassan, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Egito, conhecida como <strong>Faraós</strong>, sorteada no <strong>Grupo G</strong> ao lado de Bélgica, Irã e Nova Zelândia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Egito.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 32º · Técnico: Hossam Hassan · Última Copa: 2018 · Grupo: G</p></blockquote>
+
+<h2>Sobre a Seleção do Egito</h2>
+
+<p>O Egito é a primeira seleção africana a disputar uma Copa do Mundo (1934). Os Faraós têm 4 participações no total. Em 2018, retornaram após 28 anos com Salah em destaque. Sete vezes campeões africanos, tentam consolidar a tradição em Mundiais.</p>
+
+<h2>Provável Convocação do Egito para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Egito para o Mundial 2026, com base nas últimas convocações do técnico Hossam Hassan, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Mohamed El Shenawy (Al-Ahly) · Mohamed Abou Gabal (Pyramids) · Mostafa Shobeir (Al-Ahly)</p>
+
+<h3>Defensores</h3>
+<p>Mohamed Hamdy (Pyramids) · Mohamed Hany (Al-Ahly) · Ahmed Hegazi (Ittihad Jeddah) · Omar Kamal (Al-Ahly) · Mohamed Abdelmonem (Nice) · Mahmoud 'Trezeguet' Hassan · Ahmed Fatouh (Zamalek)</p>
+
+<h3>Meio-campistas</h3>
+<p>Mohamed Elneny (Al-Jazira) · Hamdi Fathi (Al-Wakrah) · Mostafa Fathi (Pyramids) · Mahmoud 'Bika' Saber (Al-Ahly) · Tarek Hamed (Pyramids) · Akram Tawfik (Al-Ahly)</p>
+
+<h3>Atacantes</h3>
+<p>Mohamed Salah (Liverpool) · Omar Marmoush (Manchester City) · Mostafa Mohamed (Nantes) · Trezeguet (Trabzonspor) · Mahmoud Hassan (Zamalek) · Marwan Hamdi (Pyramids)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas do Egito na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes do Egito que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Mohamed Salah</strong> (Liverpool)</li>
+<li><strong>Omar Marmoush</strong> (Manchester City)</li>
+<li><strong>Mohamed Elneny</strong> (Al-Jazira)</li>
+<li><strong>Trezeguet</strong> (Trabzonspor)</li>
+<li><strong>Mostafa Mohamed</strong> (Nantes)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Hossam Hassan</h2>
+
+<p><strong>Hossam Hassan</strong> comanda a seleção do Egito na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo G da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo G</strong>, Egito terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Egito × Bélgica</td><td>Bélgica</td></tr>
+<tr><td>Egito × Irã</td><td>Irã</td></tr>
+<tr><td>Egito × Nova Zelândia</td><td>Nova Zelândia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Egito em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase (1934, 1990, 2018)</li>
+<li><strong>Última participação antes de 2026:</strong> 2018</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Egito no Álbum da Copa do Mundo 2026</h2>
+
+<p>Mohamed Salah é uma das figurinhas mais valorizadas e disputadas do álbum mundial!</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Egito mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Egito</h2>
+
+<p>Para encontrar e completar suas figurinhas do Egito, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Egito (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Egito na Copa do Mundo 2026?</h3>
+<p>O técnico do Egito na Copa do Mundo 2026 é <strong>Hossam Hassan</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Egito caiu na Copa do Mundo 2026?</h3>
+<p>Egito foi sorteada no <strong>Grupo G</strong> da Copa do Mundo 2026 e enfrentará Bélgica, Irã e Nova Zelândia na fase de grupos.</p>
+
+<h3>Quantas vezes Egito foi campeão da Copa do Mundo?</h3>
+<p>Egito ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase (1934, 1990, 2018).</p>
+
+<h3>Quais são as figurinhas mais raras do Egito no álbum da Copa 2026?</h3>
+<p>Mohamed Salah é uma das figurinhas mais valorizadas e disputadas do álbum mundial! As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas do Egito mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Egito e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Egito promete ser uma das atrações do <strong>Grupo G</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Egito no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Egito", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo G"],
+    seoTitle: "Figurinhas Egito Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Egito na Copa 2026, técnico Hossam Hassan, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Tunísia Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-tunisia-copa-2026",
+    excerpt:
+      "Convocação provável da Tunísia na Copa 2026, técnico Sami Trabelsi, Grupo F, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Tunísia, conhecida como <strong>Águias de Cartago</strong>, sorteada no <strong>Grupo F</strong> ao lado de Holanda, Japão e Suécia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Tunísia.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 47º · Técnico: Sami Trabelsi · Última Copa: 2022 · Grupo: F</p></blockquote>
+
+<h2>Sobre a Seleção da Tunísia</h2>
+
+<p>A Tunísia disputa sua sétima Copa do Mundo, mantendo a tradição como uma das principais seleções africanas. Tem o feito histórico de ter vencido jogos em todas as últimas três Copas, mas nunca passou da primeira fase. Em 2022, derrotou a França na fase de grupos.</p>
+
+<h2>Provável Convocação da Tunísia para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Tunísia para o Mundial 2026, com base nas últimas convocações do técnico Sami Trabelsi, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Aymen Dahmen (Sochaux) · Aymen Mathlouthi (Espérance) · Bechir Ben Said (US Monastir)</p>
+
+<h3>Defensores</h3>
+<p>Yann Karamoh (Karagümrük) · Mohamed Dräger (Olympiacos) · Ali Maâloul (Al-Ahly) · Dylan Bronn (Salernitana) · Montassar Talbi (Lorient) · Nader Ghandri (Anorthosis)</p>
+
+<h3>Meio-campistas</h3>
+<p>Aïssa Laïdouni (Como) · Ellyes Skhiri (Eintracht Frankfurt) · Hannibal Mejbri (Burnley) · Mohamed Ali Ben Romdhane (Ferencváros) · Ferjani Sassi (Al-Duhail) · Anis Slimane (Brøndby)</p>
+
+<h3>Atacantes</h3>
+<p>Naïm Sliti (Al-Ettifaq) · Issam Jebali (Odense) · Mohamed Amine Ben Hamida (Espérance) · Seifeddine Jaziri (Zamalek) · Elias Achouri (Copenhague) · Taha Yassine Khenissi (Kuwait SC)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Tunísia na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Tunísia que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Hannibal Mejbri</strong> (Burnley)</li>
+<li><strong>Wahbi Khazri</strong> (aposentado)</li>
+<li><strong>Aïssa Laïdouni</strong> (Como)</li>
+<li><strong>Ellyes Skhiri</strong> (Eintracht Frankfurt)</li>
+<li><strong>Naïm Sliti</strong> (Al-Ettifaq)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Sami Trabelsi</h2>
+
+<p><strong>Sami Trabelsi</strong> comanda a seleção da Tunísia na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo F da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo F</strong>, Tunísia terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Tunísia × Holanda</td><td>Holanda</td></tr>
+<tr><td>Tunísia × Japão</td><td>Japão</td></tr>
+<tr><td>Tunísia × Suécia</td><td>Suécia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Tunísia em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase em todas as 6 participações</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Tunísia no Álbum da Copa do Mundo 2026</h2>
+
+<p>Águias de Cartago têm presença frequente no álbum, com forte apelo entre colecionadores árabes do Brasil.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Tunísia mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Tunísia</h2>
+
+<p>Para encontrar e completar suas figurinhas da Tunísia, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Tunísia (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Tunísia na Copa do Mundo 2026?</h3>
+<p>O técnico da Tunísia na Copa do Mundo 2026 é <strong>Sami Trabelsi</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Tunísia caiu na Copa do Mundo 2026?</h3>
+<p>Tunísia foi sorteada no <strong>Grupo F</strong> da Copa do Mundo 2026 e enfrentará Holanda, Japão e Suécia na fase de grupos.</p>
+
+<h3>Quantas vezes Tunísia foi campeão da Copa do Mundo?</h3>
+<p>Tunísia ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase em todas as 6 participações.</p>
+
+<h3>Quais são as figurinhas mais raras da Tunísia no álbum da Copa 2026?</h3>
+<p>Águias de Cartago têm presença frequente no álbum, com forte apelo entre colecionadores árabes do Brasil. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Tunísia mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Tunísia e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Tunísia promete ser uma das atrações do <strong>Grupo F</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Tunísia no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Tunísia", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo F"],
+    seoTitle: "Figurinhas Tunísia Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Tunísia na Copa 2026, técnico Sami Trabelsi, Grupo F, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
 ];
 
 export const seedBlogPosts = internalMutation({
