@@ -3281,7 +3281,1474 @@ const BLOG_POSTS = [
     tags: ["Equador", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo E"],
     seoTitle: "Figurinhas Equador Copa 2026 — Convocação e Álbum",
     seoDescription:
-      "Convocação provável do Equador na Copa 2026, técnico Sebastián Beccacece, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+"Convocação provável do Equador na Copa 2026, técnico Sebastián Beccacece, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Austrália Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-australia-copa-2026",
+    excerpt:
+      "Convocação provável da Austrália na Copa 2026, técnico Tony Popovic, Grupo D, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a Austrália, conhecida como <strong>Socceroos</strong>, sorteada no <strong>Grupo D</strong> ao lado de Estados Unidos, Paraguai e Turquia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Austrália.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 26º · Técnico: Tony Popovic · Última Copa: 2022 · Grupo: D</blockquote>
+
+<h2>Sobre a Seleção da Austrália</h2>
+
+<p>Os Socceroos disputam sua sexta Copa do Mundo. Após chegar às oitavas em 2006 (perdendo para a Itália na prorrogação) e em 2022 (eliminada pela Argentina), a Austrália busca ir além. É uma seleção experiente e competitiva.</p>
+
+<h2>Provável Convocação da Austrália para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Austrália para o Mundial 2026, com base nas últimas convocações do técnico Tony Popovic, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Mat Ryan (AS Roma)</li>
+<li>Joe Gauci (Aston Villa)</li>
+<li>Andrew Redmayne (Sydney FC)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Harry Souttar (Sheffield United)</li>
+<li>Cameron Burgess (Ipswich Town)</li>
+<li>Aziz Behich (Melbourne City)</li>
+<li>Nathaniel Atkinson (Hearts)</li>
+<li>Lewis Miller (Hibernian)</li>
+<li>Jordan Bos (Westerlo)</li>
+<li>Kye Rowles (Hearts)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Jackson Irvine (St. Pauli)</li>
+<li>Riley McGree (Middlesbrough)</li>
+<li>Connor Metcalfe (St. Pauli)</li>
+<li>Cameron Devlin (Hearts)</li>
+<li>Aiden O'Neill (Standard Liège)</li>
+<li>Anthony Caceres (Macarthur FC)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Mitchell Duke (Machida Zelvia)</li>
+<li>Adam Taggart (Perth Glory)</li>
+<li>Bruno Fornaroli (Melbourne Victory)</li>
+<li>Kusini Yengi (Portsmouth)</li>
+<li>Sam Silvera (Middlesbrough)</li>
+<li>Garang Kuol (Volos)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Austrália na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Mat Ryan</strong> (AS Roma)</li>
+<li><strong>Mitchell Duke</strong> (Machida Zelvia)</li>
+<li><strong>Jackson Irvine</strong> (St. Pauli)</li>
+<li><strong>Riley McGree</strong> (Middlesbrough)</li>
+<li><strong>Harry Souttar</strong> (Sheffield United)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Tony Popovic</h2>
+
+<p><strong>Tony Popovic</strong> comanda a seleção da Austrália na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo D da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo D</strong>, a Austrália terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Austrália × Estados Unidos</td><td>Estados Unidos</td></tr>
+<tr><td>Austrália × Paraguai</td><td>Paraguai</td></tr>
+<tr><td>Austrália × Turquia</td><td>Turquia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Austrália em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Oitavas de final (2006 e 2022)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Austrália no Álbum da Copa do Mundo 2026</h2>
+
+<p>Tradicional figura no álbum, com camisa amarela inconfundível.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Austrália mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Austrália</h2>
+
+<p>Para encontrar e completar suas figurinhas da Austrália, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Austrália (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Austrália na Copa do Mundo 2026?</h3>
+<p>O técnico da Austrália na Copa do Mundo 2026 é <strong>Tony Popovic</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo a Austrália caiu na Copa do Mundo 2026?</h3>
+<p>A Austrália foi sorteada no <strong>Grupo D</strong> da Copa do Mundo 2026 e enfrentará Estados Unidos, Paraguai e Turquia na fase de grupos.</p>
+
+<h3>Quantas vezes a Austrália foi campeã da Copa do Mundo?</h3>
+<p>A Austrália ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Oitavas de final (2006 e 2022).</p>
+
+<h3>Quais são as figurinhas mais raras da Austrália no álbum da Copa 2026?</h3>
+<p>Tradicional figura no álbum, com camisa amarela inconfundível. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas da Austrália mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Austrália e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Austrália promete ser uma das atrações do <strong>Grupo D</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Austrália no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Austrália", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo D"],
+    seoTitle: "Figurinhas Austrália Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Austrália na Copa 2026, técnico Tony Popovic, Grupo D, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Nova Zelândia Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-nova-zelandia-copa-2026",
+    excerpt:
+      "Convocação provável da Nova Zelândia na Copa 2026, técnico Darren Bazeley, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a Nova Zelândia, conhecida como <strong>All Whites</strong>, sorteada no <strong>Grupo G</strong> ao lado de Bélgica, Egito e Irã. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Nova Zelândia.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Oceania (OFC) · Ranking FIFA: 94º · Técnico: Darren Bazeley · Última Copa: 2010 · Grupo: G</blockquote>
+
+<h2>Sobre a Seleção da Nova Zelândia</h2>
+
+<p>Os All Whites voltam à Copa após 16 anos. Em 2010, na África do Sul, escreveram página gloriosa: foram a única seleção invicta do torneio, com três empates, sendo eliminada apenas pela então campeã Itália. Disputam sua terceira Copa do Mundo na história.</p>
+
+<h2>Provável Convocação da Nova Zelândia para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Nova Zelândia para o Mundial 2026, com base nas últimas convocações do técnico Darren Bazeley, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Oliver Sail (Wellington Phoenix)</li>
+<li>Alex Paulsen (Bournemouth)</li>
+<li>Maxim Crocombe (Vejle)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Liberato Cacace (Empoli)</li>
+<li>Tyler Bindon (Reading)</li>
+<li>Michael Boxall (Minnesota United)</li>
+<li>Francis de Vries (Auckland FC)</li>
+<li>Finn Surman (Portland Timbers)</li>
+<li>Storm Roux (Central Coast Mariners)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Marko Stamenić (Olympiacos)</li>
+<li>Joe Bell (Brentford)</li>
+<li>Matt Garbett (Auckland FC)</li>
+<li>Ben Old (St Mirren)</li>
+<li>Sarpreet Singh (Hannover)</li>
+<li>Clayton Lewis (Auckland FC)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Chris Wood (Nottingham Forest)</li>
+<li>Tyler Boyd (Sivasspor)</li>
+<li>Kosta Barbarouses (Sydney FC)</li>
+<li>Logan Rogerson (Auckland FC)</li>
+<li>Ben Waine (St Mirren)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Nova Zelândia na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Chris Wood</strong> (Nottingham Forest)</li>
+<li><strong>Marko Stamenić</strong> (Olympiacos)</li>
+<li><strong>Liberato Cacace</strong> (Empoli)</li>
+<li><strong>Tyler Boyd</strong> (Sivasspor)</li>
+<li><strong>Sarpreet Singh</strong> (Hannover)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Darren Bazeley</h2>
+
+<p><strong>Darren Bazeley</strong> comanda a seleção da Nova Zelândia na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo G da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo G</strong>, a Nova Zelândia terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Nova Zelândia × Bélgica</td><td>Bélgica</td></tr>
+<tr><td>Nova Zelândia × Egito</td><td>Egito</td></tr>
+<tr><td>Nova Zelândia × Irã</td><td>Irã</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Nova Zelândia em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase invicta (2010, com 3 empates)</li>
+<li><strong>Última participação antes de 2026:</strong> 2010</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Nova Zelândia no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta dos kiwis — figurinhas raras pela ausência de 16 anos.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Nova Zelândia mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Nova Zelândia</h2>
+
+<p>Para encontrar e completar suas figurinhas da Nova Zelândia, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Nova Zelândia (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Nova Zelândia na Copa do Mundo 2026?</h3>
+<p>O técnico da Nova Zelândia na Copa do Mundo 2026 é <strong>Darren Bazeley</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo a Nova Zelândia caiu na Copa do Mundo 2026?</h3>
+<p>A Nova Zelândia foi sorteada no <strong>Grupo G</strong> da Copa do Mundo 2026 e enfrentará Bélgica, Egito e Irã na fase de grupos.</p>
+
+<h3>Quantas vezes a Nova Zelândia foi campeã da Copa do Mundo?</h3>
+<p>A Nova Zelândia ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase invicta (2010, com 3 empates).</p>
+
+<h3>Quais são as figurinhas mais raras da Nova Zelândia no álbum da Copa 2026?</h3>
+<p>Volta dos kiwis — figurinhas raras pela ausência de 16 anos. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas da Nova Zelândia mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Nova Zelândia e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Nova Zelândia promete ser uma das atrações do <strong>Grupo G</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Nova Zelândia no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Nova Zelândia", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo G"],
+    seoTitle: "Figurinhas Nova Zelândia Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Nova Zelândia na Copa 2026, técnico Darren Bazeley, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Curaçao Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-curacao-copa-2026",
+    excerpt:
+      "Convocação provável de Curaçao na Copa 2026, técnico Dick Advocaat, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p><strong>🆕 ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
+
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Curaçao, conhecida como <strong>Famia Kòrsou</strong>, sorteada no <strong>Grupo E</strong> ao lado de Alemanha, Equador e Costa do Marfim. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas de Curaçao.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: América do Norte (Concacaf) · Ranking FIFA: 82º · Técnico: Dick Advocaat · Última Copa: Estreante · Grupo: E</blockquote>
+
+<h2>Sobre a Seleção de Curaçao</h2>
+
+<p>Curaçao faz história ao disputar sua primeira Copa do Mundo. A pequena ilha caribenha de apenas 150 mil habitantes é, em proporção populacional, a menor nação a disputar um Mundial. O grupo é majoritariamente formado por jogadores nascidos na Holanda com ascendência curaçolense.</p>
+
+<h2>Provável Convocação de Curaçao para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção de Curaçao para o Mundial 2026, com base nas últimas convocações do técnico Dick Advocaat, traz 19 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Eloy Room (Columbus Crew)</li>
+<li>Norichio Nieveld (RKC Waalwijk)</li>
+<li>Marvin Lillipaly (Roda JC)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Cuco Martina</li>
+<li>Bart Vriends (Volendam)</li>
+<li>Armando Obispo (PSV)</li>
+<li>Jürgen Locadia (Maccabi Haifa)</li>
+<li>Roshon van Eijma (Curaçao)</li>
+<li>Sherel Floranus (Sparta Rotterdam)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Leandro Bacuna (FC Groningen)</li>
+<li>Juninho Bacuna (Birmingham City)</li>
+<li>Brandley Kuwas (Heracles)</li>
+<li>Sontje Hansen (Vitesse)</li>
+<li>Vurnon Anita (Volendam)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Tahith Chong (Sheffield United)</li>
+<li>Rangelo Janga (RKC Waalwijk)</li>
+<li>Roshendry Vrolijk (Bradford City)</li>
+<li>Gervane Kastaneer (Sliema)</li>
+<li>Gyrano Kerk (Twente)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas de Curaçao na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Leandro Bacuna</strong> (FC Groningen)</li>
+<li><strong>Juninho Bacuna</strong> (Birmingham City)</li>
+<li><strong>Tahith Chong</strong> (Sheffield United)</li>
+<li><strong>Cuco Martina</strong></li>
+<li><strong>Eloy Room</strong> (Columbus Crew)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Dick Advocaat</h2>
+
+<p><strong>Dick Advocaat</strong> comanda a seleção de Curaçao na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo E da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo E</strong>, Curaçao terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Curaçao × Alemanha</td><td>Alemanha</td></tr>
+<tr><td>Curaçao × Equador</td><td>Equador</td></tr>
+<tr><td>Curaçao × Costa do Marfim</td><td>Costa do Marfim</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico de Curaçao em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Estreia em Copas do Mundo</li>
+<li><strong>Última participação antes de 2026:</strong> Estreante</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas de Curaçao no Álbum da Copa do Mundo 2026</h2>
+
+<p>ESTREANTE: figurinhas raríssimas, primeira aparição no álbum oficial — as mais procuradas por colecionadores que querem completar a coleção desde a estreia.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas de Curaçao mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas de Curaçao</h2>
+
+<p>Para encontrar e completar suas figurinhas de Curaçao, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que connecta colecconecta connecta colecconecta colecconecta colecconnecta colecconnecta connec conecta colec connecta connec conecta colec connecta colecconnecta connecta colecconnecta connecta colec connecta connec connecta colecconnecta conecta colec connecta conecta conecconecta colec conecta colecconnecta <strong>Figurinha Fácil</strong></p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> de Curaçao (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico de Curaçao na Copa do Mundo 2026?</h3>
+<p>O técnico de Curaçao na Copa do Mundo 2026 é <strong>Dick Advocaat</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Curaçao caiu na Copa do Mundo 2026?</h3>
+<p>Curaçao foi sorteada no <strong>Grupo E</strong> da Copa do Mundo 2026 e enfrentará Alemanha, Equador e Costa do Marfim na fase de grupos.</p>
+
+<h3>Quantas vezes Curaçao foi campeão da Copa do Mundo?</h3>
+<p>Curaçao ainda não conquistou nenhuma Copa do Mundo. Esta é sua estreia em Copas do Mundo.</p>
+
+<h3>Quais são as figurinhas mais raras de Curaçao no álbum da Copa 2026?</h3>
+<p>ESTREANTE: figurinhas raríssimas, primeira aparição no álbum oficial — as mais procuradas por colecionadores que querem completar a coleção desde a estreia. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas de Curaçao mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecconecta colecconnecta colec connecta conec colecconnectaconnecta colecconnecta <a href="https://figurinhafil.com.br">figurinhafacil.com.br</a> colec connecta colec connecta collec conec colecconnecta colec connecta colecconnect connectaconnecta connec connecta connec colecconnec connec connec t colec connecta colecconnecta colec <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas de Curaçao e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção de Curaçao promete ser uma das atrações do <strong>Grupo E</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página de Curaçao no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Curaçao", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo E"],
+    seoTitle: "Figurinhas Curaçao Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável de Curaçao na Copa 2026, técnico Dick Advocaat, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Panamá Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-panama-copa-2026",
+    excerpt:
+      "Convocação provável do Panamá na Copa 2026, técnico Thomas Christiansen, Grupo L, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está o Panamá, conhecido como <strong>La Marea Roja</strong>, sorteado no <strong>Grupo L</strong> ao lado de Inglaterra, Croácia e Gana. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Panamá.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: América do Norte (Concacaf) · Ranking FIFA: 37º · Técnico: Thomas Christiansen · Última Copa: 2018 · Grupo: L</blockquote>
+
+<h2>Sobre a Seleção do Panamá</h2>
+
+<p>O Panamá disputa sua segunda Copa do Mundo. A primeira foi em 2018, na Rússia, quando perdeu todos os jogos. La Marea Roja vive nova era sob o comando do dinamarquês Christiansen, com excelente campanha eliminatória.</p>
+
+<h2>Provável Convocação do Panamá para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Panamá para o Mundial 2026, com base nas últimas convocações do técnico Thomas Christiansen, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Orlando Mosquera (Águilas Doradas)</li>
+<li>Luis Mejía (Nacional)</li>
+<li>Jose Guerra (CAI)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Michael Murillo (Marselha)</li>
+<li>Eric Davis (Universitario)</li>
+<li>Fidel Escobar (Atlético San Luis)</li>
+<li>César Blackman (Spartak Trnava)</li>
+<li>Edgardo Fariña (Tauro)</li>
+<li>Andrés Andrade (Colorado Rapids)</li>
+<li>Roderick Miller (CSKA Sofia)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Aníbal Godoy (Nashville SC)</li>
+<li>Adalberto Carrasquilla (Houston Dynamo)</li>
+<li>Cristian Martínez (Tauro)</li>
+<li>Édgar Bárcenas (Olimpia)</li>
+<li>Yoel Bárcenas (Tondela)</li>
+<li>Iván Anderson (Houston Dynamo)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Cecilio Waterman (Coquimbo Unido)</li>
+<li>José Fajardo (Wilstermann)</li>
+<li>Ismael Díaz (León)</li>
+<li>Cristian Arango (Real Salt Lake)</li>
+<li>Tomás Rodríguez (Plaza Amador)</li>
+<li>Eduardo Guerrero (Atromitos)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Panamá na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Aníbal Godoy</strong> (Nashville SC)</li>
+<li><strong>Adalberto Carrasquilla</strong> (Houston Dynamo)</li>
+<li><strong>Cecilio Waterman</strong> (Coquimbo Unido)</li>
+<li><strong>Michael Murillo</strong> (Marselha)</li>
+<li><strong>José Fajardo</strong> (Wilstermann)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Thomas Christiansen</h2>
+
+<p><strong>Thomas Christiansen</strong> comanda a seleção do Panamá na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo L da Copa do Mundo 2026</h2>
+
+<p>Sorteado no <strong>Grupo L</strong>, o Panamá terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Panamá × Inglaterra</td><td>Inglaterra</td></tr>
+<tr><td>Panamá × Croácia</td><td>Croácia</td></tr>
+<tr><td>Panamá × Gana</td><td>Gana</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Panamá em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase (2018)</li>
+<li><strong>Última participação antes de 2026:</strong> 2018</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Panamá no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta dos panamenhos — figurinhas pouco vistas, valorizadas por colecionadores.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Panamá mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Panamá</h2>
+
+<p>Para encontrar e completar suas figurinhas do Panamá, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que connecta colecconecta colecconnecta colec connecta collec connecta collec conec colecconnecta collec connecta conec connec collec connecta <strong>Figurinha Fácil</strong></p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Panamá (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Panamá na Copa do Mundo 2026?</h3>
+<p>O técnico do Panamá na Copa do Mundo 2026 é <strong>Thomas Christiansen</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo o Panamá caiu na Copa do Mundo 2026?</h3>
+<p>O Panamá foi sorteado no <strong>Grupo L</strong> da Copa do Mundo 2026 e enfrentará Inglaterra, Croácia e Gana na fase de grupos.</p>
+
+<h3>Quantas vezes o Panamá foi campeão da Copa do Mundo?</h3>
+<p>O Panamá ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase (2018).</p>
+
+<h3>Quais são as figurinhas mais raras do Panamá no álbum da Copa 2026?</h3>
+<p>Volta dos panamenhos — figurinhas pouco vistas, valorizadas por colecionadores. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Panamá mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecconecta colec connecta colecconnecta <a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a> colec connecta colec connecta collec conec colecconnec connec connec collec connec connec collec connecta collec <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Panamá e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Panamá promete ser uma das atrações do <strong>Grupo L</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Panamá no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Panamá", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo L"],
+    seoTitle: "Figurinhas Panamá Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Panamá na Copa 2026, técnico Thomas Christiansen, Grupo L, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Haiti Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-haiti-copa-2026",
+    excerpt:
+      "Convocação provável do Haiti na Copa 2026, técnico Sébastien Migné, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está o Haiti, conhecido como <strong>Les Grenadiers</strong>, sorteado no <strong>Grupo C</strong> ao lado de Brasil, Marrocos e Escócia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Haiti.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: América do Norte (Concacaf) · Ranking FIFA: 82º · Técnico: Sébastien Migné · Última Copa: 1974 · Grupo: C</blockquote>
+
+<h2>Sobre a Seleção do Haiti</h2>
+
+<p>Após 52 anos, o Haiti retorna a uma Copa do Mundo. A última participação foi em 1974, na Alemanha Ocidental, quando o lendário Emmanuel Sanon marcou o gol da vitória momentânea contra a Itália. A volta dos Grenadiers é uma das histórias mais emocionantes do Mundial 2026.</p>
+
+<h2>Provável Convocação do Haiti para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Haiti para o Mundial 2026, com base nas últimas convocações do técnico Sébastien Migné, traz 19 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Johny Placide (Vannes)</li>
+<li>Josué Duverger (Bourg-en-Bresse)</li>
+<li>Jean-Marc Alexandre (Cavalry FC)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Carlens Arcus (Auxerre)</li>
+<li>Steeve Yago (Bastia)</li>
+<li>Ricardo Adé (Standard Liège)</li>
+<li>Andrew Jean-Baptiste (Bohemians)</li>
+<li>Hérold Charles (Vélez Sarsfield)</li>
+<li>Garven-Michée Metusala (Le Havre)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Jean-Ricner Bellegarde (Wolverhampton)</li>
+<li>Danley Jean Jacques (Gillingham)</li>
+<li>Leverton Pierre (Le Mans)</li>
+<li>Wilde-Donald Guerrier (Caen)</li>
+<li>Derrick Étienne (Atlanta United)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Duckens Nazon (FC Paris 13)</li>
+<li>Frantzdy Pierrot (Cádiz)</li>
+<li>Don Deedson Louicius (Charleroi)</li>
+<li>Ronaldo Damus (North Carolina FC)</li>
+<li>Kevin Lafrance (PSCS Cilacap)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Haiti na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Duckens Nazon</strong> (FC Paris 13)</li>
+<li><strong>Jean-Ricner Bellegarde</strong> (Wolverhampton)</li>
+<li><strong>Frantzdy Pierrot</strong> (Cádiz)</li>
+<li><strong>Carlens Arcus</strong> (Auxerre)</li>
+<li><strong>Steeve Yago</strong> (Bastia)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Sébastien Migné</h2>
+
+<p><strong>Sébastien Migné</strong> comanda a seleção do Haiti na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo C da Copa do Mundo 2026</h2>
+
+<p>Sorteado no <strong>Grupo C</strong>, o Haiti terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Haiti × Brasil</td><td>Brasil</td></tr>
+<tr><td>Haiti × Marrocos</td><td>Marrocos</td></tr>
+<tr><td>Haiti × Escócia</td><td>Escócia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Haiti em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase (1974)</li>
+<li><strong>Última participação antes de 2026:</strong> 1974</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Haiti no Álbum da Copa do Mundo 2026</h2>
+
+<p>Estreia simbólica no álbum: figurinhas haitianas serão raridade absoluta para colecionadores brasileiros.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Haiti mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Haiti</h2>
+
+<p>Para encontrar e completar suas figurinhas do Haiti, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que connecta colec conec collec connec connec connec connecta colecconnecta cicolec connecta colec connec collec </p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Haiti (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Haiti na Copa do Mundo 2026?</h3>
+<p>O técnico do Haiti na Copa do Mundo 2026 é <strong>Sébastien Migné</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo o Haiti caiu na Copa do Mundo 2026?</h3>
+<p>O Haiti foi sorteado no <strong>Grupo C</strong> da Copa do Mundo 2026 e enfrentará Brasil, Marrocos e Escócia na fase de grupos.</p>
+
+<h3>Quantas vezes o Haiti foi campeão da Copa do Mundo?</h3>
+<p>O Haiti ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase (1974).</p>
+
+<h3>Quais são as figurinhas mais raras do Haiti no álbum da Copa 2026?</h3>
+<p>Estreia simbólica no álbum: figurinhas haitianas serão raridade absoluta para colecionadores brasileiros. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Haiti mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colec conec collec connec connecta colec connec connec connec connec connec connec connec connecta <a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a> colec conec connec connecta collec connecta collec connec connec </p>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colec connecta colec connec connecta </p>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colec conec connecta collec connec connec connecta conec connec connec connecta conec connec collec connec connec connec connecta connec connec <a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a> ) para encontrar colec conec connec connecta collec connec connec connecta collec </p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Haiti promete ser uma das atrações do <strong>Grupo C</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Haiti no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Haiti", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo C"],
+    seoTitle: "Figurinhas Haiti Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Haiti na Copa 2026, técnico Sébastien Migné, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Paraguai Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-paraguai-copa-2026",
+    excerpt:
+      "Convocação provável do Paraguai na Copa 2026, técnico Gustavo Alfaro, Grupo D, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Paraguai, conhecida como <strong>La Albirroja</strong>, sorteada no <strong>Grupo D</strong> ao lado de Estados Unidos, Austrália e Turquia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Paraguai.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: América do Sul (Conmebol) · Ranking FIFA: 37º · Técnico: Gustavo Alfaro · Última Copa: 2010 · Grupo: D</p></blockquote>
+
+<h2>Sobre a Seleção do Paraguai</h2>
+
+<p>O Paraguai retorna à Copa do Mundo após 16 anos. A última participação foi em 2010, com a inédita classificação às quartas. La Albirroja sempre foi um osso duro de roer, com tradição de defesa sólida e contra-ataque rápido. A torcida sonha em repetir o feito de 2010.</p>
+
+<h2>Provável Convocação do Paraguai para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Paraguai para o Mundial 2026, com base nas últimas convocações do técnico Gustavo Alfaro, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Roberto Fernández (Belgrano) · Carlos Coronel (New York Red Bulls) · Orlando Gill (Cerro Porteño)</p>
+
+<h3>Defensores</h3>
+<p>Gustavo Gómez (Palmeiras) · Junior Alonso (Krasnodar) · Omar Alderete (Sunderland) · Damián Bobadilla (San Lorenzo) · Robert Rojas (River Plate) · Juan Cáceres (Famalicão) · Ronaldo Martínez (Independiente del Valle)</p>
+
+<h3>Meio-campistas</h3>
+<p>Andrés Cubas (Vancouver Whitecaps) · Diego Gómez (Brighton) · Miguel Almirón (Atlanta United) · Mathías Villasanti (Grêmio) · Andrés Caballero (Cerro Porteño) · Hernesto Caballero (Libertad)</p>
+
+<h3>Atacantes</h3>
+<p>Antonio Sanabria (Torino) · Julio Enciso (Ipswich Town) · Adam Bareiro (River Plate) · Ramón Sosa (River Plate) · Gabriel Ávalos (Argentinos Juniors)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas do Paraguai na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes do Paraguai que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Antonio Sanabria</strong> (Torino)</li>
+<li><strong>Miguel Almirón</strong> (Atlanta United)</li>
+<li><strong>Julio Enciso</strong> (Ipswich Town)</li>
+<li><strong>Diego Gómez</strong> (Brighton)</li>
+<li><strong>Damián Bobadilla</strong> (San Lorenzo)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Gustavo Alfaro</h2>
+
+<p><strong>Gustavo Alfaro</strong> comanda a seleção do Paraguai na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo D da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo D</strong>, Paraguai terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Paraguai × Estados Unidos</td><td>Estados Unidos</td></tr>
+<tr><td>Paraguai × Austrália</td><td>Austrália</td></tr>
+<tr><td>Paraguai × Turquia</td><td>Turquia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Paraguai em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Quartas de final (2010)</li>
+<li><strong>Última participação antes de 2026:</strong> 2010</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Paraguai no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta dos vizinhos guaranis ao álbum — Almirón e Sanabria são os principais alvos dos colecionadores.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Paraguai mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Paraguai</h2>
+
+<p>Para encontrar e completar suas figurinhas do Paraguai, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Paraguai (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Paraguai na Copa do Mundo 2026?</h3>
+<p>O técnico do Paraguai na Copa do Mundo 2026 é <strong>Gustavo Alfaro</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Paraguai caiu na Copa do Mundo 2026?</h3>
+<p>Paraguai foi sorteado no <strong>Grupo D</strong> da Copa do Mundo 2026 e enfrentará Estados Unidos, Austrália e Turquia na fase de grupos.</p>
+
+<h3>Quantas vezes Paraguai foi campeão da Copa do Mundo?</h3>
+<p>Paraguai ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Quartas de final (2010).</p>
+
+<h3>Quais são as figurinhas mais raras do Paraguai no álbum da Copa 2026?</h3>
+<p>Volta dos vizinhos guaranis ao álbum — Almirón e Sanabria são os principais alvos dos colecionadores. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas do Paraguai mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Paraguai e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Paraguai promete ser uma das atrações do <strong>Grupo D</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Paraguai no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Paraguai", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo D"],
+    seoTitle: "Figurinhas Paraguai Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Paraguai na Copa 2026, técnico Gustavo Alfaro, Grupo D, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Escócia Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-escocia-copa-2026",
+    excerpt:
+      "Convocação provável da Escócia na Copa 2026, técnico Steve Clarke, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Escócia, conhecida como <strong>Tartan Army</strong>, sorteada no <strong>Grupo C</strong> ao lado de Brasil, Marrocos e Haiti. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Escócia.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 44º · Técnico: Steve Clarke · Última Copa: 1998 · Grupo: C</p></blockquote>
+
+<h2>Sobre a Seleção da Escócia</h2>
+
+<p>Após 28 anos de ausência, a Escócia retorna ao maior palco do futebol mundial. Os escoceses têm histórico curioso: nunca passaram da primeira fase em 8 participações. Steve Clarke comanda uma geração talentosa que sonha com a inédita classificação às oitavas de final.</p>
+
+<h2>Provável Convocação da Escócia para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Escócia para o Mundial 2026, com base nas últimas convocações do técnico Steve Clarke, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Angus Gunn (Norwich) · Craig Gordon (Hearts) · Liam Kelly (Rangers)</p>
+
+<h3>Defensores</h3>
+<p>Andy Robertson (Liverpool) · Kieran Tierney (Arsenal) · Jack Hendry (Al-Ettifaq) · Grant Hanley (Birmingham) · Anthony Ralston (Celtic) · Aaron Hickey (Brentford) · Scott McKenna (Las Palmas)</p>
+
+<h3>Meio-campistas</h3>
+<p>Scott McTominay (Napoli) · John McGinn (Aston Villa) · Billy Gilmour (Brighton) · Callum McGregor (Celtic) · Kenny McLean (Norwich) · Lewis Ferguson (Bologna)</p>
+
+<h3>Atacantes</h3>
+<p>Che Adams (Torino) · Lyndon Dykes (Birmingham) · Lawrence Shankland (Hearts) · James Forrest (Celtic) · Ben Doak (Middlesbrough)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Escócia na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Escócia que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Andy Robertson</strong> (Liverpool)</li>
+<li><strong>Scott McTominay</strong> (Napoli)</li>
+<li><strong>Kieran Tierney</strong> (Arsenal)</li>
+<li><strong>John McGinn</strong> (Aston Villa)</li>
+<li><strong>Billy Gilmour</strong> (Brighton)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Steve Clarke</h2>
+
+<p><strong>Steve Clarke</strong> comanda a seleção da Escócia na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo C da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo C</strong>, Escócia terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Escócia × Brasil</td><td>Brasil</td></tr>
+<tr><td>Escócia × Marrocos</td><td>Marrocos</td></tr>
+<tr><td>Escócia × Haiti</td><td>Haiti</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Escócia em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Primeira fase em todas as 8 participações</li>
+<li><strong>Última participação antes de 2026:</strong> 1998</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Escócia no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta nostálgica: muitos colecionadores brasileiros mais antigos vão buscar a Escócia para reviver os álbuns de 1990 e 1998.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Escócia mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Escócia</h2>
+
+<p>Para encontrar e completar suas figurinhas da Escócia, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Escócia (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Escócia na Copa do Mundo 2026?</h3>
+<p>O técnico da Escócia na Copa do Mundo 2026 é <strong>Steve Clarke</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Escócia caiu na Copa do Mundo 2026?</h3>
+<p>Escócia foi sorteada no <strong>Grupo C</strong> da Copa do Mundo 2026 e enfrentará Brasil, Marrocos e Haiti na fase de grupos.</p>
+
+<h3>Quantas vezes Escócia foi campeão da Copa do Mundo?</h3>
+<p>Escócia ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Primeira fase em todas as 8 participações.</p>
+
+<h3>Quais são as figurinhas mais raras da Escócia no álbum da Copa 2026?</h3>
+<p>Volta nostálgica: muitos colecionadores brasileiros mais antigos vão buscar a Escócia para reviver os álbuns de 1990 e 1998. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Escócia mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Escócia e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Escócia promete ser uma das atrações do <strong>Grupo C</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Escócia no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Escócia", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo C"],
+    seoTitle: "Figurinhas Escócia Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Escócia na Copa 2026, técnico Steve Clarke, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Suíça Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-suica-copa-2026",
+    excerpt:
+      "Convocação provável da Suíça na Copa 2026, técnico Murat Yakin, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Suíça, conhecida como <strong>Nati</strong>, sorteada no <strong>Grupo B</strong> ao lado de Canadá, Catar e Bósnia e Herzegovina. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Suíça.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 20º · Técnico: Murat Yakin · Última Copa: 2022 · Grupo: B</p></blockquote>
+
+<h2>Sobre a Seleção da Suíça</h2>
+
+<p>Presença frequente em Copas, a Suíça chega à 13ª participação. Sediou a Copa de 1954 e teve seu auge nas eliminatórias daquela edição, alcançando as quartas. Em 2022, eliminou a Sérvia na fase de grupos antes de cair para Portugal nas oitavas.</p>
+
+<h2>Provável Convocação da Suíça para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Suíça para o Mundial 2026, com base nas últimas convocações do técnico Murat Yakin, traz 20 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Yann Sommer (Inter de Milão) · Gregor Kobel (Borussia Dortmund) · Yvon Mvogo (Lorient)</p>
+
+<h3>Defensores</h3>
+<p>Manuel Akanji (Manchester City) · Ricardo Rodríguez (Real Betis) · Nico Elvedi (Borussia M'gladbach) · Fabian Schär (Newcastle) · Silvan Widmer (Mainz) · Edimilson Fernandes (Mainz)</p>
+
+<h3>Meio-campistas</h3>
+<p>Granit Xhaka (Bayer Leverkusen) · Remo Freuler (Bologna) · Denis Zakaria (Monaco) · Michel Aebischer (Bologna) · Fabian Rieder (Stuttgart)</p>
+
+<h3>Atacantes</h3>
+<p>Xherdan Shaqiri (Chicago Fire) · Breel Embolo (Monaco) · Ruben Vargas (Augsburg) · Zeki Amdouni (Burnley) · Dan Ndoye (Bologna) · Noah Okafor (Napoli)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Suíça na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Suíça que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Granit Xhaka</strong> (Bayer Leverkusen)</li>
+<li><strong>Manuel Akanji</strong> (Manchester City)</li>
+<li><strong>Yann Sommer</strong> (Inter de Milão)</li>
+<li><strong>Xherdan Shaqiri</strong> (Chicago Fire)</li>
+<li><strong>Breel Embolo</strong> (Monaco)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Murat Yakin</h2>
+
+<p><strong>Murat Yakin</strong> comanda a seleção da Suíça na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo B da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo B</strong>, Suíça terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Suíça × Canadá</td><td>Canadá</td></tr>
+<tr><td>Suíça × Catar</td><td>Catar</td></tr>
+<tr><td>Suíça × Bósnia e Herzegovina</td><td>Bósnia e Herzegovina</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Suíça em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Quartas de final (1934, 1938, 1954)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Suíça no Álbum da Copa do Mundo 2026</h2>
+
+<p>A Nati sempre tem boa representação no álbum, com destaque para Xhaka e Akanji.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Suíça mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Suíça</h2>
+
+<p>Para encontrar e completar suas figurinhas da Suíça, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Suíça (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Suíça na Copa do Mundo 2026?</h3>
+<p>O técnico da Suíça na Copa do Mundo 2026 é <strong>Murat Yakin</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Suíça caiu na Copa do Mundo 2026?</h3>
+<p>Suíça foi sorteada no <strong>Grupo B</strong> da Copa do Mundo 2026 e enfrentará Canadá, Catar e Bósnia e Herzegovina na fase de grupos.</p>
+
+<h3>Quantas vezes Suíça foi campeão da Copa do Mundo?</h3>
+<p>Suíça ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Quartas de final (1934, 1938, 1954).</p>
+
+<h3>Quais são as figurinhas mais raras da Suíça no álbum da Copa 2026?</h3>
+<p>A Nati sempre tem boa representação no álbum, com destaque para Xhaka e Akanji. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Suíça mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Suíça e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Suíça promete ser uma das atrações do <strong>Grupo B</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Suíça no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Suíça", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo B"],
+    seoTitle: "Figurinhas Suíça Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Suíça na Copa 2026, técnico Murat Yakin, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Áustria Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-austria-copa-2026",
+    excerpt:
+      "Convocação provável da Áustria na Copa 2026, técnico Ralf Rangnick, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Áustria, conhecida como <strong>Das Team</strong>, sorteada no <strong>Grupo J</strong> ao lado de Argentina, Argélia e Jordânia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Áustria.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 25º · Técnico: Ralf Rangnick · Última Copa: 1998 · Grupo: J</p></blockquote>
+
+<h2>Sobre a Seleção da Áustria</h2>
+
+<p>A Áustria volta à Copa do Mundo após 28 anos. Foi um dos berços do futebol europeu nas décadas de 1930 e 1950, com 3º lugar histórico em 1954, na Suíça. Sob o comando do alemão Ralf Rangnick, vive ressurgimento liderado por Alaba e Sabitzer.</p>
+
+<h2>Provável Convocação da Áustria para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Áustria para o Mundial 2026, com base nas últimas convocações do técnico Ralf Rangnick, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Patrick Pentz (Brøndby) · Heinz Lindner (Union Saint-Gilloise) · Niklas Hedl (Rapid Wien)</p>
+
+<h3>Defensores</h3>
+<p>David Alaba (Real Madrid) · Maximilian Wöber (Borussia M'gladbach) · Kevin Danso (Wolfsburg) · Stefan Posch (Como) · Philipp Lienhart (Freiburg) · Phillipp Mwene (Mainz) · Flavius Daniliuc (Salernitana)</p>
+
+<h3>Meio-campistas</h3>
+<p>Marcel Sabitzer (Borussia Dortmund) · Konrad Laimer (Bayern de Munique) · Christoph Baumgartner (RB Leipzig) · Florian Grillitsch (Hoffenheim) · Nicolas Seiwald (RB Leipzig) · Romano Schmid (Werder Bremen)</p>
+
+<h3>Atacantes</h3>
+<p>Marko Arnautović (Inter de Milão) · Michael Gregoritsch (Freiburg) · Patrick Wimmer (Wolfsburg) · Marko Raguž (LASK) · Maximilian Entrup (Hartberg) · Andreas Weimann (Blackburn)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Áustria na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Áustria que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>David Alaba</strong> (Real Madrid)</li>
+<li><strong>Marcel Sabitzer</strong> (Borussia Dortmund)</li>
+<li><strong>Konrad Laimer</strong> (Bayern de Munique)</li>
+<li><strong>Marko Arnautović</strong> (Inter de Milão)</li>
+<li><strong>Christoph Baumgartner</strong> (RB Leipzig)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Ralf Rangnick</h2>
+
+<p><strong>Ralf Rangnick</strong> comanda a seleção da Áustria na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo J da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo J</strong>, Áustria terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Áustria × Argentina</td><td>Argentina</td></tr>
+<tr><td>Áustria × Argélia</td><td>Argélia</td></tr>
+<tr><td>Áustria × Jordânia</td><td>Jordânia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Áustria em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> 3º lugar (1954)</li>
+<li><strong>Última participação antes de 2026:</strong> 1998</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Áustria no Álbum da Copa do Mundo 2026</h2>
+
+<p>Volta da Áustria após quase três décadas — Alaba é o nome mais procurado.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Áustria mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Áustria</h2>
+
+<p>Para encontrar e completar suas figurinhas da Áustria, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Áustria (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Áustria na Copa do Mundo 2026?</h3>
+<p>O técnico da Áustria na Copa do Mundo 2026 é <strong>Ralf Rangnick</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Áustria caiu na Copa do Mundo 2026?</h3>
+<p>Áustria foi sorteada no <strong>Grupo J</strong> da Copa do Mundo 2026 e enfrentará Argentina, Argélia e Jordânia na fase de grupos.</p>
+
+<h3>Quantas vezes Áustria foi campeão da Copa do Mundo?</h3>
+<p>Áustria ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: 3º lugar (1954).</p>
+
+<h3>Quais são as figurinhas mais raras da Áustria no álbum da Copa 2026?</h3>
+<p>Volta da Áustria após quase três décadas — Alaba é o nome mais procurado. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Áustria mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Áustria e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Áustria promete ser uma das atrações do <strong>Grupo J</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Áustria no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Áustria", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo J"],
+    seoTitle: "Figurinhas Áustria Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Áustria na Copa 2026, técnico Ralf Rangnick, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Costa do Marfim Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-costa-do-marfim-copa-2026",
+    excerpt:
+      "Convocação provável da Costa do Marfim na Copa 2026, técnico Emerse Faé, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a Costa do Marfim, os Elefantes, sorteada no <strong>Grupo E</strong> ao lado de Alemanha, Equador e Curaçao. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Costa do Marfim.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 38º · Técnico: Emerse Faé · Última Copa: 2022 · Grupo: E</blockquote>
+
+<h2>Sobre a Seleção da Costa do Marfim</h2>
+
+<p>A seleção da Costa do Marfim é uma das potências do futebol africano, conhecida mundialmente como <strong>Os Elefantes</strong>. A equipe viveu um dos momentos mais gloriosos de sua história ao conquistar a <strong>Copa das Nações Africanas de 2023</strong> (disputada em 2024), sob o comando de Emerse Faé, que assumiu a seleção durante o próprio torneio e levou o título em casa.</p>
+
+<p>Apesar do domínio continental, a Costa do Marfim ainda busca seu espaço nas Copas do Mundo. A seleção esteve presente em três edições consecutivas (2006, 2010 e 2014) e retornou em 2022, mas nunca conseguiu avançar além da fase de grupos — uma marca que o técnico Faé espera superar no Mundial 2026.</p>
+
+<h2>Provável Convocação da Costa do Marfim para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Costa do Marfim para o Mundial 2026, com base nas últimas convocações do técnico Emerse Faé, traz 22 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Badra Ali Sangaré (Horoya AC)</li>
+<li>Sylvain Gbohouo (ASEC Mimosas)</li>
+<li>Abdoul Karim Cissé (Sporting Gagnoa)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Serge Aurier (Villarreal)</li>
+<li>Willy Boly (Nottingham Forest)</li>
+<li>Odilon Kossounou (Atalanta)</li>
+<li>Ousmane Diomandé (Sporting CP)</li>
+<li>Eric Bailly (Beşiktaş)</li>
+<li>Ghislain Konan (Al-Fateh)</li>
+<li>Simon Deli (Adana Demirspor)</li>
+<li>Ismaël Diallo (ASEC Mimosas)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Franck Kessié (Al-Ahli)</li>
+<li>Ibrahim Sangaré (Nottingham Forest)</li>
+<li>Seko Fofana (Rennes)</li>
+<li>Jean Michaël Seri (Al-Khaleej)</li>
+<li>Hamed Traorè (Bournemouth)</li>
+<li>Max Gradel (Sivasspor)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Sébastien Haller (Borussia Dortmund)</li>
+<li>Nicolas Pépé (Villarreal)</li>
+<li>Wilfried Zaha (Galatasaray)</li>
+<li>Jonathan Ikoné (Fiorentina)</li>
+<li>Karim Konaté (Red Bull Salzburg)</li>
+<li>Oumar Diakité (Stade de Reims)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Costa do Marfim na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Franck Kessié</strong> (Al-Ahli)</li>
+<li><strong>Sébastien Haller</strong> (Borussia Dortmund)</li>
+<li><strong>Ibrahim Sangaré</strong> (Nottingham Forest)</li>
+<li><strong>Nicolas Pépé</strong> (Villarreal)</li>
+<li><strong>Wilfried Zaha</strong> (Galatasaray)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Emerse Faé</h2>
+
+<p><strong>Emerse Faé</strong> comanda a seleção da Costa do Marfim na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo E da Copa do Mundo 2026</h2>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Costa do Marfim × Alemanha</td><td>Alemanha</td></tr>
+<tr><td>Costa do Marfim × Equador</td><td>Equador</td></tr>
+<tr><td>Costa do Marfim × Curaçao</td><td>Curaçao</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Costa do Marfim em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Fase de grupos (2006, 2010, 2014 e 2022)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Costa do Marfim no Álbum da Copa do Mundo 2026</h2>
+
+<p>As figurinhas da Costa do Marfim mais cobiçadas pelos colecionadores são as de Franck Kessié e Sébastien Haller, jogadores com grande projeção internacional e que estrelaram a campanha vitoriosa da CAN 2023.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Costa do Marfim mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Costa do Marfim</h2>
+
+<p>Para encontrar e completar suas figurinhas da Costa do Marfim, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Costa do Marfim (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Costa do Marfim na Copa do Mundo 2026?</h3>
+<p>O técnico da Costa do Marfim na Copa do Mundo 2026 é <strong>Emerse Faé</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo a Costa do Marfim caiu na Copa do Mundo 2026?</h3>
+<p>A Costa do Marfim foi sorteada no <strong>Grupo E</strong> da Copa do Mundo 2026 e enfrentará Alemanha, Equador e Curaçao na fase de grupos.</p>
+
+<h3>Quantas vezes a Costa do Marfim foi campeã da Copa do Mundo?</h3>
+<p>A Costa do Marfim nunca venceu a Copa do Mundo. Seu melhor resultado histórico foi: fase de grupos, alcançada nas edições de 2006, 2010, 2014 e 2022.</p>
+
+<h3>Quais são as figurinhas mais raras da Costa do Marfim no álbum da Copa 2026?</h3>
+<p>As figurinhas mais valorizadas da Costa do Marfim tendem a ser as de Franck Kessié e Sébastien Haller, estrelas com grande reconhecimento internacional e protagonistas da conquista da CAN 2023.</p>
+
+<h3>Como conseguir trocar figurinhas da Costa do Marfim mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Costa do Marfim e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Costa do Marfim promete ser uma das atrações do <strong>Grupo E</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Costa do Marfim no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Costa do Marfim", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo E"],
+    seoTitle: "Figurinhas Costa do Marfim Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Costa do Marfim na Copa 2026, técnico Emerse Faé, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
 ];
 
