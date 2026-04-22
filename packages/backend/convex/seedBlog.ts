@@ -376,6 +376,393 @@ const BLOG_POSTS = [
       "Conheça a história completa dos álbuns de figurinhas da Copa do Mundo. De 1970 até 2026, a tradição que atravessa gerações.",
   },
   {
+    title: "Figurinhas França Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-franca-copa-2026",
+    excerpt:
+      "Convocação provável da França na Copa 2026, técnico Didier Deschamps, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a França, conhecida como <strong>Les Bleus</strong>, sorteada no <strong>Grupo I</strong> ao lado de Senegal, Noruega e Iraque. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da França.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 2º · Técnico: Didier Deschamps · Última Copa: 2022 · Grupo: I</p></blockquote>
+
+<h2>Sobre a Seleção da França</h2>
+
+<p>Bicampeã mundial e vice em 2022, a França é considerada uma das principais favoritas. Mbappé é a estrela máxima e tenta finalmente erguer a taça pela segunda vez (foi campeão em 2018). Deschamps comanda Les Bleus pela última vez antes de deixar o cargo.</p>
+
+<h2>Provável Convocação da França para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da França para o Mundial 2026, com base nas últimas convocações do técnico Didier Deschamps, traz 25 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Mike Maignan (AC Milan) · Brice Samba (Lens) · Lucas Chevalier (PSG)</p>
+
+<h3>Defensores</h3>
+<p>Theo Hernández (Al-Hilal) · Jules Koundé (Barcelona) · William Saliba (Arsenal) · Dayot Upamecano (Bayern de Munique) · Ibrahima Konaté (Liverpool) · Lucas Digne (Aston Villa) · Benjamin Pavard (Inter de Milão) · Malo Gusto (Chelsea)</p>
+
+<h3>Meio-campistas</h3>
+<p>Aurélien Tchouaméni · Eduardo Camavinga · Adrien Rabiot (Marselha) · N'Golo Kanté (Al-Ittihad) · Warren Zaïre-Emery (PSG) · Manu Koné (Roma) · Khéphren Thuram (Juventus)</p>
+
+<h3>Atacantes</h3>
+<p>Kylian Mbappé · Antoine Griezmann · Ousmane Dembélé · Marcus Thuram (Inter de Milão) · Bradley Barcola (PSG) · Randal Kolo Muani (Juventus)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da França na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da França que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Kylian Mbappé</strong> (Real Madrid)</li>
+<li><strong>Antoine Griezmann</strong> (Atlético de Madrid)</li>
+<li><strong>Aurélien Tchouaméni</strong> (Real Madrid)</li>
+<li><strong>Eduardo Camavinga</strong> (Real Madrid)</li>
+<li><strong>Ousmane Dembélé</strong> (PSG)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Didier Deschamps</h2>
+
+<p><strong>Didier Deschamps</strong> comanda a seleção da França na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo I da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo I</strong>, a França terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>França × Senegal</td><td>Senegal</td></tr>
+<tr><td>França × Noruega</td><td>Noruega</td></tr>
+<tr><td>França × Iraque</td><td>Iraque</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da França em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Bicampeã Mundial (1998 e 2018)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 2</li>
+</ul>
+
+<h2>📒 Figurinhas da França no Álbum da Copa do Mundo 2026</h2>
+
+<p>Mbappé é uma das figurinhas mais valiosas do álbum mundial — capa quase obrigatória.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da França mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da França</h2>
+
+<p>Para encontrar e completar suas figurinhas da França, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da França (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da França na Copa do Mundo 2026?</h3>
+<p>O técnico da França na Copa do Mundo 2026 é <strong>Didier Deschamps</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo a França caiu na Copa do Mundo 2026?</h3>
+<p>A França foi sorteada no <strong>Grupo I</strong> da Copa do Mundo 2026 e enfrentará Senegal, Noruega e Iraque na fase de grupos.</p>
+
+<h3>Quantas vezes a França foi campeã da Copa do Mundo?</h3>
+<p>A França conquistou a Copa do Mundo 2 vezes: Bicampeã Mundial (1998 e 2018).</p>
+
+<h3>Quais são as figurinhas mais raras da França no álbum da Copa 2026?</h3>
+<p>Mbappé é uma das figurinhas mais valiosas do álbum mundial — capa quase obrigatória. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da França mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da França e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da França promete ser uma das atrações do <strong>Grupo I</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da França no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["França", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo I"],
+    seoTitle: "Figurinhas França Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da França na Copa 2026, técnico Didier Deschamps, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Inglaterra Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-inglaterra-copa-2026",
+    excerpt:
+      "Convocação provável da Inglaterra na Copa 2026, técnico Thomas Tuchel, Grupo L, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a Inglaterra, conhecida como <strong>Three Lions</strong>, sorteada no <strong>Grupo L</strong> ao lado de Croácia, Panamá e Gana. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Inglaterra.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 4º · Técnico: Thomas Tuchel · Última Copa: 2022 · Grupo: L</p></blockquote>
+
+<h2>Sobre a Seleção da Inglaterra</h2>
+
+<p>Campeã do mundo em 1966 (em casa), a Inglaterra busca o segundo título 60 anos depois. Sob o comando do alemão Thomas Tuchel, primeiro técnico estrangeiro da história dos Three Lions, a geração cheia de talento e fome de glória.</p>
+
+<h2>Provável Convocação da Inglaterra para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Inglaterra para o Mundial 2026, com base nas últimas convocações do técnico Thomas Tuchel, traz 25 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Jordan Pickford (Everton) · Dean Henderson (Crystal Palace) · Aaron Ramsdale (Southampton)</p>
+
+<h3>Defensores</h3>
+<p>John Stones (Manchester City) · Marc Guéhi (Crystal Palace) · Levi Colwill (Chelsea) · Ezri Konsa (Aston Villa) · Kyle Walker (Manchester City) · Trent Alexander-Arnold (Real Madrid) · Luke Shaw (Manchester United) · Reece James (Chelsea)</p>
+
+<h3>Meio-campistas</h3>
+<p>Jude Bellingham · Declan Rice (Arsenal) · Phil Foden · Cole Palmer · Conor Gallagher (Atlético de Madrid) · Curtis Jones (Liverpool) · Adam Wharton (Crystal Palace)</p>
+
+<h3>Atacantes</h3>
+<p>Harry Kane · Bukayo Saka · Marcus Rashford (Newcastle) · Ollie Watkins (Aston Villa) · Eberechi Eze (Arsenal) · Morgan Rogers (Aston Villa)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas da Inglaterra na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Inglaterra que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Harry Kane</strong> (Bayern de Munique)</li>
+<li><strong>Jude Bellingham</strong> (Real Madrid)</li>
+<li><strong>Bukayo Saka</strong> (Arsenal)</li>
+<li><strong>Phil Foden</strong> (Manchester City)</li>
+<li><strong>Cole Palmer</strong> (Chelsea)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Thomas Tuchel</h2>
+
+<p><strong>Thomas Tuchel</strong> comanda a seleção da Inglaterra na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo L da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo L</strong>, a Inglaterra terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Inglaterra × Croácia</td><td>Croácia</td></tr>
+<tr><td>Inglaterra × Panamá</td><td>Panamá</td></tr>
+<tr><td>Inglaterra × Gana</td><td>Gana</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Inglaterra em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Campeã Mundial (1966, em casa)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 1</li>
+</ul>
+
+<h2>📒 Figurinhas da Inglaterra no Álbum da Copa do Mundo 2026</h2>
+
+<p>Bellingham e Saka são figurinhas valiosíssimas — Inglaterra sempre tem grande representação no álbum.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Inglaterra mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Inglaterra</h2>
+
+<p>Para encontrar e completar suas figurinhas da Inglaterra, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Inglaterra (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Inglaterra na Copa do Mundo 2026?</h3>
+<p>O técnico da Inglaterra na Copa do Mundo 2026 é <strong>Thomas Tuchel</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo a Inglaterra caiu na Copa do Mundo 2026?</h3>
+<p>A Inglaterra foi sorteada no <strong>Grupo L</strong> da Copa do Mundo 2026 e enfrentará Croácia, Panamá e Gana na fase de grupos.</p>
+
+<h3>Quantas vezes a Inglaterra foi campeã da Copa do Mundo?</h3>
+<p>A Inglaterra conquistou a Copa do Mundo 1 vez: Campeã Mundial (1966, em casa).</p>
+
+<h3>Quais são as figurinhas mais raras da Inglaterra no álbum da Copa 2026?</h3>
+<p>Bellingham e Saka são figurinhas valiosíssimas — Inglaterra sempre tem grande representação no álbum. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Inglaterra mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Inglaterra e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Inglaterra promete ser uma das atrações do <strong>Grupo L</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Inglaterra no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Inglaterra", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo L"],
+    seoTitle: "Figurinhas Inglaterra Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Inglaterra na Copa 2026, técnico Thomas Tuchel, Grupo L, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
+    title: "Figurinhas Portugal Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-portugal-copa-2026",
+    excerpt:
+      "Convocação provável de Portugal na Copa 2026, técnico Roberto Martínez, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Portugal, conhecida como <strong>A Selecção das Quinas</strong>, sorteada no <strong>Grupo K</strong> ao lado de Colômbia, Uzbequistão e RD Congo. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas de Portugal.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: Europa (UEFA) · Ranking FIFA: 7º · Técnico: Roberto Martínez · Última Copa: 2022 · Grupo: K</p></blockquote>
+
+<h2>Sobre a Seleção de Portugal</h2>
+
+<p>Portugal disputa sua oitava Copa do Mundo. Cristiano Ronaldo, aos 41 anos, joga sua sexta — recorde absoluto em Mundiais. O melhor resultado foi o 3º lugar em 1966 (geração Eusébio). Em 2006, com a geração de Figo e Deco, chegou às semifinais. Agora, sob o comando de Roberto Martínez, busca ir mais longe.</p>
+
+<h2>Provável Convocação de Portugal para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção de Portugal para o Mundial 2026, com base nas últimas convocações do técnico Roberto Martínez, traz 25 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Diogo Costa (Porto) · Rui Patrício (Al-Ain) · José Sá (Wolverhampton)</p>
+
+<h3>Defensores</h3>
+<p>Rúben Dias · Antonio Silva (Benfica) · Gonçalo Inácio (Sporting) · Nuno Mendes (PSG) · Diogo Dalot (Manchester United) · João Cancelo (Al-Hilal) · Nélson Semedo (Wolves)</p>
+
+<h3>Meio-campistas</h3>
+<p>Bruno Fernandes · Bernardo Silva · Vitinha (PSG) · João Palhinha (Bayern de Munique) · Rúben Neves (Al-Hilal) · João Neves (PSG) · Otávio (Al-Nassr)</p>
+
+<h3>Atacantes</h3>
+<p>Cristiano Ronaldo · Rafael Leão · João Félix (Chelsea) · Diogo Jota (Liverpool) · Pedro Neto (Chelsea) · Gonçalo Ramos</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas de Portugal na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes de Portugal que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Cristiano Ronaldo</strong> (Al-Nassr)</li>
+<li><strong>Bruno Fernandes</strong> (Manchester United)</li>
+<li><strong>Bernardo Silva</strong> (Manchester City)</li>
+<li><strong>Rafael Leão</strong> (AC Milan)</li>
+<li><strong>Rúben Dias</strong> (Manchester City)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Roberto Martínez</h2>
+
+<p><strong>Roberto Martínez</strong> comanda a seleção de Portugal na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo K da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo K</strong>, Portugal terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Portugal × Colômbia</td><td>Colômbia</td></tr>
+<tr><td>Portugal × Uzbequistão</td><td>Uzbequistão</td></tr>
+<tr><td>Portugal × RD Congo</td><td>RD Congo</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico de Portugal em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> 3º lugar (1966) e 4º lugar (2006)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas de Portugal no Álbum da Copa do Mundo 2026</h2>
+
+<p>Cristiano Ronaldo é uma das figurinhas históricas do álbum 2026 — última edição de uma lenda viva!</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas de Portugal mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas de Portugal</h2>
+
+<p>Para encontrar e completar suas figurinhas de Portugal, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> de Portugal (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico de Portugal na Copa do Mundo 2026?</h3>
+<p>O técnico de Portugal na Copa do Mundo 2026 é <strong>Roberto Martínez</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo Portugal caiu na Copa do Mundo 2026?</h3>
+<p>Portugal foi sorteado no <strong>Grupo K</strong> da Copa do Mundo 2026 e enfrentará Colômbia, Uzbequistão e RD Congo na fase de grupos.</p>
+
+<h3>Quantas vezes Portugal foi campeão da Copa do Mundo?</h3>
+<p>Portugal ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: 3º lugar (1966) e 4º lugar (2006).</p>
+
+<h3>Quais são as figurinhas mais raras de Portugal no álbum da Copa 2026?</h3>
+<p>Cristiano Ronaldo é uma das figurinhas históricas do álbum 2026 — última edição de uma lenda viva! As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas de Portugal mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas de Portugal e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção de Portugal promete ser uma das atrações do <strong>Grupo K</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página de Portugal no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Portugal", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo K"],
+    seoTitle: "Figurinhas Portugal Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável de Portugal na Copa 2026, técnico Roberto Martínez, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
     title: "Figurinhas Argentina Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-argentina-copa-2026",
     excerpt:
