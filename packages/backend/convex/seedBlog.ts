@@ -194,6 +194,136 @@ const BLOG_POSTS = [
       "Aprenda a conservar suas figurinhas e álbum corretamente. Dicas de armazenamento, colagem e cuidados para manter sua coleção perfeita.",
   },
   {
+    title: "Figurinhas Brasil Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-brasil-copa-2026",
+    excerpt:
+      "Convocação provável do Brasil na Copa 2026, técnico Carlo Ancelotti, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está o Brasil, conhecido como <strong>Seleção Canarinho</strong> ou <strong>Verde-Amarela</strong>, sorteado no <strong>Grupo C</strong> ao lado de Marrocos, Escócia e Haiti. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Brasil.</p>
+
+<blockquote><p><strong>📊 Ficha rápida</strong> · Continente: América do Sul (Conmebol) · Ranking FIFA: 5º · Técnico: Carlo Ancelotti · Última Copa: 2022 · Grupo: C</p></blockquote>
+
+<h2>Sobre a Seleção do Brasil</h2>
+
+<p>Maior vencedor da Copa do Mundo com cinco títulos, o Brasil persegue o tão sonhado hexacampeonato. Sob o comando do italiano Carlo Ancelotti — primeiro estrangeiro a treinar a seleção em busca do Mundial —, a Canarinho combina veteranos como Marquinhos e Casemiro com a nova safra liderada por Vini Jr., Endrick e Estevão.</p>
+
+<h2>Provável Convocação do Brasil para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Brasil para o Mundial 2026, com base nas últimas convocações do técnico Carlo Ancelotti, traz 26 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<p>Alisson · Bento (Al-Nassr) · Hugo Souza (Corinthians)</p>
+
+<h3>Defensores</h3>
+<p>Marquinhos · Gabriel Magalhães (Arsenal) · Éder Militão (Real Madrid) · Bremer (Juventus) · Léo Ortiz (Flamengo) · Vanderson (Monaco) · Wesley (Roma) · Carlos Augusto (Inter de Milão) · Alex Sandro (Flamengo)</p>
+
+<h3>Meio-campistas</h3>
+<p>Casemiro · Bruno Guimarães (Newcastle) · Lucas Paquetá (West Ham) · André (Wolverhampton) · Andrey Santos (Strasbourg) · Gerson (Zenit) · Joelinton (Newcastle)</p>
+
+<h3>Atacantes</h3>
+<p>Vinícius Júnior · Raphinha · Rodrygo (Real Madrid) · Matheus Cunha (Manchester United) · Richarlison (Tottenham) · Endrick (Real Madrid) · Estevão (Chelsea)</p>
+
+<blockquote><p>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</p></blockquote>
+
+<h2>Estrelas do Brasil na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes do Brasil que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Vinícius Júnior</strong> (Real Madrid)</li>
+<li><strong>Raphinha</strong> (Barcelona)</li>
+<li><strong>Casemiro</strong> (Manchester United)</li>
+<li><strong>Marquinhos</strong> (PSG)</li>
+<li><strong>Alisson</strong> (Liverpool)</li>
+<li><strong>Estevão</strong> (Chelsea)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Carlo Ancelotti</h2>
+
+<p><strong>Carlo Ancelotti</strong> comanda a seleção do Brasil na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores irão compor o elenco — o que define quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo C da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo C</strong>, o Brasil terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead><tr><th>Confronto</th><th>Adversário</th></tr></thead>
+<tbody>
+<tr><td>Brasil × Marrocos</td><td>Marrocos</td></tr>
+<tr><td>Brasil × Escócia</td><td>Escócia</td></tr>
+<tr><td>Brasil × Haiti</td><td>Haiti</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Brasil em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Pentacampeão Mundial (1958, 1962, 1970, 1994, 2002)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 5</li>
+</ul>
+
+<h2>📒 Figurinhas do Brasil no Álbum da Copa do Mundo 2026</h2>
+
+<p>As figurinhas da Seleção Brasileira são as <strong>mais procuradas</strong> do álbum no país. Vini Jr. e Estevão devem ser os "craques" mais valiosos do álbum 2026.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Brasil mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Brasil</h2>
+
+<p>Para encontrar e completar suas figurinhas do Brasil, use o <a href="https://figurinhafacil.com.br"><strong>Figurinha Fácil</strong></a> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Brasil (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicações</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Brasil na Copa do Mundo 2026?</h3>
+<p>O técnico do Brasil na Copa do Mundo 2026 é <strong>Carlo Ancelotti</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo o Brasil caiu na Copa do Mundo 2026?</h3>
+<p>O Brasil foi sorteado no <strong>Grupo C</strong> da Copa do Mundo 2026 e enfrentará Marrocos, Escócia e Haiti na fase de grupos.</p>
+
+<h3>Quantas vezes o Brasil foi campeão da Copa do Mundo?</h3>
+<p>O Brasil conquistou a Copa do Mundo 5 vezes: Pentacampeão Mundial (1958, 1962, 1970, 1994, 2002).</p>
+
+<h3>Quais são as figurinhas mais raras do Brasil no álbum da Copa 2026?</h3>
+<p>As figurinhas da Seleção Brasileira são as mais procuradas do álbum no país. Vini Jr. e Estevão devem ser os "craques" mais valiosos do álbum 2026. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique nossa plataforma para encontrar as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Brasil e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Brasil promete ser uma das atrações do <strong>Grupo C</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Brasil no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Brasil", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo C"],
+    seoTitle: "Figurinhas Brasil Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Brasil na Copa 2026, técnico Carlo Ancelotti, Grupo C, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+  {
     title: "História dos Álbuns de Figurinhas da Copa do Mundo",
     slug: "historia-albuns-figurinhas-copa",
     excerpt:
@@ -244,6 +374,173 @@ const BLOG_POSTS = [
     seoTitle: "História dos Álbuns de Figurinhas da Copa - 1970 a 2026",
     seoDescription:
       "Conheça a história completa dos álbuns de figurinhas da Copa do Mundo. De 1970 até 2026, a tradição que atravessa gerações.",
+  },
+  {
+    title: "Figurinhas Argentina Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-argentina-copa-2026",
+    excerpt:
+      "Convocação provável da Argentina na Copa 2026, técnico Lionel Scaloni, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está a Argentina, conhecida como <strong>Albiceleste</strong>, sorteada no <strong>Grupo J</strong> ao lado de Áustria, Argélia e Jordânia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Argentina.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: América do Sul (Conmebol) · Ranking FIFA: 3º · Técnico: Lionel Scaloni · Última Copa: 2022 (campeã) · Grupo: J</blockquote>
+
+<h2>Sobre a Seleção da Argentina</h2>
+
+<p>Atual campeã mundial, a Argentina chega para defender o título conquistado em 2022 no Catar — o terceiro de sua história. Messi, aos 38 anos, deve disputar sua sexta e última Copa do Mundo. A seleção também é bicampeã da Copa América (2021 e 2024).</p>
+
+<h2>Provável Convocação da Argentina para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Argentina para o Mundial 2026, com base nas últimas convocações do técnico Lionel Scaloni, traz 25 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Emiliano Martínez (Aston Villa)</li>
+<li>Walter Benítez (Crystal Palace)</li>
+<li>Gerónimo Rulli (Marselha)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Cristian Romero (Tottenham)</li>
+<li>Lisandro Martínez (Manchester United)</li>
+<li>Nahuel Molina (Atlético de Madrid)</li>
+<li>Nicolás Tagliafico (Lyon)</li>
+<li>Gonzalo Montiel (River Plate)</li>
+<li>Marcos Acuña (River Plate)</li>
+<li>Nicolás Otamendi (Benfica)</li>
+<li>Leonardo Balerdi (Marselha)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Enzo Fernández (Chelsea)</li>
+<li>Alexis Mac Allister (Liverpool)</li>
+<li>Rodrigo De Paul (Atlético de Madrid)</li>
+<li>Leandro Paredes (Boca Juniors)</li>
+<li>Giovani Lo Celso (Real Betis)</li>
+<li>Exequiel Palacios (Bayer Leverkusen)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Lionel Messi (Inter Miami)</li>
+<li>Lautaro Martínez (Inter de Milão)</li>
+<li>Julián Álvarez (Atlético de Madrid)</li>
+<li>Ángel Di María (Benfica)</li>
+<li>Nicolás González (Juventus)</li>
+<li>Alejandro Garnacho (Chelsea)</li>
+<li>Valentín Carboni (Genoa)</li>
+<li>Thiago Almada (Atlético de Madrid)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Argentina na Copa do Mundo 2026</h2>
+
+<p>Os principais nomes da Argentina que devem brilhar no Mundial — e cujas figurinhas serão as mais procuradas no álbum oficial:</p>
+
+<ul>
+<li><strong>Lionel Messi</strong> (Inter Miami)</li>
+<li><strong>Lautaro Martínez</strong> (Inter de Milão)</li>
+<li><strong>Julián Álvarez</strong> (Atlético de Madrid)</li>
+<li><strong>Enzo Fernández</strong> (Chelsea)</li>
+<li><strong>Emiliano 'Dibu' Martínez</strong> (Aston Villa)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Lionel Scaloni</h2>
+
+<p><strong>Lionel Scaloni</strong> comanda a seleção argentina desde 2018, conduzindo o time à conquista da Copa América 2021 e da Copa do Mundo 2022. Sua filosofia técnica influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo J da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo J</strong>, a Argentina terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Argentina × Áustria</td><td>Áustria</td></tr>
+<tr><td>Argentina × Argélia</td><td>Argélia</td></tr>
+<tr><td>Argentina × Jordânia</td><td>Jordânia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Argentina em Copas do Mundo</h2>
+
+<ul>
+<li><strong>Maior conquista:</strong> Tricampeã Mundial (1978, 1986, 2022)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022 (campeã)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 3</li>
+</ul>
+
+<h2>📒 Figurinhas da Argentina no Álbum da Copa do Mundo 2026</h2>
+
+<p>Messi é a figurinha-LENDA do álbum 2026 — provavelmente a mais valorizada do mundo na sua despedida em Copas!</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Argentina mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Argentina</h2>
+
+<p>Para encontrar e completar suas figurinhas da Argentina, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Argentina (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Argentina na Copa do Mundo 2026?</h3>
+<p>O técnico da Argentina na Copa do Mundo 2026 é <strong>Lionel Scaloni</strong>, responsável por comandar a seleção durante todo o torneio nos Estados Unidos, Canadá e México.</p>
+
+<h3>Em qual grupo a Argentina caiu na Copa do Mundo 2026?</h3>
+<p>A Argentina foi sorteada no <strong>Grupo J</strong> da Copa do Mundo 2026 e enfrentará Áustria, Argélia e Jordânia na fase de grupos.</p>
+
+<h3>Quantas vezes a Argentina foi campeã da Copa do Mundo?</h3>
+<p>A Argentina conquistou a Copa do Mundo 3 vezes (1978, 1986 e 2022). É tricampeã mundial.</p>
+
+<h3>Quais são as figurinhas mais raras da Argentina no álbum da Copa 2026?</h3>
+<p>Messi é a figurinha-LENDA do álbum 2026 — provavelmente a mais valorizada do mundo na sua despedida em Copas! As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas — verifique as raridades disponíveis para troca.</p>
+
+<h3>Como conseguir trocar figurinhas da Argentina mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Argentina e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022. A lista oficial deve ser entregue à FIFA no início de junho de 2026.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Argentina promete ser uma das atrações do <strong>Grupo J</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Argentina no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Argentina", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo J"],
+    seoTitle: "Figurinhas Argentina Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Argentina na Copa 2026, técnico Lionel Scaloni, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
 ];
 
