@@ -3605,7 +3605,7 @@ const BLOG_POSTS = [
     excerpt:
       "Convocação provável de Curaçao na Copa 2026, técnico Dick Advocaat, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
     content: `
-<p><strong>🆕 ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
+<p>🆕 <strong>ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
 
 <p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Curaçao, conhecida como <strong>Famia Kòrsou</strong>, sorteada no <strong>Grupo E</strong> ao lado de Alemanha, Equador e Costa do Marfim. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas de Curaçao.</p>
 
@@ -5941,7 +5941,1265 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Tunísia Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Tunísia na Copa 2026, técnico Sami Trabelsi, Grupo F, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas RD Congo Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-rd-congo-copa-2026",
+    excerpt:
+      "Convocação provável da RD Congo na Copa 2026, técnico Sébastien Desabre, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está da RD Congo, conhecido como <strong>Leões Intocáveis</strong>, sorteada no <strong>Grupo K</strong> ao lado França, Chile, Uzbequistão. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da RD Congo.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 61º · Técnico: Sébastien Desabre · Última Copa: 1974 (como Zaire) · Grupo: K</blockquote>
+
+<h2>Sobre a Seleção da RD Congo</h2>
+
+<p>A RD Congo (ex-Zaire) retorna à Copa do Mundo após 52 anos. Em 1974, tornou-se a primeira seleção da África Subsaariana a disputar um Mundial, embora tenha perdido todos os jogos. Sob o comando de Sébastien Desabre, os Leões Intocáveis buscam fazer história na Copa 2026.</p>
+
+<h2>Provável Convocação da RD Congo para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da RD Congo para o Mundial 2026, com base nas últimas convocações do técnico Sébastien Desabre, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Lionel Mbumba (Galatasaray)</li>
+<li>DESCARDO Minge (Kortrijk)</li>
+<li>Christian Mafumba (Young Africans)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Chancel Mbemba (Olympique de Marseille)</li>
+<li>Arthur Masuaku (Beşiktaş)</li>
+<li>Henock Inonga (Vitória de Guimarães)</li>
+<li>Dylan Batubinsika (St-Étienne)</li>
+<li>Sébastien Amoros (Antwerp)</li>
+<li>Olivier Mbaizo (Philadelphia Union)</li>
+<li>Glody Ngonda (Dijon)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Yoane Wissa (Brentford)</li>
+<li>Samuel Moutoussamy (Nantes)</li>
+<li>Chadrac Lukoki (Konyaspor)</li>
+<li>Dimbisoa Rajaona (St-Étienne)</li>
+<li>Jacques Maghoma (Al-Fateh)</li>
+<li>Edo Kayembe (Watford)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Silas Katompa Mvumpa (Stuttgart)</li>
+<li>Meschak Elia (Young Boys)</li>
+<li>Theo Bongonda (Spartak Moscou)</li>
+<li>Fiston Mayele (Pyramids)</li>
+<li>Jonathan Ikone (Hellas Verona)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da RD Congo na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Yoane Wissa</strong> (Brentford)</li>
+<li><strong>Chancel Mbemba</strong> (Olympique de Marseille)</li>
+<li><strong>Silas Katompa Mvumpa</strong> (Stuttgart)</li>
+<li><strong>Arthur Masuaku</strong> (Beşiktaş)</li>
+<li><strong>Meschak Elia</strong> (Young Boys)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Sébastien Desabre</h2>
+
+<p><strong>Sébastien Desabre</strong> comanda a seleção da RD Congo na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo K da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo K</strong>, RD Congo terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>RD Congo × França</td><td>França</td></tr>
+<tr><td>RD Congo × Chile</td><td>Chile</td></tr>
+<tr><td>RD Congo × Uzbequistão</td><td>Uzbequistão</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da RD Congo em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Fase de grupos (1974, como Zaire)</li>
+<li><strong>Última participação antes de 2026:</strong> 1974 (como Zaire)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da RD Congo no Álbum da Copa do Mundo 2026</h2>
+
+<p>Retorno histórico — figurinhas congalesas raríssimas, primeira aparição desde 1974 (como Zaire).</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da RD Congo mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da RD Congo</h2>
+
+<p>Para encontrar e completar suas figurinhas da RD Congo, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da RD Congo (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da RD Congo na Copa do Mundo 2026?</h3>
+<p>O técnico da RD Congo na Copa do Mundo 2026 é <strong>Sébastien Desabre</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo RD Congo caiu na Copa do Mundo 2026?</h3>
+<p>A RD Congo foi sorteada no <strong>Grupo K</strong> da Copa do Mundo 2026 e enfrentará França, Chile e Uzbequistão na fase de grupos.</p>
+
+<h3>Quantas vezes RD Congo foi campeã da Copa do Mundo?</h3>
+<p>A RD Congo ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Fase de grupos (1974, como Zaire).</p>
+
+<h3>Quais são as figurinhas mais raras da RD Congo no álbum da Copa 2026?</h3>
+<p>Retorno histórico — figurinhas congalesas raríssimas, primeira aparição desde 1974 (como Zaire).. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas da RD Congo mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da RD Congo e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da RD Congo promete ser uma das atrações do <strong>Grupo K</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da RD Congo no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["RD Congo", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo K"],
+    seoTitle: "Figurinhas RD Congo Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da RD Congo na Copa 2026, técnico Sébastien Desabre, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Irã Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-irac-copa-2026",
+    excerpt:
+      "Convocação provável do Irã na Copa 2026, técnico Amir Ghalenoei, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está do Irã, conhecido como <strong>Team Melli</strong>, sorteado no <strong>Grupo G</strong> ao lado Brasil, Suíça, Costa Rica. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Irã.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 18º · Técnico: Amir Ghalenoei · Última Copa: 2022 · Grupo: G</blockquote>
+
+<h2>Sobre a Seleção do Irã</h2>
+
+<p>O Irã é uma das forças mais consistentes da Ásia, com 6 participações em Copas do Mundo. Embora nunca tenha passado da fase de grupos, a geração atual liderada por Azmoun e Taremi é considerada a mais talentosa da história. Sob o comando de Amir Ghalenoei, o Team Melli sonha com a inédita classificação às oitavas de final.</p>
+
+<h2>Provável Convocação do Irã para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Irã para o Mundial 2026, com base nas últimas convocações do técnico Amir Ghalenoei, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Alireza Beiranvand (Persepolis)</li>
+<li>Seyed Hossein Hosseini (Sepahan)</li>
+<li>Amir Abedzadeh (Charleroi)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Ehsan Hajsafi (Sepahan)</li>
+<li>Ramin Rezaeian (Sepahan)</li>
+<li>Shoja Khalilzadeh (Al-Rayyan)</li>
+<li>Morteza Pouraliganji (Sepahan)</li>
+<li>Milad Mohammadi (AEK Athens)</li>
+<li>Omid Ebrahimi (Zob Ahan)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Saeid Ezatolahi (Al-Duhail)</li>
+<li>Alireza Jahanbakhsh (Feyenoord)</li>
+<li>Ahmad Nourollahi (Persepolis)</li>
+<li>Mehdi Torabi (Sepahan)</li>
+<li>Saman Ghoddos (Ittihad Kalba)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Sardar Azmoun (Shabab Al-Ahli)</li>
+<li>Mehdi Taremi (Inter de Milão)</li>
+<li>Karim Ansarifard (Omonia)</li>
+<li>Amirhossein Hosseinzadeh (Teyahvin)</li>
+<li>Saman Ghoddos (Ittihad Kalba)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Irã na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Sardar Azmoun</strong> (Shabab Al-Ahli)</li>
+<li><strong>Mehdi Taremi</strong> (Inter de Milão)</li>
+<li><strong>Alireza Jahanbakhsh</strong> (Feyenoord)</li>
+<li><strong>Saeid Ezatolahi</strong> (Al-Duhail)</li>
+<li><strong>Ramin Rezaeian</strong> (Sepahan)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Amir Ghalenoei</h2>
+
+<p><strong>Amir Ghalenoei</strong> comanda a seleção do Irã na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo G da Copa do Mundo 2026</h2>
+
+<p>Sorteado no <strong>Grupo G</strong>, Irã terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Irã × Brasil</td><td>Brasil</td></tr>
+<tr><td>Irã × Suíça</td><td>Suíça</td></tr>
+<tr><td>Irã × Costa Rica</td><td>Costa Rica</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Irã em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Fase de grupos (6 participações)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Irã no Álbum da Copa do Mundo 2026</h2>
+
+<p>Team Melli tem fanbase fiel — Azmoun e Taremi são figurinhas muito procuradas.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Irã mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Irã</h2>
+
+<p>Para encontrar e completar suas figurinhas do Irã, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Irã (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Irã na Copa do Mundo 2026?</h3>
+<p>O técnico do Irã na Copa do Mundo 2026 é <strong>Amir Ghalenoei</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Irã caiu na Copa do Mundo 2026?</h3>
+<p>O Irã foi sorteado no <strong>Grupo G</strong> da Copa do Mundo 2026 e enfrentará Brasil, Suíça e Costa Rica na fase de grupos.</p>
+
+<h3>Quantas vezes Irã foi campeã da Copa do Mundo?</h3>
+<p>O Irã ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Fase de grupos (6 participações).</p>
+
+<h3>Quais são as figurinhas mais raras do Irã no álbum da Copa 2026?</h3>
+<p>Team Melli tem fanbase fiel — Azmoun e Taremi são figurinhas muito procuradas.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Irã mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Irã e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Irã promete ser uma das atrações do <strong>Grupo G</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Irã no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Irã", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo G"],
+    seoTitle: "Figurinhas Irã Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Irã na Copa 2026, técnico Amir Ghalenoei, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Iraque Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-iraque-copa-2026",
+    excerpt:
+      "Convocação provável do Iraque na Copa 2026, técnico Jesús Casas, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está do Iraque, conhecido como <strong>Leões da Babilônia</strong>, sorteado no <strong>Grupo I</strong> ao lado Espanha, Escócia, Paraguai. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Iraque.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 55º · Técnico: Jesús Casas · Última Copa: 1986 · Grupo: I</blockquote>
+
+<h2>Sobre a Seleção do Iraque</h2>
+
+<p>O Iraque retorna à Copa do Mundo após 40 anos de ausência. Sua única participação foi em 1986, no México. Os Leões da Babilônia, sob o comando do espanhol Jesús Casas, trouxeram nova vida ao futebol iraquiano após conquistar a Copa da Ásia de 2023 (realizada em 2024). A geração atual busca fazer história na Copa 2026.</p>
+
+<h2>Provável Convocação do Iraque para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Iraque para o Mundial 2026, com base nas últimas convocações do técnico Jesús Casas, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Ibrahim Ali (Al-Shorta)</li>
+<li>Mohammed Hamed (Erbil)</li>
+<li>Ahmed Basil (Al-Zawraa)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Amir Al-Ammari (FC Midtjylland)</li>
+<li>Ahmed Yahya (Al-Quwa Al-Jawiya)</li>
+<li>Saad Natiq (Al-Shorta)</li>
+<li>Mustafa Nadhim (Al-Zawraa)</li>
+<li>Adil AL-Mhaywi (Al-Shorta)</li>
+<li>Ous Al-Anbari (Al-Shorta)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Ibrahim Bayesh (Al-Zawraa)</li>
+<li>Bashar Resan (Al-Shorta)</li>
+<li>Ayman Hussein (Duhok)</li>
+<li>Ali Qasim (Al-Shorta)</li>
+<li>Hussein Ali (Erbil)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Mohanad Ali (Al-Shorta)</li>
+<li>Aymen Hussein (Al-Zawraa)</li>
+<li>Ali Jasim (Al-Shorta)</li>
+<li>Dhurgham Ismail (Duhok)</li>
+<li>Hussein Al-Obaidi (Al-Quwa Al-Jawiya)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Iraque na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Mohanad Ali</strong> (Al-Shorta)</li>
+<li><strong>Amir Al-Ammari</strong> (FC Midtjylland)</li>
+<li><strong>Aymen Hussein</strong> (Al-Zawraa)</li>
+<li><strong>Bashar Resan</strong> (Al-Shorta)</li>
+<li><strong>Ibrahim Bayesh</strong> (Al-Zawraa)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Jesús Casas</h2>
+
+<p><strong>Jesús Casas</strong> comanda a seleção do Iraque na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo I da Copa do Mundo 2026</h2>
+
+<p>Sorteado no <strong>Grupo I</strong>, Iraque terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Iraque × Espanha</td><td>Espanha</td></tr>
+<tr><td>Iraque × Escócia</td><td>Escócia</td></tr>
+<tr><td>Iraque × Paraguai</td><td>Paraguai</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Iraque em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Fase de grupos (1986)</li>
+<li><strong>Última participação antes de 2026:</strong> 1986</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Iraque no Álbum da Copa do Mundo 2026</h2>
+
+<p>Retorno histórico — figurinhas iraquianas raríssimas, primeira aparição desde 1986.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Iraque mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Iraque</h2>
+
+<p>Para encontrar e completar suas figurinhas do Iraque, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Iraque (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Iraque na Copa do Mundo 2026?</h3>
+<p>O técnico do Iraque na Copa do Mundo 2026 é <strong>Jesús Casas</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Iraque caiu na Copa do Mundo 2026?</h3>
+<p>O Iraque foi sorteado no <strong>Grupo I</strong> da Copa do Mundo 2026 e enfrentará Espanha, Escócia e Paraguai na fase de grupos.</p>
+
+<h3>Quantas vezes Iraque foi campeã da Copa do Mundo?</h3>
+<p>O Iraque ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Fase de grupos (1986).</p>
+
+<h3>Quais são as figurinhas mais raras do Iraque no álbum da Copa 2026?</h3>
+<p>Retorno histórico — figurinhas iraquianas raríssimas, primeira aparição desde 1986.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Iraque mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Iraque e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Iraque promete ser uma das atrações do <strong>Grupo I</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Iraque no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Iraque", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo I"],
+    seoTitle: "Figurinhas Iraque Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Iraque na Copa 2026, técnico Jesús Casas, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Catar Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-catar-copa-2026",
+    excerpt:
+      "Convocação provável do Catar na Copa 2026, técnico Marquez López, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está do Catar, conhecido como <strong>Al-Annabi</strong>, sorteada no <strong>Grupo B</strong> ao lado Argentina, Chile, Tunísia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Catar.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 48º · Técnico: Marquez López · Última Copa: 2022 (anfitrião) · Grupo: B</blockquote>
+
+<h2>Sobre a Seleção do Catar</h2>
+
+<p>O Catar disputa sua segunda Copa do Mundo consecutiva. Em 2022, como anfitrião, perdeu todos os jogos mas marcou presença. Agora, sob o comando de Marquez López, Al-Annabi busca superar a decepção do torneio caseiro e mostrar evolução.</p>
+
+<h2>Provável Convocação do Catar para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Catar para o Mundial 2026, com base nas últimas convocações do técnico Marquez López, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Meshaal Abar (Al-Sadd)</li>
+<li>Saad Al-Sheeb (Al-Sadd)</li>
+<li>Yousef Hassan (Al-Duhail)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Abdelkarim Hassan (Al Sadd)</li>
+<li>Boualem Khoukhi (Al Sadd)</li>
+<li>Tarek Salman (Al-Sadd)</li>
+<li>Pedro Miguel (Al-Wakrah)</li>
+<li>Musab Kheder (Al-Sadd)</li>
+<li>Homam El Ahmed (Al-Gharafa)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Hassan Al-Haydos (Al Sadd)</li>
+<li>Karim Boudiaf (Al-Sadd)</li>
+<li>Abdulaziz Hatem (Al-Gharafa)</li>
+<li>Salmeen Al-Kaabi (Al-Sadd)</li>
+<li>Ahmed Fathi (Al-Duhail)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Akram Afif (Al Sadd)</li>
+<li>Almoez Ali (Al-Duhail)</li>
+<li>Yusuf Abdurisag (Al-Sadd)</li>
+<li>Mohammed Muntari (Al-Duhail)</li>
+<li>Ismaeel Mohammad (Al-Duhail)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Catar na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Akram Afif</strong> (Al Sadd)</li>
+<li><strong>Almoez Ali</strong> (Al-Duhail)</li>
+<li><strong>Hassan Al-Haydos</strong> (Al Sadd)</li>
+<li><strong>Abdelkarim Hassan</strong> (Al Sadd)</li>
+<li><strong>Boualem Khoukhi</strong> (Al Sadd)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Marquez López</h2>
+
+<p><strong>Marquez López</strong> comanda a seleção do Catar na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo B da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo B</strong>, Catar terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Catar × Argentina</td><td>Argentina</td></tr>
+<tr><td>Catar × Chile</td><td>Chile</td></tr>
+<tr><td>Catar × Tunísia</td><td>Tunísia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Catar em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Fase de grupos (2022)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022 (anfitrião)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Catar no Álbum da Copa do Mundo 2026</h2>
+
+<p>Após 2022, figurinhas do Catar ganharam visibilidade — Akram Afif é a estrela principal.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Catar mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Catar</h2>
+
+<p>Para encontrar e completar suas figurinhas do Catar, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Catar (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Catar na Copa do Mundo 2026?</h3>
+<p>O técnico do Catar na Copa do Mundo 2026 é <strong>Marquez López</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Catar caiu na Copa do Mundo 2026?</h3>
+<p>O Catar foi sorteado no <strong>Grupo B</strong> da Copa do Mundo 2026 e enfrentará Argentina, Chile e Tunísia na fase de grupos.</p>
+
+<h3>Quantas vezes Catar foi campeã da Copa do Mundo?</h3>
+<p>O Catar ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Fase de grupos (2022).</p>
+
+<h3>Quais são as figurinhas mais raras do Catar no álbum da Copa 2026?</h3>
+<p>Após 2022, figurinhas do Catar ganharam visibilidade — Akram Afif é a estrela principal.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Catar mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Catar e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Catar promete ser uma das atrações do <strong>Grupo B</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Catar no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Catar", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo B"],
+    seoTitle: "Figurinhas Catar Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Catar na Copa 2026, técnico Marquez López, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Arábia Saudita Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-arabia-saudita-copa-2026",
+    excerpt:
+      "Convocação provável da Arábia Saudita na Copa 2026, técnico Hervé Renard, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está da Arábia Saudita, conhecido como <strong>Falcões Árabes</strong>, sorteada no <strong>Grupo H</strong> ao lado Colômbia, Romênia, Cabo Verde. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Arábia Saudita.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 59º · Técnico: Hervé Renard · Última Copa: 2022 · Grupo: H</blockquote>
+
+<h2>Sobre a Seleção da Arábia Saudita</h2>
+
+<p>A Arábia Saudita é uma das seleções asiáticas mais tradicionais em Copas, com 7 participações (incluindo 2026). O grande momento foi em 1994, quando chegou às oitavas de final. Em 2022, surpreendeu ao vencer a Argentina na estreia. O retorno de Hervé Renard ao comando traz expectativa de recuperação.</p>
+
+<h2>Provável Convocação da Arábia Saudita para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Arábia Saudita para o Mundial 2026, com base nas últimas convocações do técnico Hervé Renard, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Mohammed Al-Owais (Al-Hilal)</li>
+<li>Fawaz Al-Qarni (Al-Shabab)</li>
+<li>Nawaf Al-Aqidi (Al-Nassr)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Yasser Al-Shahrani (Al-Hilal)</li>
+<li>Sultan Al-Ghannam (Al-Hilal)</li>
+<li>Ali Al-Bulaihi (Al-Hilal)</li>
+<li>Mohammed Al-Breik (Al-Ahli)</li>
+<li>Hassan Kadesh (Al-Ittihad)</li>
+<li>Abdulelah Al-Amri (Al-Hilal)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Salem Al-Dawsari (Al-Hilal)</li>
+<li>Mohammed Kanno (Al-Hilal)</li>
+<li>Abdullah Otayf (Al-Hilal)</li>
+<li>Sami Al-Najei (Al-Nassr)</li>
+<li>Ali Al-Hassan (Al-Ittihad)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Firas Al-Buraikan (Al-Ahli)</li>
+<li>Saleh Al-Shehri (Al-Hilal)</li>
+<li>Abdulrahman Al-Aboud (Al-Ittihad)</li>
+<li>Hattan Bahebri (Al-Shabab)</li>
+<li>Abdullah Radif (Al-Hilal)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Arábia Saudita na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Salem Al-Dawsari</strong> (Al-Hilal)</li>
+<li><strong>Yasser Al-Shahrani</strong> (Al-Hilal)</li>
+<li><strong>Firas Al-Buraikan</strong> (Al-Ahli)</li>
+<li><strong>Saleh Al-Shehri</strong> (Al-Hilal)</li>
+<li><strong>Mohammed Kanno</strong> (Al-Hilal)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Hervé Renard</h2>
+
+<p><strong>Hervé Renard</strong> comanda a seleção da Arábia Saudita na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo H da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo H</strong>, Arábia Saudita terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Arábia Saudita × Colômbia</td><td>Colômbia</td></tr>
+<tr><td>Arábia Saudita × Romênia</td><td>Romênia</td></tr>
+<tr><td>Arábia Saudita × Cabo Verde</td><td>Cabo Verde</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Arábia Saudita em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Oitavas de final (1994)</li>
+<li><strong>Última participação antes de 2026:</strong> 2022</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Arábia Saudita no Álbum da Copa do Mundo 2026</h2>
+
+<p>Falcões Árabes com tradição — Al-Dawsari é figurinha valorizada por colecionadores.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Arábia Saudita mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Arábia Saudita</h2>
+
+<p>Para encontrar e completar suas figurinhas da Arábia Saudita, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Arábia Saudita (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Arábia Saudita na Copa do Mundo 2026?</h3>
+<p>O técnico da Arábia Saudita na Copa do Mundo 2026 é <strong>Hervé Renard</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Arábia Saudita caiu na Copa do Mundo 2026?</h3>
+<p>A Arábia Saudita foi sorteada no <strong>Grupo H</strong> da Copa do Mundo 2026 e enfrentará Colômbia, Romênia e Cabo Verde na fase de grupos.</p>
+
+<h3>Quantas vezes Arábia Saudita foi campeã da Copa do Mundo?</h3>
+<p>A Arábia Saudita ainda não conquistou nenhuma Copa do Mundo. Seu melhor resultado histórico foi: Oitavas de final (1994).</p>
+
+<h3>Quais são as figurinhas mais raras da Arábia Saudita no álbum da Copa 2026?</h3>
+<p>Falcões Árabes com tradição — Al-Dawsari é figurinha valorizada por colecionadores.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas da Arábia Saudita mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Arábia Saudita e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Arábia Saudita promete ser uma das atrações do <strong>Grupo H</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Arábia Saudita no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Arábia Saudita", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo H"],
+    seoTitle: "Figurinhas Arábia Saudita Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Arábia Saudita na Copa 2026, técnico Hervé Renard, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Jordânia Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-jordania-copa-2026",
+    excerpt:
+      "Convocação provável da Jordânia na Copa 2026, técnico Jamal Sellami, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está da Jordânia, conhecido como <strong>Al-Nashama (Os Cavaleiros)</strong>, sorteada no <strong>Grupo J</strong> ao lado Portugal, Egito, Paraguai. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas da Jordânia.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 69º · Técnico: Jamal Sellami · Última Copa: Estreante · Grupo: J</blockquote>
+
+<p>🆕 <strong>ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
+
+<h2>Sobre a Seleção da Jordânia</h2>
+
+<p>A Jordânia faz história ao disputar sua primeira Copa do Mundo. Os Cavaleiros (Al-Nashama) protagonizaram uma campanha heroica nas eliminatórias asiáticas, eliminando tradicionais potências. A estrela máxima, Musa Al-Taamari, joga no Montpellier e é o principal nome do elenco. A estreia em Mundiais torna as figurinhas jordanianas peças de desejo para colecionadores.</p>
+
+<h2>Provável Convocação da Jordânia para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção da Jordânia para o Mundial 2026, com base nas últimas convocações do técnico Jamal Sellami, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Yazid Aboulaila (Al-Faisaly)</li>
+<li>Ahmad Hashem (Al-Wehdat)</li>
+<li>Abdalah Al-Maqableh (Al-Ramtha)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Anas Bani Yaseen (Al-Faisaly)</li>
+<li>Mohammad Al-Dmour (Al-Wehdat)</li>
+<li>Ibrahim Al-Saaideh (Al-Faisaly)</li>
+<li>Sulaiman Al-Salman (Al-Jazeera)</li>
+<li>Saleh Al-Aqtash (Al-Wehdat)</li>
+<li>Moutaz Al-Raddad (Al-Faisaly)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Noor Al-Rawabdeh (Al-Faisaly)</li>
+<li>Ehsan Haddad (Al-Faisaly)</li>
+<li>Mahmoud Al-Mardi (Al-Faisaly)</li>
+<li>Yousef Al-Rawashdeh (Al-Wehdat)</li>
+<li>Ahmad Al-Ersan (Al-Jazeera)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Musa Al-Taamari (Montpellier)</li>
+<li>Yazan Al-Naimat (Al-Arabi)</li>
+<li>Ali Olwan (Al-Wehdat)</li>
+<li>Hamza Al-Dardour (Al-Salt)</li>
+<li>Mohammad Al-Zwei (Al-Faisaly)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas da Jordânia na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Musa Al-Taamari</strong> (Montpellier)</li>
+<li><strong>Yazan Al-Naimat</strong> (Al-Arabi)</li>
+<li><strong>Noor Al-Rawabdeh</strong> (Al-Faisaly)</li>
+<li><strong>Ali Olwan</strong> (Al-Wehdat)</li>
+<li><strong>Mahmoud Al-Mardi</strong> (Al-Faisaly)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Jamal Sellami</h2>
+
+<p><strong>Jamal Sellami</strong> comanda a seleção da Jordânia na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo J da Copa do Mundo 2026</h2>
+
+<p>Sorteada no <strong>Grupo J</strong>, Jordânia terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Jordânia × Portugal</td><td>Portugal</td></tr>
+<tr><td>Jordânia × Egito</td><td>Egito</td></tr>
+<tr><td>Jordânia × Paraguai</td><td>Paraguai</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico da Jordânia em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira participação em Copas do Mundo</li>
+<li><strong>Última participação antes de 2026:</strong> Estreante (nunca disputou)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas da Jordânia no Álbum da Copa do Mundo 2026</h2>
+
+<p>ESTREANTE: figurinhas jordanianas raríssimas, primeira aparição no álbum oficial — as mais procuradas por quem quer completar a coleção desde a estreia.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas da Jordânia mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas da Jordânia</h2>
+
+<p>Para encontrar e completar suas figurinhas da Jordânia, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> da Jordânia (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico da Jordânia na Copa do Mundo 2026?</h3>
+<p>O técnico da Jordânia na Copa do Mundo 2026 é <strong>Jamal Sellami</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Jordânia caiu na Copa do Mundo 2026?</h3>
+<p>A Jordânia foi sorteada no <strong>Grupo J</strong> da Copa do Mundo 2026 e enfrentará Portugal, Egito e Paraguai na fase de grupos.</p>
+
+<h3>Quantas vezes Jordânia foi campeã da Copa do Mundo?</h3>
+<p>A Jordânia ainda não conquistou nenhuma Copa do Mundial. Esta é sua estreia em Copas do Mundo.</p>
+
+<h3>Quais são as figurinhas mais raras da Jordânia no álbum da Copa 2026?</h3>
+<p>ESTREANTE: figurinhas jordanianas raríssimas, primeira aparição no álbum oficial — as mais procuradas por quem quer completar a coleção desde a estreia.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas da Jordânia mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas da Jordânia e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção da Jordânia promete ser uma das atrações do <strong>Grupo J</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Jordânia no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Jordânia", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo J"],
+    seoTitle: "Figurinhas Jordânia Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável da Jordânia na Copa 2026, técnico Jamal Sellami, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },,
+  {
+    title: "Figurinhas Uzbequistão Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-uzbequistao-copa-2026",
+    excerpt:
+      "Convocação provável do Uzbequistão na Copa 2026, técnico Srečko Katanec, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está do Uzbequistão, conhecido como <strong>Lobos Brancos</strong>, sorteado no <strong>Grupo K</strong> ao lado França, Chile, RD Congo. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas do Uzbequistão.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: Ásia (AFC) · Ranking FIFA: 58º · Técnico: Srečko Katanec · Última Copa: Estreante · Grupo: K</blockquote>
+
+<p>🆕 <strong>ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
+
+<h2>Sobre a Seleção do Uzbequistão</h2>
+
+<p>O Uzbequistão faz história ao disputar sua primeira Copa do Mundo. Os Lobos Brancos, sob o comando do experiente Srečko Katanec, passaram por eliminatórias difíceis mas conquistaram a vaga. Eldor Shomurodov, que atua na Roma, é a grande estrela. A estreia em Mundiais torna as figurinhas uzbeques peças de grande valor para colecionadores.</p>
+
+<h2>Provável Convocação do Uzbequistão para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção do Uzbequistão para o Mundial 2026, com base nas últimas convocações do técnico Srečko Katanec, traz 21 nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Iglat Khamrobekov (Pakhtakor)</li>
+<li>Utkir Yusupov (Nasaf)</li>
+<li>Abduvohid Nematov (Pakhtakor)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Husniddin Aliqulov (Çorum FK)</li>
+<li>Egor Krimets (Pakhtakor)</li>
+<li>Nasrulla Khamraev (Nasaf)</li>
+<li>Sukhrob Nurmatov (Bunyodkor)</li>
+<li>Doston Khamdamov (Pakhtakor)</li>
+<li>Akrom Tursunov (NASAF)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Otabek Shukurov (Al-Wahda)</li>
+<li>Jaloliddin Masharipov (Al-Nassr)</li>
+<li>Abbosbek Fayzullaev (Pakhtakor)</li>
+<li>Doston Ibragimov (Navbahor)</li>
+<li>Oybek Suyunov (Bunyodkor)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Eldor Shomurodov (Roma)</li>
+<li>Jasur Yeshimurodov (Pakhtakor)</li>
+<li>Igor Sergeev (Pakhtakor)</li>
+<li>Sardar Rashidov (Bunyodkor)</li>
+<li>Zabikhillo Urinboev (Nasaf)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas do Uzbequistão na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Eldor Shomurodov</strong> (Roma)</li>
+<li><strong>Jasur Yeshimurodov</strong> (Pakhtakor)</li>
+<li><strong>Abbosbek Fayzullaev</strong> (Pakhtakor)</li>
+<li><strong>Husniddin Aliqulov</strong> (Çorum FK)</li>
+<li><strong>Otabek Shukurov</strong> (Al-Wahda)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Srečko Katanec</h2>
+
+<p><strong>Srečko Katanec</strong> comanda a seleção do Uzbequistão na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo K da Copa do Mundo 2026</h2>
+
+<p>Sorteado no <strong>Grupo K</strong>, Uzbequistão terá pela frente os seguintes adversários na fase de grupos:</p>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Uzbequistão × França</td><td>França</td></tr>
+<tr><td>Uzbequistão × Chile</td><td>Chile</td></tr>
+<tr><td>Uzbequistão × RD Congo</td><td>RD Congo</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico do Uzbequistão em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira participação em Copas do Mundo</li>
+<li><strong>Última participação antes de 2026:</strong> Estreante (nunca disputou)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas do Uzbequistão no Álbum da Copa do Mundo 2026</h2>
+
+<p>ESTREANTE: figurinhas uzbeques raríssimas, primeira aparição no álbum oficial — as mais procuradas por quem quer completar a coleção desde a estreia.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas do Uzbequistão mais valorizadas pelos colecionadores brasileiros costumam ser as dos atacantes e dos jogadores que atuam em grandes clubes europeus.</p>
+
+<h2>🔄 Onde Trocar Figurinhas do Uzbequistão</h2>
+
+<p>Para encontrar e completar suas figurinhas do Uzbequistão, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> do Uzbequistão (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico do Uzbequistão na Copa do Mundo 2026?</h3>
+<p>O técnico do Uzbequistão na Copa do Mundo 2026 é <strong>Srečko Katanec</strong>, responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Uzbequistão caiu na Copa do Mundo 2026?</h3>
+<p>O Uzbequistão foi sorteado no <strong>Grupo K</strong> da Copa do Mundo 2026 e enfrentará França, Chile e RD Congo na fase de grupos.</p>
+
+<h3>Quantas vezes Uzbequistão foi campeã da Copa do Mundo?</h3>
+<p>O Uzbequistão ainda não conquistou nenhuma Copa do Mundo. Esta é sua estreia em Copas.</p>
+
+<h3>Quais são as figurinhas mais raras do Uzbequistão no álbum da Copa 2026?</h3>
+<p>ESTREANTE: figurinhas uzbeques raríssimas, primeira aparição no álbum oficial — as mais procuradas por quem quer completar a coleção desde a estreia.. As figurinhas dos titulares e das estrelas tendem a ser as mais procuradas.</p>
+
+<h3>Como conseguir trocar figurinhas do Uzbequistão mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas do Uzbequistão e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção do Uzbequistão promete ser uma das atrações do <strong>Grupo K</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página do Uzbequistão no álbum oficial é parte da experiência única do Mundial. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Uzbequistão", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo K"],
+    seoTitle: "Figurinhas Uzbequistão Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável do Uzbequistão na Copa 2026, técnico Srečko Katanec, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
+
+  {
+    title: "Figurinhas Cabo Verde Copa 2026: Convocação e Álbum FIFA",
+    slug: "figurinhas-cabo-verde-copa-2026",
+    excerpt:
+      "Convocação provável de Cabo Verde na Copa 2026, técnico Bubista, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+    content: `
+<p>A <strong>Copa do Mundo FIFA 2026</strong>, disputada entre <strong>11 de junho e 19 de julho</strong> nos Estados Unidos, México e Canadá, será a primeira da história com <strong>48 seleções</strong>. Entre elas está Cabo Verde, os <strong>Tubarões Azuis</strong>, sorteado no <strong>Grupo H</strong> ao lado de Colômbia, Romênia e Tunísia. Se você é colecionador do álbum oficial da FIFA, este guia traz tudo: provável convocação, jogadores estrela, histórico em Copas do Mundo e dicas de troca para completar suas figurinhas de Cabo Verde.</p>
+
+<blockquote><strong>📊 Ficha rápida</strong> · Continente: África (CAF) · Ranking FIFA: 72º · Técnico: Bubista · Última Copa: Estreante · Grupo: H</blockquote>
+
+<p>🆕 <strong>ESTREIA HISTÓRICA NA COPA DO MUNDO</strong> — Esta é a primeira vez que essa seleção disputa uma Copa do Mundo FIFA, o que torna suas figurinhas ainda mais especiais para colecionadores.</p>
+
+<h2>Sobre a Seleção de Cabo Verde</h2>
+
+<p>Cabo Verde disputa sua primeira Copa do Mundo, conquistando uma vaga histórica para o torneio. Os Tubarões Azuis têm se consolidado como uma das revelações do futebol africano, com geração talentosa e determinação que marcou as eliminatórias. A estreia no Mundial promete ser um marco para o país e para os colecionadores do álbum oficial da FIFA.</p>
+
+<h2>Provável Convocação de Cabo Verde para a Copa do Mundo 2026</h2>
+
+<p>A lista provável da seleção de Cabo Verde para o Mundial 2026, com base nas últimas convocações do técnico Bubista, traz nomes distribuídos entre goleiros, defensores, meio-campistas e atacantes. Cada seleção pode levar <strong>26 jogadores</strong> ao torneio (regra mantida desde 2022).</p>
+
+<h3>Goleiros</h3>
+<ul>
+<li>Vozinha (AEL Limassol)</li>
+<li>Marco Soares (Farense)</li>
+<li>Elber Evora (Gil Vicente)</li>
+</ul>
+
+<h3>Defensores</h3>
+<ul>
+<li>Jamilu Collins (Cardiff City)</li>
+<li>Dylan Tavares (Servette)</li>
+<li>Roby Lamine (Alcorcón)</li>
+<li>Steven Fortes (Dunkerque)</li>
+<li>Dygene Lopes (Akhmat Grozny)</li>
+<li>Valentine Da Silva (Bastia)</li>
+<li>Kevin Martínez (Farense)</li>
+</ul>
+
+<h3>Meio-campistas</h3>
+<ul>
+<li>Ryan Mendes (Fenerbahce)</li>
+<li>Kenny Rocha (Nancy)</li>
+<li>André Facundo (Alcorcón)</li>
+<li>Garry Rodrigues (Khorfakkan)</li>
+<li>Lisandro Semedo (Córdoba)</li>
+<li>Willi Gonçalves (Krylya Sovetov)</li>
+</ul>
+
+<h3>Atacantes</h3>
+<ul>
+<li>Djaniny (Al-Jazira)</li>
+<li>Ricardo Rodrigues (Farense)</li>
+<li>Buckley De La Cruz (BK Häcken)</li>
+<li>Gilson Benchimol (Pacos de Ferreira)</li>
+<li>Ze Vitor (Estoril)</li>
+</ul>
+
+<blockquote>⚠️ Esta é uma <strong>convocação provável</strong> baseada nas últimas listas oficiais e no desempenho recente. A lista final será divulgada por cada federação nacional no início de junho de 2026.</blockquote>
+
+<h2>Estrelas de Cabo Verde na Copa do Mundo 2026</h2>
+
+<ul>
+<li><strong>Ryan Mendes</strong> (Fenerbahce)</li>
+<li><strong>Garry Rodrigues</strong> (Khorfakkan)</li>
+<li><strong>Kenny Rocha</strong> (Nancy)</li>
+<li><strong>Jamilu Collins</strong> (Cardiff City)</li>
+<li><strong>Djaniny</strong> (Al-Jazira)</li>
+</ul>
+
+<p>Essas figurinhas costumam ter alta demanda no mercado de trocas. Se você conseguir uma repetida de algum desses craques, vai trocá-la por várias outras com facilidade na plataforma Figurinha Fácil.</p>
+
+<h2>Técnico: Bubista</h2>
+
+<p><strong>Bubista</strong> (Pedro Alexandre Lopes) comanda a seleção de Cabo Verde na Copa do Mundo 2026. A escolha técnica do treinador influencia diretamente a estratégia, o esquema tático e quais jogadores serão chamados — fatores que impactam quais figurinhas serão lançadas no álbum oficial da FIFA.</p>
+
+<h2>Grupo H da Copa do Mundo 2026</h2>
+
+<table>
+<thead>
+<tr><th>Confronto</th><th>Adversário</th></tr>
+</thead>
+<tbody>
+<tr><td>Cabo Verde × Colômbia</td><td>Colômbia</td></tr>
+<tr><td>Cabo Verde × Romênia</td><td>Romênia</td></tr>
+<tr><td>Cabo Verde × Tunísia</td><td>Tunísia</td></tr>
+</tbody>
+</table>
+
+<p>Avançam para a fase eliminatória os <strong>dois primeiros</strong> colocados de cada grupo, mais os <strong>oito melhores terceiros</strong>. Total de 32 seleções na nova fase de <strong>16 avos de final</strong> — uma novidade desta Copa.</p>
+
+<h2>Histórico de Cabo Verde em Copas do Mundo</h2>
+<ul>
+<li><strong>Maior conquista:</strong> Primeira participação em Copas do Mundo</li>
+<li><strong>Última participação antes de 2026:</strong> Estreante (nunca disputou)</li>
+<li><strong>Total de Copas do Mundo conquistadas:</strong> 0</li>
+</ul>
+
+<h2>📒 Figurinhas de Cabo Verde no Álbum da Copa do Mundo 2026</h2>
+
+<p>Ryan Mendes é uma das figurinhas mais valorizadas — é o capitão e referência da seleção.</p>
+
+<p>O <strong>álbum oficial da Copa do Mundo FIFA 2026</strong> traz uma seção dedicada a cada uma das 48 seleções classificadas. Cada time geralmente possui entre 18 e 20 figurinhas, incluindo:</p>
+<ul>
+<li>1 figurinha do <strong>escudo da seleção</strong></li>
+<li>1 figurinha de <strong>uniforme oficial</strong></li>
+<li>1 a 2 figurinhas de <strong>estádio ou momento histórico</strong></li>
+<li>Figurinhas individuais dos <strong>jogadores titulares e reservas</strong></li>
+</ul>
+
+<p>As figurinhas de Cabo Verde tendem a ser bastante procuradas pelos colecionadores brasileiros por se tratar de uma seleção estreante, o que aumenta o interesse e a raridade no álbum.</p>
+
+<h2>🔄 Onde Trocar Figurinhas de Cabo Verde</h2>
+
+<p>Para encontrar e completar suas figurinhas de Cabo Verde, use o <strong><a href="https://figurinhafacil.com.br">Figurinha Fácil</a></strong> — a plataforma brasileira que conecta colecionadores do álbum da Copa do Mundo 2026:</p>
+<ol>
+<li><strong>Cadastre-se gratuitamente</strong> em figurinhafacil.com.br</li>
+<li><strong>Marque suas figurinhas repetidas</strong> de Cabo Verde (e de qualquer outra seleção)</li>
+<li><strong>Encontre colecionadores</strong> que precisam delas e oferecem o que você procura</li>
+<li><strong>Troque com segurança</strong> dentro da plataforma — sem fraudes, sem complicação</li>
+</ol>
+
+<h2>Perguntas Frequentes (FAQ)</h2>
+
+<h3>Quem é o técnico de Cabo Verde na Copa do Mundo 2026?</h3>
+<p>O técnico de Cabo Verde na Copa do Mundo 2026 é <strong>Bubista</strong> (Pedro Alexandre Lopes), responsável por comandar a seleção durante todo o torneio.</p>
+
+<h3>Em qual grupo Cabo Verde caiu na Copa do Mundo 2026?</h3>
+<p>Cabo Verde foi sorteado no <strong>Grupo H</strong> da Copa do Mundo 2026 e enfrentará Colômbia, Romênia e Tunísia na fase de grupos.</p>
+
+<h3>Quantas vezes Cabo Verde foi campeã da Copa do Mundo?</h3>
+<p>Cabo Verde ainda não conquistou nenhuma Copa do Mundo. Esta é sua primeira participação na história do torneio.</p>
+
+<h3>Quais são as figurinhas mais raras de Cabo Verde no álbum da Copa 2026?</h3>
+<p>Ryan Mendes é uma das figurinhas mais valorizadas — é o capitão e referência da seleção. Por ser estreante, a seleção inteira gera curiosidade entre colecionadores.</p>
+
+<h3>Como conseguir trocar figurinhas de Cabo Verde mais rápido?</h3>
+<p>Use o <strong>Figurinha Fácil</strong> (<a href="https://figurinhafacil.com.br">figurinhafacil.com.br</a>) para encontrar colecionadores com figurinhas repetidas de Cabo Verde e completar seu álbum com trocas seguras pela internet.</p>
+
+<h3>Quantos jogadores cada seleção pode levar para a Copa do Mundo 2026?</h3>
+<p>Cada seleção pode convocar até <strong>26 jogadores</strong> para a Copa do Mundo 2026, mantendo a regra adotada desde 2022.</p>
+
+<h2>Conclusão</h2>
+
+<p>A seleção de Cabo Verde promete ser uma das grandes atrações do <strong>Grupo H</strong> na Copa do Mundo de 2026, marcando sua estreia histórica no torneio. Para os colecionadores brasileiros, completar a página de Cabo Verde no álbum oficial é parte da experiência única do Mundial — especialmente por se tratar de figurinhas inéditas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
+
+<h2>Leia também</h2>
+<ul>
+<li><a href="/blog/como-completar-album-copa-2026">Como completar o álbum da Copa do Mundo 2026 mais rápido</a></li>
+<li><a href="/blog/figurinhas-mais-raras-copa-2026">As 10 Figurinhas Mais Raras da Copa 2026</a></li>
+<li><a href="/blog/pontos-troca-figurinhas-sao-paulo">Guia de Pontos de Troca de Figurinhas em São Paulo</a></li>
+</ul>
+    `.trim(),
+    category: "Seleções Copa 2026",
+    tags: ["Cabo Verde", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo H"],
+    seoTitle: "Figurinhas Cabo Verde Copa 2026 — Convocação e Álbum",
+    seoDescription:
+      "Convocação provável de Cabo Verde na Copa 2026, técnico Bubista, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+  },
+
 ];
 
 export const seedBlogPosts = internalMutation({
