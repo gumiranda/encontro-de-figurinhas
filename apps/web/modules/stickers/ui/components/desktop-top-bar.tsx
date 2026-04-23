@@ -3,6 +3,7 @@
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, Save } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface DesktopTopBarProps {
   totalStickers: number;
@@ -13,6 +14,7 @@ interface DesktopTopBarProps {
   onContinue: () => void;
   onFlush: () => void;
   className?: string;
+  modeSwitch?: ReactNode;
 }
 
 export function DesktopTopBar({
@@ -24,6 +26,7 @@ export function DesktopTopBar({
   onContinue,
   onFlush,
   className,
+  modeSwitch,
 }: DesktopTopBarProps) {
   return (
     <header
@@ -40,6 +43,9 @@ export function DesktopTopBar({
         <p className="mt-2 text-sm text-on-surface-variant">
           Álbum oficial da Copa do Mundo 2026 · {totalStickers} posições
         </p>
+        {modeSwitch ? (
+          <div className="mt-3 text-sm">{modeSwitch}</div>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-2">

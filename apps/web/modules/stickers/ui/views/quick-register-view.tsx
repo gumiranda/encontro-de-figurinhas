@@ -6,6 +6,7 @@ import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -45,7 +46,13 @@ const SECTION_EMOJI: Record<string, string> = {
   EXT: "⭐️",
 };
 
-export function QuickRegisterView() {
+type RegisterModeSwitch = { href: string; label: string };
+
+export function QuickRegisterView({
+  registerModeSwitch,
+}: {
+  registerModeSwitch?: RegisterModeSwitch;
+} = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated } = useConvexAuth();
@@ -156,6 +163,15 @@ export function QuickRegisterView() {
 
   const ctaMode: "continue" | "save" = hasCompletedSetup ? "save" : "continue";
 
+  const modeSwitchLink = registerModeSwitch ? (
+    <Link
+      href={registerModeSwitch.href}
+      className="font-medium text-primary underline-offset-4 hover:underline"
+    >
+      {registerModeSwitch.label}
+    </Link>
+  ) : null;
+
   const sectionsWithEmoji: SectionInfo[] = useMemo(
     () =>
       sections.map((s) => ({
@@ -205,6 +221,9 @@ export function QuickRegisterView() {
                   {needCount} preciso
                 </span>
               </p>
+              {modeSwitchLink ? (
+                <p className="mt-1 text-[11px]">{modeSwitchLink}</p>
+              ) : null}
             </div>
             <AppNavDrawer />
           </header>
@@ -219,6 +238,7 @@ export function QuickRegisterView() {
                 canContinue={canFinalize}
                 onContinue={handleContinue}
                 onFlush={flush}
+                modeSwitch={modeSwitchLink}
               />
 
               <StatsCardRow

@@ -5,7 +5,7 @@ import { ArrowLeftRight, Palette } from "lucide-react";
 import type { ListKind } from "../../lib/use-stickers";
 
 const tabButtonBase =
-  "flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 font-label text-sm font-bold uppercase tracking-widest transition-all duration-300";
+  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-3 font-label text-sm font-bold uppercase tracking-widest transition-all duration-300";
 
 const TAB_ORDER: ListKind[] = ["duplicates", "missing"];
 

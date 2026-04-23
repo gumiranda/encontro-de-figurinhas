@@ -109,21 +109,21 @@ export function SectionAccordion({
                   <button
                     type="button"
                     onClick={() => onBulkAction(section.code, "all")}
-                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                    className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
                   >
                     Marcar todas
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction(section.code, "none")}
-                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                    className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
                   >
                     Desmarcar
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction(section.code, "invert")}
-                    className="text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                    className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
                   >
                     Inverter
                   </button>

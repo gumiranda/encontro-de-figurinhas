@@ -735,7 +735,7 @@ function SwitchRow({ label, on }: { label: string; on?: boolean }) {
         }`}
       >
         <span
-          className={`absolute top-[2px] size-[18px] rounded-full transition-all ${
+          className={`absolute top-[2px] size-[18px] rounded-full transition-[left,background-color] duration-300 ${
             on ? "left-[22px] bg-primary" : "left-[2px] bg-outline"
           }`}
         />

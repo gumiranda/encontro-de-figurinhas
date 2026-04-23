@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { celebrateMilestone } from "@/components/delight";
 
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -72,7 +73,7 @@ export function CompleteProfileForm() {
         birthDate: data.birthDate.getTime(),
       });
 
-      toast.success("Perfil completo! Bem-vindo à Arena.");
+      celebrateMilestone("profileComplete");
       router.push("/cadastrar-figurinhas");
     } catch (error) {
       if (error instanceof Error) {
@@ -218,7 +219,7 @@ export function CompleteProfileForm() {
             type="submit"
             disabled={isSubmitting}
             aria-busy={isSubmitting}
-            className="h-16 w-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary)] font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 shadow-xl shadow-[var(--primary)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="h-14 w-full bg-primary text-on-primary font-headline text-lg font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-3 disabled:opacity-50"
           >
             {isSubmitting ? (
               <>

@@ -21,12 +21,14 @@ import {
 } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { DownloadGuideButton } from "@/components/download-guide-button";
 import {
   BASE_URL,
   SITE_NAME,
   generateBreadcrumbSchema,
   generateCombinedSchema,
   generateFAQSchema,
+  generateCollectionPageSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -166,10 +168,13 @@ const articleSchema = {
   inLanguage: "pt-BR",
 };
 
+const collectionPageSchema = generateCollectionPageSchema();
+
 const combinedSchema = generateCombinedSchema([
   articleSchema,
   breadcrumbSchema,
   faqSchema,
+  collectionPageSchema,
 ]);
 
 const quickFacts = [
@@ -683,6 +688,7 @@ export default function AlbumCopaDoMundo2026Page() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+              <DownloadGuideButton />
               <Button
                 asChild
                 size="lg"

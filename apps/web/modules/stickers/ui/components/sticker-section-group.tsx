@@ -59,15 +59,11 @@ function StickerSectionGroupBase({
     return arr;
   }, [section.startNumber, section.endNumber]);
 
-  const handleContainerClick = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      const el = (e.target as HTMLElement).closest<HTMLElement>(
-        "[data-sticker-num]"
-      );
-      if (!el) return;
-      const raw = el.dataset.stickerNum;
-      const num = raw !== undefined ? Number(raw) : Number.NaN;
-      if (!Number.isFinite(num)) return;
+  const handleTileClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      const raw = e.currentTarget.dataset.stickerNum;
+      const num = Number(raw);
+      if (!raw || Number.isNaN(num)) return;
       onToggle(num);
     },
     [onToggle]
@@ -119,21 +115,21 @@ function StickerSectionGroupBase({
                   <button
                     type="button"
                     onClick={() => onBulkAction("all")}
-                    className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
                   >
                     Marcar todas
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction("none")}
-                    className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
                   >
                     Desmarcar
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction("invert")}
-                    className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
                   >
                     Inverter
                   </button>
@@ -155,7 +151,6 @@ function StickerSectionGroupBase({
       )}
 
       <div
-        onClick={handleContainerClick}
         className={cn(
           "grid gap-1.5",
           "grid-cols-5 md:grid-cols-10 xl:grid-cols-14"
@@ -178,6 +173,7 @@ function StickerSectionGroupBase({
               num={num}
               relativeNum={relativeNum}
               state={state}
+              onClick={handleTileClick}
             />
           );
         })}

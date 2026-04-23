@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
@@ -11,6 +12,7 @@ import {
   Shield,
   ArrowRight,
   Share2,
+  Store,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -46,7 +48,9 @@ import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
   generateTradePointMetadata,
   generateBreadcrumbSchema,
-  generatePlaceSchema,
+  generateTradePointPlaceSchema,
+  generateSpeakableSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -55,11 +59,26 @@ interface PontoPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const loadTradePoint = cache((slug: string) =>
-  fetchQuery(api.tradePoints.getBySlug, { slug })
-);
+async function loadTradePoint(slug: string) {
+  "use cache";
+  cacheTag(`ponto:${slug}`);
+  cacheLife("hours");
+  return fetchQuery(api.tradePoints.getBySlug, { slug });
+}
+
+async function loadRelatedPoints(citySlug: string) {
+  "use cache";
+  cacheTag(`cidade:${citySlug}`);
+  cacheLife("hours");
+  return fetchQuery(api.tradePoints.listTopByCity, { citySlug, limit: 7 });
+}
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+export async function generateStaticParams() {
+  const slugs = await fetchQuery(api.tradePoints.listTopForSSG, {});
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -82,12 +101,16 @@ export async function generateMetadata({
 }
 
 export default async function PontoPage({ params }: PontoPageProps) {
+  await connection();
   const { slug } = await params;
   const point = await loadTradePoint(slug);
 
   if (!point || !point.city) {
     notFound();
   }
+
+  const relatedPoints = await loadRelatedPoints(point.city.slug);
+  const otherPoints = relatedPoints.filter((p) => p.slug !== slug);
 
   const isActive = Date.now() - point.lastActivityAt < SEVEN_DAYS_MS;
   const citySlug = point.city.slug;
@@ -101,20 +124,33 @@ export default async function PontoPage({ params }: PontoPageProps) {
     { name: point.name },
   ]);
 
-  const localBusinessSchema = generatePlaceSchema(
-    point.name,
-    point.city.name,
-    point.city.state,
-    point.lat,
-    point.lng
+  const placeSchema = generateTradePointPlaceSchema({
+    name: point.name,
+    slug,
+    address: point.address,
+    city: point.city.name,
+    state: point.city.state,
+    lat: point.lat,
+    lng: point.lng,
+    description: point.description ?? undefined,
+  });
+
+  const speakableSchema = generateSpeakableSchema(
+    `${BASE_URL}/ponto/${slug}`,
+    ["h1", "h2", ".typography p", ".typography ol", ".typography ul"]
   );
+
+  const combinedSchema = generateCombinedSchema([
+    breadcrumbSchema,
+    placeSchema,
+    speakableSchema,
+  ]);
 
   const shareUrl = `${BASE_URL}/ponto/${slug}`;
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={localBusinessSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}
@@ -305,6 +341,61 @@ export default async function PontoPage({ params }: PontoPageProps) {
             </div>
           </div>
         </section>
+
+        {/* Related Points Section */}
+        {otherPoints.length > 0 && (
+          <section className="py-12 border-t">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-headline font-bold">
+                      Outros pontos em {point.city.name}
+                    </h2>
+                    <p className="text-muted-foreground mt-1">
+                      {otherPoints.length}{" "}
+                      {otherPoints.length === 1
+                        ? "ponto de troca próximo"
+                        : "pontos de troca próximos"}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/cidade/${citySlug}`}
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
+                  >
+                    Ver todos em {point.city.name}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {otherPoints.slice(0, 6).map((p) => (
+                    <li key={p.slug}>
+                      <Link
+                        href={`/ponto/${p.slug}`}
+                        className="group flex items-start gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-primary/5"
+                      >
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <Store className="h-4 w-4" aria-hidden="true" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium group-hover:text-primary truncate">
+                            {p.name}
+                          </p>
+                          {p.address && (
+                            <p className="text-sm text-muted-foreground truncate">
+                              {p.address}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="py-16 md:py-24">

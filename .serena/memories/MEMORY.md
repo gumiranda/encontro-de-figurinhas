@@ -1,0 +1,5 @@
+- [Project Overview](project_overview.md) — Full-stack SaaS for trading World Cup figurinhas (collectible cards)
+- [Code Style & Conventions](code_style_conventions.md) — TypeScript, React, Convex patterns; always use shadcn/ui
+- [Suggested Commands](suggested_commands.md) — Essential dev, build, lint, format, database commands
+- [UI Component Guidelines](ui_component_guidelines.md) — Use shadcn/ui, Tailwind utilities, Form patterns
+- [Git & Branching](git_and_branching.md) — Commit conventions, branching strategy, workflow

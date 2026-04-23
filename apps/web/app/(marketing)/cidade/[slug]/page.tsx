@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { MapPin, Users, ArrowRight, Calendar } from "lucide-react";
+import { MapPin, Users, ArrowRight, Calendar, Store, Navigation } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -16,19 +17,44 @@ import {
   generateCityMetadata,
   generateBreadcrumbSchema,
   generatePlaceSchema,
+  generateCityItemListSchema,
+  generateSpeakableSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { stateCodeToSlug, stateCodeToName } from "@/lib/states";
 
 interface CityPageProps {
   params: Promise<{ slug: string }>;
+}
+
+async function loadCity(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.cities.getBySlug, { slug });
+}
+
+async function loadCityStats(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.cities.getStatsBySlug, { slug });
+}
+
+async function loadCityTopPoints(slug: string) {
+  "use cache";
+  cacheTag(`cidade:${slug}`);
+  cacheLife("hours");
+  return convexServer.query(api.tradePoints.listTopByCity, { citySlug: slug, limit: 20 });
 }
 
 export async function generateMetadata({
   params,
 }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const city = await convexServer.query(api.cities.getBySlug, { slug });
+  const city = await loadCity(slug);
 
   if (!city) {
     return {
@@ -40,43 +66,38 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  // Generate static pages for major cities
-  const majorCitySlugs = [
-    "sao-paulo",
-    "rio-de-janeiro",
-    "belo-horizonte",
-    "brasilia",
-    "salvador",
-    "fortaleza",
-    "curitiba",
-    "recife",
-    "porto-alegre",
-    "manaus",
-    "goiania",
-    "campinas",
-    "santos",
-    "guarulhos",
-    "niteroi",
-  ];
-
-  return majorCitySlugs.map((slug) => ({ slug }));
+  const slugs = await convexServer.query(api.cities.listTopActiveForSSG, {});
+  return slugs.map((slug) => ({ slug }));
 }
 
 export default async function CityPage({ params }: CityPageProps) {
   const { slug } = await params;
-  const city = await convexServer.query(api.cities.getBySlug, { slug });
+  const [city, stats, topPoints] = await Promise.all([
+    loadCity(slug),
+    loadCityStats(slug),
+    loadCityTopPoints(slug),
+  ]);
 
   if (!city) {
     notFound();
   }
 
+  const collectorsCount = stats?.collectorsCount ?? 0;
+  const tradePointsCount = stats?.tradePointsCount ?? 0;
+  const visiblePoints = topPoints.slice(0, 20);
+  const hasMorePoints = tradePointsCount > visiblePoints.length;
+
+  const stateSlug = stateCodeToSlug(city.state);
+  const stateName = stateCodeToName(city.state) ?? city.state;
+
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
-    { name: "Cidades", url: `${BASE_URL}/cidades` },
+    { name: "Estados", url: `${BASE_URL}/estados` },
+    ...(stateSlug ? [{ name: stateName, url: `${BASE_URL}/estado/${stateSlug}` }] : []),
     { name: city.name },
   ]);
 
-  const localBusinessSchema = generatePlaceSchema(
+  const placeSchema = generatePlaceSchema(
     `Figurinha Fácil ${city.name}`,
     city.name,
     city.state,
@@ -84,22 +105,51 @@ export default async function CityPage({ params }: CityPageProps) {
     city.lng
   );
 
+  const itemListSchema =
+    visiblePoints.length > 0
+      ? generateCityItemListSchema(city.slug, city.name, visiblePoints)
+      : null;
+
+  const speakableSchema = generateSpeakableSchema(
+    `${BASE_URL}/cidade/${city.slug}`,
+    ["h1", "h2", "h3", ".prose p", ".prose ul", ".prose ol"]
+  );
+
+  const schemas = [breadcrumbSchema, placeSchema, speakableSchema];
+  if (itemListSchema) schemas.push(itemListSchema);
+  const combinedSchema = generateCombinedSchema(schemas);
+
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={localBusinessSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
           <div className="container mx-auto px-4">
             <nav className="mb-8 text-sm text-muted-foreground">
-              <ol className="flex items-center gap-2">
+              <ol className="flex items-center gap-2 flex-wrap">
                 <li>
                   <Link href="/" className="hover:text-primary">
                     Início
                   </Link>
                 </li>
+                <li>/</li>
+                <li>
+                  <Link href="/estados" className="hover:text-primary">
+                    Estados
+                  </Link>
+                </li>
+                {stateSlug && (
+                  <>
+                    <li>/</li>
+                    <li>
+                      <Link href={`/estado/${stateSlug}`} className="hover:text-primary">
+                        {stateName}
+                      </Link>
+                    </li>
+                  </>
+                )}
                 <li>/</li>
                 <li className="text-foreground font-medium">{city.name}</li>
               </ol>
@@ -108,7 +158,9 @@ export default async function CityPage({ params }: CityPageProps) {
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 text-primary mb-4">
                 <MapPin className="h-5 w-5" />
-                <span className="text-sm font-medium">{city.state}</span>
+                <Link href={stateSlug ? `/estado/${stateSlug}` : "/estados"} className="text-sm font-medium hover:underline">
+                  {stateName}
+                </Link>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
@@ -130,12 +182,95 @@ export default async function CityPage({ params }: CityPageProps) {
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link href="/arena/map">Ver mapa de trocas</Link>
+                  <Link href={`/map?city=${city.slug}`}>Ver mapa de trocas</Link>
                 </Button>
               </div>
+
+              {(collectorsCount > 0 || tradePointsCount > 0) && (
+                <div className="flex flex-wrap gap-6 mt-8 pt-8 border-t">
+                  {collectorsCount > 0 && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{collectorsCount}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {collectorsCount === 1 ? "colecionador ativo" : "colecionadores ativos"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {tradePointsCount > 0 && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Store className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{tradePointsCount}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {tradePointsCount === 1 ? "ponto de troca" : "pontos de troca"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </section>
+
+        {visiblePoints.length > 0 && (
+          <section className="py-16 md:py-24 border-b">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-headline font-bold">
+                      Pontos de troca em {city.name}
+                    </h2>
+                    <p className="text-muted-foreground mt-2">
+                      {tradePointsCount === 1
+                        ? "1 ponto aprovado nesta cidade"
+                        : `${tradePointsCount} pontos aprovados nesta cidade`}
+                      {hasMorePoints && " — mostrando os 20 mais recentes"}
+                    </p>
+                  </div>
+                  {hasMorePoints && (
+                    <Button variant="outline" asChild>
+                      <Link href={`/map?city=${city.slug}`}>
+                        <Navigation className="mr-2 h-4 w-4" />
+                        Ver todos no mapa
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {visiblePoints.map((point) => (
+                    <li key={point.slug}>
+                      <Link
+                        href={`/ponto/${point.slug}`}
+                        className="group flex items-start gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-primary/5"
+                      >
+                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <Store className="h-4 w-4" aria-hidden="true" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium group-hover:text-primary">
+                            {point.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {point.address}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Features Section */}
         <section className="py-16 md:py-24">
@@ -199,10 +334,33 @@ export default async function CityPage({ params }: CityPageProps) {
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
               <h2>Troca de figurinhas em {city.name}</h2>
               <p>
-                {city.name} é uma das cidades mais ativas na comunidade de
-                colecionadores de figurinhas do Brasil. Com a proximidade da
-                Copa do Mundo 2026, a busca por figurinhas e pontos de troca na
-                cidade tem crescido significativamente.
+                {collectorsCount > 0 ? (
+                  <>
+                    {city.name} já conta com {collectorsCount}{" "}
+                    {collectorsCount === 1
+                      ? "colecionador cadastrado"
+                      : "colecionadores cadastrados"}{" "}
+                    no Figurinha Fácil.{" "}
+                    {tradePointsCount > 0 && (
+                      <>
+                        A cidade possui {tradePointsCount}{" "}
+                        {tradePointsCount === 1
+                          ? "ponto de troca aprovado"
+                          : "pontos de troca aprovados"}{" "}
+                        onde você pode realizar trocas presenciais com segurança.
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {city.name}, {city.state}, está pronta para receber
+                    colecionadores de figurinhas. Seja um dos primeiros a se
+                    cadastrar e ajude a construir a comunidade de trocas na sua
+                    cidade.
+                  </>
+                )}{" "}
+                Com a proximidade da Copa do Mundo 2026, a busca por figurinhas
+                e pontos de troca na cidade tem crescido significativamente.
               </p>
 
               <h3>Por que usar o Figurinha Fácil em {city.name}?</h3>
@@ -210,9 +368,19 @@ export default async function CityPage({ params }: CityPageProps) {
                 <li>
                   Encontre colecionadores perto de você em {city.name} e região
                 </li>
-                <li>
-                  Descubra pontos de troca seguros e bem avaliados na cidade
-                </li>
+                {tradePointsCount > 0 ? (
+                  <li>
+                    Acesse {tradePointsCount}{" "}
+                    {tradePointsCount === 1
+                      ? "ponto de troca verificado"
+                      : "pontos de troca verificados"}{" "}
+                    na cidade
+                  </li>
+                ) : (
+                  <li>
+                    Sugira pontos de troca seguros e ajude a expandir a rede
+                  </li>
+                )}
                 <li>
                   Economize tempo encontrando exatamente as figurinhas que
                   precisa

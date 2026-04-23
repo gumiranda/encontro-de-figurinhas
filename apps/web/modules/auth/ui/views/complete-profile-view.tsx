@@ -1,10 +1,11 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 import { OnboardingProgress } from "../components/onboarding-progress";
 import { OnboardingStepper } from "../components/onboarding-stepper";
@@ -15,31 +16,62 @@ const TOTAL_STEPS = 3;
 
 export function CompleteProfileView() {
   const router = useRouter();
+  const { isLoaded: clerkLoaded, isSignedIn } = useAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+  // Clerk define sessão; a query pode retornar null enquanto o JWT Convex sincroniza.
+  // Não usar `isAuthenticated` no skip — senão `undefined` + loader bloqueado por `authLoading`.
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    clerkLoaded && isSignedIn ? {} : "skip"
+  );
   const createUser = useMutation(api.users.createUser);
-  const called = useRef(false);
 
-  // Create user if authenticated but doesn't exist in Convex
+  // Cria linha em `users` só quando o JWT Convex está pronto; antes disso `createUser` pode
+  // retornar null (sem identity no mutation) e o efeito reexecuta quando `isAuthenticated` estabiliza.
   useEffect(() => {
-    if (isAuthenticated && currentUser === null && !called.current) {
-      called.current = true;
-      createUser();
+    if (
+      !clerkLoaded ||
+      !isSignedIn ||
+      authLoading ||
+      !isAuthenticated ||
+      currentUser !== null ||
+      currentUser === undefined
+    ) {
+      return;
     }
-  }, [isAuthenticated, currentUser, createUser]);
 
-  // Already onboarded - redirect to dashboard
-  useEffect(() => {
-    if (currentUser?.hasCompletedOnboarding) {
-      router.replace("/cadastrar-figurinhas");
-    }
+    void createUser().catch(() => {});
+  }, [
+    clerkLoaded,
+    isSignedIn,
+    authLoading,
+    isAuthenticated,
+    currentUser,
+    createUser,
+  ]);
+
+  // Perfil já completo — alinhar ao dashboard-shell (próximo passo do funil ou dashboard).
+  // useLayoutEffect reduz flash de loader antes do replace.
+  useLayoutEffect(() => {
+    if (!currentUser?.hasCompletedOnboarding) return;
+
+    const next =
+      currentUser.hasCompletedStickerSetup !== true
+        ? "/cadastrar-figurinhas"
+        : !currentUser.locationSource
+          ? "/selecionar-localizacao"
+          : "/dashboard";
+
+    router.replace(next);
   }, [currentUser, router]);
 
-  // Middleware handles auth redirect to /sign-in
-  // Wait for auth and user data
+  // Middleware handles auth redirect to /sign-in.
+  // Não condicionar o loader a `useConvexAuth`: após router.back o token pode re-sync com
+  // authLoading true por tempo indefinido enquanto Clerk já está logado → loader eterno.
+  // A mutação createUser continua guardada por !authLoading && isAuthenticated.
   if (
-    authLoading ||
-    !isAuthenticated ||
+    !clerkLoaded ||
+    !isSignedIn ||
     currentUser === undefined ||
     !currentUser ||
     currentUser.hasCompletedOnboarding

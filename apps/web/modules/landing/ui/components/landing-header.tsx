@@ -16,7 +16,7 @@ export function LandingHeader() {
   return (
     <header
       role="banner"
-      className="fixed top-0 z-50 w-full bg-background/80 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+      className="fixed top-0 z-50 w-full bg-background/80 shadow-header backdrop-blur-xl"
     >
       <div className="flex min-h-14 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
         <Link
@@ -24,7 +24,7 @@ export function LandingHeader() {
           className="flex min-w-0 flex-1 items-center gap-3 pr-2"
         >
           <span
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dim)] shadow-[0_0_24px_rgba(149,170,255,0.35)]"
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dim shadow-logo-glow"
             aria-hidden="true"
           >
             <Landmark
@@ -42,10 +42,10 @@ export function LandingHeader() {
             <Link
               key={item.label}
               href={item.href}
-              className={`font-[var(--font-headline)] text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${
+              className={`font-headline text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${
                 item.active
-                  ? "text-[var(--secondary)] drop-shadow-[0_0_8px_rgba(79,243,37,0.5)]"
-                  : "text-slate-400 hover:text-[var(--primary)]"
+                  ? "text-secondary drop-shadow-nav-active"
+                  : "text-slate-400 hover:text-primary"
               }`}
               aria-current={item.active ? "page" : undefined}
             >
@@ -68,7 +68,7 @@ export function LandingHeader() {
           <Button
             asChild
             size="lg"
-            className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] px-4 text-xs font-bold uppercase tracking-wider text-[var(--on-primary-container)] shadow-none hover:opacity-95 active:scale-95 sm:px-6 sm:text-sm"
+            className="rounded-lg bg-primary px-4 text-xs font-bold uppercase tracking-wider text-on-primary sm:px-6 sm:text-sm"
           >
             <Link href="/sign-up" className="whitespace-nowrap">
               Criar conta

@@ -63,9 +63,28 @@ export const BRAND_GRADIENTS = {
   primary: `linear-gradient(135deg, ${BRAND_COLORS.primaryDim} 0%, ${BRAND_COLORS.primary} 100%)`,
   /** Headline hero: primary → primary-dim → pitch green. */
   headlineText: `linear-gradient(to right, ${BRAND_COLORS.primary}, ${BRAND_COLORS.primaryDim}, ${BRAND_COLORS.secondary})`,
-  /** Sombra/glow para cards com destaque. */
-  stadiumShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.5)",
-  primaryGlow: "0 10px 25px -5px rgba(149, 170, 255, 0.25)",
+} as const;
+
+/**
+ * Sombras e efeitos reutilizáveis do styleguide.
+ * Sincronizado com globals.css --shadow-* tokens.
+ */
+export const BRAND_SHADOWS = {
+  stadium: "0 20px 40px -10px rgba(0, 0, 0, 0.5)",
+  soft: "0 4px 12px rgba(0, 0, 0, 0.25)",
+  lift: "0 12px 28px -6px rgba(0, 0, 0, 0.45)",
+  glowPrimary: "0 0 20px rgba(149, 170, 255, 0.35)",
+  glowSuccess: "0 0 20px rgba(79, 243, 37, 0.35)",
+  glowTertiary: "0 0 20px rgba(255, 201, 101, 0.35)",
+  ringPrimary: "0 0 0 4px rgba(149, 170, 255, 0.25)",
+  ringPrimaryStrong: "0 0 0 5px rgba(149, 170, 255, 0.25)",
+  markerPrimary: "0 0 0 4px rgba(149, 170, 255, 0.25), 0 0 16px rgba(149, 170, 255, 0.45)",
+  markerSuccess: "0 8px 20px rgba(79, 243, 37, 0.35)",
+  markerMuted: "0 8px 20px rgba(0, 0, 0, 0.4)",
+  cluster: "0 0 0 5px rgba(149, 170, 255, 0.25), 0 6px 14px rgba(0, 0, 0, 0.45)",
+  pinPrimary: "0 0 10px rgba(149, 170, 255, 0.6)",
+  pinSuccess: "0 0 10px rgba(79, 243, 37, 0.6)",
+  pinTertiary: "0 0 10px rgba(255, 201, 101, 0.6)",
 } as const;
 
 /**

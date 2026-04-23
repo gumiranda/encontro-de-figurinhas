@@ -42,24 +42,24 @@ export const CITY_SUGGESTIONS = [
 
 export const FEATURES = [
   {
-    id: "security",
-    icon: "shield",
-    title: "Troca Segura",
-    description: "Validamos os pontos de encontro para garantir que você esteja em locais movimentados e monitorados.",
+    id: "nearby",
+    icon: "map",
+    title: "Trocas perto de você",
+    description: "Veja pontos de troca e colecionadores num raio de 5km. Sem deslocamento desnecessário.",
     colorClass: "text-[var(--primary)] bg-[var(--primary)]/10",
   },
   {
-    id: "map",
-    icon: "map",
-    title: "Mapa de Calor",
-    description: "Veja em tempo real onde estão as figurinhas que você mais precisa na sua região.",
+    id: "smart-list",
+    icon: "shield",
+    title: "Lista inteligente",
+    description: "Cadastre suas repetidas e faltantes. O sistema cruza automaticamente com outros colecionadores.",
     colorClass: "text-[var(--secondary)] bg-[var(--secondary)]/10",
   },
   {
     id: "match",
     icon: "zap",
-    title: "Match Instantâneo",
-    description: "Nosso algoritmo conecta você diretamente com quem tem o que você procura e quer o que você tem.",
+    title: "Match instantâneo",
+    description: "Receba alerta quando alguém próximo tiver a figurinha que você procura.",
     colorClass: "text-[var(--tertiary)] bg-[var(--tertiary)]/10",
   },
 ];

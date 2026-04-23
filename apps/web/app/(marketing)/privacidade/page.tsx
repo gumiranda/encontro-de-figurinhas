@@ -48,7 +48,7 @@ export default function PrivacidadePage() {
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
               <h1>Política de Privacidade</h1>
               <p className="lead">
-                Última atualização: {new Date().toLocaleDateString("pt-BR")}
+                Última atualização: 20 de abril de 2026
               </p>
 
               <p>

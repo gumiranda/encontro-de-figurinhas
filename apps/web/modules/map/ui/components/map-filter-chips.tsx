@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ArenaFilter } from "../../lib/use-arena-map-filters";
 
@@ -12,6 +12,7 @@ const OPTIONS: { key: ArenaFilter; label: string }[] = [
 type MapFilterChipsProps = {
   value: ArenaFilter;
   onChange: (next: ArenaFilter) => void;
+  canFavorite: boolean;
   className?: string;
   layout?: "scroll" | "wrap";
 };
@@ -19,19 +20,25 @@ type MapFilterChipsProps = {
 export function MapFilterChips({
   value,
   onChange,
+  canFavorite,
   className,
   layout = "scroll",
 }: MapFilterChipsProps) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
 
+  const visibleOptions = useMemo(
+    () => (canFavorite ? OPTIONS : OPTIONS.filter((o) => o.key !== "favorites")),
+    [canFavorite],
+  );
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, idx: number) => {
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     e.preventDefault();
     const dir = e.key === "ArrowRight" ? 1 : -1;
-    const nextIdx = (idx + dir + OPTIONS.length) % OPTIONS.length;
+    const nextIdx = (idx + dir + visibleOptions.length) % visibleOptions.length;
     const target = refs.current[nextIdx];
     target?.focus();
-    onChange(OPTIONS[nextIdx]!.key);
+    onChange(visibleOptions[nextIdx]!.key);
   };
 
   return (
@@ -46,7 +53,7 @@ export function MapFilterChips({
         className,
       )}
     >
-      {OPTIONS.map((opt, idx) => {
+      {visibleOptions.map((opt, idx) => {
         const active = value === opt.key;
         return (
           <button
@@ -61,7 +68,7 @@ export function MapFilterChips({
             onClick={() => onChange(opt.key)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-headline text-[11px] font-semibold uppercase tracking-wider transition-colors",
+              "inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 font-headline text-[11px] font-semibold uppercase tracking-wider transition-colors",
               active
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-outline-variant bg-[var(--glass-surface)] text-on-surface-variant backdrop-blur-md hover:text-on-surface",

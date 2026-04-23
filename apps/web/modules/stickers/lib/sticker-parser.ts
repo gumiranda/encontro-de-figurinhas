@@ -4,6 +4,7 @@ export type Section = {
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
+  flagEmoji?: string;
 };
 
 export type SectionLookup = {

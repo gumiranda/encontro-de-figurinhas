@@ -5,6 +5,7 @@ type RadarMode = "idle" | "searching";
 type PinTone = "primary" | "secondary" | "tertiary";
 
 interface PinConfig {
+  id: string;
   tone: PinTone;
   top?: string;
   left?: string;
@@ -23,35 +24,33 @@ interface RadarConfig {
 const MOBILE: RadarConfig = {
   containerClass: "mx-auto h-60 w-60",
   ringInsets: [70, 40],
-  meDotClass:
-    "h-4 w-4 shadow-[0_0_0_6px_rgba(149,170,255,0.25),0_0_20px_rgba(149,170,255,0.6)]",
+  meDotClass: "h-4 w-4 shadow-radar-me-mobile",
   pinSizeClass: "h-2 w-2",
   pins: [
-    { tone: "secondary", top: "30%", left: "22%" },
-    { tone: "secondary", top: "20%", right: "30%" },
-    { tone: "tertiary", bottom: "25%", right: "18%" },
-    { tone: "secondary", bottom: "30%", left: "30%" },
+    { id: "mobile-tl", tone: "secondary", top: "30%", left: "22%" },
+    { id: "mobile-tr", tone: "secondary", top: "20%", right: "30%" },
+    { id: "mobile-br", tone: "tertiary", bottom: "25%", right: "18%" },
+    { id: "mobile-bl", tone: "secondary", bottom: "30%", left: "30%" },
   ],
 };
 
 const DESKTOP: RadarConfig = {
   containerClass: "h-[420px] w-[420px]",
   ringInsets: [75, 50, 25],
-  meDotClass:
-    "h-6 w-6 shadow-[0_0_0_10px_rgba(149,170,255,0.2),0_0_30px_rgba(149,170,255,0.6)]",
+  meDotClass: "h-6 w-6 shadow-radar-me",
   pinSizeClass: "h-3 w-3",
   pins: [
-    { tone: "secondary", top: "25%", left: "28%" },
-    { tone: "tertiary", top: "22%", right: "30%" },
-    { tone: "secondary", bottom: "20%", right: "20%" },
-    { tone: "primary", bottom: "28%", left: "22%" },
+    { id: "desktop-tl", tone: "secondary", top: "25%", left: "28%" },
+    { id: "desktop-tr", tone: "tertiary", top: "22%", right: "30%" },
+    { id: "desktop-br", tone: "secondary", bottom: "20%", right: "20%" },
+    { id: "desktop-bl", tone: "primary", bottom: "28%", left: "22%" },
   ],
 };
 
 const PIN_TONE_CLASS: Record<PinTone, string> = {
-  primary: "bg-[var(--primary)] shadow-[0_0_10px_rgba(149,170,255,0.6)]",
-  secondary: "bg-[var(--secondary)] shadow-[0_0_10px_rgba(79,243,37,0.6)]",
-  tertiary: "bg-[var(--tertiary)] shadow-[0_0_10px_rgba(255,201,101,0.6)]",
+  primary: "bg-primary shadow-pin-primary",
+  secondary: "bg-secondary shadow-pin-success",
+  tertiary: "bg-tertiary shadow-pin-tertiary",
 };
 
 interface RadarProps {
@@ -85,9 +84,9 @@ export function Radar({ variant, mode = "idle", pointsCount, className }: RadarP
         aria-hidden="true"
       />
 
-      {cfg.pins.map((pin, i) => (
+      {cfg.pins.map((pin) => (
         <div
-          key={i}
+          key={pin.id}
           className={cn("absolute rounded-full", cfg.pinSizeClass, PIN_TONE_CLASS[pin.tone])}
           style={{ top: pin.top, left: pin.left, right: pin.right, bottom: pin.bottom }}
           aria-hidden="true"

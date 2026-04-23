@@ -1,6 +1,7 @@
 "use client";
 import { Heart } from "lucide-react";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -21,6 +22,20 @@ export function FavoriteButton({
 }: FavoriteButtonProps) {
   const toggle = useMutation(api.users.toggleFavoriteTradePoint);
 
+  const handleClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await toggle({ tradePointId });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      if (message.includes("FAVORITE_LIMIT_REACHED")) {
+        toast.error("Limite de 50 favoritos atingido");
+      } else {
+        toast.error("Não foi possível atualizar favorito");
+      }
+    }
+  };
+
   return (
     <Button
       type="button"
@@ -32,10 +47,7 @@ export function FavoriteButton({
           : `Marcar ${pointName} como favorito`
       }
       aria-pressed={isFavorite}
-      onClick={(e) => {
-        e.stopPropagation();
-        void toggle({ tradePointId });
-      }}
+      onClick={handleClick}
       className={cn("size-8 shrink-0 text-on-surface-variant", className)}
     >
       <Heart

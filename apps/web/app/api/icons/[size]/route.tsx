@@ -2,8 +2,6 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { BRAND_GRADIENTS, BRAND_COLORS } from "@workspace/ui/lib/design-tokens";
 
-export const runtime = "edge";
-
 const VALID_SIZES = [192, 512];
 
 export async function GET(

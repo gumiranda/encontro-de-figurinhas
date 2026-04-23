@@ -346,6 +346,8 @@ export function useLocationFlow({
     return () => abortControllerRef.current?.abort();
   }, []);
 
+  // Intencional: após recusa explícita o diálogo IP não reabre nesta sessão.
+  // `sessionStorage` preserva a decisão até a aba fechar; retry do GPS não ressurge o prompt.
   function dismissIpConsent(): void {
     persistIpConsentDismissed();
     dispatch({ type: "DISMISS_IP_CONSENT" });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type MouseEvent } from "react";
+import { memo, useMemo, useCallback, type MouseEvent } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +19,7 @@ type Props = {
   onToggle: (num: number, action: "add" | "remove") => void;
 };
 
-export function StickerGrid({
+function StickerGridBase({
   mode,
   sectionCode,
   sectionStart,
@@ -33,34 +33,41 @@ export function StickerGrid({
     return Array.from({ length: count }, (_, i) => sectionStart + i);
   }, [sectionStart, sectionEnd]);
 
-  const getState = (
-    num: number
-  ): "none" | "duplicate" | "missing" | "blocked" => {
-    const isInDuplicates = duplicates.has(num);
-    const isInMissing = missing.has(num);
+  const getState = useCallback(
+    (num: number): "none" | "duplicate" | "missing" | "blocked" => {
+      const isInDuplicates = duplicates.has(num);
+      const isInMissing = missing.has(num);
 
-    if (mode === "duplicates" && isInMissing) return "blocked";
-    if (mode === "missing" && isInDuplicates) return "blocked";
+      if (mode === "duplicates" && isInMissing) return "blocked";
+      if (mode === "missing" && isInDuplicates) return "blocked";
 
-    if (isInDuplicates) return "duplicate";
-    if (isInMissing) return "missing";
-    return "none";
-  };
+      if (isInDuplicates) return "duplicate";
+      if (isInMissing) return "missing";
+      return "none";
+    },
+    [mode, duplicates, missing]
+  );
 
-  const handleClick = (num: number) => {
-    const state = getState(num);
-    if (state === "blocked") return;
+  const handleClick = useCallback(
+    (num: number) => {
+      const state = getState(num);
+      if (state === "blocked") return;
 
-    const isSelected = state === "duplicate" || state === "missing";
-    onToggle(num, isSelected ? "remove" : "add");
-  };
+      const isSelected = state === "duplicate" || state === "missing";
+      onToggle(num, isSelected ? "remove" : "add");
+    },
+    [getState, onToggle]
+  );
 
-  const handleStickerButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
-    const raw = e.currentTarget.dataset.stickerNum;
-    const num = raw !== undefined ? Number(raw) : NaN;
-    if (!Number.isFinite(num)) return;
-    handleClick(num);
-  };
+  const handleStickerButtonClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      const raw = e.currentTarget.dataset.stickerNum;
+      const num = raw !== undefined ? Number(raw) : NaN;
+      if (!Number.isFinite(num)) return;
+      handleClick(num);
+    },
+    [handleClick]
+  );
 
   return (
     <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
@@ -69,7 +76,7 @@ export function StickerGrid({
         const state = getState(num);
 
         const buttonClasses = cn(
-          "h-10 w-full rounded-lg font-bold text-sm transition-all duration-150 active:scale-95",
+          "h-10 w-full rounded-lg font-bold text-sm transition-transform duration-150 active:scale-[0.96]",
           {
             "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
               state === "duplicate",
@@ -117,3 +124,5 @@ export function StickerGrid({
     </div>
   );
 }
+
+export const StickerGrid = memo(StickerGridBase);

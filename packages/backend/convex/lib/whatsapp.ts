@@ -3,7 +3,8 @@ import type { Doc } from "../_generated/dataModel";
 export type WhatsappAccessState =
   | { state: "ok"; link: string }
   | { state: "blocked-link-invalid" }
-  | { state: "blocked-minor" };
+  | { state: "blocked-minor" }
+  | { state: "blocked-not-participant" };
 
 export function evaluateWhatsappAccess(
   user: Doc<"users">,

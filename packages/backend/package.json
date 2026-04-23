@@ -9,12 +9,15 @@
   },
   "exports": {
     "./convex": "./convex/*.ts",
+    "./convex/matches": "./convex/matches.ts",
     "./_generated/api": "./convex/_generated/api.js",
     "./_generated/dataModel": "./convex/_generated/dataModel.d.ts",
     "./lib/types": "./convex/lib/types.ts",
     "./lib/ipLocationToken": "./convex/lib/ipLocationToken.ts",
     "./lib/setLocationErrors": "./convex/lib/setLocationErrors.ts",
-    "./lib/geo": "./convex/lib/geo.ts"
+    "./lib/geo": "./convex/lib/geo.ts",
+    "./lib/confidence-status": "./convex/lib/confidence_status.ts",
+    "./lib/report-severity": "./convex/lib/report_severity.ts"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",

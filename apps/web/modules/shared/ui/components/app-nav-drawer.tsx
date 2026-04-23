@@ -18,6 +18,7 @@ import {
   MapPin,
   MapPinPlus,
   Menu,
+  ShieldCheck,
   StickyNote,
   UserCog,
   type LucideIcon,
@@ -75,7 +76,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             href: "/cadastrar-figurinhas/quick",
             icon: ListPlus,
           },
-          { label: "Encontrar trocas", href: "/encontrar-trocas", icon: ArrowLeftRight },
+          { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
       },
@@ -90,7 +91,10 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         ? [
             {
               title: "Admin",
-              items: [{ label: "Usuários", href: "/admin/users", icon: UserCog }],
+              items: [
+                { label: "Aprovar pontos", href: "/admin/points", icon: ShieldCheck },
+                { label: "Usuários", href: "/admin/users", icon: UserCog },
+              ],
             },
           ]
         : []),

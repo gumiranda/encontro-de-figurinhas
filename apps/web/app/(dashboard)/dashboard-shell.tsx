@@ -1,5 +1,24 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  ArrowLeftRight,
+  ListPlus,
+  MapPinPlus,
+  Menu,
+  StickyNote,
+} from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
+import { useConvexAuth, useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import { Button } from "@workspace/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { RoleBadge } from "@/components/role-badge";
 import { MobileBottomNav } from "@/modules/shared/ui/components/mobile-bottom-nav";
@@ -8,11 +27,7 @@ import {
   AppSidebarContent,
   useAppNavGroups,
 } from "@/modules/shared/ui/components/app-nav-drawer";
-import { UserButton } from "@clerk/nextjs";
-import { api } from "@workspace/backend/_generated/api";
-import { useConvexAuth, useQuery } from "convex/react";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,20 +36,42 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
 
+  const onboardingGateRef = useRef({
+    isAuthenticated,
+    authLoading,
+    currentUser,
+  });
+  onboardingGateRef.current = { isAuthenticated, authLoading, currentUser };
+
   const isSuperadminOrCeo =
     currentUser?.role === "superadmin" || currentUser?.role === "ceo";
 
   const navGroups = useAppNavGroups();
 
+  // NÃO mover pra middleware: onboarding state vem de useQuery do Convex,
+  // que hidrata apenas no cliente. Convex não expõe esse estado em server/edge
+  // sem duplicar a camada de auth. react-doctor flagga, mas é o padrão correto.
+  //
+  // Debounce: após setLocation + router.replace("/dashboard"), o primeiro snapshot
+  // de getCurrentUser pode ser obsoleto por um frame e disparar redirect errado
+  // (ex.: volta para /cadastrar-figurinhas).
   useEffect(() => {
     if (!isAuthenticated || authLoading || currentUser === undefined) return;
-    if (currentUser === null || !currentUser.hasCompletedOnboarding) {
-      router.replace("/complete-profile");
-    } else if (!currentUser.hasCompletedStickerSetup) {
-      router.replace("/cadastrar-figurinhas");
-    } else if (!currentUser.locationSource) {
-      router.replace("/selecionar-localizacao");
-    }
+
+    const id = window.setTimeout(() => {
+      const { isAuthenticated: ia, authLoading: al, currentUser: u } =
+        onboardingGateRef.current;
+      if (!ia || al || u === undefined) return;
+      if (u === null || !u.hasCompletedOnboarding) {
+        router.replace("/complete-profile");
+      } else if (u.hasCompletedStickerSetup !== true) {
+        router.replace("/cadastrar-figurinhas");
+      } else if (!u.locationSource) {
+        router.replace("/selecionar-localizacao");
+      }
+    }, 120);
+
+    return () => window.clearTimeout(id);
   }, [isAuthenticated, authLoading, currentUser, router]);
 
   const isFullyOnboarded =
@@ -61,6 +98,44 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             {isSuperadminOrCeo && <RoleBadge role={currentUser.role} />}
           </div>
           <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden gap-2 md:flex"
+                >
+                  <Menu className="size-4" />
+                  Ações rápidas
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/cadastrar-figurinhas/quick">
+                    <ListPlus className="mr-2 size-4" />
+                    Adicionar figurinhas
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/album">
+                    <StickyNote className="mr-2 size-4" />
+                    Ver álbum
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/matches">
+                    <ArrowLeftRight className="mr-2 size-4" />
+                    Buscar trocas
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/ponto/solicitar">
+                    <MapPinPlus className="mr-2 size-4" />
+                    Sugerir ponto
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <UserButton />
           </div>
         </header>

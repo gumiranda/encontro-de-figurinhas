@@ -3,6 +3,7 @@
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
@@ -50,7 +51,13 @@ type TabConfig = {
   tabActiveClass: string;
 };
 
-export function VeryQuickRegisterView() {
+type RegisterModeSwitch = { href: string; label: string };
+
+export function VeryQuickRegisterView({
+  registerModeSwitch,
+}: {
+  registerModeSwitch?: RegisterModeSwitch;
+} = {}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("duplicates");
 
@@ -155,6 +162,16 @@ export function VeryQuickRegisterView() {
             <p className="text-xs text-on-surface-variant">
               {totalStickers} figurinhas · {haveCount} tenho · {missing.length} preciso
             </p>
+            {registerModeSwitch ? (
+              <p className="mt-1.5 text-xs">
+                <Link
+                  href={registerModeSwitch.href}
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {registerModeSwitch.label}
+                </Link>
+              </p>
+            ) : null}
           </div>
         </div>
         <button
@@ -237,7 +254,7 @@ export function VeryQuickRegisterView() {
           <Button
             onClick={handleFinalize}
             disabled={!canFinalize}
-            className="w-full bg-gradient-to-r from-primary to-primary-dim text-primary-foreground py-4 h-auto rounded-xl font-headline font-bold text-lg uppercase tracking-widest active:scale-[0.98] transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-3"
+            className="w-full bg-primary text-primary-foreground h-14 rounded-xl font-headline font-bold text-lg uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-3"
           >
             {isSaving ? (
               <span className="animate-pulse">Salvando...</span>

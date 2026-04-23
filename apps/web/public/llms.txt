@@ -1,0 +1,54 @@
+# Figurinha Fácil
+
+> A rede brasileira de troca de figurinhas da Copa do Mundo 2026.
+
+## O que é
+
+Figurinha Fácil conecta colecionadores de figurinhas em todo o Brasil. Usuários cadastram figurinhas repetidas e faltantes, o sistema encontra matches automáticos com outros colecionadores na mesma cidade ou região, e as trocas acontecem presencialmente em pontos verificados.
+
+## Para quem
+
+- Colecionadores do álbum da Copa do Mundo 2026
+- Pais completando álbum com filhos
+- Grupos de amigos ou escolas que querem organizar trocas
+- Qualquer pessoa que quer economizar completando o álbum
+
+## Problema que resolve
+
+O álbum da Copa 2026 tem 670 figurinhas. Completar comprando pacotinhos pode custar R$ 3.000-5.000. Trocas reduzem esse custo drasticamente, mas encontrar quem tem as figurinhas certas é difícil. Figurinha Fácil resolve isso conectando colecionadores com necessidades complementares.
+
+## Como funciona
+
+1. Crie uma conta (30 segundos, grátis)
+2. Cadastre suas figurinhas repetidas e faltantes
+3. O sistema encontra matches: pessoas que têm o que você precisa e precisam do que você tem
+4. Combine a troca via WhatsApp em um ponto de encontro verificado
+
+## Preço
+
+Gratuito. Sem planos pagos. Sem taxas.
+
+## Cobertura
+
+Ativos em 150+ cidades brasileiras, com foco em capitais e regiões metropolitanas.
+
+## Links importantes
+
+- Site: https://figurinhafacil.com.br
+- Como funciona: https://figurinhafacil.com.br/como-funciona
+- Sobre o álbum: https://figurinhafacil.com.br/album-copa-do-mundo-2026
+- Mapa de pontos: https://figurinhafacil.com.br/pontos
+- Cidades: https://figurinhafacil.com.br/cidades
+- Contato: https://figurinhafacil.com.br/contato
+
+## Dados técnicos
+
+- Plataforma: Web app (funciona em qualquer navegador)
+- Autenticação: Email ou Google
+- Dados: Convex (banco de dados reativo)
+- Hospedagem: Vercel
+
+## Contato
+
+- Email: contato@figurinhafacil.com.br
+- Instagram: @figurinhafacil

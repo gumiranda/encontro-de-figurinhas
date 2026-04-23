@@ -15,12 +15,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.3211 0 0);
   --primary: oklch(0.6231 0.188 259.8145);
-  --primary-dim: oklch(0.5 0.2 259.8);
+  --primary-dim: oklch(0.35 0.2 259.8);
   --primary-foreground: oklch(1 0 0);
+  --on-primary: oklch(0.2 0.08 260);
   --secondary: oklch(0.967 0.0029 264.5419);
   --secondary-container: oklch(0.9 0.01 264);
   --secondary-foreground: oklch(0.4461 0.0263 256.8018);
-  --tertiary: oklch(0.85 0.12 85);
+  --tertiary: oklch(0.65 0.16 85);
   --tertiary-foreground: oklch(0.3 0.08 85);
   --muted: oklch(0.9846 0.0017 247.8389);
   --muted-foreground: oklch(0.551 0.0234 264.3637);
@@ -52,6 +53,8 @@
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.475rem;
+  --whatsapp-brand: #25d366;
+  --whatsapp-brand-dark: #128c7e;
 
   /* MD3 Surface Colors (light mode fallbacks) */
   --surface-dim: oklch(0.95 0 0);
@@ -99,6 +102,9 @@
 
   /* Altura do MobileBottomNav (h-16 = 4rem). Consumida pelo nav e pela bottom-sheet do mapa */
   --mobile-nav-height: 4rem;
+
+  /* Offset do FAB mobile sobre o bottom nav (nav-height + gap de 1.25rem = 84px) */
+  --mobile-fab-offset: calc(var(--mobile-nav-height) + 1.25rem);
 }
 
 .dark {
@@ -215,11 +221,40 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --shadow-stadium: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
 
-  /* Copa 2026 glows */
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lift: 0 12px 28px -6px rgba(0, 0, 0, 0.45);
-  --shadow-glow-primary: 0 0 20px rgba(149, 170, 255, 0.35);
-  --shadow-glow-success: 0 0 20px rgba(79, 243, 37, 0.35);
+  /* Copa 2026 glows — refined for sophistication */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 10px 24px -6px rgba(0, 0, 0, 0.35);
+  --shadow-glow-primary: 0 0 12px rgba(149, 170, 255, 0.2);
+  --shadow-glow-success: 0 0 12px rgba(79, 243, 37, 0.2);
+  --shadow-glow-tertiary: 0 0 12px rgba(255, 201, 101, 0.2);
+
+  /* Ring/halo effects for markers and interactive elements — refined */
+  --shadow-ring-primary: 0 0 0 3px rgba(149, 170, 255, 0.15);
+  --shadow-ring-primary-strong: 0 0 0 4px rgba(149, 170, 255, 0.18);
+  --shadow-marker-primary: 0 0 0 3px rgba(149, 170, 255, 0.15), 0 0 10px rgba(149, 170, 255, 0.25);
+  --shadow-marker-success: 0 6px 16px rgba(79, 243, 37, 0.2);
+  --shadow-marker-muted: 0 6px 16px rgba(0, 0, 0, 0.3);
+  --shadow-cluster: 0 0 0 4px rgba(149, 170, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.35);
+
+  /* Gradient backgrounds for sticker states */
+  --gradient-sticker-have: linear-gradient(to bottom right, rgba(79, 243, 37, 0.15), rgba(23, 110, 0, 0.25));
+  --gradient-sticker-need: linear-gradient(to bottom right, rgba(255, 201, 101, 0.12), rgba(254, 183, 0, 0.2));
+
+  /* Radar/location visual effects — refined */
+  --shadow-radar-me: 0 0 0 6px rgba(149, 170, 255, 0.12), 0 0 16px rgba(149, 170, 255, 0.3);
+  --shadow-radar-me-mobile: 0 0 0 4px rgba(149, 170, 255, 0.15), 0 0 12px rgba(149, 170, 255, 0.35);
+  --shadow-pin-primary: 0 0 6px rgba(149, 170, 255, 0.35);
+  --shadow-pin-success: 0 0 6px rgba(79, 243, 37, 0.35);
+  --shadow-pin-tertiary: 0 0 6px rgba(255, 201, 101, 0.35);
+
+  /* Header and navigation — refined */
+  --shadow-header: 0 6px 24px rgba(0, 0, 0, 0.3);
+  --shadow-logo-glow: 0 0 16px rgba(149, 170, 255, 0.2);
+  --drop-shadow-nav-active: 0 0 6px rgba(79, 243, 37, 0.35);
+
+  /* Avatar and hero visuals — refined */
+  --shadow-avatar: 0 8px 24px rgba(149, 170, 255, 0.2);
+  --shadow-arena-center: 0 0 24px rgba(149, 170, 255, 0.25);
 }
 
 @theme inline {
@@ -321,6 +356,22 @@
   --shadow-lift: var(--shadow-lift);
   --shadow-glow-primary: var(--shadow-glow-primary);
   --shadow-glow-success: var(--shadow-glow-success);
+  --shadow-glow-tertiary: var(--shadow-glow-tertiary);
+  --shadow-ring-primary: var(--shadow-ring-primary);
+  --shadow-ring-primary-strong: var(--shadow-ring-primary-strong);
+  --shadow-marker-primary: var(--shadow-marker-primary);
+  --shadow-marker-success: var(--shadow-marker-success);
+  --shadow-marker-muted: var(--shadow-marker-muted);
+  --shadow-cluster: var(--shadow-cluster);
+  --shadow-radar-me: var(--shadow-radar-me);
+  --shadow-radar-me-mobile: var(--shadow-radar-me-mobile);
+  --shadow-pin-primary: var(--shadow-pin-primary);
+  --shadow-pin-success: var(--shadow-pin-success);
+  --shadow-pin-tertiary: var(--shadow-pin-tertiary);
+  --shadow-header: var(--shadow-header);
+  --shadow-logo-glow: var(--shadow-logo-glow);
+  --shadow-avatar: var(--shadow-avatar);
+  --shadow-arena-center: var(--shadow-arena-center);
 }
 
 @layer base {
@@ -342,14 +393,127 @@
   }
 }
 
-/* Custom utility classes for MD3 design (styleguide v1.0 — arena/stadium) */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HIGH-END VISUAL DESIGN SYSTEM — Awwwards-tier utilities
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @layer utilities {
+  /* ─── Double-Bezel Card Architecture (Doppelrand) ─── */
+  .card-shell {
+    --shell-radius: 1.5rem;
+    --shell-padding: 0.375rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--shell-radius);
+    padding: var(--shell-padding);
+    ring: 1px;
+    ring-color: rgba(255, 255, 255, 0.06);
+  }
+  .card-shell-lg {
+    --shell-radius: 2rem;
+    --shell-padding: 0.5rem;
+  }
+  .card-core {
+    background: var(--surface-container);
+    border-radius: calc(var(--shell-radius, 1.5rem) - var(--shell-padding, 0.375rem));
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  }
+
+  /* ─── Premium Ambient Shadows ─── */
+  .shadow-ambient {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      0 1px 2px rgba(0, 0, 0, 0.07),
+      0 4px 16px -2px rgba(0, 0, 0, 0.12);
+  }
+  .shadow-ambient-lg {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 12px 40px -8px rgba(0, 0, 0, 0.2);
+  }
+  .shadow-diffused {
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* ─── Ethereal Glass (SaaS/Tech vibe) ─── */
+  .glass-ethereal {
+    background: rgba(13, 19, 35, 0.6);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* ─── Eyebrow Tag (precedes headlines) ─── */
+  .eyebrow-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    background: rgba(149, 170, 255, 0.08);
+    border: 1px solid rgba(149, 170, 255, 0.15);
+    color: var(--primary);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ─── Scroll-Triggered Reveal (viewport entry) ─── */
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(2rem);
+    filter: blur(4px);
+    transition: all 800ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  .reveal-stagger-1 { transition-delay: 0ms; }
+  .reveal-stagger-2 { transition-delay: 75ms; }
+  .reveal-stagger-3 { transition-delay: 150ms; }
+  .reveal-stagger-4 { transition-delay: 225ms; }
+  .reveal-stagger-5 { transition-delay: 300ms; }
+
+  /* ─── Floating Island Nav ─── */
+  .nav-island {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    border-radius: 9999px;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    background: rgba(13, 19, 35, 0.85);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 4px 24px -4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* ─── Premium Motion ─── */
+  .motion-premium {
+    transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    transition-duration: 500ms;
+  }
+  .motion-magnetic:hover {
+    transform: translateY(-2px);
+  }
+  .motion-magnetic:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* ─── Existing utilities ─── */
   .glass-effect {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
-  /* Glass card — painel translúcido usado em heroes/sheets */
   .glass-card {
     background: rgba(30, 37, 59, 0.4);
     backdrop-filter: blur(20px);
@@ -360,14 +524,12 @@
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
 
-  /* Stadium gradient — fundo radial de arena */
   .stadium-gradient {
     background:
       radial-gradient(circle at top right, rgba(149, 170, 255, 0.15), transparent),
       radial-gradient(circle at bottom left, rgba(79, 243, 37, 0.05), transparent);
   }
 
-  /* Stadium glow radial central (GPS/localização) */
   .stadium-glow {
     background: radial-gradient(
       circle at center,
@@ -376,7 +538,6 @@
     );
   }
 
-  /* Text gradient primary → secondary — headlines de hero */
   .text-gradient-primary {
     background: linear-gradient(
       to right,
@@ -390,57 +551,210 @@
     color: transparent;
   }
 
-  /* Tag chip — pill verde "ao vivo" */
   .tag-chip {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.375rem 0.75rem;
+    padding: 0.375rem 0.875rem;
     border-radius: 9999px;
-    background: rgba(79, 243, 37, 0.12);
-    border: 1px solid rgba(79, 243, 37, 0.35);
+    background: rgba(79, 243, 37, 0.1);
+    border: 1px solid rgba(79, 243, 37, 0.2);
     color: var(--secondary);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  /* Botão primário com gradiente (CTA da landing/trocas) */
+  /* Sticker state gradients */
+  .sticker-have-gradient {
+    background: var(--gradient-sticker-have);
+  }
+  .sticker-need-gradient {
+    background: var(--gradient-sticker-need);
+  }
+
+  /* Radar pin shadows */
+  .shadow-pin-primary {
+    box-shadow: var(--shadow-pin-primary);
+  }
+  .shadow-pin-success {
+    box-shadow: var(--shadow-pin-success);
+  }
+  .shadow-pin-tertiary {
+    box-shadow: var(--shadow-pin-tertiary);
+  }
+  .shadow-radar-me {
+    box-shadow: var(--shadow-radar-me);
+  }
+  .shadow-radar-me-mobile {
+    box-shadow: var(--shadow-radar-me-mobile);
+  }
+
+  /* Header and navigation shadows */
+  .shadow-header {
+    box-shadow: var(--shadow-header);
+  }
+  .shadow-logo-glow {
+    box-shadow: var(--shadow-logo-glow);
+  }
+  .drop-shadow-nav-active {
+    filter: drop-shadow(var(--drop-shadow-nav-active));
+  }
+
+  /* Avatar and hero shadows */
+  .shadow-avatar {
+    box-shadow: var(--shadow-avatar);
+  }
+  .shadow-arena-center {
+    box-shadow: var(--shadow-arena-center);
+  }
+
+  /* REFINED ANIMATION UTILITIES — Subtle, sophisticated entrances */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-fade-in-scale {
+    animation: fade-in-scale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-in-left {
+    animation: slide-in-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-float-pin {
+    animation: float-pin 4s ease-in-out infinite;
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 3.5s ease-in-out infinite;
+  }
+  .animate-number-pop {
+    animation: number-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+  .delay-700 { animation-delay: 700ms; }
+
+  /* Arena ring animations — refined */
+  .arena-ring {
+    animation: ring-expand 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .arena-ring-1 { animation-delay: 0ms; }
+  .arena-ring-2 { animation-delay: 100ms; }
+  .arena-ring-3 { animation-delay: 200ms; }
+
+  /* DELIGHT UTILITIES — Refined celebration effects */
+  .animate-bounce-in {
+    animation: bounce-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-shake-celebrate {
+    animation: shake-celebrate 0.4s ease-in-out;
+  }
+  .animate-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
+  }
+  .animate-trophy-shine {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: trophy-shine 2.5s ease-in-out infinite;
+  }
+
+  /* Success checkmark animation */
+  .success-check-circle {
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    animation: success-circle 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .success-check-path {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: success-check 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  /* Confetti piece */
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     HIGH-END CTA — Double-bezel architecture with premium motion
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   .btn-primary-gradient {
-    height: 3rem;
-    border-radius: 0.75rem;
-    padding: 0 1.5rem;
+    --btn-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    position: relative;
+    height: 3.25rem;
+    border-radius: 9999px;
+    padding: 0 1.75rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    background-image: linear-gradient(
-      to right,
-      var(--primary-dim),
-      var(--primary)
-    );
+    gap: 0.75rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
     color: var(--on-primary);
     font-family: var(--font-headline), var(--font-body), sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 0.8125rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    box-shadow: 0 10px 25px -5px rgba(149, 170, 255, 0.25);
-    transition-property: opacity, transform;
-    transition-duration: 200ms;
-    transition-timing-function: ease-out;
+    letter-spacing: 0.02em;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      0 4px 16px -4px rgba(149, 170, 255, 0.3),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    transition: all 500ms var(--btn-ease);
   }
   .btn-primary-gradient:hover {
-    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 8px 24px -4px rgba(149, 170, 255, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
   }
   .btn-primary-gradient:active {
-    transform: scale(0.98);
+    transform: translateY(0) scale(0.98);
+    transition-duration: 100ms;
   }
 
-  /* Pulse ring — badge "ao vivo" */
-  .pulse-ring {
-    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Button-in-button trailing icon wrapper */
+  .btn-icon-nest {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.15);
+    margin-right: -0.5rem;
+    transition: all 500ms var(--btn-ease);
+  }
+  .btn-primary-gradient:hover .btn-icon-nest {
+    transform: translateX(2px) scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  /* Extra large CTA variant */
+  .btn-primary-gradient-xl {
+    height: 3.5rem;
+    padding: 0 2rem;
+    font-size: 0.875rem;
+    gap: 0.875rem;
+  }
+  .btn-primary-gradient-xl .btn-icon-nest {
+    width: 2rem;
+    height: 2rem;
   }
 
   /* Pulse dot — bulletinho verde pulsante */
@@ -452,12 +766,6 @@
     background: var(--secondary);
     box-shadow: 0 0 0 0 rgba(79, 243, 37, 0.5);
     animation: pulse-dot 1.8s ease-in-out infinite;
-  }
-
-  /* Radar bars — ondinhas que sobem/descem */
-  .bar-wave {
-    transform-origin: bottom;
-    animation: bar-wave 1.2s ease-in-out infinite;
   }
 
   /* Radar sweep — conic GPS rodando */
@@ -489,17 +797,6 @@
   }
 }
 
-@keyframes pulse-ring {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
-}
 @keyframes pulse-dot {
   0%,
   100% {
@@ -507,15 +804,6 @@
   }
   50% {
     box-shadow: 0 0 0 6px rgba(79, 243, 37, 0);
-  }
-}
-@keyframes bar-wave {
-  0%,
-  100% {
-    transform: scaleY(0.68);
-  }
-  50% {
-    transform: scaleY(1);
   }
 }
 @keyframes radar-sweep {
@@ -527,16 +815,208 @@
   }
 }
 
+/* REFINED ANIMATIONS — Subtle, sophisticated entrances */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(-50%) translateY(-50%);
+  }
+  50% {
+    transform: translateY(-4px) translateX(-50%) translateY(-50%);
+  }
+}
+
+@keyframes float-pin {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 3px)) scale(1.02);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(149, 170, 255, 0.2), 0 0 24px rgba(149, 170, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(149, 170, 255, 0.3), 0 0 32px rgba(149, 170, 255, 0.15);
+  }
+}
+
+@keyframes ring-expand {
+  from {
+    transform: scale(0.95);
+    opacity: 0.3;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+}
+
+@keyframes number-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* DELIGHT ANIMATIONS — Celebration and joy */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes success-check {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes success-circle {
+  0% {
+    stroke-dashoffset: 314;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake-celebrate {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  10% { transform: translateX(-2px) rotate(-2deg); }
+  20% { transform: translateX(2px) rotate(2deg); }
+  30% { transform: translateX(-2px) rotate(-1deg); }
+  40% { transform: translateX(2px) rotate(1deg); }
+  50% { transform: translateX(-1px) rotate(-1deg); }
+  60% { transform: translateX(1px) rotate(1deg); }
+  70% { transform: translateX(-1px) rotate(0); }
+  80% { transform: translateX(1px) rotate(0); }
+  90% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes trophy-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pulse-ring,
-  .pulse-dot,
-  .bar-wave {
+  .pulse-dot {
     animation: none;
   }
   .radar-sweep {
     animation-duration: 12s;
   }
   .btn-primary-gradient:active {
+    transform: none;
+  }
+  .animate-fade-in-up,
+  .animate-fade-in-scale,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-float-pin,
+  .animate-glow-pulse,
+  .animate-number-pop,
+  .arena-ring {
+    animation: none;
+    opacity: 1;
     transform: none;
   }
 }

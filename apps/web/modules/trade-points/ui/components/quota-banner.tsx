@@ -16,10 +16,9 @@ function QuotaBannerImpl() {
   const { quota, isLoading } = useQuotaStatus();
 
   if (isLoading || !quota || quota.unlimited) return null;
-  if (quota.remaining === quota.limit) return null;
+  if (quota.tier === "available") return null;
 
-  const atLimit = quota.remaining === 0;
-  const pending = quota.limit - quota.remaining;
+  const atLimit = quota.tier === "blocked";
   const lastRelative =
     quota.lastSubmissionAt !== null
       ? formatDistanceToNow(new Date(quota.lastSubmissionAt), {
@@ -30,7 +29,7 @@ function QuotaBannerImpl() {
 
   const message = atLimit
     ? `Limite atingido${lastRelative ? ` · última sugestão ${lastRelative}` : ""} — aguarde a revisão.`
-    : `Você tem ${pending} sugestão${pending > 1 ? "es" : ""} pendente${pending > 1 ? "s" : ""}${lastRelative ? ` · última ${lastRelative}` : ""}.`;
+    : `Você tem sugestões aguardando revisão.${lastRelative ? ` Última enviada ${lastRelative}.` : ""}`;
 
   return (
     <Banner className={atLimit ? "bg-destructive text-destructive-foreground" : undefined}>
