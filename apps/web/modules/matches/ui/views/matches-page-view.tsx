@@ -5,8 +5,6 @@ import { ListPlus, MapPin, Share2, Sparkles, User } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 
 import { api } from "@workspace/backend/_generated/api";
-import type { ListMyMatchRow, MatchView } from "@workspace/backend/convex/matches";
-import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
@@ -15,47 +13,6 @@ import { useShare } from "@/modules/trade-points/lib/use-share";
 import { useMatchesFilters } from "../../hooks/use-matches-filters";
 import { MatchCard } from "../components/match-card";
 import { MatchesEmptyState } from "../components/matches-empty-state";
-
-/**
- * `listMyMatches` reads `precomputedMatches`, which is not populated yet.
- * While that table is empty, derive rows from `findUserMatches` (userMatchCache)
- * for people currently checked in at the caller's trade points.
- */
-function presentRowsFromUserMatchCache(
-  findMatches: MatchView[],
-  presentUserIds: Id<"users">[],
-  tradePointId: Id<"tradePoints">,
-  opts: { bidirectionalOnly: boolean; layer: 1 | 2 | null }
-): ListMyMatchRow[] {
-  if (opts.layer === 2) return [];
-  const present = new Set(presentUserIds);
-  const rows: ListMyMatchRow[] = [];
-  for (const m of findMatches) {
-    if (!present.has(m.otherUserId)) continue;
-    const okOneWay = m.ihaveCount >= 1 || m.ineedCount >= 1;
-    const okBoth = m.ihaveCount >= 1 && m.ineedCount >= 1;
-    if (opts.bidirectionalOnly ? !okBoth : !okOneWay) continue;
-    rows.push({
-      matchedUserId: m.otherUserId,
-      displayNickname: m.displayNickname,
-      avatarSeed: m.otherUserId,
-      albumCompletionPct: 0,
-      confirmedTradesCount: m.totalTrades,
-      theyHaveINeed: m.ihaveSample,
-      iHaveTheyNeed: m.ineedSample,
-      isBidirectional: okBoth,
-      distanceKm: 0,
-      layer: 1,
-      tradePointId,
-    });
-  }
-  rows.sort((a, b) => {
-    const s = (r: ListMyMatchRow) =>
-      r.theyHaveINeed.length + r.iHaveTheyNeed.length;
-    return s(b) - s(a);
-  });
-  return rows;
-}
 
 export function MatchesPageView() {
   const { queryArgs } = useMatchesFilters();
@@ -81,6 +38,18 @@ export function MatchesPageView() {
     canLoadMatches ? queryArgs : "skip"
   );
 
+  const needPresentFallback =
+    canLoadMatches &&
+    listMatches !== undefined &&
+    listMatches.matches.length === 0;
+
+  const presentMatchRowsAtPointQ = useQuery(
+    api.matches.listPresentMatchRowsAtActivePoint,
+    needPresentFallback
+      ? { bidirectionalOnly: queryArgs.bidirectionalOnly }
+      : "skip"
+  );
+
   const handleSharePoint = useCallback(async () => {
     const slug = checkinQ?.tradePointSlug;
     if (!slug || typeof window === "undefined") return;
@@ -104,42 +73,11 @@ export function MatchesPageView() {
   }, [findData?.status, listMatches]);
 
   const cachePresentFallback = useMemo(() => {
-    if (findData === undefined) return [];
-    if (findData.status !== "ready" && findData.status !== "computing") {
-      return [];
-    }
-    if (
-      presentQ === undefined ||
-      checkinQ === undefined ||
-      listMatches === undefined
-    ) {
-      return [];
-    }
-    if (
-      !checkinQ.hasActiveCheckin ||
-      checkinQ.tradePointId == null ||
-      presentQ.present.length === 0
-    ) {
-      return [];
-    }
+    if (!needPresentFallback) return [];
+    if (presentMatchRowsAtPointQ === undefined) return [];
     if (queryArgs.layer === 2) return [];
-    return presentRowsFromUserMatchCache(
-      findData.matches,
-      presentQ.present,
-      checkinQ.tradePointId,
-      {
-        bidirectionalOnly: queryArgs.bidirectionalOnly,
-        layer: queryArgs.layer,
-      }
-    );
-  }, [
-    findData,
-    presentQ,
-    checkinQ,
-    listMatches,
-    queryArgs.bidirectionalOnly,
-    queryArgs.layer,
-  ]);
+    return presentMatchRowsAtPointQ.matches;
+  }, [needPresentFallback, presentMatchRowsAtPointQ, queryArgs.layer]);
 
   if (findData === undefined) {
     return <MatchesPageSkeleton />;
@@ -184,7 +122,8 @@ export function MatchesPageView() {
   if (
     presentQ === undefined ||
     checkinQ === undefined ||
-    listMatches === undefined
+    listMatches === undefined ||
+    (needPresentFallback && presentMatchRowsAtPointQ === undefined)
   ) {
     return <MatchesPageSkeleton />;
   }

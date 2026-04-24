@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>03 · Finalizar Perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+.pm { position:absolute; inset:0; padding:56px 24px 32px; overflow:auto;
+  background: radial-gradient(500px 400px at 100% -10%, rgba(255,201,101,.1), transparent 60%), var(--bg);}
+.pm::-webkit-scrollbar{ display:none; }
+.progress { display:flex; align-items:center; gap:6px; margin-bottom:20px; }
+.progress .step { flex:1; height:4px; border-radius:2px; background:var(--surface-container-high); }
+.progress .step.done { background:var(--secondary); }
+.progress .step.active { background: linear-gradient(90deg, var(--primary), var(--primary-dim)); }
+.avatar-picker { display:flex; flex-direction:column; align-items:center; margin-bottom:28px; }
+.avatar-picker .av {
+  width:120px; height:120px; border-radius:50%; position:relative;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display:flex; align-items:center; justify-content:center;
+  color:var(--on-primary); font-family:var(--font-headline); font-weight:900; font-size:48px;
+  border: 3px solid var(--surface-container-high);
+  box-shadow: 0 0 0 4px rgba(149,170,255,.15);
+}
+.avatar-picker .av .edit {
+  position:absolute; right:-4px; bottom:-4px; width:40px; height:40px;
+  border-radius:50%; background:var(--primary); color:var(--on-primary);
+  display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--bg); cursor:pointer;
+}
+.avatar-picker .hint { color:var(--on-surface-variant); font-size:12px; margin-top:12px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-family:var(--font-headline); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--on-surface-variant); margin-bottom:6px; }
+.helper { font-size:11px; color:var(--outline); margin-top:6px; font-family: 'JetBrains Mono', monospace;}
+
+.pd { position:absolute; inset:0; display:grid; grid-template-columns: 340px 1fr; }
+.pd .side { background:var(--surface-container-low); border-right:1px solid var(--outline-variant); padding:40px 32px; }
+.pd .side .brand { display:flex; align-items:center; gap:10px; margin-bottom:40px; }
+.pd .side .brand .mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary-dim)); display:flex; align-items:center; justify-content:center; color:var(--on-primary); }
+.pd .side .brand .name { font-family:var(--font-headline); font-weight:800; font-size:16px; }
+.pd .side .steps { display:flex; flex-direction:column; gap:4px; }
+.pd .side .steps .s { display:flex; align-items:center; gap:14px; padding:12px; border-radius:12px; }
+.pd .side .steps .s.active { background:var(--surface-container); border:1px solid var(--outline-variant); }
+.pd .side .steps .s .n { width:28px; height:28px; border-radius:50%; background:var(--surface-container-high); display:flex; align-items:center; justify-content:center; font-family:var(--font-headline); font-weight:800; font-size:12px; color:var(--outline); border:1px solid var(--outline-variant); }
+.pd .side .steps .s.active .n { background:var(--primary); color:var(--on-primary); border-color:var(--primary);}
+.pd .side .steps .s.done .n { background:var(--secondary); color:var(--on-secondary); border-color:var(--secondary); }
+.pd .side .steps .t { font-family:var(--font-headline); font-weight:700; font-size:13px; color:var(--on-surface); }
+.pd .side .steps .d { font-size:11px; color:var(--on-surface-variant); }
+.pd .content { padding:80px; overflow:auto; max-width:700px; }
+.pd h1 { font-size:40px; font-weight:900; line-height:1; margin-bottom:12px; }
+.pd h1 em { font-style:normal; background: linear-gradient(90deg,var(--primary),var(--tertiary)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.pd p.sub { color:var(--on-surface-variant); margin-bottom:36px; font-size:15px; }
+.pd .row { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+
+[data-tweak="perfil"][data-variant="cards"] .avatar-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;}
+[data-tweak="perfil"][data-variant="cards"] .avatar-grid .opt { aspect-ratio:1; border-radius:50%; border:2px solid var(--outline-variant); cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page-canvas">
+  <div class="top"><a class="brand" href="../index.html"><span class="dot"></span><span class="name">Figurinha Fácil</span></a><div class="crumb">03 / 11 · <b>Finalizar Perfil</b></div></div>
+  <div class="page-head"><div><h1>Finalize <em>seu perfil</em></h1><p>Onboarding leve: 3 passos claros, progresso visível. Foco em reduzir atrito.</p></div><div class="meta"><span class="chip"><span class="bullet"></span>MOBILE</span><span class="chip">DESKTOP</span><span class="chip">2 VARIAÇÕES</span></div></div>
+
+  <div class="frames">
+    <div class="frame-col">
+      <div class="label">Mobile · Step 2 of 3</div>
+      <div class="mobile-frame" data-tweak="perfil" data-variant="default">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="mobile-statusbar"><span>9:41</span><span class="right"><span class="material-symbols-outlined" style="font-size:16px">signal_cellular_alt</span><span class="material-symbols-outlined" style="font-size:16px">wifi</span><span class="material-symbols-outlined" style="font-size:16px">battery_full</span></span></div>
+          <div class="pm">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <button class="btn-icon btn-ghost" style="width:40px;height:40px"><span class="material-symbols-outlined">arrow_back</span></button>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size:11px; color:var(--on-surface-variant);">2 / 3</span>
+            </div>
+            <div class="progress"><span class="step done"></span><span class="step active"></span><span class="step"></span></div>
+
+            <h1 style="font-size:28px; line-height:1.05; font-weight:900; margin-bottom:6px;">Como te <em style="font-style:normal;background:linear-gradient(90deg,var(--primary),var(--tertiary));-webkit-background-clip:text;background-clip:text;color:transparent">chamamos?</em></h1>
+            <p style="color:var(--on-surface-variant); font-size:13px; margin-bottom:24px;">Seu nome aparece nas propostas de troca.</p>
+
+            <div class="avatar-picker">
+              <div class="av">MA<span class="edit"><span class="material-symbols-outlined" style="font-size:20px">photo_camera</span></span></div>
+              <div class="hint">Toque para adicionar foto</div>
+            </div>
+
+            <div class="form-group">
+              <label>Nome</label>
+              <div class="input-wrap"><input placeholder="Marina Alves" value="Marina Alves"></div>
+              <div class="helper">↳ Aparecerá pública nas trocas</div>
+            </div>
+            <div class="form-group">
+              <label>@username</label>
+              <div class="input-wrap" style="padding-left:0"><span style="padding:0 0 0 16px;color:var(--outline);font-family:'JetBrains Mono',monospace;">@</span><input placeholder="marina" value="marina"><span class="pill pill-success" style="margin-right:6px"><span class="material-symbols-outlined" style="font-size:12px">check</span>livre</span></div>
+            </div>
+            <div class="form-group">
+              <label>WhatsApp</label>
+              <div class="input-wrap"><span class="material-symbols-outlined" style="color:var(--secondary)">call</span><input placeholder="+55 11 99999-9999"></div>
+              <div class="helper">↳ Para trocas combinadas · nunca público</div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:20px;">
+              <button class="btn btn-ghost" style="flex:1">Voltar</button>
+              <button class="btn btn-primary" style="flex:2">Continuar →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame-col">
+      <div class="label">Desktop · Stepper lateral</div>
+      <div class="desktop-frame">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="url">figurinhafacil.com.br/perfil/finalizar</div></div>
+        <div class="viewport" data-tweak="perfil" data-variant="default">
+          <div class="pd">
+            <div class="side">
+              <div class="brand"><span class="mark"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span><span class="name">Figurinha Fácil</span></div>
+              <div style="font-family:var(--font-headline); font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--outline); margin-bottom:12px;">Onboarding</div>
+              <div class="steps">
+                <div class="s done"><span class="n">✓</span><div><div class="t">Conta criada</div><div class="d">marina@email.com</div></div></div>
+                <div class="s active"><span class="n">2</span><div><div class="t">Seu perfil</div><div class="d">Nome, foto, contato</div></div></div>
+                <div class="s"><span class="n">3</span><div><div class="t">Cidade</div><div class="d">Onde você troca</div></div></div>
+              </div>
+            </div>
+            <div class="content">
+              <div style="display:flex; gap:20px; align-items:center; margin-bottom:8px;">
+                <span style="font-family:'JetBrains Mono',monospace; color:var(--outline); font-size:12px;">PASSO 02 / 03</span>
+                <div style="flex:1;height:4px;background:var(--surface-container-high);border-radius:2px;overflow:hidden;"><div style="width:66%; height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary));"></div></div>
+              </div>
+              <h1>Como te <em>chamamos?</em></h1>
+              <p class="sub">Seu nome aparece nas propostas de troca. O WhatsApp é privado, usado só quando vocês combinam um encontro.</p>
+
+              <div style="display:grid; grid-template-columns:160px 1fr; gap:32px; margin-bottom:32px; align-items:center;">
+                <div style="position:relative;">
+                  <div style="width:140px; height:140px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; color:var(--on-primary); font-family:var(--font-headline); font-weight:900; font-size:56px; border:3px solid var(--surface-container-high);">MA</div>
+                  <button class="btn-icon" style="position:absolute; right:4px; bottom:4px; width:40px; height:40px; border-radius:50%; background:var(--primary); color:var(--on-primary); border:3px solid var(--bg); cursor:pointer;"><span class="material-symbols-outlined">photo_camera</span></button>
+                </div>
+                <div>
+                  <div style="font-family:var(--font-headline); font-weight:700; font-size:16px; margin-bottom:6px;">Sua foto de perfil</div>
+                  <div style="color:var(--on-surface-variant); font-size:13px; margin-bottom:12px;">Uma boa foto aumenta a confiança em trocas presenciais. JPG ou PNG, até 5MB.</div>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:18px">upload</span>Upload</button>
+                    <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:18px">palette</span>Gerar avatar</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="form-group"><label>Nome completo</label><div class="input-wrap"><input value="Marina Alves"></div></div>
+                <div class="form-group"><label>@username</label><div class="input-wrap" style="padding-left:0"><span style="padding:0 0 0 16px;color:var(--outline);font-family:'JetBrains Mono',monospace;">@</span><input value="marina"><span class="pill pill-success" style="margin-right:6px"><span class="material-symbols-outlined" style="font-size:12px">check</span>disponível</span></div></div>
+              </div>
+              <div class="form-group"><label>WhatsApp · opcional mas recomendado</label><div class="input-wrap"><span class="material-symbols-outlined" style="color:var(--secondary)">call</span><input placeholder="+55 11 99999-9999"></div><div class="helper">↳ Só compartilhamos quando você aceita uma troca</div></div>
+
+              <div style="display:flex; gap:12px; margin-top:32px;">
+                <button class="btn btn-ghost">← Voltar</button>
+                <button class="btn btn-primary btn-lg" style="flex:1">Continuar para cidade →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tweaks-panel open">
+  <h4>Tweaks · Perfil</h4>
+  <div class="tweaks-group"><label>Avatar</label>
+    <div class="tweaks-seg" data-key="perfil" data-attr="data-variant">
+      <button class="active" data-value="default">Upload</button>
+      <button data-value="cards">Gerar (grid)</button>
+    </div>
+  </div>
+</div>
+<script src="../shared/tweaks.js"></script>
+</body></html>

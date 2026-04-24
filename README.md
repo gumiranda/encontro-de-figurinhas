@@ -3,6 +3,15 @@
 RODAR COMANDO npx convex run seedAlbumConfig:seedAlbumConfig pra cadastrar os paises/figurinha
 npx convex run seedBlog:seedBlogPosts
 
+# Seeds públicos (mutation)
+
+npx convex run seedAlbumConfig:seedAlbumConfig
+
+# Seeds internos (internalMutation) - precisa do flag --component
+
+npx convex run seeds/seedCities:seedCities --component \_root
+npx convex run seeds/seedTradePoints:seedTradePoints --component \_root
+npx convex run seedBlog:seedBlogPosts --component \_root
 ![Next.js](https://img.shields.io/badge/Next.js-15.4-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
@@ -133,6 +142,51 @@ cd template
 # Instalar dependencias
 pnpm install
 ```
+
+## Database Seeds
+
+Seeds são scripts de inicialização do banco de dados Convex. Rodam via dashboard ou CLI.
+
+### Seeds disponíveis
+
+| Seed         | Localização                       | Tipo             | Descrição                                                     |
+| ------------ | --------------------------------- | ---------------- | ------------------------------------------------------------- |
+| Cities       | `convex/seeds/seedCities.ts`      | internalMutation | 54 cidades brasileiras                                        |
+| Album Config | `convex/seedAlbumConfig.ts`       | mutation         | Configuração do álbum Copa 2026 (980 figurinhas, 48 seleções) |
+| Blog Posts   | `convex/seedBlog.ts`              | internalMutation | Posts de SEO sobre seleções                                   |
+| Trade Points | `convex/seeds/seedTradePoints.ts` | internalMutation | 80+ pontos de troca oficiais e tradicionais                   |
+
+### Como rodar seeds
+
+**Opção 1: Via Convex Dashboard**
+
+1. Acesse o dashboard do Convex
+2. Vá em "Functions" → selecione o seed
+3. Clique "Run" (sem argumentos)
+
+**Opção 2: Via CLI (ambiente dev)**
+
+```bash
+# Seeds públicos (mutation)
+npx convex run seedAlbumConfig:seedAlbumConfig
+
+# Seeds internos (internalMutation) - precisa do flag --component
+npx convex run seeds/seedCities:seedCities --component _root
+npx convex run seeds/seedTradePoints:seedTradePoints --component _root
+npx convex run seedBlog:seedBlogPosts --component _root
+```
+
+### Ordem de execução
+
+1. `seedCities` - Cidades devem existir primeiro
+2. `seedTradePoints` - Depende de cities
+3. `seedAlbumConfig` - Independente
+4. `seedBlogPosts` - Independente
+
+### Comportamento de idempotência
+
+- Todos os seeds verificam se já existem dados antes de inserir
+- Re-rodar um seed é seguro (não duplica dados)
 
 ### 2. Configurar o Clerk
 

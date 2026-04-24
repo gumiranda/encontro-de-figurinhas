@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guias | Blog Figurinha Fácil</title>
+<meta name="description" content="Todos os guias práticos para colecionadores da Copa 2026: como trocar, organizar, identificar raridades e completar seu álbum.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.cat-hero {
+  position: relative;
+  padding: 56px 0 40px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.cat-hero::before {
+  content: ''; position: absolute;
+  top: -100px; right: -40px; width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(149,170,255,.18), transparent 60%);
+  filter: blur(50px); pointer-events: none;
+}
+.cat-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-top: 16px;
+}
+.cat-sub { color: var(--on-surface-variant); font-size: clamp(1rem, 1.3vw, 1.15rem); max-width: 55ch; margin-top: 18px; line-height: 1.55; }
+
+.cat-stats { margin-top: 32px; display: flex; gap: 40px; flex-wrap: wrap; }
+.cat-stat { display: flex; flex-direction: column; }
+.cat-stat .num { font-family: 'Space Grotesk'; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+.cat-stat .lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--outline); margin-top: 2px; }
+
+/* Sub-cat nav */
+.subcat-nav { display: flex; gap: 10px; overflow-x: auto; margin-top: 32px; padding-bottom: 8px; scrollbar-width: none; }
+.subcat-nav::-webkit-scrollbar { display: none; }
+.subcat-pill {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-family: 'Space Grotesk';
+  font-weight: 600;
+  font-size: .8rem;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  color: var(--on-surface-variant);
+  transition: all .2s;
+}
+.subcat-pill.active { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+.subcat-pill:hover { color: var(--primary); }
+.subcat-pill.active:hover { color: var(--on-primary); }
+
+/* Toolbar */
+.list-toolbar {
+  display: flex; gap: 16px; align-items: center; justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+.list-toolbar-left { display: flex; align-items: center; gap: 16px; color: var(--on-surface-variant); font-size: .88rem; }
+.sort-select {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  font-size: .82rem; font-weight: 500;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+.view-toggle { display: inline-flex; background: var(--surface-container); border-radius: 10px; padding: 3px; border: 1px solid rgba(255,255,255,.06); }
+.view-toggle button { padding: 6px 10px; border-radius: 7px; color: var(--on-surface-variant); transition: all .2s; }
+.view-toggle button.active { background: var(--primary); color: var(--on-primary); }
+
+/* List grid - mix of sizes */
+.list-grid { display: grid; gap: 24px; grid-template-columns: 1fr; margin-top: 32px; }
+@media (min-width: 720px) { .list-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .list-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.list-card {
+  display: flex; flex-direction: column;
+  border-radius: 18px; overflow: hidden;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.list-card:hover { transform: translateY(-3px); border-color: rgba(149,170,255,.2); box-shadow: var(--shadow-ambient-lg); }
+.list-card .thumb { aspect-ratio: 16/10; position: relative; overflow: hidden; background: var(--surface-variant); }
+.list-card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.list-card:hover .thumb img { transform: scale(1.05); }
+.list-card .level {
+  position: absolute; top: 12px; left: 12px;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(9,14,28,.85);
+  backdrop-filter: blur(8px);
+  font-family: 'Space Grotesk';
+  font-size: .65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+}
+.list-card .body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.list-card h3 { font-family: 'Space Grotesk'; font-size: 1.05rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+.list-card .excerpt { font-size: .85rem; color: var(--on-surface-variant); line-height: 1.5; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.list-card .meta { margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; gap: 10px; font-size: .76rem; color: var(--on-surface-variant); }
+
+/* Featured wide card */
+.feat-wide {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: 1fr;
+  border-radius: 24px; overflow: hidden;
+  background: var(--surface-container-high);
+  border: 1px solid rgba(149,170,255,.15);
+}
+@media (min-width: 900px) { .feat-wide { grid-template-columns: 1.2fr 1fr; } }
+.feat-wide .thumb { min-height: 280px; background-size: cover; background-position: center; position: relative; }
+.feat-wide .thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(149,170,255,.25), transparent 60%); }
+.feat-wide .body { padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.feat-wide h3 { font-family: 'Space Grotesk'; font-size: clamp(1.4rem, 2.4vw, 2rem); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
+.feat-wide .excerpt { color: var(--on-surface-variant); font-size: 1rem; line-height: 1.55; }
+
+/* Pagination */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 48px; }
+.page-btn {
+  min-width: 40px; height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.05);
+  font-family: 'Space Grotesk';
+  font-weight: 600; font-size: .85rem;
+  color: var(--on-surface-variant);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.page-btn:hover { color: var(--primary); border-color: rgba(149,170,255,.25); }
+.page-btn.active { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="blog-home.html" class="brand">
+      <span class="brand-mark"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span>
+      <span class="brand-name">Figurinha <span>Fácil</span></span>
+    </a>
+    <nav class="nav-main">
+      <a href="#" class="nav-link">Explorar</a>
+      <a href="#" class="nav-link">Como Funciona</a>
+      <a href="#" class="nav-link">Arenas</a>
+      <a href="blog-home.html" class="nav-link active">Blog</a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn-icon"><span class="material-symbols-outlined">search</span></button>
+      <button class="btn btn-primary btn-sm">Entrar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="cat-hero">
+  <div class="container">
+    <nav style="display:flex; gap:8px; font-size:.8rem; color:var(--on-surface-variant);">
+      <a href="blog-home.html" style="color:var(--on-surface-variant);">Blog</a>
+      <span style="opacity:.4">/</span>
+      <span>Categoria</span>
+    </nav>
+    <div style="display:flex; align-items:center; gap:16px; margin-top:16px;">
+      <div style="width:56px; height:56px; border-radius:16px; background:rgba(149,170,255,.12); color:var(--primary); display:grid; place-items:center; border:1px solid rgba(149,170,255,.2);">
+        <span class="material-symbols-outlined" style="font-size:32px">menu_book</span>
+      </div>
+      <h1 class="cat-title" style="margin:0">Guias</h1>
+    </div>
+    <p class="cat-sub">Tutoriais, checklists e passo-a-passos para colecionar, trocar e completar o álbum da Copa 2026 como um pro.</p>
+
+    <div class="cat-stats">
+      <div class="cat-stat"><div class="num">38</div><div class="lbl">artigos</div></div>
+      <div class="cat-stat"><div class="num" style="color:var(--primary)">14k</div><div class="lbl">leitores/mês</div></div>
+      <div class="cat-stat"><div class="num" style="color:var(--secondary)">7</div><div class="lbl">autores ativos</div></div>
+      <div class="cat-stat"><div class="num" style="color:var(--tertiary)">4.9</div><div class="lbl">★ avaliação</div></div>
+    </div>
+
+    <div class="subcat-nav">
+      <button class="subcat-pill active">Todos</button>
+      <button class="subcat-pill">Começando</button>
+      <button class="subcat-pill">Trocas</button>
+      <button class="subcat-pill">Identificação</button>
+      <button class="subcat-pill">Organização</button>
+      <button class="subcat-pill">Mercado</button>
+      <button class="subcat-pill">Segurança</button>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="list-toolbar">
+    <div class="list-toolbar-left">
+      Mostrando <strong style="color:var(--on-surface);">1–12</strong> de <strong style="color:var(--on-surface);">38</strong> guias
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="sort-select">
+        <span class="material-symbols-outlined" style="font-size:16px">sort</span>
+        Mais recentes
+        <span class="material-symbols-outlined" style="font-size:16px">expand_more</span>
+      </button>
+      <div class="view-toggle">
+        <button class="active"><span class="material-symbols-outlined" style="font-size:18px">grid_view</span></button>
+        <button><span class="material-symbols-outlined" style="font-size:18px">view_list</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-grid">
+    <!-- Featured wide -->
+    <article class="feat-wide">
+      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=900&q=80');"></div>
+      <div class="body">
+        <div style="display:flex; gap:8px;">
+          <span class="chip chip-primary">Guia completo</span>
+          <span class="chip">Iniciante</span>
+        </div>
+        <h3>Guia definitivo: do álbum zero ao álbum completo</h3>
+        <p class="excerpt">Um passo-a-passo de 15 etapas para quem nunca colecionou. Onde comprar, como organizar, quando começar a trocar, e como evitar gastar demais no caminho.</p>
+        <div style="display:flex; align-items:center; gap:12px; font-size:.82rem; color:var(--on-surface-variant); margin-top:8px;">
+          <div class="avatar">MR</div>
+          <span>Marina Ribeiro</span><span style="opacity:.4">·</span><span>22 min</span><span style="opacity:.4">·</span><span style="color:var(--secondary);">Atualizado hoje</span>
+        </div>
+        <div style="margin-top:8px;"><button class="btn btn-primary">Ler o guia completo<span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span></button></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80" alt="">
+        <span class="level chip-primary">Intermediário</span>
+      </div>
+      <div class="body">
+        <h3>Como trocar com segurança em pontos físicos</h3>
+        <p class="excerpt">Checklist prático, o que levar e como evitar os 3 golpes mais comuns.</p>
+        <div class="meta"><div class="avatar" style="background:linear-gradient(135deg, var(--tertiary), #f59e0b);">MR</div><span>Marina R.</span><span style="margin-left:auto;">5 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=600&q=80" alt="">
+        <span class="level chip-tertiary">Avançado</span>
+      </div>
+      <div class="body">
+        <h3>Messi rainbow holographic: como identificar a original</h3>
+        <p class="excerpt">Três detalhes invisíveis que separam a legítima das falsificações.</p>
+        <div class="meta"><div class="avatar">LG</div><span>Lucas G.</span><span style="margin-left:auto;">4 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80" alt="">
+        <span class="level chip-secondary">Iniciante</span>
+      </div>
+      <div class="body">
+        <h3>Primeira vez colecionando? Comece por aqui</h3>
+        <p class="excerpt">Do álbum certo ao primeiro pacote — passo a passo para começar.</p>
+        <div class="meta"><div class="avatar" style="background:linear-gradient(135deg, var(--tertiary), #f59e0b);">MR</div><span>Marina R.</span><span style="margin-left:auto;">5 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=600&q=80" alt="">
+        <span class="level chip-primary">Intermediário</span>
+      </div>
+      <div class="body">
+        <h3>Trocas em rede: colecionar com 5+ amigos</h3>
+        <p class="excerpt">Organize um grupo, defina regras e complete 3x mais rápido.</p>
+        <div class="meta"><div class="avatar" style="background:linear-gradient(135deg, var(--secondary), var(--secondary-container));">JS</div><span>Julia S.</span><span style="margin-left:auto;">7 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80" alt="">
+        <span class="level chip-secondary">Iniciante</span>
+      </div>
+      <div class="body">
+        <h3>Como organizar suas repetidas: 4 sistemas testados</h3>
+        <p class="excerpt">Pasta, caderneta, app ou planilha — qual funciona melhor para você?</p>
+        <div class="meta"><div class="avatar">CM</div><span>Camila M.</span><span style="margin-left:auto;">6 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80" alt="">
+        <span class="level chip-tertiary">Avançado</span>
+      </div>
+      <div class="body">
+        <h3>Avaliando o valor real de uma figurinha rara</h3>
+        <p class="excerpt">5 variáveis de mercado: conservação, tiragem, demanda e mais.</p>
+        <div class="meta"><div class="avatar">LG</div><span>Lucas G.</span><span style="margin-left:auto;">9 min</span></div>
+      </div>
+    </article>
+
+    <article class="list-card">
+      <div class="thumb">
+        <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600&q=80" alt="">
+        <span class="level chip-primary">Intermediário</span>
+      </div>
+      <div class="body">
+        <h3>Como usar o app para encontrar trocas próximas</h3>
+        <p class="excerpt">Tutorial completo do radar de trocas da Figurinha Fácil.</p>
+        <div class="meta"><div class="avatar" style="background:linear-gradient(135deg, var(--secondary), var(--secondary-container));">JS</div><span>Julia S.</span><span style="margin-left:auto;">8 min</span></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="pagination">
+    <button class="page-btn"><span class="material-symbols-outlined" style="font-size:18px">chevron_left</span></button>
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn">4</button>
+    <span class="page-btn" style="background:transparent; border:0;">…</span>
+    <button class="page-btn">6</button>
+    <button class="page-btn"><span class="material-symbols-outlined" style="font-size:18px">chevron_right</span></button>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px; font-size:.82rem; color:var(--outline);">
+      <span>© 2026 Figurinha Fácil</span>
+      <div style="display:flex; gap:20px;"><a href="#" style="color:var(--outline)">Termos</a><a href="#" style="color:var(--outline)">Privacidade</a><a href="#" style="color:var(--outline)">Contato</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

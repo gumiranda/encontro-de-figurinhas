@@ -39,24 +39,20 @@ import { PointStatsStrip } from "../components/point-stats-strip";
 import { WhatsappButton } from "../components/whatsapp-button";
 
 const REPORT_CATEGORIES = [
-  "suspicious_behavior",
-  "private_contact_attempt",
-  "minor_approach",
-  "inappropriate_content",
-  "broken_whatsapp_link",
-  "inactive_point",
+  "safety",
+  "fake_stickers",
+  "no_show",
+  "spam",
   "other",
 ] as const;
 
 type ReportCategory = (typeof REPORT_CATEGORIES)[number];
 
 const REPORT_CATEGORY_LABEL: Record<ReportCategory, string> = {
-  suspicious_behavior: "Comportamento suspeito",
-  private_contact_attempt: "Tentativa de contato privado",
-  minor_approach: "Abordagem a menores",
-  inappropriate_content: "Conteúdo inadequado",
-  broken_whatsapp_link: "Link do WhatsApp quebrado",
-  inactive_point: "Ponto inativo",
+  safety: "Comportamento inadequado",
+  fake_stickers: "Figurinhas falsas",
+  no_show: "Faltou ao encontro",
+  spam: "Spam ou propaganda",
   other: "Outro",
 };
 
@@ -254,7 +250,7 @@ export function TradePointDetailView({ tradePointId }: Props) {
         tradePointId: point._id,
         category: reportCategory,
       });
-      if (reportCategory === "minor_approach") {
+      if (reportCategory === "safety") {
         toast.success("Nossa equipe revisará em até 24h");
       } else {
         toast.success(
@@ -267,15 +263,11 @@ export function TradePointDetailView({ tradePointId }: Props) {
       const code = reportErrorCode(err);
       switch (code) {
         case "already-reported":
+        case "DUPLICATE_REPORT":
           toast.error("Você já denunciou este ponto recentemente.");
           break;
-        case "reliability-too-low":
-          toast.error("Sua conta ainda não tem histórico suficiente");
-          break;
-        case "minor-approach-extra-requirement":
-          toast.error(
-            "Esta categoria exige conta com mais histórico"
-          );
+        case "DAILY_LIMIT":
+          toast.error("Limite diário de denúncias atingido");
           break;
         default:
           toast.error("Não foi possível enviar a denúncia. Tente novamente.");

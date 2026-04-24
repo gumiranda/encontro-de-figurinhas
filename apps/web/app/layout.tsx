@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
 import { Geist, Geist_Mono, Space_Grotesk, Manrope } from "next/font/google";
 
 import "@workspace/ui/globals.css";
-import { Providers } from "@/components/providers";
 import { Toaster } from "@workspace/ui/components/sonner";
 
 const fontSans = Geist({
@@ -125,12 +123,8 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontHeadline.variable} ${fontBody.variable} font-body antialiased`}
       >
-        <Suspense>
-          <Providers>
-            <Toaster />
-            {children}
-          </Providers>
-        </Suspense>
+        <Toaster />
+        {children}
       </body>
     </html>
   );

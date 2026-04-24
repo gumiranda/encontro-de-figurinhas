@@ -127,52 +127,56 @@ export const getStatsBySlug = query({
     const stateCities = allCities.filter((c) => c.state === stateCode);
     if (stateCities.length === 0) return null;
 
-    const cityIds = new Set(stateCities.map((c) => c._id));
+    const CAP_USERS_PER_CITY = 5000;
+    const CAP_TRADE_POINTS_PER_CITY = 500;
 
-    const [allUsers, allTradePoints] = await Promise.all([
-      ctx.db.query("users").take(50000),
-      ctx.db
-        .query("tradePoints")
-        .withIndex("by_status", (q) => q.eq("status", "approved"))
-        .take(5000),
-    ]);
-
-    const stateUsers = allUsers.filter(
-      (u) =>
-        u.cityId &&
-        cityIds.has(u.cityId) &&
-        u.hasCompletedStickerSetup &&
-        !u.isShadowBanned &&
-        !u.isBanned
+    const buckets = await Promise.all(
+      stateCities.map(async (c) => {
+        const [usersInCity, pointsInCity] = await Promise.all([
+          ctx.db
+            .query("users")
+            .withIndex("by_city_not_shadowbanned", (q) =>
+              q.eq("cityId", c._id).eq("isShadowBanned", false)
+            )
+            .take(CAP_USERS_PER_CITY),
+          ctx.db
+            .query("tradePoints")
+            .withIndex("by_city_status", (q) =>
+              q.eq("cityId", c._id).eq("status", "approved")
+            )
+            .take(CAP_TRADE_POINTS_PER_CITY),
+        ]);
+        const activeCount = usersInCity.filter(
+          (u) => u.hasCompletedStickerSetup === true && u.isBanned !== true
+        ).length;
+        return {
+          city: c,
+          activeCount,
+          pointsCount: pointsInCity.length,
+        };
+      })
     );
 
-    const stateTradePoints = allTradePoints.filter((p) =>
-      cityIds.has(p.cityId)
-    );
-
-    const collectorsByCity = new Map<string, number>();
-    for (const user of stateUsers) {
-      if (user.cityId) {
-        collectorsByCity.set(
-          user.cityId,
-          (collectorsByCity.get(user.cityId) ?? 0) + 1
-        );
-      }
+    let collectorsCount = 0;
+    let tradePointsCount = 0;
+    for (const b of buckets) {
+      collectorsCount += b.activeCount;
+      tradePointsCount += b.pointsCount;
     }
 
-    const topCities = stateCities
-      .map((c) => ({
-        name: c.name,
-        slug: c.slug,
-        collectorsCount: collectorsByCity.get(c._id) ?? 0,
+    const topCities = buckets
+      .map((b) => ({
+        name: b.city.name,
+        slug: b.city.slug,
+        collectorsCount: b.activeCount,
       }))
       .sort((a, b) => b.collectorsCount - a.collectorsCount)
       .slice(0, 5);
 
     return {
       citiesCount: stateCities.length,
-      collectorsCount: stateUsers.length,
-      tradePointsCount: stateTradePoints.length,
+      collectorsCount,
+      tradePointsCount,
       topCities,
     };
   },

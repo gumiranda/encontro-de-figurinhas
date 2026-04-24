@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar post · Admin | Figurinha Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+body { background: var(--surface-dim); overflow-x: hidden; }
+
+/* Editor top bar */
+.edit-top {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(11,16,32,.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.edit-top .back { display: inline-flex; align-items: center; gap: 8px; color: var(--on-surface-variant); font-size: .88rem; }
+.edit-top .back:hover { color: var(--on-surface); }
+.divider-v { width: 1px; height: 22px; background: rgba(255,255,255,.08); }
+.save-status { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--on-surface-variant); }
+.save-status .dot { width: 6px; height: 6px; border-radius: 9999px; background: var(--secondary); box-shadow: 0 0 8px var(--secondary); }
+
+.edit-shell {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: calc(100dvh - 60px);
+}
+@media (max-width: 1080px) { .edit-shell { grid-template-columns: 1fr; } }
+
+/* Main canvas */
+.canvas { padding: clamp(20px, 4vw, 48px) clamp(16px, 3vw, 32px); }
+.canvas-inner { max-width: 780px; margin: 0 auto; }
+
+.field-row { margin-bottom: 28px; }
+.field-label { font-family: 'Space Grotesk'; font-size: .7rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--outline); display: block; margin-bottom: 10px; }
+
+.title-input {
+  font-family: 'Space Grotesk';
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  background: transparent; border: 0;
+  width: 100%;
+  color: var(--on-surface);
+  padding: 8px 0;
+}
+.title-input::placeholder { color: rgba(236,237,244,.15); }
+.subtitle-input {
+  font-size: 1.2rem;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  background: transparent; border: 0;
+  width: 100%;
+  padding: 8px 0;
+}
+.subtitle-input::placeholder { color: rgba(148,153,170,.4); }
+
+.slug-field {
+  display: flex; align-items: center; gap: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.05);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem;
+}
+.slug-prefix { color: var(--outline); }
+.slug-field input { background: transparent; border: 0; color: var(--primary); flex: 1; font-family: inherit; font-size: inherit; }
+
+/* Cover uploader */
+.cover-dz {
+  border-radius: 18px;
+  border: 2px dashed rgba(255,255,255,.08);
+  aspect-ratio: 16/7;
+  display: grid; place-items: center;
+  background: var(--surface-container-low);
+  position: relative;
+  overflow: hidden;
+  transition: all .25s;
+}
+.cover-dz.has-image { border-style: solid; }
+.cover-dz:hover { border-color: rgba(149,170,255,.3); }
+.cover-dz img { width: 100%; height: 100%; object-fit: cover; }
+.cover-dz .overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(9,14,28,.7));
+  display: flex; align-items: end; justify-content: space-between;
+  padding: 16px 20px;
+  opacity: 0; transition: opacity .25s;
+}
+.cover-dz.has-image:hover .overlay { opacity: 1; }
+
+/* Toolbar sticky above editor area */
+.rich-toolbar {
+  position: sticky; top: 60px;
+  display: flex; align-items: center; gap: 2px;
+  padding: 6px; margin-bottom: 20px;
+  border-radius: 12px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.05);
+  z-index: 10;
+  overflow-x: auto;
+}
+.rich-toolbar::-webkit-scrollbar { display: none; }
+.tb-btn {
+  width: 34px; height: 34px;
+  display: inline-grid; place-items: center;
+  border-radius: 8px;
+  color: var(--on-surface-variant);
+  transition: all .15s;
+  font-family: 'Space Grotesk';
+  font-weight: 700;
+  font-size: .85rem;
+}
+.tb-btn:hover { background: rgba(255,255,255,.05); color: var(--on-surface); }
+.tb-btn.active { background: rgba(149,170,255,.15); color: var(--primary); }
+.tb-divider { width: 1px; height: 22px; background: rgba(255,255,255,.08); margin: 0 4px; }
+.tb-select { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 34px; border-radius: 8px; font-family: 'Space Grotesk'; font-weight: 600; font-size: .85rem; color: var(--on-surface); }
+.tb-select:hover { background: rgba(255,255,255,.05); }
+
+/* Editor surface */
+.editor-surface {
+  min-height: 500px;
+  font-family: 'Lora', 'Source Serif Pro', Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: var(--on-surface);
+}
+.editor-surface p { margin: 1em 0; }
+.editor-surface h2 { font-family: 'Space Grotesk'; font-size: 1.75rem; font-weight: 700; margin-top: 1.8em; margin-bottom: 0.6em; letter-spacing: -0.02em; }
+.editor-surface h3 { font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
+.editor-surface blockquote {
+  border-left: 3px solid var(--secondary);
+  padding-left: 20px;
+  color: var(--on-surface-variant);
+  font-style: italic;
+  margin: 1.5em 0;
+}
+
+/* Block that's being edited (simulate cursor) */
+.cursor-block {
+  position: relative;
+}
+.cursor-block::after {
+  content: '';
+  display: inline-block; width: 2px; height: 1.2em;
+  background: var(--primary);
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Inline "add block" button */
+.add-block-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0;
+  color: var(--outline);
+}
+.add-block-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--surface-container);
+  border: 1px dashed rgba(255,255,255,.1);
+  color: var(--outline);
+  transition: all .2s;
+}
+.add-block-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(149,170,255,.08); }
+.add-block-hint { font-size: .82rem; font-family: 'Lora', serif; font-style: italic; opacity: .6; }
+
+/* Block menu (popover showing inline) */
+.block-menu {
+  margin-top: 14px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--surface-container-high);
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow: var(--shadow-ambient-lg);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  max-width: 420px;
+}
+@media (min-width: 600px) { .block-menu { grid-template-columns: repeat(3, 1fr); } }
+.bm-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  font-family: 'Manrope'; font-size: .85rem;
+  color: var(--on-surface-variant);
+  transition: all .15s;
+  text-align: left;
+}
+.bm-item:hover { background: rgba(149,170,255,.08); color: var(--on-surface); }
+.bm-item.focus { background: rgba(149,170,255,.12); color: var(--primary); }
+.bm-item .mi { width: 28px; height: 28px; border-radius: 6px; background: var(--surface-container); display: grid; place-items: center; color: var(--primary); flex: 0 0 auto; }
+
+/* Sidebar (settings) */
+.side { background: var(--surface-container-low); border-left: 1px solid rgba(255,255,255,.05); padding: 20px; overflow-y: auto; }
+@media (max-width: 1080px) { .side { border-left: 0; border-top: 1px solid rgba(255,255,255,.05); } }
+
+.side-tabs { display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.05); margin-bottom: 20px; }
+.side-tab { flex: 1; padding: 8px; border-radius: 7px; font-family: 'Space Grotesk'; font-weight: 600; font-size: .78rem; color: var(--on-surface-variant); transition: all .2s; }
+.side-tab.active { background: var(--primary); color: var(--on-primary); }
+
+.side-section { margin-bottom: 24px; }
+.side-section-head { font-family: 'Space Grotesk'; font-size: .7rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--outline); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+.side-row { margin-bottom: 12px; }
+.side-label { font-size: .78rem; color: var(--on-surface-variant); margin-bottom: 6px; display: block; }
+
+.ctrl {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  color: var(--on-surface);
+  font-size: .85rem;
+  transition: border-color .2s;
+}
+.ctrl:hover, .ctrl:focus { border-color: rgba(149,170,255,.3); outline: none; }
+textarea.ctrl { resize: vertical; min-height: 72px; font-family: inherit; line-height: 1.5; }
+
+.status-select {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(79,243,37,.06);
+  border: 1px solid rgba(79,243,37,.2);
+}
+.status-select .dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--secondary); box-shadow: 0 0 8px var(--secondary); }
+
+.tag-input {
+  padding: 6px;
+  border-radius: 9px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.tag-pill { padding: 4px 10px 4px 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px; background: rgba(149,170,255,.12); color: var(--primary); font-family: 'Space Grotesk'; font-size: .72rem; font-weight: 600; }
+.tag-pill .x { cursor: pointer; opacity: .6; }
+.tag-input input { flex: 1; min-width: 100px; background: transparent; border: 0; font-size: .82rem; color: var(--on-surface); padding: 4px 6px; }
+
+/* SEO panel */
+.seo-score {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+}
+.seo-ring {
+  width: 58px; height: 58px;
+  position: relative;
+  flex: 0 0 auto;
+}
+.seo-ring svg { transform: rotate(-90deg); }
+.seo-ring .lbl { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Space Grotesk'; font-weight: 800; font-size: 1.1rem; color: var(--secondary); }
+
+.check-list { display: flex; flex-direction: column; gap: 8px; }
+.check-item { display: flex; gap: 10px; align-items: start; padding: 8px 10px; border-radius: 9px; font-size: .82rem; line-height: 1.35; color: var(--on-surface-variant); transition: background .2s; }
+.check-item:hover { background: rgba(255,255,255,.02); }
+.check-item .icn { width: 18px; height: 18px; border-radius: 9999px; display: grid; place-items: center; flex: 0 0 auto; margin-top: 2px; }
+.icn-ok { background: rgba(79,243,37,.15); color: var(--secondary); }
+.icn-warn { background: rgba(255,201,101,.15); color: var(--tertiary); }
+.icn-err { background: rgba(239,68,68,.15); color: var(--error); }
+
+/* Preview box (SERP) */
+.serp-preview {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+}
+.serp-url { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--secondary); }
+.serp-title { color: #8ab4f8; font-size: 1rem; font-weight: 500; line-height: 1.3; margin-top: 4px; }
+.serp-desc { color: var(--on-surface-variant); font-size: .78rem; line-height: 1.4; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="edit-top">
+  <a href="admin-posts.html" class="back"><span class="material-symbols-outlined" style="font-size:20px">arrow_back</span>Posts</a>
+  <div class="divider-v"></div>
+  <div style="font-family:'Space Grotesk'; font-size:.9rem; font-weight:600;">As 12 figurinhas mais raras da Copa 2026</div>
+  <div class="save-status"><span class="dot"></span>Salvo há 8s</div>
+  <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+    <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">history</span>Histórico</button>
+    <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">visibility</span>Preview</button>
+    <div class="divider-v"></div>
+    <button class="btn btn-ghost btn-sm">Salvar rascunho</button>
+    <button class="btn btn-primary btn-sm"><span class="material-symbols-outlined" style="font-size:16px">publish</span>Publicar</button>
+  </div>
+</div>
+
+<div class="edit-shell">
+
+<!-- CANVAS -->
+<section class="canvas">
+<div class="canvas-inner">
+
+  <div class="field-row">
+    <label class="field-label">Capa</label>
+    <div class="cover-dz has-image">
+      <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80" alt="">
+      <div class="overlay">
+        <span style="font-size:.8rem; color:var(--on-surface-variant);">cover-raras-2026.jpg · 240 KB</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-ghost btn-sm" style="backdrop-filter:blur(8px); background:rgba(11,16,32,.6);"><span class="material-symbols-outlined" style="font-size:16px">crop</span>Editar</button>
+          <button class="btn btn-ghost btn-sm" style="backdrop-filter:blur(8px); background:rgba(11,16,32,.6);">Trocar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <input class="title-input" value="As 12 figurinhas mais raras da Copa 2026 (e quanto valem hoje)">
+    <input class="subtitle-input" value="Um guia completo com valores de mercado, como identificar as legítimas e onde encontrá-las sem cair em golpe.">
+  </div>
+
+  <div class="field-row">
+    <label class="field-label">URL</label>
+    <div class="slug-field">
+      <span class="slug-prefix">figurinhafacil.com/blog/guias/</span>
+      <input value="figurinhas-raras-copa-2026">
+      <button class="btn-icon" style="width:28px; height:28px;"><span class="material-symbols-outlined" style="font-size:16px">refresh</span></button>
+    </div>
+  </div>
+
+  <!-- Rich toolbar -->
+  <div class="rich-toolbar">
+    <button class="tb-select">Parágrafo <span class="material-symbols-outlined" style="font-size:16px">expand_more</span></button>
+    <div class="tb-divider"></div>
+    <button class="tb-btn" style="font-weight:800;">B</button>
+    <button class="tb-btn" style="font-style:italic; font-family:'Lora';">I</button>
+    <button class="tb-btn" style="text-decoration:underline;">U</button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">strikethrough_s</span></button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">link</span></button>
+    <div class="tb-divider"></div>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">format_list_bulleted</span></button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">format_list_numbered</span></button>
+    <button class="tb-btn active"><span class="material-symbols-outlined" style="font-size:18px">format_quote</span></button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">code</span></button>
+    <div class="tb-divider"></div>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">image</span></button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">play_circle</span></button>
+    <button class="tb-btn"><span class="material-symbols-outlined" style="font-size:18px">table_chart</span></button>
+    <div class="tb-divider"></div>
+    <button class="tb-btn" style="margin-left:auto;"><span class="material-symbols-outlined" style="font-size:18px">auto_awesome</span></button>
+  </div>
+
+  <!-- Editor content -->
+  <div class="editor-surface">
+    <p>A Copa de 2026 trouxe mudanças no álbum que ninguém esperava: novos padrões de holográficas, parcerias com artistas locais e a volta das <em>shiny</em> especiais que sumiram em 2018. O resultado? Um mercado paralelo fervendo — e algumas figurinhas que, se você tiver, valem mais que um pacote inteiro.</p>
+
+    <p>Reunimos aqui as <strong>12 figurinhas mais raras desta edição</strong>, com valores praticados no mercado de colecionadores sérios, marcadores visuais que ajudam a identificar as legítimas e, principalmente, o que você deve evitar antes de fechar qualquer troca.</p>
+
+    <blockquote>"Troquei com segurança em 4 pontos diferentes só em 2026. O segredo é sempre encontrar em local público, verificar a figurinha na hora e usar o app como intermediador." — Marina, colecionadora há 8 anos.</blockquote>
+
+    <h2>O ranking das 12 mais raras</h2>
+    <p class="cursor-block">Abaixo, em ordem de raridade. O valor é uma média das ofertas verificadas — trocas diretas podem variar para mais ou menos dependendo da conservação da figurinha</p>
+
+    <!-- Add-block (slash menu simulated) -->
+    <div class="add-block-row">
+      <button class="add-block-btn"><span class="material-symbols-outlined" style="font-size:16px">add</span></button>
+      <span class="add-block-hint">Digite <kbd style="padding:1px 6px; border-radius:4px; background:rgba(255,255,255,.06); font-family:'JetBrains Mono'; font-size:.72rem;">/</kbd> para inserir um bloco…</span>
+    </div>
+
+    <div class="block-menu">
+      <button class="bm-item focus"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">list_alt</span></span>Ranking</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">campaign</span></span>Callout</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">image</span></span>Imagem</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">view_carousel</span></span>Galeria</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">ads_click</span></span>CTA Inline</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">quiz</span></span>Quiz</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">swap_horiz</span></span>Figurinha</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">format_quote</span></span>Citação</button>
+      <button class="bm-item"><span class="mi"><span class="material-symbols-outlined" style="font-size:16px">table_chart</span></span>Tabela</button>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- SIDE -->
+<aside class="side">
+
+  <div class="side-tabs">
+    <button class="side-tab active">Config</button>
+    <button class="side-tab">SEO</button>
+    <button class="side-tab">Preview</button>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">Status</div>
+    <div class="status-select">
+      <span class="dot"></span>
+      <div style="flex:1;">
+        <div style="font-family:'Space Grotesk'; font-weight:600; font-size:.85rem; color:var(--secondary);">Publicado</div>
+        <div style="font-size:.72rem; color:var(--on-surface-variant);">Em 12 abr · 10:00</div>
+      </div>
+      <span class="material-symbols-outlined" style="font-size:18px; color:var(--outline);">expand_more</span>
+    </div>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">Publicação</div>
+    <div class="side-row">
+      <label class="side-label">Data e hora</label>
+      <input class="ctrl" value="12/04/2026 10:00" type="text">
+    </div>
+    <div class="side-row">
+      <label class="side-label">Autor</label>
+      <div class="ctrl" style="display:flex; align-items:center; gap:10px; padding:6px 12px;">
+        <div class="avatar" style="width:24px; height:24px; font-size:.68rem;">LG</div>
+        <span style="flex:1;">Lucas Garcia</span>
+        <span class="material-symbols-outlined" style="font-size:16px; color:var(--outline);">expand_more</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">Categoria</div>
+    <div class="ctrl" style="display:flex; align-items:center; gap:10px;">
+      <span class="chip chip-primary" style="font-size:.64rem; padding:3px 9px;">Guia</span>
+      <span style="color:var(--on-surface-variant); font-size:.8rem;">Principal</span>
+      <span class="material-symbols-outlined" style="font-size:16px; color:var(--outline); margin-left:auto;">expand_more</span>
+    </div>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">Tags <button style="color:var(--primary); font-family:'Space Grotesk'; font-size:.72rem; font-weight:600;">+ Nova</button></div>
+    <div class="tag-input">
+      <span class="tag-pill">figurinhas-raras <span class="x">×</span></span>
+      <span class="tag-pill">copa-2026 <span class="x">×</span></span>
+      <span class="tag-pill">mercado <span class="x">×</span></span>
+      <span class="tag-pill">holograficas <span class="x">×</span></span>
+      <input placeholder="adicionar...">
+    </div>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">SEO</div>
+    <div class="seo-score">
+      <div class="seo-ring">
+        <svg width="58" height="58"><circle cx="29" cy="29" r="24" stroke="rgba(255,255,255,.06)" stroke-width="4" fill="none"/><circle cx="29" cy="29" r="24" stroke="var(--secondary)" stroke-width="4" fill="none" stroke-dasharray="150.8" stroke-dashoffset="9" stroke-linecap="round" style="filter: drop-shadow(0 0 4px var(--secondary));"/></svg>
+        <div class="lbl">94</div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk'; font-weight:700; font-size:.95rem;">Excelente</div>
+        <div style="font-size:.75rem; color:var(--on-surface-variant); line-height:1.4; margin-top:2px;">11 de 12 critérios atendidos</div>
+      </div>
+    </div>
+
+    <div class="check-list">
+      <div class="check-item"><span class="icn icn-ok"><span class="material-symbols-outlined" style="font-size:12px">check</span></span>Palavra-chave "figurinhas raras Copa 2026" no título</div>
+      <div class="check-item"><span class="icn icn-ok"><span class="material-symbols-outlined" style="font-size:12px">check</span></span>Meta description entre 140–160 caracteres</div>
+      <div class="check-item"><span class="icn icn-ok"><span class="material-symbols-outlined" style="font-size:12px">check</span></span>Alt text em todas as 8 imagens</div>
+      <div class="check-item"><span class="icn icn-ok"><span class="material-symbols-outlined" style="font-size:12px">check</span></span>3 links internos · 2 externos</div>
+      <div class="check-item"><span class="icn icn-warn"><span class="material-symbols-outlined" style="font-size:12px">priority_high</span></span>Densidade da palavra-chave está em 2,3% (ideal: 1–2%)</div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label class="side-label">Meta description</label>
+      <textarea class="ctrl">Guia completo das 12 figurinhas mais raras do álbum da Copa 2026, com valores de mercado, como identificar e onde encontrá-las com segurança.</textarea>
+      <div style="font-size:.7rem; color:var(--outline); margin-top:4px; display:flex; justify-content:space-between;"><span>148 / 160</span><span style="color:var(--secondary);">● no alvo</span></div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label class="side-label">Pré-visualização no Google</label>
+      <div class="serp-preview">
+        <div class="serp-url">figurinhafacil.com › blog › guias</div>
+        <div class="serp-title">As 12 figurinhas mais raras da Copa 2026 (e quanto valem hoje)</div>
+        <div class="serp-desc">Guia completo das 12 figurinhas mais raras do álbum da Copa 2026, com valores de mercado, como identificar e onde encontrá-las com segurança.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-section">
+    <div class="side-section-head">Distribuição</div>
+    <label style="display:flex; align-items:center; gap:10px; padding:8px 0; font-size:.85rem; color:var(--on-surface-variant);">
+      <input type="checkbox" checked style="accent-color: var(--primary);">
+      Enviar para newsletter (4.2k assinantes)
+    </label>
+    <label style="display:flex; align-items:center; gap:10px; padding:8px 0; font-size:.85rem; color:var(--on-surface-variant);">
+      <input type="checkbox" checked style="accent-color: var(--primary);">
+      Postar no Instagram automaticamente
+    </label>
+    <label style="display:flex; align-items:center; gap:10px; padding:8px 0; font-size:.85rem; color:var(--on-surface-variant);">
+      <input type="checkbox" style="accent-color: var(--primary);">
+      Gerar notificação push para o app
+    </label>
+  </div>
+
+</aside>
+
+</div>
+
+</body>
+</html>

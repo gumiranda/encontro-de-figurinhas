@@ -3,12 +3,10 @@ import type { QueryCtx } from "../_generated/server";
 import type { Doc } from "../_generated/dataModel";
 
 export const reportCategoryValidator = v.union(
-  v.literal("suspicious_behavior"),
-  v.literal("private_contact_attempt"),
-  v.literal("minor_approach"),
-  v.literal("inappropriate_content"),
-  v.literal("broken_whatsapp_link"),
-  v.literal("inactive_point"),
+  v.literal("safety"),
+  v.literal("fake_stickers"),
+  v.literal("no_show"),
+  v.literal("spam"),
   v.literal("other")
 );
 
@@ -20,6 +18,7 @@ export {
   SAFETY_WINDOW_MS,
 } from "./report_severity";
 export const REPORT_DEDUP_MS = 24 * 60 * 60 * 1000;
+export const EVALUATE_AUTO_ACTION_DEBOUNCE_MS = 5_000;
 export const MINOR_APPROACH_EXTRA_MIN = 4;
 
 /** Chave denormalizada para índices de reports contra um ponto de troca. */

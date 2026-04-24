@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { checkAuth } from "./lib/auth";
-import { FREE_USER_MAX_POINTS } from "./lib/limits";
+import { FREE_USER_MAX_POINTS, PREMIUM_USER_MAX_POINTS } from "./lib/limits";
 
 export const getMyPoints = query({
   args: {},
@@ -12,7 +12,7 @@ export const getMyPoints = query({
     const memberships = await ctx.db
       .query("userTradePoints")
       .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
-      .collect();
+      .take(50);
 
     const points = await Promise.all(
       memberships.map(async (m) => {
@@ -53,14 +53,13 @@ export const join = mutation({
       .unique();
     if (existing) return { ok: false as const, error: "already-member" as const };
 
-    if (!user.isPremium) {
-      const sample = await ctx.db
-        .query("userTradePoints")
-        .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .take(FREE_USER_MAX_POINTS + 1);
-      if (sample.length >= FREE_USER_MAX_POINTS) {
-        return { ok: false as const, error: "limit-reached" as const };
-      }
+    const cap = user.isPremium ? PREMIUM_USER_MAX_POINTS : FREE_USER_MAX_POINTS;
+    const sample = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .take(cap + 1);
+    if (sample.length >= cap) {
+      return { ok: false as const, error: "limit-reached" as const };
     }
 
     await ctx.db.insert("userTradePoints", {

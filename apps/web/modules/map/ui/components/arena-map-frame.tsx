@@ -154,7 +154,7 @@ export function ArenaMapFrame() {
   return (
     <main className="fixed inset-0 overflow-hidden bg-background text-foreground">
       {skipLink}
-      <div className="absolute inset-0">{mapNode}</div>
+      <div className="absolute inset-0 isolate">{mapNode}</div>
       <MapTopBar query={query} onQueryChange={setQuery} />
       <MapFilterChips
         value={filter}

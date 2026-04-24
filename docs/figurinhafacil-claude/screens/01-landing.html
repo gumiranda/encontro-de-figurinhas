@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>01 · Landing Page — Figurinha Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+/* ===== Screen-specific styles ===== */
+.landing-hero-m {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 60px 24px 100px;
+  background:
+    radial-gradient(600px 400px at 80% -10%, rgba(55,102,255,.25), transparent 60%),
+    radial-gradient(500px 400px at -20% 40%, rgba(79,243,37,.10), transparent 60%),
+    var(--bg);
+  overflow-y: auto;
+}
+.landing-hero-m::-webkit-scrollbar { display: none; }
+.landing-hero-m .top-bar {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px;
+}
+.landing-hero-m .top-bar .brand { display: flex; align-items: center; gap: 8px; }
+.landing-hero-m .top-bar .brand .mark {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  display: flex; align-items: center; justify-content: center; color: var(--on-primary);
+}
+.landing-hero-m .top-bar .brand .name { font-family: var(--font-headline); font-weight: 800; font-size: 15px; }
+
+.landing-hero-m .tag {
+  display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(79,243,37,.12); border: 1px solid rgba(79,243,37,.3);
+  font-family: var(--font-headline); font-size: 10px; font-weight: 700;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--secondary);
+  margin-bottom: 20px;
+}
+.landing-hero-m h1 {
+  font-size: 44px; line-height: 0.95; font-weight: 900; margin-bottom: 16px;
+}
+.landing-hero-m h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.landing-hero-m p.lead { color: var(--on-surface-variant); font-size: 15px; line-height: 1.5; margin-bottom: 24px; }
+
+.landing-search {
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: 20px;
+  padding: 8px;
+  margin-bottom: 28px;
+}
+.landing-search .input-wrap { background: transparent; border: 0; padding: 4px 4px 4px 12px; }
+.landing-search .input-wrap input { font-size: 14px; }
+.landing-search .btn { width: 100%; }
+
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
+.stats-row .stat { background: var(--surface-container); border: 1px solid var(--outline-variant); border-radius: 12px; padding: 10px 12px; }
+.stats-row .stat .v { font-family: var(--font-headline); font-weight: 800; font-size: 20px; color: var(--on-surface); line-height: 1; margin-bottom: 4px; }
+.stats-row .stat .l { font-size: 10px; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: .1em; font-family: var(--font-headline); font-weight: 700; }
+
+.section-title { font-family: var(--font-headline); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--on-surface-variant); margin: 24px 0 12px; }
+
+.cities-scroll { display: flex; gap: 10px; margin: 0 -24px; padding: 0 24px 8px; overflow-x: auto; }
+.cities-scroll::-webkit-scrollbar { display: none; }
+.city-card-m {
+  min-width: 160px; background: var(--surface-container); border: 1px solid var(--outline-variant);
+  border-radius: 14px; padding: 12px; position: relative; overflow: hidden;
+}
+.city-card-m .flag {
+  width: 100%; aspect-ratio: 16/10; border-radius: 8px; margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--primary-dim), var(--primary));
+  display: flex; align-items: center; justify-content: center;
+}
+.city-card-m:nth-child(2) .flag { background: linear-gradient(135deg, var(--secondary-container), var(--secondary)); }
+.city-card-m:nth-child(3) .flag { background: linear-gradient(135deg, var(--tertiary-container), var(--tertiary)); }
+.city-card-m:nth-child(4) .flag { background: linear-gradient(135deg, var(--error-container), var(--error)); }
+.city-card-m .name { font-family: var(--font-headline); font-weight: 700; font-size: 14px; }
+.city-card-m .count { color: var(--on-surface-variant); font-size: 11px; }
+
+.how-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.how-step { display: flex; gap: 14px; padding: 14px; background: var(--surface-container); border: 1px solid var(--outline-variant); border-radius: 14px; }
+.how-step .n {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: var(--surface-container-high); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-headline); font-weight: 800; color: var(--primary); font-size: 14px;
+}
+.how-step .t { font-family: var(--font-headline); font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+.how-step .d { font-size: 12px; color: var(--on-surface-variant); line-height: 1.4; }
+
+.cta-card {
+  background: linear-gradient(135deg, rgba(55,102,255,.2), rgba(79,243,37,.08));
+  border: 1px solid rgba(149,170,255,.3);
+  border-radius: 20px; padding: 24px; margin-bottom: 20px;
+  text-align: center;
+}
+.cta-card h3 { font-size: 20px; margin-bottom: 8px; }
+.cta-card p { color: var(--on-surface-variant); font-size: 13px; margin-bottom: 16px; }
+
+/* Desktop landing */
+.desktop-landing { position: absolute; inset: 0; overflow-y: auto;
+  background:
+    radial-gradient(1000px 600px at 80% -10%, rgba(55,102,255,.15), transparent 60%),
+    radial-gradient(800px 500px at -10% 40%, rgba(79,243,37,.06), transparent 60%),
+    var(--bg);
+}
+.desktop-landing::-webkit-scrollbar { display: none; }
+.desktop-landing header {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 48px; background: rgba(9,14,28,.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(67,71,89,.5);
+}
+.desktop-landing header .brand { display: flex; align-items: center; gap: 10px; color: var(--on-surface); text-decoration: none; }
+.desktop-landing header .brand .mark {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  display: flex; align-items: center; justify-content: center; color: var(--on-primary);
+}
+.desktop-landing header .brand .name { font-family: var(--font-headline); font-weight: 800; font-size: 17px; }
+.desktop-landing header nav { display: flex; gap: 28px; }
+.desktop-landing header nav a {
+  color: var(--on-surface-variant); text-decoration: none; font-family: var(--font-headline);
+  font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.desktop-landing header nav a.active { color: var(--secondary); }
+
+.dl-hero { padding: 60px 48px 40px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: center; max-width: 1400px; margin: 0 auto; }
+.dl-hero h1 { font-size: 64px; line-height: 0.95; font-weight: 900; margin-bottom: 20px; }
+.dl-hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dl-hero p.lead { color: var(--on-surface-variant); font-size: 16px; line-height: 1.55; margin-bottom: 28px; max-width: 520px; }
+.dl-search { max-width: 560px; margin-bottom: 24px; }
+.dl-search .input-wrap { padding: 6px 6px 6px 16px; }
+
+.dl-stats { display: flex; gap: 28px; }
+.dl-stats .stat .v { font-family: var(--font-headline); font-size: 28px; font-weight: 800; }
+.dl-stats .stat .l { font-size: 11px; color: var(--on-surface-variant); letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-headline); font-weight: 700; }
+
+/* Hero visual — arena cluster */
+.arena-visual {
+  aspect-ratio: 1; max-width: 480px; margin-left: auto; position: relative;
+  border-radius: 32px; overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(149,170,255,.15), transparent 70%),
+    var(--surface-container);
+  border: 1px solid var(--outline-variant);
+}
+.arena-visual .ring {
+  position: absolute; border-radius: 50%; border: 1px solid rgba(149,170,255,.2);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+}
+.arena-visual .ring.r1 { width: 70%; height: 70%; }
+.arena-visual .ring.r2 { width: 50%; height: 50%; border-color: rgba(79,243,37,.2); }
+.arena-visual .ring.r3 { width: 30%; height: 30%; border-color: rgba(255,201,101,.25); }
+.arena-visual .pin {
+  position: absolute; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--primary); color: var(--on-primary);
+  font-family: var(--font-headline); font-weight: 800; font-size: 13px;
+  box-shadow: 0 8px 24px rgba(149,170,255,.4);
+}
+.arena-visual .pin.p1 { top: 22%; left: 28%; }
+.arena-visual .pin.p2 { top: 70%; left: 24%; background: var(--secondary); color: var(--on-secondary); }
+.arena-visual .pin.p3 { top: 38%; right: 22%; background: var(--tertiary); color: var(--on-tertiary); }
+.arena-visual .pin.center {
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+}
+.arena-visual .pin.center::after {
+  content: ''; position: absolute; inset: -8px; border-radius: 24px;
+  border: 2px solid var(--primary); opacity: .4;
+}
+
+.dl-cities { padding: 40px 48px; max-width: 1400px; margin: 0 auto; }
+.dl-cities h2 { font-size: 32px; margin-bottom: 6px; }
+.dl-cities .sub { color: var(--on-surface-variant); margin-bottom: 28px; font-size: 14px; }
+.dl-cities .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.city-card-d {
+  background: var(--surface-container); border: 1px solid var(--outline-variant);
+  border-radius: 16px; overflow: hidden; cursor: pointer; transition: all .2s;
+}
+.city-card-d:hover { transform: translateY(-4px); border-color: var(--primary); }
+.city-card-d .flag {
+  aspect-ratio: 16/10;
+  background: linear-gradient(135deg, var(--primary-dim), var(--primary));
+  position: relative; display: flex; align-items: flex-end; padding: 16px;
+}
+.city-card-d .flag::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(9,14,28,.8)); }
+.city-card-d:nth-child(2) .flag { background: linear-gradient(135deg, var(--secondary-container), var(--secondary)); }
+.city-card-d:nth-child(3) .flag { background: linear-gradient(135deg, var(--tertiary-container), var(--tertiary)); }
+.city-card-d:nth-child(4) .flag { background: linear-gradient(135deg, var(--error-container), var(--error)); }
+.city-card-d .body { padding: 14px 16px; }
+.city-card-d .name { font-family: var(--font-headline); font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+.city-card-d .count { font-size: 12px; color: var(--on-surface-variant); }
+
+/* ===== Variant: B (bolder) ===== */
+[data-tweak="landing"][data-variant="bold"] .landing-hero-m h1,
+[data-tweak="landing"][data-variant="bold"] .dl-hero h1 {
+  text-transform: uppercase; letter-spacing: -0.04em;
+}
+[data-tweak="landing"][data-variant="bold"] .landing-hero-m::before,
+[data-tweak="landing"][data-variant="bold"] .desktop-landing::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(45deg, rgba(149,170,255,.03) 0 2px, transparent 2px 80px);
+}
+
+/* ===== Variant: C (editorial/magazine) ===== */
+[data-tweak="landing"][data-variant="editorial"] .landing-hero-m h1,
+[data-tweak="landing"][data-variant="editorial"] .dl-hero h1 {
+  font-family: 'Space Grotesk'; font-weight: 400; letter-spacing: -0.04em;
+}
+[data-tweak="landing"][data-variant="editorial"] .landing-hero-m h1 em,
+[data-tweak="landing"][data-variant="editorial"] .dl-hero h1 em {
+  font-style: italic; font-weight: 700;
+}
+</style>
+</head>
+<body>
+<div class="page-canvas">
+  <div class="top">
+    <a class="brand" href="../index.html">
+      <span class="dot"></span>
+      <span class="name">Figurinha Fácil</span>
+    </a>
+    <div class="crumb">01 / 11 · <b>Landing Page</b></div>
+  </div>
+
+  <div class="page-head">
+    <div>
+      <h1>Landing <em>Page</em></h1>
+      <p>Página inicial pública. Prioridades: clareza do que o app faz, busca de cidade em destaque, prova social, CTA firme.</p>
+    </div>
+    <div class="meta">
+      <span class="chip"><span class="bullet"></span>MOBILE 390 × 844</span>
+      <span class="chip">DESKTOP 1440 × 900</span>
+      <span class="chip">3 VARIAÇÕES</span>
+    </div>
+  </div>
+
+  <div class="frames">
+    <!-- MOBILE -->
+    <div class="frame-col">
+      <div class="label">Mobile · iOS</div>
+      <div class="mobile-frame" data-tweak="landing" data-variant="default">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="mobile-statusbar">
+            <span>9:41</span>
+            <span class="right">
+              <span class="material-symbols-outlined" style="font-size:16px">signal_cellular_alt</span>
+              <span class="material-symbols-outlined" style="font-size:16px">wifi</span>
+              <span class="material-symbols-outlined" style="font-size:16px">battery_full</span>
+            </span>
+          </div>
+          <div class="landing-hero-m">
+            <div class="top-bar">
+              <div class="brand">
+                <span class="mark"><span class="material-symbols-outlined" style="font-size:18px">stadium</span></span>
+                <span class="name">Figurinha Fácil</span>
+              </div>
+              <button class="btn btn-ghost btn-sm">Entrar</button>
+            </div>
+
+            <span class="tag"><span class="pulse-dot"></span>Ao vivo · 12.4k trocando</span>
+
+            <h1>Sua figurinha <em>perdida</em> está aqui perto.</h1>
+            <p class="lead">Encontre colecionadores e pontos de troca na sua cidade em segundos.</p>
+
+            <div class="landing-search">
+              <div class="input-wrap" style="margin-bottom:8px">
+                <span class="material-symbols-outlined" style="color:var(--outline)">search</span>
+                <input placeholder="Digite sua cidade...">
+              </div>
+              <button class="btn btn-primary">Buscar pontos</button>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat"><div class="v">12.4k</div><div class="l">Colec.</div></div>
+              <div class="stat"><div class="v">842</div><div class="l">Pontos</div></div>
+              <div class="stat"><div class="v">98%</div><div class="l">Match</div></div>
+            </div>
+
+            <div class="section-title">Cidades Ativas</div>
+            <div class="cities-scroll">
+              <div class="city-card-m">
+                <div class="flag"><span class="material-symbols-outlined" style="color:rgba(255,255,255,.8);font-size:32px">location_city</span></div>
+                <div class="name">São Paulo</div><div class="count">3.2k colecionadores</div>
+              </div>
+              <div class="city-card-m">
+                <div class="flag"><span class="material-symbols-outlined" style="color:rgba(255,255,255,.8);font-size:32px">location_city</span></div>
+                <div class="name">Rio de Janeiro</div><div class="count">1.8k colecionadores</div>
+              </div>
+              <div class="city-card-m">
+                <div class="flag"><span class="material-symbols-outlined" style="color:rgba(255,255,255,.9);font-size:32px">location_city</span></div>
+                <div class="name">Belo Horizonte</div><div class="count">940 colecionadores</div>
+              </div>
+              <div class="city-card-m">
+                <div class="flag"><span class="material-symbols-outlined" style="color:rgba(255,255,255,.8);font-size:32px">location_city</span></div>
+                <div class="name">Porto Alegre</div><div class="count">620 colecionadores</div>
+              </div>
+            </div>
+
+            <div class="section-title">Como Funciona</div>
+            <div class="how-steps">
+              <div class="how-step">
+                <span class="n">1</span>
+                <div><div class="t">Cadastre suas figurinhas</div><div class="d">Marque o que tem e o que precisa em segundos.</div></div>
+              </div>
+              <div class="how-step">
+                <span class="n">2</span>
+                <div><div class="t">Veja quem combina</div><div class="d">Mostramos matches reais perto de você.</div></div>
+              </div>
+              <div class="how-step">
+                <span class="n">3</span>
+                <div><div class="t">Troque no ponto</div><div class="d">Encontros em locais verificados pela comunidade.</div></div>
+              </div>
+            </div>
+
+            <div class="cta-card">
+              <h3>Pronto pra começar?</h3>
+              <p>Grátis · leva menos de 2 minutos</p>
+              <button class="btn btn-primary btn-lg" style="width:100%">Criar conta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP -->
+    <div class="frame-col">
+      <div class="label">Desktop · 1440×900</div>
+      <div class="desktop-frame">
+        <div class="chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="url">figurinhafacil.com.br</div>
+        </div>
+        <div class="viewport" data-tweak="landing" data-variant="default">
+          <div class="desktop-landing">
+            <header>
+              <a class="brand" href="#">
+                <span class="mark"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span>
+                <span class="name">Figurinha Fácil</span>
+              </a>
+              <nav>
+                <a href="#" class="active">Explorar</a>
+                <a href="#">Como Funciona</a>
+                <a href="#">Álbum</a>
+                <a href="#">Cidades</a>
+              </nav>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-ghost btn-sm">Entrar</button>
+                <button class="btn btn-primary btn-sm">Criar conta</button>
+              </div>
+            </header>
+
+            <section class="dl-hero">
+              <div>
+                <span class="tag" style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(79,243,37,.12);border:1px solid rgba(79,243,37,.3);font-family:var(--font-headline);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--secondary);margin-bottom:20px">
+                  <span class="pulse-dot"></span>Ao vivo · 12.4k trocando agora
+                </span>
+                <h1>Sua figurinha <em>perdida</em> está aqui perto.</h1>
+                <p class="lead">A maior rede de troca do Brasil. Encontre colecionadores e pontos verificados na sua cidade em segundos — grátis.</p>
+                <div class="landing-search dl-search">
+                  <div class="input-wrap" style="background:transparent;border:0">
+                    <span class="material-symbols-outlined" style="color:var(--outline)">search</span>
+                    <input placeholder="Digite sua cidade (ex: São Paulo, Rio...)">
+                    <button class="btn btn-primary">Buscar</button>
+                  </div>
+                </div>
+                <div class="dl-stats">
+                  <div class="stat"><div class="v">12.4k</div><div class="l">Colecionadores ativos</div></div>
+                  <div class="stat"><div class="v">842</div><div class="l">Pontos de troca</div></div>
+                  <div class="stat"><div class="v">98%</div><div class="l">Taxa de match</div></div>
+                </div>
+              </div>
+              <div class="arena-visual">
+                <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+                <div class="pin center"><span class="material-symbols-outlined" style="font-size:26px">stadium</span></div>
+                <div class="pin p1">12</div>
+                <div class="pin p2">8</div>
+                <div class="pin p3">23</div>
+              </div>
+            </section>
+
+            <section class="dl-cities">
+              <h2>Cidades <em style="font-style:normal;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent">ativas</em></h2>
+              <div class="sub">Onde os colecionadores estão trocando agora.</div>
+              <div class="grid">
+                <div class="city-card-d">
+                  <div class="flag"><span style="position:relative;z-index:1;color:#fff;font-family:var(--font-headline);font-weight:800;font-size:18px">SP</span></div>
+                  <div class="body">
+                    <div class="name">São Paulo</div>
+                    <div class="count">3.214 colecionadores · 186 pontos</div>
+                  </div>
+                </div>
+                <div class="city-card-d">
+                  <div class="flag"><span style="position:relative;z-index:1;color:#fff;font-family:var(--font-headline);font-weight:800;font-size:18px">RJ</span></div>
+                  <div class="body">
+                    <div class="name">Rio de Janeiro</div>
+                    <div class="count">1.840 colecionadores · 112 pontos</div>
+                  </div>
+                </div>
+                <div class="city-card-d">
+                  <div class="flag"><span style="position:relative;z-index:1;color:#fff;font-family:var(--font-headline);font-weight:800;font-size:18px">BH</span></div>
+                  <div class="body">
+                    <div class="name">Belo Horizonte</div>
+                    <div class="count">942 colecionadores · 58 pontos</div>
+                  </div>
+                </div>
+                <div class="city-card-d">
+                  <div class="flag"><span style="position:relative;z-index:1;color:#fff;font-family:var(--font-headline);font-weight:800;font-size:18px">POA</span></div>
+                  <div class="body">
+                    <div class="name">Porto Alegre</div>
+                    <div class="count">624 colecionadores · 41 pontos</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tweaks -->
+<div class="tweaks-panel open">
+  <h4>Tweaks · Landing</h4>
+  <div class="tweaks-group">
+    <label>Estilo de tipografia</label>
+    <div class="tweaks-seg" data-key="landing" data-attr="data-variant">
+      <button class="active" data-value="default">Bold</button>
+      <button data-value="bold">Uppercase</button>
+      <button data-value="editorial">Editorial</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/tweaks.js"></script>
+</body>
+</html>

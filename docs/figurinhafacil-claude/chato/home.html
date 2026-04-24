@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo Mais Chato · Rodada atual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="chato.css">
+<style>
+body { display: grid; place-items: center; padding: 40px 16px; min-height: 100dvh; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel">
+const { IOSDevice } = window;
+
+const matches = [
+  { home: "Alemanha", away: "Su\u00ed\u00e7a", hf: "\ud83c\udde9\ud83c\uddea", af: "\ud83c\udde8\ud83c\udded", score: "0 × 0", votes: 2847, pct: 34 },
+  { home: "Fran\u00e7a", away: "B\u00e9lgica", hf: "\ud83c\uddeb\ud83c\uddf7", af: "\ud83c\udde7\ud83c\uddea", score: "1 × 1", votes: 1924, pct: 23 },
+  { home: "Arg\u00e9lia", away: "It\u00e1lia", hf: "\ud83c\udde9\ud83c\uddff", af: "\ud83c\uddee\ud83c\uddf9", score: "0 × 1", votes: 1542, pct: 19 },
+  { home: "Uruguai", away: "Cro\u00e1cia", hf: "\ud83c\uddfa\ud83c\uddfe", af: "\ud83c\udded\ud83c\uddf7", score: "2 × 1", votes: 1108, pct: 13 },
+  { home: "Coreia", away: "Dinamarca", hf: "\ud83c\uddf0\ud83c\uddf7", af: "\ud83c\udde9\ud83c\uddf0", score: "1 × 1", votes: 842, pct: 11 },
+];
+
+function App() {
+  const [selected, setSelected] = React.useState(0);
+  return (
+    <IOSDevice dark>
+      <div className="iscroll" style={{background:"var(--surface)", color:"var(--on-surface)"}}>
+        {/* TOP */}
+        <header style={{padding:"14px 20px 10px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+          <div style={{display:"flex", alignItems:"center", gap:10}}>
+            <div style={{width:34, height:34, borderRadius:10, background:"var(--chato-yellow)", display:"grid", placeItems:"center", fontSize:20}}>🥱</div>
+            <div>
+              <div className="ff-display" style={{fontSize:".95rem", lineHeight:1}}>JMC</div>
+              <div style={{fontSize:".62rem", color:"var(--outline)", letterSpacing:".12em", textTransform:"uppercase"}}>Figurinha Fácil</div>
+            </div>
+          </div>
+          <button style={{width:36, height:36, borderRadius:10, background:"var(--surface-container)", display:"grid", placeItems:"center", color:"var(--on-surface-variant)"}}>
+            <span className="material-symbols-outlined" style={{fontSize:20}}>menu</span>
+          </button>
+        </header>
+
+        {/* HERO */}
+        <div style={{padding:"14px 20px 12px"}}>
+          <div className="micro-cap" style={{color:"var(--chato-yellow)"}}>● rodada 3 · ao vivo</div>
+          <h1 className="ff-display" style={{fontSize:"2.6rem", lineHeight:.9, marginTop:10, letterSpacing:"-0.02em"}}>
+            Qual foi <span style={{color:"var(--chato-yellow)"}}>o jogo mais chato</span> dessa rodada?
+          </h1>
+          <p style={{color:"var(--on-surface-variant)", fontSize:".9rem", marginTop:12, lineHeight:1.5}}>
+            Você assistiu. Você sofreu. Agora vote pra dar o troco.
+          </p>
+          <div style={{marginTop:16, display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:14, background:"var(--surface-container)", border:"1px solid rgba(255,255,255,.05)"}}>
+            <div style={{display:"flex"}}>
+              {["🥱","😴","💤","🪦"].map((e,i)=>(
+                <div key={i} style={{width:26, height:26, borderRadius:9999, background:"var(--chato-navy)", border:"2px solid var(--surface-container)", display:"grid", placeItems:"center", fontSize:13, marginLeft: i?-8:0}}>{e}</div>
+              ))}
+            </div>
+            <div style={{flex:1, fontSize:".82rem"}}>
+              <strong className="ff-display">8.263</strong> <span style={{color:"var(--on-surface-variant)"}}>já votaram nessa rodada</span>
+            </div>
+          </div>
+        </div>
+
+        {/* LIST */}
+        <div style={{padding:"4px 20px 20px", display:"flex", flexDirection:"column", gap:10}}>
+          <div className="micro-cap" style={{color:"var(--outline)", marginTop:12, marginBottom:4}}>Escolha um · 5 jogos</div>
+          {matches.map((m, i) => (
+            <div key={i} className={`match-card ${selected===i?"selected":""}`} onClick={()=>setSelected(i)}>
+              <div className="teams">
+                <div className="team">
+                  <div className="flag">{m.hf}</div>
+                  <div className="team-name">{m.home}</div>
+                </div>
+                <div className="score">{m.score}</div>
+                <div className="team right">
+                  <div className="flag">{m.af}</div>
+                  <div className="team-name">{m.away}</div>
+                </div>
+              </div>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, fontSize:".72rem", color:"var(--on-surface-variant)"}}>
+                <span>{m.votes.toLocaleString("pt-BR")} votos</span>
+                <div className="vbar" style={{flex:1, maxWidth:110}}>
+                  <div className="fill" style={{width: `${m.pct}%`}}/>
+                </div>
+                <span className="ff-display" style={{color: selected===i?"var(--chato-yellow)":"var(--on-surface)", fontSize:".95rem"}}>{m.pct}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{position:"sticky", bottom:0, padding:"12px 20px 28px", background:"linear-gradient(180deg, transparent, var(--surface) 40%)"}}>
+          <button className="btn-meme" style={{width:"100%"}}>
+            CONFIRMAR MEU VOTO
+            <span style={{fontSize:"1.2rem"}}>🥱</span>
+          </button>
+          <div style={{textAlign:"center", fontSize:".7rem", color:"var(--outline)", marginTop:10}}>
+            votação encerra em <strong style={{color:"var(--chato-yellow)"}}>2h 14m</strong>
+          </div>
+        </div>
+      </div>
+    </IOSDevice>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

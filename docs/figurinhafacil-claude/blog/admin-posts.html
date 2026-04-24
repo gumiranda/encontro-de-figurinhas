@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Posts · Admin | Figurinha Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+body { background: var(--surface-dim); }
+.admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100dvh; }
+@media (max-width: 900px) { .admin-shell { grid-template-columns: 1fr; } }
+
+.sidebar {
+  background: var(--surface-container-low);
+  border-right: 1px solid rgba(255,255,255,.05);
+  padding: 20px 16px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0;
+  height: 100dvh;
+}
+@media (max-width: 900px) { .sidebar { position: static; height: auto; } }
+.sb-brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 28px; }
+.sb-section { font-family: 'Space Grotesk'; font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--outline); padding: 0 10px; margin: 20px 0 8px; }
+.sb-nav { display: flex; flex-direction: column; gap: 2px; }
+.sb-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: .88rem;
+  color: var(--on-surface-variant);
+  transition: all .2s;
+  font-weight: 500;
+}
+.sb-link:hover { background: rgba(255,255,255,.04); color: var(--on-surface); }
+.sb-link.active { background: rgba(149,170,255,.1); color: var(--primary); font-weight: 600; }
+.sb-link .badge { margin-left: auto; padding: 2px 7px; border-radius: 9999px; background: var(--surface-container-high); font-size: .68rem; font-family: 'Space Grotesk'; font-weight: 600; color: var(--on-surface-variant); }
+.sb-link.active .badge { background: var(--primary); color: var(--on-primary); }
+
+.sb-user { margin-top: auto; padding: 10px; border-radius: 12px; background: var(--surface-container); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.04); }
+.sb-user .name { font-family: 'Space Grotesk'; font-weight: 600; font-size: .85rem; }
+.sb-user .role { font-size: .7rem; color: var(--on-surface-variant); }
+
+/* Main */
+.admin-main { padding: 28px clamp(16px, 3vw, 40px); max-width: 1400px; }
+.admin-head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.admin-head h1 { font-family: 'Space Grotesk'; font-size: 2rem; font-weight: 700; letter-spacing: -0.025em; }
+.admin-head p { color: var(--on-surface-variant); margin-top: 4px; }
+
+/* Stat cards */
+.stat-row { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); margin-top: 28px; }
+@media (min-width: 720px) { .stat-row { grid-template-columns: repeat(4, 1fr); } }
+.stat-tile { padding: 18px 20px; border-radius: 14px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.04); }
+.stat-tile .lbl { font-size: .72rem; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: .12em; }
+.stat-tile .val { font-family: 'Space Grotesk'; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin-top: 6px; }
+.stat-tile .trend { margin-top: 4px; font-size: .78rem; font-family: 'Space Grotesk'; font-weight: 600; }
+.trend-up { color: var(--secondary); }
+.trend-down { color: var(--error); }
+
+/* Toolbar */
+.adm-toolbar { display: flex; gap: 10px; margin-top: 32px; flex-wrap: wrap; align-items: center; }
+.adm-search { flex: 1; min-width: 240px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.06); }
+.adm-search input { flex: 1; }
+.adm-search input::placeholder { color: var(--outline); }
+.adm-filter { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.06); font-size: .82rem; color: var(--on-surface); }
+.adm-filter .count { background: var(--primary); color: var(--on-primary); padding: 1px 7px; border-radius: 9999px; font-family: 'Space Grotesk'; font-size: .68rem; font-weight: 700; }
+
+/* Status tabs */
+.status-tabs { display: flex; gap: 24px; margin-top: 28px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.status-tab {
+  padding: 12px 2px; font-family: 'Space Grotesk'; font-size: .88rem; font-weight: 600;
+  color: var(--on-surface-variant); border-bottom: 2px solid transparent;
+  transition: all .2s; white-space: nowrap;
+}
+.status-tab:hover { color: var(--on-surface); }
+.status-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.status-tab .num { font-size: .72rem; margin-left: 6px; padding: 2px 7px; border-radius: 9999px; background: var(--surface-container-high); font-weight: 700; }
+.status-tab.active .num { background: rgba(149,170,255,.15); color: var(--primary); }
+
+/* Table */
+.table-wrap { margin-top: 20px; border-radius: 14px; overflow: hidden; background: var(--surface-container); border: 1px solid rgba(255,255,255,.04); }
+table.posts { width: 100%; border-collapse: collapse; }
+.posts th, .posts td { text-align: left; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .88rem; vertical-align: middle; }
+.posts th { background: var(--surface-container-low); font-family: 'Space Grotesk'; font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--outline); }
+.posts tbody tr { transition: background .2s; }
+.posts tbody tr:hover { background: rgba(255,255,255,.02); }
+.posts tbody tr:last-child td { border-bottom: 0; }
+.post-cell { display: flex; align-items: center; gap: 14px; }
+.post-thumb { width: 56px; height: 40px; border-radius: 6px; object-fit: cover; flex: 0 0 auto; background: var(--surface-variant); }
+.post-title-a { font-family: 'Space Grotesk'; font-weight: 600; font-size: .92rem; letter-spacing: -0.01em; }
+.post-title-a:hover { color: var(--primary); }
+.post-cell .sub { font-size: .72rem; color: var(--on-surface-variant); margin-top: 2px; display: flex; gap: 6px; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; font-family: 'Space Grotesk'; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pill-pub { background: rgba(79,243,37,.1); color: var(--secondary); border: 1px solid rgba(79,243,37,.2); }
+.pill-draft { background: rgba(255,255,255,.04); color: var(--on-surface-variant); border: 1px solid rgba(255,255,255,.08); }
+.pill-sch { background: rgba(255,201,101,.1); color: var(--tertiary); border: 1px solid rgba(255,201,101,.2); }
+.pill-rev { background: rgba(149,170,255,.1); color: var(--primary); border: 1px solid rgba(149,170,255,.2); }
+.pill-dot { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; }
+
+.avatar-sm { width: 28px; height: 28px; border-radius: 9999px; font-size: .7rem; }
+.metric { font-variant-numeric: tabular-nums; color: var(--on-surface); font-weight: 600; }
+.metric-sub { color: var(--on-surface-variant); font-size: .72rem; }
+.action-btn { width: 32px; height: 32px; border-radius: 8px; display: inline-grid; place-items: center; color: var(--on-surface-variant); background: transparent; transition: all .2s; }
+.action-btn:hover { background: rgba(255,255,255,.05); color: var(--primary); }
+
+@media (max-width: 900px) {
+  .posts thead { display: none; }
+  .posts, .posts tbody, .posts tr, .posts td { display: block; width: 100%; }
+  .posts tr { padding: 14px; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .posts td { padding: 6px 0; border: 0; }
+}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <span class="brand-mark" style="width:30px;height:30px;"><span class="material-symbols-outlined" style="font-size:18px">stadium</span></span>
+    <div><div class="brand-name" style="font-size:.95rem;">Figurinha <span>Fácil</span></div><div style="font-size:.65rem; color:var(--tertiary); letter-spacing:.12em; text-transform:uppercase; font-family:'Space Grotesk'; font-weight:700;">Admin</div></div>
+  </div>
+
+  <div class="sb-section">Conteúdo</div>
+  <nav class="sb-nav">
+    <a class="sb-link active"><span class="material-symbols-outlined" style="font-size:20px">article</span>Posts<span class="badge">142</span></a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">drafts</span>Rascunhos<span class="badge">8</span></a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">sell</span>Categorias</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">image</span>Mídia</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">forum</span>Comentários<span class="badge">24</span></a>
+  </nav>
+
+  <div class="sb-section">Distribuição</div>
+  <nav class="sb-nav">
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">mail</span>Newsletter</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">analytics</span>Analytics</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">search</span>SEO</a>
+  </nav>
+
+  <div class="sb-section">Time</div>
+  <nav class="sb-nav">
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">group</span>Autores</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">settings</span>Configurações</a>
+  </nav>
+
+  <div class="sb-user">
+    <div class="avatar">LG</div>
+    <div style="flex:1; min-width:0;"><div class="name">Lucas Garcia</div><div class="role">Editor chefe</div></div>
+    <span class="material-symbols-outlined" style="font-size:18px; color:var(--outline);">more_vert</span>
+  </div>
+</aside>
+
+<main class="admin-main">
+
+  <div class="admin-head">
+    <div>
+      <nav style="display:flex; gap:8px; font-size:.78rem; color:var(--on-surface-variant); margin-bottom:8px;">
+        <span>Admin</span><span style="opacity:.4">/</span><span style="color:var(--on-surface);">Posts</span>
+      </nav>
+      <h1>Posts</h1>
+      <p>Gerencie o conteúdo do blog, agende publicações e acompanhe métricas.</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-ghost"><span class="material-symbols-outlined" style="font-size:18px">file_download</span>Exportar</button>
+      <a href="admin-editor.html" class="btn btn-primary"><span class="material-symbols-outlined" style="font-size:18px">add</span>Novo post</a>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-tile"><div class="lbl">Publicados</div><div class="val" style="color:var(--secondary);">142</div><div class="trend trend-up">↑ 6 este mês</div></div>
+    <div class="stat-tile"><div class="lbl">Visualizações / mês</div><div class="val">32.4k</div><div class="trend trend-up">↑ 18,2%</div></div>
+    <div class="stat-tile"><div class="lbl">Leitura média</div><div class="val">4m 32s</div><div class="trend trend-up">↑ 12s</div></div>
+    <div class="stat-tile"><div class="lbl">Conversão p/ signup</div><div class="val" style="color:var(--tertiary);">8,4%</div><div class="trend trend-down">↓ 0,6pp</div></div>
+  </div>
+
+  <div class="adm-toolbar">
+    <div class="adm-search">
+      <span class="material-symbols-outlined" style="color:var(--outline)">search</span>
+      <input type="text" placeholder="Buscar por título, autor ou tag...">
+      <span style="font-size:.72rem; color:var(--outline);">⌘ K</span>
+    </div>
+    <button class="adm-filter"><span class="material-symbols-outlined" style="font-size:16px">filter_list</span>Filtros<span class="count">3</span></button>
+    <button class="adm-filter"><span class="material-symbols-outlined" style="font-size:16px">sort</span>Mais recentes</button>
+  </div>
+
+  <nav class="status-tabs">
+    <button class="status-tab active">Todos<span class="num">174</span></button>
+    <button class="status-tab">Publicados<span class="num">142</span></button>
+    <button class="status-tab">Agendados<span class="num">6</span></button>
+    <button class="status-tab">Em revisão<span class="num">18</span></button>
+    <button class="status-tab">Rascunhos<span class="num">8</span></button>
+    <button class="status-tab">Lixeira<span class="num">3</span></button>
+  </nav>
+
+  <div class="table-wrap">
+    <table class="posts">
+      <thead>
+        <tr>
+          <th style="width:40%">Post</th>
+          <th>Status</th>
+          <th>Autor</th>
+          <th>Categoria</th>
+          <th style="text-align:right;">Views</th>
+          <th>Publicado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=200&q=80" alt="">
+              <div>
+                <a href="post.html" class="post-title-a">As 12 figurinhas mais raras da Copa 2026</a>
+                <div class="sub"><span>/guias/figurinhas-raras-copa-2026</span><span style="color:var(--secondary)">● SEO 94</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-pub"><span class="pill-dot"></span>Publicado</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm">LG</div>Lucas G.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Guia</span></td>
+          <td style="text-align:right;"><div class="metric">8.234</div><div class="metric-sub">342 likes</div></td>
+          <td style="color:var(--on-surface-variant);">12 abr</td>
+          <td style="text-align:right;">
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">Como trocar figurinhas com segurança em pontos físicos</a>
+                <div class="sub"><span>/guias/trocar-seguranca</span><span style="color:var(--secondary)">● SEO 88</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-pub"><span class="pill-dot"></span>Publicado</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm" style="background:linear-gradient(135deg, var(--tertiary), #f59e0b);">MR</div>Marina R.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Guia</span></td>
+          <td style="text-align:right;"><div class="metric">6.401</div><div class="metric-sub">287 likes</div></td>
+          <td style="color:var(--on-surface-variant);">10 abr</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1459865264687-595d652de67e?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">Seleção Brasileira: as 23 figurinhas confirmadas</a>
+                <div class="sub"><span>/copa-2026/selecao-brasileira</span><span style="color:var(--tertiary)">● SEO 72</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-sch"><span class="pill-dot"></span>Agendado · 19 abr 09h</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm">PA</div>Pedro A.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Copa 2026</span></td>
+          <td style="text-align:right; color:var(--outline);">—</td>
+          <td style="color:var(--tertiary);">Em 3 dias</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">De 1970 a 2026: a evolução do álbum da Copa</a>
+                <div class="sub"><span>/historia/evolucao-album</span><span style="color:var(--secondary)">● SEO 91</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-pub"><span class="pill-dot"></span>Publicado</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm">PA</div>Pedro A.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">História</span></td>
+          <td style="text-align:right;"><div class="metric">5.128</div><div class="metric-sub">198 likes</div></td>
+          <td style="color:var(--on-surface-variant);">8 abr</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">Messi rainbow holographic: guia de identificação</a>
+                <div class="sub"><span>/raridades/messi-holo</span><span style="color:var(--primary)">● SEO 81</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-rev"><span class="pill-dot"></span>Em revisão</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm">LG</div>Lucas G.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Raridades</span></td>
+          <td style="text-align:right; color:var(--outline);">—</td>
+          <td style="color:var(--on-surface-variant);">Ontem</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">"Completei 7 álbuns" — entrevista com Sr. Waldir</a>
+                <div class="sub"><span>/entrevistas/sr-waldir</span><span style="color:var(--secondary)">● SEO 89</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-draft"><span class="pill-dot"></span>Rascunho</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm">CM</div>Camila M.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Entrevista</span></td>
+          <td style="text-align:right; color:var(--outline);">—</td>
+          <td style="color:var(--on-surface-variant);">3 dias atrás</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="post-cell">
+              <img class="post-thumb" src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=200&q=80" alt="">
+              <div>
+                <a class="post-title-a">O protocolo das trocas em rede</a>
+                <div class="sub"><span>/guias/trocas-em-rede</span><span style="color:var(--secondary)">● SEO 92</span></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="pill pill-pub"><span class="pill-dot"></span>Publicado</span></td>
+          <td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar avatar-sm" style="background:linear-gradient(135deg, var(--secondary), var(--secondary-container));">JS</div>Julia S.</div></td>
+          <td><span class="chip" style="font-size:.64rem; padding:3px 9px;">Guia</span></td>
+          <td style="text-align:right;"><div class="metric">3.892</div><div class="metric-sub">156 likes</div></td>
+          <td style="color:var(--on-surface-variant);">5 abr</td>
+          <td style="text-align:right;"><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; color:var(--on-surface-variant); font-size:.82rem;">
+    <span>Mostrando 7 de 174 posts</span>
+    <div style="display:flex; gap:6px;">
+      <button class="page-btn" style="min-width:40px;height:36px;padding:0 12px;border-radius:8px;background:var(--surface-container);border:1px solid rgba(255,255,255,.06);font-family:'Space Grotesk';font-weight:600;font-size:.8rem;color:var(--on-surface-variant);"><span class="material-symbols-outlined" style="font-size:16px">chevron_left</span></button>
+      <button class="page-btn" style="min-width:40px;height:36px;padding:0 12px;border-radius:8px;background:var(--primary);color:var(--on-primary);font-family:'Space Grotesk';font-weight:700;font-size:.8rem;">1</button>
+      <button class="page-btn" style="min-width:40px;height:36px;padding:0 12px;border-radius:8px;background:var(--surface-container);border:1px solid rgba(255,255,255,.06);font-family:'Space Grotesk';font-weight:600;font-size:.8rem;color:var(--on-surface-variant);">2</button>
+      <button class="page-btn" style="min-width:40px;height:36px;padding:0 12px;border-radius:8px;background:var(--surface-container);border:1px solid rgba(255,255,255,.06);font-family:'Space Grotesk';font-weight:600;font-size:.8rem;color:var(--on-surface-variant);">3</button>
+      <button class="page-btn" style="min-width:40px;height:36px;padding:0 12px;border-radius:8px;background:var(--surface-container);border:1px solid rgba(255,255,255,.06);font-family:'Space Grotesk';font-weight:600;font-size:.8rem;color:var(--on-surface-variant);"><span class="material-symbols-outlined" style="font-size:16px">chevron_right</span></button>
+    </div>
+  </div>
+
+</main>
+</div>
+</body>
+</html>

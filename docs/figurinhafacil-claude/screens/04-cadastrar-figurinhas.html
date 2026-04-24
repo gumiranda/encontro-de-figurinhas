@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>04 · Cadastrar Figurinhas</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+.sm { position:absolute; inset:0; display:flex; flex-direction:column; }
+.sm .head { padding:52px 20px 12px; background:var(--bg); border-bottom:1px solid var(--outline-variant);}
+.sm .head .row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.sm .head h1 { font-size:22px; font-weight:800; line-height:1; margin-bottom:4px;}
+.sm .head p { color:var(--on-surface-variant); font-size:12px; margin-bottom:12px;}
+.sm .tabs { display:flex; gap:4px; padding:4px; background:var(--surface-container); border:1px solid var(--outline-variant); border-radius:12px; }
+.sm .tabs button { flex:1; border:0; background:transparent; color:var(--on-surface-variant); font-family:var(--font-headline); font-weight:700; font-size:11px; padding:10px; border-radius:9px; text-transform:uppercase; letter-spacing:.1em; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
+.sm .tabs button.active { background:var(--primary); color:var(--on-primary); }
+.sm .tabs button.active.need { background:var(--tertiary); color:var(--on-tertiary); }
+.sm .quick-entry { padding:16px 20px; background:var(--surface-container-low); border-bottom:1px solid var(--outline-variant);}
+.sm .quick-entry .input-wrap { background:var(--bg); }
+.sm .hint-row { display:flex; align-items:center; gap:8px; margin-top:10px; color:var(--on-surface-variant); font-size:11px;}
+.sm .hint-row kbd { padding:2px 6px; border-radius:4px; background:var(--surface-container-high); border:1px solid var(--outline-variant); font-family:'JetBrains Mono', monospace; font-size:10px; }
+
+.sm .grid-wrap { flex:1; overflow:auto; padding:16px 20px 100px; }
+.sm .grid-wrap::-webkit-scrollbar{ display:none;}
+.sm .group-label { display:flex; align-items:center; justify-content:space-between; margin:12px 0 8px;}
+.sm .group-label .t { font-family:var(--font-headline); font-size:11px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--on-surface-variant);}
+.sm .group-label .c { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--outline);}
+
+.sticker-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px;}
+.sticker {
+  aspect-ratio:3/4; border-radius:8px; position:relative;
+  background: var(--surface-container); border:1px solid var(--outline-variant);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; color:var(--outline);
+  cursor:pointer; transition: all .15s; overflow:hidden;
+}
+.sticker.have { background: linear-gradient(135deg, rgba(79,243,37,.15), rgba(23,110,0,.25)); border-color:var(--secondary); color:var(--secondary); }
+.sticker.have::after { content:''; position:absolute; top:4px; right:4px; width:14px; height:14px; border-radius:50%; background:var(--secondary); color:var(--on-secondary); font-family:var(--font-headline); font-weight:900; font-size:9px; display:flex; align-items:center; justify-content:center; }
+.sticker.have[data-dup]::after { content: attr(data-dup); }
+.sticker.need { background: linear-gradient(135deg, rgba(255,201,101,.12), rgba(254,183,0,.2)); border-color: var(--tertiary); color:var(--tertiary); }
+.sticker.need::after { content: '+'; position:absolute; top:3px; right:4px; font-family:var(--font-headline); font-weight:900; color:var(--tertiary); font-size:12px; }
+.sticker.locked { opacity:.4; }
+
+.fab-row { position:absolute; left:20px; right:20px; bottom:104px; display:flex; gap:10px; z-index:25;}
+.fab-row .counter { flex:1; background:var(--surface-container-highest); border:1px solid var(--outline-variant); border-radius:14px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; backdrop-filter:blur(12px);}
+.fab-row .counter .n { font-family:var(--font-headline); font-size:18px; font-weight:800; color:var(--secondary); }
+.fab-row .counter .l { font-size:10px; color:var(--on-surface-variant); text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-headline); font-weight:700;}
+
+/* Desktop */
+.sd { position:absolute; inset:0; display:grid; grid-template-columns: 260px 1fr; }
+.sd .side { background:var(--surface-container-low); border-right:1px solid var(--outline-variant); padding:24px 16px;}
+.sd .main { padding:28px 36px; overflow:auto;}
+.sd .main::-webkit-scrollbar{ display:none; }
+.sd .top-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;}
+.sd .top-row h1 { font-size:32px; font-weight:900; line-height:1;}
+.sd .top-row h1 em { font-style:normal; color:var(--secondary);}
+.sd .top-row p { color:var(--on-surface-variant); font-size:13px; margin-top:4px;}
+
+.sd .quick-bar { background:var(--surface-container); border:1px solid var(--outline-variant); border-radius:16px; padding:12px; display:flex; align-items:center; gap:10px; margin-bottom:20px;}
+.sd .quick-bar .tabs { display:flex; gap:4px; padding:4px; background:var(--surface-container-low); border-radius:10px; }
+.sd .quick-bar .tabs button { border:0; background:transparent; color:var(--on-surface-variant); font-family:var(--font-headline); font-weight:700; font-size:11px; padding:8px 14px; border-radius:7px; text-transform:uppercase; letter-spacing:.1em; cursor:pointer;}
+.sd .quick-bar .tabs button.active { background:var(--secondary); color:var(--on-secondary);}
+.sd .quick-bar .input-wrap { flex:1; background:var(--bg); border:0;}
+.sd .quick-bar .shortcuts { display:flex; gap:4px; align-items:center; color:var(--outline); font-size:11px; font-family:'JetBrains Mono',monospace;}
+.sd .quick-bar kbd { padding:3px 6px; border-radius:4px; background:var(--surface-container-low); border:1px solid var(--outline-variant);}
+
+.sd .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;}
+.sd .stats-row .s { background:var(--surface-container); border:1px solid var(--outline-variant); border-radius:14px; padding:14px;}
+.sd .stats-row .s .v { font-family:var(--font-headline); font-size:26px; font-weight:800; line-height:1;}
+.sd .stats-row .s.have .v { color:var(--secondary);}
+.sd .stats-row .s.need .v { color:var(--tertiary);}
+.sd .stats-row .s.dup .v { color:var(--primary);}
+.sd .stats-row .s .l { font-size:11px; color:var(--on-surface-variant); text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-headline); font-weight:700; margin-top:4px;}
+
+.sd .group-wrap { background:var(--surface-container); border:1px solid var(--outline-variant); border-radius:16px; padding:16px 18px; margin-bottom:14px; }
+.sd .group-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.sd .group-head .t { display:flex; align-items:center; gap:10px; font-family:var(--font-headline); font-weight:700;}
+.sd .group-head .t .flag { width:28px; height:20px; border-radius:4px; background:linear-gradient(135deg,var(--primary-dim),var(--primary));}
+.sd .group-head .prog { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--on-surface-variant); font-family:'JetBrains Mono',monospace;}
+.sd .group-head .prog .bar { width:120px; height:4px; background:var(--surface-container-high); border-radius:2px; overflow:hidden;}
+.sd .group-head .prog .bar span { display:block; height:100%; background:linear-gradient(90deg,var(--secondary),var(--primary));}
+.sd .sticker-grid { grid-template-columns: repeat(14, 1fr); }
+</style></head><body>
+<div class="page-canvas">
+  <div class="top"><a class="brand" href="../index.html"><span class="dot"></span><span class="name">Figurinha Fácil</span></a><div class="crumb">04 / 11 · <b>Cadastrar Figurinhas</b></div></div>
+  <div class="page-head"><div><h1>Cadastrar <em>Figurinhas</em></h1><p>Quick entry. Foco em velocidade: teclado numérico, abas Tenho/Preciso, contador ao vivo. Estado das figurinhas visível sempre.</p></div><div class="meta"><span class="chip"><span class="bullet"></span>MOBILE</span><span class="chip">DESKTOP</span><span class="chip">3 VARIAÇÕES</span></div></div>
+
+  <div class="frames">
+    <div class="frame-col">
+      <div class="label">Mobile · Quick entry</div>
+      <div class="mobile-frame" data-tweak="cad" data-variant="default">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="mobile-statusbar"><span>9:41</span><span class="right"><span class="material-symbols-outlined" style="font-size:16px">signal_cellular_alt</span><span class="material-symbols-outlined" style="font-size:16px">wifi</span><span class="material-symbols-outlined" style="font-size:16px">battery_full</span></span></div>
+          <div class="sm">
+            <div class="head">
+              <div class="row1">
+                <button class="btn-icon btn-ghost" style="width:36px;height:36px"><span class="material-symbols-outlined">arrow_back</span></button>
+                <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">tune</span>Filtros</button>
+              </div>
+              <h1>Álbum · Copa 2026</h1>
+              <p>670 figurinhas · <span style="color:var(--secondary);font-weight:700">214 tenho</span> · <span style="color:var(--tertiary);font-weight:700">112 preciso</span></p>
+              <div class="tabs">
+                <button class="active"><span class="material-symbols-outlined" style="font-size:14px">check</span>Tenho · 214</button>
+                <button class="need"><span class="material-symbols-outlined" style="font-size:14px">star</span>Preciso · 112</button>
+              </div>
+            </div>
+            <div class="quick-entry">
+              <div class="input-wrap" style="background:var(--bg)">
+                <span class="material-symbols-outlined" style="color:var(--secondary)">add</span>
+                <input placeholder="Digite números · ex: 42, 108, 250">
+                <button class="btn btn-success btn-sm" style="height:34px;padding:0 12px">OK</button>
+              </div>
+              <div class="hint-row">
+                <span class="material-symbols-outlined" style="font-size:14px;color:var(--outline)">keyboard</span>
+                Separar por vírgula · <kbd>2x</kbd> duplicadas
+              </div>
+            </div>
+            <div class="grid-wrap">
+              <div class="group-label"><span class="t">📘 Brasil · 1–20</span><span class="c">16/20</span></div>
+              <div class="sticker-grid">
+                <div class="sticker have">1</div><div class="sticker have" data-dup="2">2</div><div class="sticker">3</div>
+                <div class="sticker have">4</div><div class="sticker have">5</div><div class="sticker have">6</div>
+                <div class="sticker have">7</div><div class="sticker have" data-dup="3">8</div><div class="sticker">9</div>
+                <div class="sticker have">10</div><div class="sticker have">11</div><div class="sticker">12</div>
+                <div class="sticker have">13</div><div class="sticker have">14</div><div class="sticker">15</div>
+                <div class="sticker have">16</div><div class="sticker have">17</div><div class="sticker have">18</div>
+                <div class="sticker have">19</div><div class="sticker have">20</div>
+              </div>
+              <div class="group-label"><span class="t">🇦🇷 Argentina · 21–40</span><span class="c">9/20</span></div>
+              <div class="sticker-grid">
+                <div class="sticker have">21</div><div class="sticker">22</div><div class="sticker">23</div>
+                <div class="sticker have">24</div><div class="sticker have">25</div><div class="sticker">26</div>
+                <div class="sticker have">27</div><div class="sticker">28</div><div class="sticker have" data-dup="2">29</div>
+                <div class="sticker">30</div><div class="sticker have">31</div><div class="sticker">32</div>
+                <div class="sticker have">33</div><div class="sticker have">34</div><div class="sticker">35</div>
+                <div class="sticker">36</div><div class="sticker">37</div><div class="sticker have">38</div>
+                <div class="sticker">39</div><div class="sticker">40</div>
+              </div>
+            </div>
+            <div class="fab-row">
+              <div class="counter"><div><div class="l">Adicionadas hoje</div><div style="display:flex; align-items:baseline; gap:4px;"><span class="n">+23</span><span style="color:var(--outline); font-size:11px;">(2 dup)</span></div></div><button class="btn btn-primary btn-sm">Salvar</button></div>
+            </div>
+            <div class="bottom-nav">
+              <a><span class="material-symbols-outlined">home</span>Início</a>
+              <a class="active"><span class="material-symbols-outlined">style</span>Álbum</a>
+              <a><span class="material-symbols-outlined">swap_horiz</span>Trocas</a>
+              <a><span class="material-symbols-outlined">map</span>Mapa</a>
+              <a><span class="material-symbols-outlined">person</span>Perfil</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame-col">
+      <div class="label">Desktop · Grid denso</div>
+      <div class="desktop-frame">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="url">figurinhafacil.com.br/cadastrar-figurinhas</div></div>
+        <div class="viewport" data-tweak="cad" data-variant="default">
+          <div class="sd">
+            <div class="side">
+              <div style="display:flex; align-items:center; gap:10px; padding:0 12px 24px;"><span style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dim));display:flex;align-items:center;justify-content:center;color:var(--on-primary)"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span><span style="font-family:var(--font-headline);font-weight:800;font-size:15px">Figurinha Fácil</span></div>
+              <div style="font-family:var(--font-headline); font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--outline); padding:16px 12px 8px;">Principal</div>
+              <a style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--on-surface-variant);font-family:var(--font-headline);font-weight:600;font-size:13px;text-decoration:none"><span class="material-symbols-outlined" style="font-size:20px">dashboard</span>Dashboard</a>
+              <a style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:var(--surface-container-high);color:var(--primary);font-family:var(--font-headline);font-weight:600;font-size:13px;text-decoration:none"><span class="material-symbols-outlined" style="font-size:20px">style</span>Meu Álbum</a>
+              <a style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--on-surface-variant);font-family:var(--font-headline);font-weight:600;font-size:13px;text-decoration:none"><span class="material-symbols-outlined" style="font-size:20px">swap_horiz</span>Encontrar trocas</a>
+              <a style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--on-surface-variant);font-family:var(--font-headline);font-weight:600;font-size:13px;text-decoration:none"><span class="material-symbols-outlined" style="font-size:20px">map</span>Mapa da arena</a>
+              <a style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--on-surface-variant);font-family:var(--font-headline);font-weight:600;font-size:13px;text-decoration:none"><span class="material-symbols-outlined" style="font-size:20px">bookmark</span>Meus pontos</a>
+            </div>
+            <div class="main">
+              <div class="top-row">
+                <div><h1>Cadastrar <em>figurinhas</em></h1><p>Álbum oficial da Copa do Mundo 2026 · 670 posições</p></div>
+                <div style="display:flex; gap:10px;"><button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">ios_share</span>Exportar</button><button class="btn btn-primary btn-sm"><span class="material-symbols-outlined" style="font-size:16px">save</span>Salvar alterações</button></div>
+              </div>
+
+              <div class="quick-bar">
+                <div class="tabs"><button class="active">Tenho</button><button>Preciso</button></div>
+                <div class="input-wrap"><span class="material-symbols-outlined" style="color:var(--secondary)">add</span><input placeholder="Digite números · ex: 42, 108, 250 · 2x250 (duplicadas)"></div>
+                <div class="shortcuts"><span>Atalhos:</span><kbd>Tab</kbd><span>troca aba</span><kbd>Enter</kbd></div>
+                <button class="btn btn-success btn-sm">Adicionar</button>
+              </div>
+
+              <div class="stats-row">
+                <div class="s have"><div class="v">214</div><div class="l">Tenho</div></div>
+                <div class="s dup"><div class="v">38</div><div class="l">Duplicadas</div></div>
+                <div class="s need"><div class="v">112</div><div class="l">Preciso</div></div>
+                <div class="s"><div class="v">670</div><div class="l">Total álbum</div></div>
+              </div>
+
+              <div class="group-wrap">
+                <div class="group-head"><div class="t"><span class="flag"></span>Brasil · 1 – 20</div><div class="prog"><div class="bar"><span style="width:80%"></span></div>16 / 20</div></div>
+                <div class="sticker-grid">
+                  <div class="sticker have">1</div><div class="sticker have" data-dup="2">2</div><div class="sticker">3</div><div class="sticker have">4</div><div class="sticker have">5</div><div class="sticker have">6</div><div class="sticker have">7</div><div class="sticker have" data-dup="3">8</div><div class="sticker">9</div><div class="sticker have">10</div><div class="sticker have">11</div><div class="sticker">12</div><div class="sticker have">13</div><div class="sticker have">14</div>
+                  <div class="sticker">15</div><div class="sticker have">16</div><div class="sticker have">17</div><div class="sticker have">18</div><div class="sticker have">19</div><div class="sticker have">20</div>
+                </div>
+              </div>
+
+              <div class="group-wrap">
+                <div class="group-head"><div class="t"><span class="flag" style="background:linear-gradient(135deg,var(--tertiary-container),var(--tertiary))"></span>Argentina · 21 – 40</div><div class="prog"><div class="bar"><span style="width:45%"></span></div>9 / 20</div></div>
+                <div class="sticker-grid">
+                  <div class="sticker have">21</div><div class="sticker need">22</div><div class="sticker">23</div><div class="sticker have">24</div><div class="sticker have">25</div><div class="sticker need">26</div><div class="sticker have">27</div><div class="sticker need">28</div><div class="sticker have" data-dup="2">29</div><div class="sticker need">30</div><div class="sticker have">31</div><div class="sticker">32</div><div class="sticker have">33</div><div class="sticker have">34</div>
+                  <div class="sticker">35</div><div class="sticker need">36</div><div class="sticker">37</div><div class="sticker have">38</div><div class="sticker">39</div><div class="sticker need">40</div>
+                </div>
+              </div>
+
+              <div class="group-wrap">
+                <div class="group-head"><div class="t"><span class="flag" style="background:linear-gradient(135deg,var(--secondary-container),var(--secondary))"></span>França · 41 – 60</div><div class="prog"><div class="bar"><span style="width:30%"></span></div>6 / 20</div></div>
+                <div class="sticker-grid">
+                  <div class="sticker have">41</div><div class="sticker">42</div><div class="sticker need">43</div><div class="sticker">44</div><div class="sticker have">45</div><div class="sticker need">46</div><div class="sticker">47</div><div class="sticker have">48</div><div class="sticker">49</div><div class="sticker need">50</div><div class="sticker have">51</div><div class="sticker">52</div><div class="sticker">53</div><div class="sticker need">54</div>
+                  <div class="sticker">55</div><div class="sticker have">56</div><div class="sticker">57</div><div class="sticker need">58</div><div class="sticker have">59</div><div class="sticker">60</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tweaks-panel open"><h4>Tweaks · Cadastro</h4>
+  <div class="tweaks-group"><label>Aba ativa</label>
+    <div class="tweaks-seg" data-key="cad-tab" data-attr="data-tab">
+      <button class="active" data-value="have">Tenho</button>
+      <button data-value="need">Preciso</button>
+    </div></div>
+  <div class="tweaks-group"><label>Densidade</label>
+    <div class="tweaks-seg" data-key="cad-density" data-attr="data-density">
+      <button data-value="roomy">Folgada</button>
+      <button class="active" data-value="default">Padrão</button>
+      <button data-value="dense">Densa</button>
+    </div></div>
+</div>
+<script src="../shared/tweaks.js"></script>
+</body></html>

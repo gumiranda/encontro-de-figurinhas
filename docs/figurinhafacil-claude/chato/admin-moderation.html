@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Moderação JMC</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display:ital@1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="chato.css">
+<style>
+body { background: var(--surface-dim); min-height:100dvh; padding: 24px; }
+.admin {
+  max-width: 1400px; margin: 0 auto;
+  display: grid; grid-template-columns: 240px 1fr; gap: 20px;
+  min-height: calc(100dvh - 48px);
+}
+.side {
+  background: var(--surface-container); border-radius: 20px; padding: 18px;
+  display: flex; flex-direction: column; gap: 4px;
+  border: 1px solid rgba(255,255,255,.04);
+  height: fit-content; position: sticky; top: 24px;
+}
+.side-item {
+  padding: 10px 12px; border-radius: 10px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: .84rem; font-weight: 600; color: var(--on-surface-variant);
+  cursor: pointer;
+}
+.side-item.active { background: var(--chato-yellow); color: var(--chato-navy); }
+.side-item .material-symbols-outlined { font-size: 18px; }
+.side-item .count { margin-left: auto; font-size: .7rem; padding: 2px 8px; border-radius: 9999px; background: var(--surface-container-high); font-family: 'JetBrains Mono'; }
+.side-item.active .count { background: rgba(11,16,32,.15); color: var(--chato-navy); }
+
+.main { display: flex; flex-direction: column; gap: 18px; }
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface-container); border-radius: 20px; padding: 14px 18px;
+  border: 1px solid rgba(255,255,255,.04);
+}
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.kpi { background: var(--surface-container); border-radius: 18px; padding: 16px 18px; border: 1px solid rgba(255,255,255,.04); position: relative; overflow: hidden; }
+.kpi .label { font-size: .68rem; color: var(--on-surface-variant); letter-spacing: .14em; text-transform: uppercase; font-weight: 700; }
+.kpi .value { font-family: 'Bungee'; font-size: 2rem; margin-top: 6px; letter-spacing: -.02em; }
+.kpi .delta { font-size: .72rem; font-family: 'Space Grotesk'; font-weight: 600; margin-top: 4px; }
+.kpi.hot { background: linear-gradient(135deg, var(--chato-yellow) 0%, var(--chato-yellow-hot) 100%); color: var(--chato-navy); }
+.kpi.hot .label { color: var(--chato-navy); opacity: .7; }
+
+.panel { background: var(--surface-container); border-radius: 20px; border: 1px solid rgba(255,255,255,.04); overflow: hidden; }
+.panel-head { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.04); display: flex; justify-content: space-between; align-items: center; }
+.panel-head h3 { font-family: 'Bungee'; font-size: 1.05rem; letter-spacing: -.01em; }
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface); border-radius: 10px; }
+.tabs button { padding: 6px 12px; border-radius: 7px; font-size: .75rem; font-weight: 600; color: var(--on-surface-variant); }
+.tabs button.active { background: var(--surface-container-high); color: var(--on-surface); }
+
+.queue { display: flex; flex-direction: column; }
+.queue-row { display: grid; grid-template-columns: 32px 1fr auto auto auto; gap: 14px; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.04); }
+.queue-row:last-child { border-bottom: none; }
+.queue-row:hover { background: rgba(255,255,255,.02); }
+.queue-row input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--outline); cursor: pointer; }
+.queue-row input[type="checkbox"]:checked { background: var(--chato-yellow); border-color: var(--chato-yellow); }
+.qf-content { min-width: 0; }
+.qf-match { font-family: 'Bungee'; font-size: .82rem; color: var(--on-surface-variant); }
+.qf-quote { font-family: 'DM Serif Display'; font-style: italic; font-size: 1rem; margin-top: 3px; line-height: 1.3; }
+.qf-meta { font-size: .7rem; color: var(--outline); margin-top: 4px; display: flex; gap: 10px; }
+.qf-badges { display: flex; gap: 5px; }
+.mini-badge { font-size: .62rem; padding: 3px 7px; border-radius: 9999px; font-weight: 700; letter-spacing: .04em; font-family: 'Space Grotesk'; }
+.mini-badge.warn { background: rgba(214,69,69,.12); color: var(--chato-stamp); }
+.mini-badge.ok { background: rgba(79,243,37,.1); color: var(--chato-green); }
+.mini-badge.info { background: rgba(149,170,255,.12); color: var(--chato-lilac); }
+.qf-actions { display: flex; gap: 4px; }
+.icon-btn { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--on-surface-variant); background: transparent; transition: all .15s; }
+.icon-btn:hover { background: var(--surface-container-high); }
+.icon-btn .material-symbols-outlined { font-size: 18px; }
+.icon-btn.approve:hover { background: rgba(79,243,37,.15); color: var(--chato-green); }
+.icon-btn.reject:hover { background: rgba(214,69,69,.15); color: var(--chato-stamp); }
+
+.bulk-bar { display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: var(--chato-navy); color: #fff; border-bottom: 1px solid rgba(255,255,255,.05); }
+.bulk-bar .count-sel { font-family: 'Bungee'; font-size: .85rem; color: var(--chato-yellow); }
+.bulk-bar .actions { margin-left: auto; display: flex; gap: 6px; }
+.bulk-btn { padding: 6px 12px; border-radius: 8px; font-size: .74rem; font-weight: 700; font-family: 'Space Grotesk'; display: inline-flex; align-items: center; gap: 6px; letter-spacing: .02em; }
+.bulk-btn .material-symbols-outlined { font-size: 16px; }
+.bulk-btn.approve { background: var(--chato-green); color: var(--chato-navy); }
+.bulk-btn.reject { background: var(--chato-stamp); color: #fff; }
+.bulk-btn.ghost { background: rgba(255,255,255,.08); color: #fff; }
+
+.two-col { display: grid; grid-template-columns: 1fr 340px; gap: 18px; }
+@media (max-width: 1100px) { .two-col { grid-template-columns: 1fr; } .admin { grid-template-columns: 1fr; } .side { position: static; } }
+
+.flag-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px; background: var(--surface); margin-top: 8px; }
+.flag-row:first-child { margin-top: 0; }
+.flag-row .score { font-family: 'Bungee'; font-size: 1rem; }
+
+.user-item { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 10px; }
+.user-item:hover { background: var(--surface); }
+.user-item .avatar { width: 32px; height: 32px; border-radius: 9999px; background: var(--chato-yellow); color: var(--chato-navy); display: grid; place-items: center; font-family: 'Bungee'; font-size: .8rem; }
+.user-item .name { font-weight: 600; font-size: .82rem; }
+.user-item .meta { font-size: .65rem; color: var(--outline); }
+
+.chart-bar { height: 120px; display: flex; gap: 6px; align-items: end; padding: 0 4px; }
+.chart-bar > div { flex: 1; border-radius: 4px 4px 0 0; background: var(--surface-container-high); position: relative; transition: all .2s; }
+.chart-bar > div.peak { background: var(--chato-yellow); }
+.chart-bar > div:hover::after {
+  content: attr(data-v); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  background: var(--chato-navy); color: var(--chato-yellow); padding: 3px 7px; border-radius: 5px;
+  font-size: .62rem; font-family: 'JetBrains Mono'; white-space: nowrap; margin-bottom: 4px;
+}
+
+.search { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); width: 260px; }
+.search input { background: transparent; border: none; outline: none; color: var(--on-surface); font-size: .84rem; width: 100%; }
+.search .material-symbols-outlined { font-size: 16px; color: var(--outline); }
+
+h1.page { font-family: 'Bungee'; font-size: 1.6rem; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+
+<div class="admin">
+
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div style="display:flex; align-items:center; gap:10px; padding: 4px 8px 12px; border-bottom: 1px solid rgba(255,255,255,.05); margin-bottom:8px;">
+      <div style="width:32px; height:32px; border-radius:9px; background:var(--chato-yellow); color:var(--chato-navy); display:grid; place-items:center; font-family:'Bungee'; font-size:.9rem;">JMC</div>
+      <div>
+        <div style="font-family:'Bungee'; font-size:.78rem;">Admin</div>
+        <div style="font-size:.58rem; color:var(--outline); letter-spacing:.14em; text-transform:uppercase;">Moderação</div>
+      </div>
+    </div>
+
+    <div class="side-item"><span class="material-symbols-outlined">dashboard</span>Dashboard</div>
+    <div class="side-item"><span class="material-symbols-outlined">sports_soccer</span>Rodadas<span class="count">3</span></div>
+    <div class="side-item active"><span class="material-symbols-outlined">gavel</span>Moderação<span class="count">47</span></div>
+    <div class="side-item"><span class="material-symbols-outlined">format_quote</span>Frases<span class="count">128</span></div>
+    <div class="side-item"><span class="material-symbols-outlined">group</span>Usuários</div>
+    <div class="side-item"><span class="material-symbols-outlined">flag</span>Denúncias<span class="count">12</span></div>
+    <div class="side-item"><span class="material-symbols-outlined">article</span>Blog</div>
+
+    <div style="margin-top:auto; padding:12px 8px 4px; border-top:1px solid rgba(255,255,255,.05); margin-top:16px;">
+      <div style="display:flex; align-items:center; gap:10px; padding:4px;">
+        <div style="width:32px; height:32px; border-radius:9999px; background:var(--chato-lilac); display:grid; place-items:center; font-family:'Bungee'; font-size:.75rem; color:var(--chato-navy);">MC</div>
+        <div>
+          <div style="font-size:.78rem; font-weight:700;">Mari Costa</div>
+          <div style="font-size:.62rem; color:var(--outline);">Editora-chefe</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="micro-cap" style="color:var(--chato-yellow);">● Moderação · Rodada 3 ao vivo</div>
+        <h1 class="page" style="margin-top:4px;">Fila de curadoria</h1>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="search">
+          <span class="material-symbols-outlined">search</span>
+          <input placeholder="Buscar frase, usuário, jogo..."/>
+        </div>
+        <button class="icon-btn" style="background:var(--surface);"><span class="material-symbols-outlined">notifications</span></button>
+        <button class="btn-meme" style="padding:10px 16px; font-size:.82rem;">
+          <span class="material-symbols-outlined" style="font-size:16px;">tune</span> Regras
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi hot">
+        <div class="label">Na fila agora</div>
+        <div class="value">47</div>
+        <div class="delta">+12 na última hora</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Aprovadas hoje</div>
+        <div class="value" style="color:var(--chato-green);">203</div>
+        <div class="delta" style="color:var(--on-surface-variant);">↑ 18% vs ontem</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Rejeitadas hoje</div>
+        <div class="value" style="color:var(--chato-stamp);">34</div>
+        <div class="delta" style="color:var(--on-surface-variant);">taxa 14%</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Tempo médio</div>
+        <div class="value">2m<span style="font-size:1.2rem; color:var(--outline);">18s</span></div>
+        <div class="delta" style="color:var(--on-surface-variant);">mediana por frase</div>
+      </div>
+    </div>
+
+    <!-- TWO COL: fila + sidebar -->
+    <div class="two-col">
+
+      <!-- FILA -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📥 Frases pendentes <span style="color:var(--outline); font-weight:400; font-family:'Space Grotesk'; font-size:.85rem; margin-left:6px;">47 não revisadas</span></h3>
+          <div class="tabs">
+            <button class="active">Pendentes (47)</button>
+            <button>Flaggadas (8)</button>
+            <button>Aprovadas</button>
+            <button>Rejeitadas</button>
+          </div>
+        </div>
+
+        <!-- BULK -->
+        <div class="bulk-bar">
+          <input type="checkbox" style="width:18px; height:18px; accent-color:var(--chato-yellow);"/>
+          <span class="count-sel">3 selecionadas</span>
+          <span style="color:rgba(255,255,255,.4); font-size:.75rem;">· de 47 na página</span>
+          <div class="actions">
+            <button class="bulk-btn approve"><span class="material-symbols-outlined">check</span>Aprovar</button>
+            <button class="bulk-btn reject"><span class="material-symbols-outlined">close</span>Rejeitar</button>
+            <button class="bulk-btn ghost"><span class="material-symbols-outlined">block</span>Banir autor</button>
+            <button class="bulk-btn ghost"><span class="material-symbols-outlined">more_horiz</span></button>
+          </div>
+        </div>
+
+        <div class="queue">
+          <!-- Row 1 -->
+          <div class="queue-row">
+            <input type="checkbox" checked/>
+            <div class="qf-content">
+              <div class="qf-match">🇩🇪 ALE 0×0 SUI 🇨🇭 · Rodada 3</div>
+              <div class="qf-quote">"parecia o tempo extra de um jogo que nem começou"</div>
+              <div class="qf-meta">
+                <span>@carlinhos_sdv · há 3 min</span>
+                <span>✍️ 247 frases · 89% aprovadas</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge ok">limpa</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">87% chato</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve" title="Aprovar"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject" title="Rejeitar"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn" title="Mais"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+          </div>
+
+          <!-- Row 2: flagged -->
+          <div class="queue-row" style="background:rgba(214,69,69,.03);">
+            <input type="checkbox"/>
+            <div class="qf-content">
+              <div class="qf-match">🇰🇷 KOR 0×0 JPN 🇯🇵 · Rodada 2</div>
+              <div class="qf-quote">"ju**** como foi ruim, <span style="background:rgba(214,69,69,.2); padding:0 3px; border-radius:3px;">&lt;palavrão&gt;</span> de jogo"</div>
+              <div class="qf-meta">
+                <span>@zecar_mg · há 7 min</span>
+                <span>⚠️ 3 denúncias prévias</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge warn">linguagem</span>
+              <span class="mini-badge warn">repeat</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--chato-stamp);">flagged</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">edit</span></button>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="queue-row">
+            <input type="checkbox" checked/>
+            <div class="qf-content">
+              <div class="qf-match">🇩🇿 DZA 0×0 MAR 🇲🇦 · Rodada 3</div>
+              <div class="qf-quote">"assisti duas vezes pra ter certeza que ninguém chutou"</div>
+              <div class="qf-meta">
+                <span>@bibi.zs · há 11 min</span>
+                <span>✨ primeira frase</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge info">novata</span>
+              <span class="mini-badge ok">limpa</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">72% chato</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+          </div>
+
+          <!-- Row 4 -->
+          <div class="queue-row">
+            <input type="checkbox" checked/>
+            <div class="qf-content">
+              <div class="qf-match">🇩🇪 ALE 0×0 SUI 🇨🇭 · Rodada 3</div>
+              <div class="qf-quote">"tava esperando a FIFA cancelar no intervalo"</div>
+              <div class="qf-meta">
+                <span>@renato.xyz · há 14 min</span>
+                <span>✍️ 82 frases · 94% aprovadas</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge ok">limpa</span>
+              <span class="mini-badge info">top 10%</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">91% chato</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+          </div>
+
+          <!-- Row 5: similar -->
+          <div class="queue-row">
+            <input type="checkbox"/>
+            <div class="qf-content">
+              <div class="qf-match">🇩🇰 DEN 1×0 NOR 🇳🇴 · Rodada 1</div>
+              <div class="qf-quote">"devolve 90 min da minha vida"</div>
+              <div class="qf-meta">
+                <span>@paulo_br · há 18 min</span>
+                <span>⚠️ 92% similar à #1847 já aprovada</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge warn">duplicata</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--chato-stamp);">similar 92%</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">merge</span></button>
+            </div>
+          </div>
+
+          <!-- Row 6 -->
+          <div class="queue-row">
+            <input type="checkbox"/>
+            <div class="qf-content">
+              <div class="qf-match">🇺🇾 URU 2×1 CRO 🇭🇷 · Rodada 2</div>
+              <div class="qf-quote">"tinha gol e ainda assim deu sono, explica essa"</div>
+              <div class="qf-meta">
+                <span>@lucia.mf · há 22 min</span>
+                <span>✍️ 14 frases · 71% aprovadas</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge ok">limpa</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">64% chato</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+          </div>
+
+          <!-- Row 7 -->
+          <div class="queue-row">
+            <input type="checkbox"/>
+            <div class="qf-content">
+              <div class="qf-match">🇦🇹 AUT 2×2 CZE 🇨🇿 · Rodada 3</div>
+              <div class="qf-quote">"3 gols contra e ainda quase consegui cochilar"</div>
+              <div class="qf-meta">
+                <span>@tomas_br · há 34 min</span>
+                <span>✍️ 58 frases · 86% aprovadas</span>
+              </div>
+            </div>
+            <div class="qf-badges">
+              <span class="mini-badge ok">limpa</span>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">58% chato</div>
+            <div class="qf-actions">
+              <button class="icon-btn approve"><span class="material-symbols-outlined">check</span></button>
+              <button class="icon-btn reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="icon-btn"><span class="material-symbols-outlined">more_horiz</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center; color:var(--outline); font-size:.78rem; border-top:1px solid rgba(255,255,255,.04);">
+          <span>Mostrando 1-7 de 47</span>
+          <div style="display:flex; gap:4px;">
+            <button class="icon-btn" style="background:var(--surface);"><span class="material-symbols-outlined">chevron_left</span></button>
+            <button class="icon-btn" style="background:var(--chato-yellow); color:var(--chato-navy);">1</button>
+            <button class="icon-btn" style="background:var(--surface);">2</button>
+            <button class="icon-btn" style="background:var(--surface);">3</button>
+            <button class="icon-btn" style="background:var(--surface);"><span class="material-symbols-outlined">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR RIGHT -->
+      <aside style="display:flex; flex-direction:column; gap:18px;">
+
+        <!-- Volume chart -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 style="font-size:.9rem;">📈 Submissões · 24h</h3>
+            <span style="font-family:'JetBrains Mono'; font-size:.7rem; color:var(--outline);">+428 total</span>
+          </div>
+          <div style="padding:14px 18px 18px;">
+            <div class="chart-bar">
+              <div style="height:20%" data-v="8 · 01h"></div>
+              <div style="height:12%" data-v="5 · 03h"></div>
+              <div style="height:8%" data-v="3 · 05h"></div>
+              <div style="height:16%" data-v="7 · 07h"></div>
+              <div style="height:28%" data-v="12 · 09h"></div>
+              <div style="height:42%" data-v="18 · 11h"></div>
+              <div style="height:58%" data-v="25 · 13h"></div>
+              <div style="height:75%" data-v="32 · 15h"></div>
+              <div style="height:90%; " class="peak" data-v="38 · 17h"></div>
+              <div style="height:98%" class="peak" data-v="42 · 19h"></div>
+              <div style="height:100%" class="peak" data-v="43 · 21h"></div>
+              <div style="height:65%" data-v="28 · 23h"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:.6rem; color:var(--outline); font-family:'JetBrains Mono';">
+              <span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>00h</span>
+            </div>
+            <div style="margin-top:12px; padding:10px 12px; border-radius:10px; background:rgba(255,201,101,.08); border:1px solid rgba(255,201,101,.15);">
+              <div style="font-size:.68rem; color:var(--chato-yellow); font-family:'Space Grotesk'; font-weight:700; letter-spacing:.1em;">🔥 PICO ÀS 21H</div>
+              <div style="font-size:.76rem; margin-top:3px; color:var(--on-surface-variant);">ALE × SUI terminou 20:45 — 43 frases em 1h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto-moderation rules -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 style="font-size:.9rem;">⚙️ Auto-moderação</h3>
+            <button style="font-size:.72rem; color:var(--chato-yellow); font-family:'Space Grotesk'; font-weight:700;">Editar</button>
+          </div>
+          <div style="padding:6px;">
+            <div class="flag-row" style="background:transparent;">
+              <span class="material-symbols-outlined" style="color:var(--chato-green); font-size:18px;">check_circle</span>
+              <div style="flex:1;">
+                <div style="font-size:.82rem; font-weight:600;">Filtro de palavrões</div>
+                <div style="font-size:.66rem; color:var(--outline);">247 termos · pt-BR</div>
+              </div>
+              <div style="width:32px; height:18px; border-radius:9999px; background:var(--chato-green); position:relative;">
+                <div style="position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:9999px; background:#fff;"></div>
+              </div>
+            </div>
+            <div class="flag-row" style="background:transparent;">
+              <span class="material-symbols-outlined" style="color:var(--chato-green); font-size:18px;">content_copy</span>
+              <div style="flex:1;">
+                <div style="font-size:.82rem; font-weight:600;">Detector de duplicatas</div>
+                <div style="font-size:.66rem; color:var(--outline);">Similaridade &gt; 85%</div>
+              </div>
+              <div style="width:32px; height:18px; border-radius:9999px; background:var(--chato-green); position:relative;">
+                <div style="position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:9999px; background:#fff;"></div>
+              </div>
+            </div>
+            <div class="flag-row" style="background:transparent;">
+              <span class="material-symbols-outlined" style="color:var(--outline); font-size:18px;">robot</span>
+              <div style="flex:1;">
+                <div style="font-size:.82rem; font-weight:600;">Anti-bot / spam</div>
+                <div style="font-size:.66rem; color:var(--outline);">Rate limit + captcha</div>
+              </div>
+              <div style="width:32px; height:18px; border-radius:9999px; background:var(--chato-green); position:relative;">
+                <div style="position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:9999px; background:#fff;"></div>
+              </div>
+            </div>
+            <div class="flag-row" style="background:transparent;">
+              <span class="material-symbols-outlined" style="color:var(--outline); font-size:18px;">auto_awesome</span>
+              <div style="flex:1;">
+                <div style="font-size:.82rem; font-weight:600;">Auto-aprovar top 5%</div>
+                <div style="font-size:.66rem; color:var(--outline);">Usuários 95%+ aprovação</div>
+              </div>
+              <div style="width:32px; height:18px; border-radius:9999px; background:var(--surface-container-high); position:relative;">
+                <div style="position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:9999px; background:var(--outline);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top moderators -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3 style="font-size:.9rem;">👥 Mods hoje</h3>
+          </div>
+          <div style="padding:6px;">
+            <div class="user-item">
+              <div class="avatar">MC</div>
+              <div><div class="name">Mari Costa</div><div class="meta">Editora-chefe</div></div>
+              <div style="font-family:'Bungee'; font-size:.9rem; color:var(--chato-yellow);">87</div>
+            </div>
+            <div class="user-item">
+              <div class="avatar" style="background:var(--chato-lilac)">JR</div>
+              <div><div class="name">João Ramos</div><div class="meta">Moderador</div></div>
+              <div style="font-family:'Bungee'; font-size:.9rem; color:var(--on-surface-variant);">64</div>
+            </div>
+            <div class="user-item">
+              <div class="avatar" style="background:var(--chato-green); color:var(--chato-navy);">LS</div>
+              <div><div class="name">Lia Souza</div><div class="meta">Moderadora</div></div>
+              <div style="font-family:'Bungee'; font-size:.9rem; color:var(--on-surface-variant);">52</div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

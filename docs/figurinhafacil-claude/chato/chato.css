@@ -1,0 +1,146 @@
+/* "Jogo mais chato" — estilo meme/exagero sobre a paleta Figurinha Fácil */
+@import url("shared.css");
+
+:root {
+  --chato-yellow: #ffc965;
+  --chato-yellow-hot: #ffd873;
+  --chato-lilac: #95aaff;
+  --chato-navy: #0b1020;
+  --chato-green: #4ff325;
+  --chato-paper: #f5efd8;
+  --chato-paper-dim: #e8dfc0;
+  --chato-stamp: #d64545;
+}
+
+/* Fonts são carregados no <head> de cada HTML */
+.ff-display { font-family: 'Bungee', 'Space Grotesk', sans-serif; letter-spacing: -0.01em; }
+.ff-mono { font-family: 'JetBrains Mono', monospace; }
+.ff-serif { font-family: 'DM Serif Display', Georgia, serif; }
+
+/* Stamp / Certificado */
+.cert-stamp {
+  display: inline-grid;
+  place-items: center;
+  width: 160px; height: 160px;
+  border-radius: 9999px;
+  border: 4px double var(--chato-stamp);
+  color: var(--chato-stamp);
+  text-align: center;
+  transform: rotate(-12deg);
+  padding: 14px;
+  position: relative;
+  font-family: 'Bungee', sans-serif;
+  background: rgba(245, 239, 216, 0.08);
+}
+.cert-stamp::before {
+  content: ''; position: absolute; inset: 8px;
+  border: 2px solid var(--chato-stamp);
+  border-radius: 9999px;
+  opacity: .5;
+}
+.cert-stamp .pct { font-size: 2.2rem; line-height: 1; font-family: 'Bungee', sans-serif; }
+.cert-stamp .lbl { font-size: .65rem; letter-spacing: .2em; margin-top: 4px; text-transform: uppercase; }
+.cert-stamp .sub { font-size: .55rem; letter-spacing: .14em; margin-top: 6px; opacity: .8; }
+
+/* Wavy underline */
+.wavy {
+  background-image: linear-gradient(90deg, var(--chato-yellow), var(--chato-yellow));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 12px;
+  padding-bottom: 2px;
+}
+
+/* Big chato number */
+.chato-pct {
+  font-family: 'Bungee', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  line-height: .85;
+  letter-spacing: -0.04em;
+}
+
+/* Emoji burst */
+.bonus-emoji { display: inline-flex; gap: 2px; font-size: 1.4rem; }
+
+/* Paper card (shareable) */
+.paper-card {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,201,101,.18), transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(149,170,255,.12), transparent 55%),
+    #0b1020;
+  border-radius: 18px;
+  color: var(--on-surface);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Status chip for match */
+.vs-dot { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; }
+
+/* Flag avatar (emoji + bg) */
+.flag {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: 1.9rem;
+  background: var(--surface-container-high);
+  border: 1px solid rgba(255,255,255,.06);
+}
+.flag.lg { width: 72px; height: 72px; font-size: 2.6rem; border-radius: 18px; }
+.flag.xl { width: 96px; height: 96px; font-size: 3.5rem; border-radius: 22px; }
+
+/* Vote bar */
+.vbar { height: 10px; border-radius: 9999px; background: rgba(255,255,255,.06); overflow: hidden; }
+.vbar .fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, var(--chato-yellow), var(--tertiary-dim)); }
+
+/* Scroll iphone content — top padding reserves safe-area for Dynamic Island / status bar */
+.iscroll { overflow-y: auto; overflow-x: hidden; height: 100%; scrollbar-width: none; padding-top: 88px; }
+.iscroll::-webkit-scrollbar { display: none; }
+
+/* Small caps eyebrow */
+.micro-cap { font-family: 'Space Grotesk', sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+
+/* Meme button */
+.btn-meme {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  background: var(--chato-yellow);
+  color: var(--chato-navy);
+  font-family: 'Bungee', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .02em;
+  transition: transform .15s;
+  box-shadow: 0 6px 0 #a47c2a, 0 10px 24px rgba(255,201,101,.3);
+}
+.btn-meme:active { transform: translateY(3px); box-shadow: 0 3px 0 #a47c2a; }
+.btn-meme.secondary {
+  background: rgba(255,255,255,.08);
+  color: var(--on-surface);
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+/* Match card */
+.match-card {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.05);
+  transition: all .25s;
+}
+.match-card.selected { border-color: var(--chato-yellow); background: rgba(255,201,101,.06); }
+.match-card .teams { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; }
+.match-card .team { display: flex; align-items: center; gap: 10px; }
+.match-card .team.right { flex-direction: row-reverse; }
+.match-card .team-name { font-family: 'Space Grotesk'; font-weight: 700; font-size: .95rem; letter-spacing: -0.01em; }
+.match-card .score { font-family: 'Bungee', sans-serif; font-size: 1.1rem; color: var(--on-surface-variant); letter-spacing: .08em; }
+
+.chato-glow-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,201,101,.12), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(149,170,255,.08), transparent 55%);
+  pointer-events: none;
+}
