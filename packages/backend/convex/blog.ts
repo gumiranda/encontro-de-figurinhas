@@ -116,7 +116,7 @@ export const getRelated = query({
 
     if (!current || current.status !== "published") return [];
 
-    const currentTags = new Set(current.tags);
+    const currentTags = new Set(current.tags.map((t) => t.toLowerCase().trim()));
 
     const candidates = await ctx.db
       .query("blogPosts")
@@ -127,7 +127,9 @@ export const getRelated = query({
     const scored = candidates
       .filter((p) => p.slug !== slug)
       .map((p) => {
-        const commonTags = p.tags.filter((t) => currentTags.has(t)).length;
+        const commonTags = p.tags.filter((t) =>
+          currentTags.has(t.toLowerCase().trim())
+        ).length;
         return { post: p, score: commonTags };
       })
       .sort((a, b) => {
@@ -193,10 +195,12 @@ export const create = mutation({
 
     const wordCount = args.content.split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / 200);
+    const normalizedTags = args.tags.map((t) => t.trim().toLowerCase());
 
     const now = Date.now();
     const id = await ctx.db.insert("blogPosts", {
       ...args,
+      tags: normalizedTags,
       readingTime,
       author: {
         name: user.name,
@@ -234,6 +238,10 @@ export const update = mutation({
     if (!post) throw new Error("Post not found");
 
     const patch: Record<string, unknown> = { ...updates, updatedAt: Date.now() };
+
+    if (updates.tags) {
+      patch.tags = updates.tags.map((t) => t.trim().toLowerCase());
+    }
 
     if (updates.content) {
       const wordCount = updates.content.split(/\s+/).length;
