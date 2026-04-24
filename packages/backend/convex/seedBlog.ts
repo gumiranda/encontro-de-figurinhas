@@ -773,7 +773,7 @@ const BLOG_POSTS = [
 
 <p>No Figurinha Fácil, você encontra todos os pontos de troca de São Paulo verificados pela comunidade. Veja horários, avaliações e quantos colecionadores frequentam cada local.</p>
 
-<p><a href="/cidade/sao-paulo">Ver todos os pontos de troca em São Paulo →</a></p>
+<p><a href="/cidade/sao-paulo-sp">Ver todos os pontos de troca em São Paulo →</a></p>
     `.trim(),
     category: "Guias",
     tags: ["são paulo", "pontos de troca", "onde trocar", "guia"],
@@ -3281,7 +3281,7 @@ const BLOG_POSTS = [
     tags: ["Equador", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo E"],
     seoTitle: "Figurinhas Equador Copa 2026 — Convocação e Álbum",
     seoDescription:
-"Convocação provável do Equador na Copa 2026, técnico Sebastián Beccacece, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
+      "Convocação provável do Equador na Copa 2026, técnico Sebastián Beccacece, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
   {
     title: "Figurinhas Austrália Copa 2026: Convocação e Álbum FIFA",
@@ -3594,7 +3594,13 @@ const BLOG_POSTS = [
 </ul>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Nova Zelândia", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo G"],
+    tags: [
+      "Nova Zelândia",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo G",
+    ],
     seoTitle: "Figurinhas Nova Zelândia Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Nova Zelândia na Copa 2026, técnico Darren Bazeley, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -4745,7 +4751,13 @@ const BLOG_POSTS = [
 </ul>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Costa do Marfim", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo E"],
+    tags: [
+      "Costa do Marfim",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo E",
+    ],
     seoTitle: "Figurinhas Costa do Marfim Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Costa do Marfim na Copa 2026, técnico Emerse Faé, Grupo E, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -5292,7 +5304,13 @@ const BLOG_POSTS = [
 <p>A seleção da República Tcheca promete ser uma das atrações do <strong>Grupo A</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da República Tcheca no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["República Tcheca", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo A"],
+    tags: [
+      "República Tcheca",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo A",
+    ],
     seoTitle: "Figurinhas República Tcheca Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da República Tcheca na Copa 2026, técnico Ivan Hašek, Grupo A, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -5550,7 +5568,13 @@ const BLOG_POSTS = [
 <p>A seleção da Bósnia e Herzegovina promete ser uma das atrações do <strong>Grupo B</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da Bósnia e Herzegovina no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Bósnia e Herzegovina", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo B"],
+    tags: [
+      "Bósnia e Herzegovina",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo B",
+    ],
     seoTitle: "Figurinhas Bósnia e Herzegovina Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Bósnia e Herzegovina na Copa 2026, técnico Sergej Barbarez, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -5679,7 +5703,13 @@ const BLOG_POSTS = [
 <p>A seleção da África do Sul promete ser uma das atrações do <strong>Grupo A</strong> na Copa do Mundo de 2026. Para os colecionadores brasileiros, completar a página da África do Sul no álbum oficial é parte da experiência única do Mundial — e nada melhor do que trocar com a comunidade para conquistar todas as figurinhas. Comece já no <a href="https://figurinhafacil.com.br">Figurinha Fácil</a> e prepare-se para o maior torneio da história do futebol!</p>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["África do Sul", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo A"],
+    tags: [
+      "África do Sul",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo A",
+    ],
     seoTitle: "Figurinhas África do Sul Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da África do Sul na Copa 2026, técnico Hugo Broos, Grupo A, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -5941,7 +5971,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Tunísia Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Tunísia na Copa 2026, técnico Sami Trabelsi, Grupo F, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas RD Congo Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-rd-congo-copa-2026",
@@ -6099,7 +6130,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas RD Congo Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da RD Congo na Copa 2026, técnico Sébastien Desabre, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Irã Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-irac-copa-2026",
@@ -6255,7 +6287,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Irã Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável do Irã na Copa 2026, técnico Amir Ghalenoei, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Iraque Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-iraque-copa-2026",
@@ -6411,7 +6444,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Iraque Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável do Iraque na Copa 2026, técnico Jesús Casas, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Catar Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-catar-copa-2026",
@@ -6567,7 +6601,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Catar Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável do Catar na Copa 2026, técnico Marquez López, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Arábia Saudita Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-arabia-saudita-copa-2026",
@@ -6719,11 +6754,18 @@ const BLOG_POSTS = [
 </ul>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Arábia Saudita", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo H"],
+    tags: [
+      "Arábia Saudita",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo H",
+    ],
     seoTitle: "Figurinhas Arábia Saudita Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Arábia Saudita na Copa 2026, técnico Hervé Renard, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Jordânia Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-jordania-copa-2026",
@@ -6881,7 +6923,8 @@ const BLOG_POSTS = [
     seoTitle: "Figurinhas Jordânia Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável da Jordânia na Copa 2026, técnico Jamal Sellami, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
-  },,
+  },
+  ,
   {
     title: "Figurinhas Uzbequistão Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-uzbequistao-copa-2026",
@@ -7035,7 +7078,13 @@ const BLOG_POSTS = [
 </ul>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Uzbequistão", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo K"],
+    tags: [
+      "Uzbequistão",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo K",
+    ],
     seoTitle: "Figurinhas Uzbequistão Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável do Uzbequistão na Copa 2026, técnico Srečko Katanec, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
@@ -7194,12 +7243,17 @@ const BLOG_POSTS = [
 </ul>
     `.trim(),
     category: "Seleções Copa 2026",
-    tags: ["Cabo Verde", "Copa do Mundo 2026", "figurinhas", "álbum FIFA 2026", "Grupo H"],
+    tags: [
+      "Cabo Verde",
+      "Copa do Mundo 2026",
+      "figurinhas",
+      "álbum FIFA 2026",
+      "Grupo H",
+    ],
     seoTitle: "Figurinhas Cabo Verde Copa 2026 — Convocação e Álbum",
     seoDescription:
       "Convocação provável de Cabo Verde na Copa 2026, técnico Bubista, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-
 ];
 
 export const seedBlogPosts = internalMutation({

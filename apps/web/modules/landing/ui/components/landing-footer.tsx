@@ -1,5 +1,5 @@
+import { Globe, Landmark, Share2 } from "lucide-react";
 import Link from "next/link";
-import { Landmark, Share2, Globe } from "lucide-react";
 
 const PRODUCT_LINKS = [
   { label: "Como Funciona", href: "/como-funciona" },
@@ -16,11 +16,11 @@ const HUB_LINKS = [
 ];
 
 const CITY_LINKS = [
-  { label: "São Paulo", href: "/cidade/sao-paulo" },
-  { label: "Rio de Janeiro", href: "/cidade/rio-de-janeiro" },
-  { label: "Belo Horizonte", href: "/cidade/belo-horizonte" },
-  { label: "Curitiba", href: "/cidade/curitiba" },
-  { label: "Porto Alegre", href: "/cidade/porto-alegre" },
+  { label: "São Paulo", href: "/cidade/sao-paulo-sp" },
+  { label: "Rio de Janeiro", href: "/cidade/rio-de-janeiro-rj" },
+  { label: "Belo Horizonte", href: "/cidade/belo-horizonte-mg" },
+  { label: "Curitiba", href: "/cidade/curitiba-pr" },
+  { label: "Porto Alegre", href: "/cidade/porto-alegre-rs" },
 ];
 
 const LEGAL_LINKS = [

@@ -1,29 +1,24 @@
+import { JsonLd } from "@/components/json-ld";
+import { api, convexServer } from "@/lib/convex-server";
+import {
+  BASE_URL,
+  generateBreadcrumbSchema,
+  generateCityItemListSchema,
+  generateCityMetadata,
+  generateCombinedSchema,
+  generatePlaceSchema,
+  generateSpeakableSchema,
+} from "@/lib/seo";
+import { stateCodeToName, stateCodeToSlug } from "@/lib/states";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { ArrowRight, Calendar, MapPin, Navigation, Store, Users } from "lucide-react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { MapPin, Users, ArrowRight, Calendar, Store, Navigation } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
-import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { convexServer, api } from "@/lib/convex-server";
-import {
-  generateCityMetadata,
-  generateBreadcrumbSchema,
-  generatePlaceSchema,
-  generateCityItemListSchema,
-  generateSpeakableSchema,
-  generateCombinedSchema,
-  BASE_URL,
-} from "@/lib/seo";
-import { JsonLd } from "@/components/json-ld";
-import { stateCodeToSlug, stateCodeToName } from "@/lib/states";
+import { notFound } from "next/navigation";
 
 interface CityPageProps {
   params: Promise<{ slug: string }>;
@@ -50,9 +45,7 @@ async function loadCityTopPoints(slug: string) {
   return convexServer.query(api.tradePoints.listTopByCity, { citySlug: slug, limit: 20 });
 }
 
-export async function generateMetadata({
-  params,
-}: CityPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
   const city = await loadCity(slug);
 
@@ -110,10 +103,14 @@ export default async function CityPage({ params }: CityPageProps) {
       ? generateCityItemListSchema(city.slug, city.name, visiblePoints)
       : null;
 
-  const speakableSchema = generateSpeakableSchema(
-    `${BASE_URL}/cidade/${city.slug}`,
-    ["h1", "h2", "h3", ".prose p", ".prose ul", ".prose ol"]
-  );
+  const speakableSchema = generateSpeakableSchema(`${BASE_URL}/cidade/${city.slug}`, [
+    "h1",
+    "h2",
+    "h3",
+    ".prose p",
+    ".prose ul",
+    ".prose ol",
+  ]);
 
   const schemas = [breadcrumbSchema, placeSchema, speakableSchema];
   if (itemListSchema) schemas.push(itemListSchema);
@@ -158,20 +155,22 @@ export default async function CityPage({ params }: CityPageProps) {
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 text-primary mb-4">
                 <MapPin className="h-5 w-5" />
-                <Link href={stateSlug ? `/estado/${stateSlug}` : "/estados"} className="text-sm font-medium hover:underline">
+                <Link
+                  href={stateSlug ? `/estado/${stateSlug}` : "/estados"}
+                  className="text-sm font-medium hover:underline"
+                >
                   {stateName}
                 </Link>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
-                Troca de Figurinhas em{" "}
-                <span className="text-primary">{city.name}</span>
+                Troca de Figurinhas em <span className="text-primary">{city.name}</span>
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                Encontre colecionadores e pontos de troca de figurinhas em{" "}
-                {city.name}, {city.state}. Conecte-se com outros apaixonados por
-                figurinhas e complete seu álbum.
+                Encontre colecionadores e pontos de troca de figurinhas em {city.name},{" "}
+                {city.state}. Conecte-se com outros apaixonados por figurinhas e complete
+                seu álbum.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -196,7 +195,9 @@ export default async function CityPage({ params }: CityPageProps) {
                       <div>
                         <p className="text-2xl font-bold">{collectorsCount}</p>
                         <p className="text-sm text-muted-foreground">
-                          {collectorsCount === 1 ? "colecionador ativo" : "colecionadores ativos"}
+                          {collectorsCount === 1
+                            ? "colecionador ativo"
+                            : "colecionadores ativos"}
                         </p>
                       </div>
                     </div>
@@ -289,8 +290,8 @@ export default async function CityPage({ params }: CityPageProps) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Informe quais figurinhas você tem repetidas e quais está
-                    buscando para completar seu álbum.
+                    Informe quais figurinhas você tem repetidas e quais está buscando para
+                    completar seu álbum.
                   </p>
                 </CardContent>
               </Card>
@@ -304,8 +305,8 @@ export default async function CityPage({ params }: CityPageProps) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Nossa plataforma conecta você com colecionadores em{" "}
-                    {city.name} que têm o que você precisa.
+                    Nossa plataforma conecta você com colecionadores em {city.name} que
+                    têm o que você precisa.
                   </p>
                 </CardContent>
               </Card>
@@ -319,8 +320,8 @@ export default async function CityPage({ params }: CityPageProps) {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Escolha um ponto de troca seguro em {city.name} e realize
-                    suas trocas presencialmente.
+                    Escolha um ponto de troca seguro em {city.name} e realize suas trocas
+                    presencialmente.
                   </p>
                 </CardContent>
               </Card>
@@ -353,21 +354,18 @@ export default async function CityPage({ params }: CityPageProps) {
                   </>
                 ) : (
                   <>
-                    {city.name}, {city.state}, está pronta para receber
-                    colecionadores de figurinhas. Seja um dos primeiros a se
-                    cadastrar e ajude a construir a comunidade de trocas na sua
-                    cidade.
+                    {city.name}, {city.state}, está pronta para receber colecionadores de
+                    figurinhas. Seja um dos primeiros a se cadastrar e ajude a construir a
+                    comunidade de trocas na sua cidade.
                   </>
                 )}{" "}
-                Com a proximidade da Copa do Mundo 2026, a busca por figurinhas
-                e pontos de troca na cidade tem crescido significativamente.
+                Com a proximidade da Copa do Mundo 2026, a busca por figurinhas e pontos
+                de troca na cidade tem crescido significativamente.
               </p>
 
               <h3>Por que usar o Figurinha Fácil em {city.name}?</h3>
               <ul>
-                <li>
-                  Encontre colecionadores perto de você em {city.name} e região
-                </li>
+                <li>Encontre colecionadores perto de você em {city.name} e região</li>
                 {tradePointsCount > 0 ? (
                   <li>
                     Acesse {tradePointsCount}{" "}
@@ -377,41 +375,62 @@ export default async function CityPage({ params }: CityPageProps) {
                     na cidade
                   </li>
                 ) : (
-                  <li>
-                    Sugira pontos de troca seguros e ajude a expandir a rede
-                  </li>
+                  <li>Sugira pontos de troca seguros e ajude a expandir a rede</li>
                 )}
-                <li>
-                  Economize tempo encontrando exatamente as figurinhas que
-                  precisa
-                </li>
-                <li>
-                  Conecte-se com uma comunidade ativa de colecionadores locais
-                </li>
+                <li>Economize tempo encontrando exatamente as figurinhas que precisa</li>
+                <li>Conecte-se com uma comunidade ativa de colecionadores locais</li>
               </ul>
 
               <h3>Álbuns populares para troca em {city.name}</h3>
               <p>
-                Os colecionadores de {city.name} estão ativamente trocando
-                figurinhas de diversos álbuns, incluindo o álbum oficial da Copa
-                do Mundo 2026, álbuns Panini de campeonatos brasileiros, e
-                outras coleções populares.
+                Os colecionadores de {city.name} estão ativamente trocando figurinhas de
+                diversos álbuns, incluindo o álbum oficial da Copa do Mundo 2026, álbuns
+                Panini de campeonatos brasileiros, e outras coleções populares.
               </p>
 
               <h3>Outras cidades para trocar figurinhas</h3>
               <p>
-                Além de {city.name}, você pode encontrar colecionadores em outras
-                grandes cidades do Brasil. Confira:{" "}
-                <Link href="/cidade/sao-paulo" className="text-primary hover:underline">São Paulo</Link>,{" "}
-                <Link href="/cidade/rio-de-janeiro" className="text-primary hover:underline">Rio de Janeiro</Link>,{" "}
-                <Link href="/cidade/belo-horizonte" className="text-primary hover:underline">Belo Horizonte</Link>,{" "}
-                <Link href="/cidade/curitiba" className="text-primary hover:underline">Curitiba</Link> e{" "}
-                <Link href="/cidade/porto-alegre" className="text-primary hover:underline">Porto Alegre</Link>.
+                Além de {city.name}, você pode encontrar colecionadores em outras grandes
+                cidades do Brasil. Confira:{" "}
+                <Link
+                  href="/cidade/sao-paulo-sp"
+                  className="text-primary hover:underline"
+                >
+                  São Paulo
+                </Link>
+                ,{" "}
+                <Link
+                  href="/cidade/rio-de-janeiro-rj"
+                  className="text-primary hover:underline"
+                >
+                  Rio de Janeiro
+                </Link>
+                ,{" "}
+                <Link
+                  href="/cidade/belo-horizonte-mg"
+                  className="text-primary hover:underline"
+                >
+                  Belo Horizonte
+                </Link>
+                ,{" "}
+                <Link href="/cidade/curitiba-pr" className="text-primary hover:underline">
+                  Curitiba
+                </Link>{" "}
+                e{" "}
+                <Link
+                  href="/cidade/porto-alegre-rs"
+                  className="text-primary hover:underline"
+                >
+                  Porto Alegre
+                </Link>
+                .
               </p>
 
               <p>
                 Não sabe por onde começar? Veja{" "}
-                <Link href="/como-funciona" className="text-primary hover:underline">como funciona o Figurinha Fácil</Link>{" "}
+                <Link href="/como-funciona" className="text-primary hover:underline">
+                  como funciona o Figurinha Fácil
+                </Link>{" "}
                 e comece a trocar figurinhas hoje mesmo.
               </p>
             </div>
@@ -425,8 +444,8 @@ export default async function CityPage({ params }: CityPageProps) {
               Pronto para começar a trocar em {city.name}?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Cadastre-se gratuitamente e encontre colecionadores na sua região
-              hoje mesmo.
+              Cadastre-se gratuitamente e encontre colecionadores na sua região hoje
+              mesmo.
             </p>
             <Button size="lg" asChild>
               <Link href="/sign-up">

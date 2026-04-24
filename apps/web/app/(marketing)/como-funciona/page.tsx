@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, CheckCircle, Users, MapPin, RefreshCw, Shield } from "lucide-react";
+import { JsonLd } from "@/components/json-ld";
+import {
+  BASE_URL,
+  generateBreadcrumbSchema,
+  generateFAQSchema,
+  GEO_OPTIMIZED_FAQS,
+} from "@/lib/seo";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -9,15 +15,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
-import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import {
-  generateBreadcrumbSchema,
-  generateFAQSchema,
-  GEO_OPTIMIZED_FAQS,
-  BASE_URL,
-} from "@/lib/seo";
-import { JsonLd } from "@/components/json-ld";
+import { ArrowRight, CheckCircle, MapPin, RefreshCw, Shield, Users } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Como Funciona | Troque Figurinhas da Copa 2026",
@@ -124,12 +124,11 @@ export default function ComoFuncionaPage() {
 
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
-                Como funciona o{" "}
-                <span className="text-primary">Figurinha Fácil</span>
+                Como funciona o <span className="text-primary">Figurinha Fácil</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                Trocar figurinhas nunca foi tão fácil. Em poucos passos você
-                encontra colecionadores perto de você e completa seu álbum.
+                Trocar figurinhas nunca foi tão fácil. Em poucos passos você encontra
+                colecionadores perto de você e completa seu álbum.
               </p>
             </div>
           </div>
@@ -184,9 +183,7 @@ export default function ComoFuncionaPage() {
                   <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">{benefit.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {benefit.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{benefit.description}</p>
                   </div>
                 </div>
               ))}
@@ -207,27 +204,26 @@ export default function ComoFuncionaPage() {
 
               <div className="prose prose-lg dark:prose-invert">
                 <p>
-                  Para garantir uma experiência segura ao trocar figurinhas,
-                  siga estas recomendações:
+                  Para garantir uma experiência segura ao trocar figurinhas, siga estas
+                  recomendações:
                 </p>
                 <ul>
                   <li>
-                    <strong>Escolha locais públicos:</strong> Prefira realizar
-                    trocas em locais movimentados como shoppings, praças ou
-                    pontos de troca conhecidos.
+                    <strong>Escolha locais públicos:</strong> Prefira realizar trocas em
+                    locais movimentados como shoppings, praças ou pontos de troca
+                    conhecidos.
                   </li>
                   <li>
-                    <strong>Verifique as figurinhas:</strong> Antes de confirmar
-                    a troca, verifique se as figurinhas estão em bom estado.
+                    <strong>Verifique as figurinhas:</strong> Antes de confirmar a troca,
+                    verifique se as figurinhas estão em bom estado.
                   </li>
                   <li>
-                    <strong>Confira a quantidade:</strong> Conte as figurinhas
-                    antes de finalizar a troca para garantir que tudo está
-                    correto.
+                    <strong>Confira a quantidade:</strong> Conte as figurinhas antes de
+                    finalizar a troca para garantir que tudo está correto.
                   </li>
                   <li>
-                    <strong>Vá acompanhado:</strong> Quando possível, leve um
-                    amigo ou familiar, especialmente em primeiras trocas.
+                    <strong>Vá acompanhado:</strong> Quando possível, leve um amigo ou
+                    familiar, especialmente em primeiras trocas.
                   </li>
                 </ul>
               </div>
@@ -261,31 +257,31 @@ export default function ComoFuncionaPage() {
             </h2>
             <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
               <Button variant="outline" asChild>
-                <Link href="/cidade/sao-paulo">
+                <Link href="/cidade/sao-paulo-sp">
                   <MapPin className="mr-2 h-4 w-4" />
                   São Paulo
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/cidade/rio-de-janeiro">
+                <Link href="/cidade/rio-de-janeiro-rj">
                   <MapPin className="mr-2 h-4 w-4" />
                   Rio de Janeiro
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/cidade/belo-horizonte">
+                <Link href="/cidade/belo-horizonte-mg">
                   <MapPin className="mr-2 h-4 w-4" />
                   Belo Horizonte
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/cidade/curitiba">
+                <Link href="/cidade/curitiba-pr">
                   <MapPin className="mr-2 h-4 w-4" />
                   Curitiba
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/cidade/porto-alegre">
+                <Link href="/cidade/porto-alegre-rs">
                   <MapPin className="mr-2 h-4 w-4" />
                   Porto Alegre
                 </Link>
