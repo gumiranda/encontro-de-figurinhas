@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link2, Share2, MessageCircle } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 
@@ -13,6 +13,11 @@ interface ShareRailProps {
 
 export function ShareRail({ title, url, className, style }: ShareRailProps) {
   const [copied, setCopied] = useState(false);
+  const [hasNativeShare, setHasNativeShare] = useState(false);
+
+  useEffect(() => {
+    setHasNativeShare(typeof navigator !== "undefined" && "share" in navigator);
+  }, []);
 
   const handleCopyLink = async () => {
     try {
@@ -46,8 +51,6 @@ export function ShareRail({ title, url, className, style }: ShareRailProps) {
       if (err instanceof Error && err.name === "AbortError") return;
     }
   };
-
-  const hasNativeShare = typeof navigator !== "undefined" && "share" in navigator;
 
   return (
     <aside className={`share-rail ${className ?? ""}`} style={style}>

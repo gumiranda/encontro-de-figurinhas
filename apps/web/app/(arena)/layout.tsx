@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Providers } from "@/components/providers";
 import { MobileBottomNav } from "@/modules/shared/ui/components/mobile-bottom-nav";
 
 export const metadata: Metadata = {
@@ -21,11 +22,15 @@ export default function ArenaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
-      <div className="pb-24 lg:pb-0">{children}</div>
-      <Suspense fallback={<MobileNavSkeleton />}>
-        <MobileBottomNav />
-      </Suspense>
-    </div>
+    <Suspense>
+      <Providers>
+        <div className="dark min-h-screen bg-background text-foreground">
+          <div className="pb-24 lg:pb-0">{children}</div>
+          <Suspense fallback={<MobileNavSkeleton />}>
+            <MobileBottomNav />
+          </Suspense>
+        </div>
+      </Providers>
+    </Suspense>
   );
 }
