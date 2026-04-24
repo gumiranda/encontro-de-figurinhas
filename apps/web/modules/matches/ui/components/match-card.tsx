@@ -18,7 +18,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { formatDistanceKmLabel, roundDistanceKmHalf } from "../../lib/format-match-distance";
 import { MatchCardActions } from "./match-card-actions";
 import { MatchDicebearAvatar } from "./match-dicebear-avatar";
-import { MatchTradeDrawer } from "./match-trade-drawer";
+import { MatchTradeModal } from "./match-trade-modal";
 
 export type MatchCardProps = {
   match: ListMyMatchRow;
@@ -32,7 +32,7 @@ function stickerSampleLabel(nums: number[], max = 5): string {
 }
 
 export function MatchCard({ match, variant = "default", className }: MatchCardProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const isElite = variant === "elite";
   const avatarSize = isElite ? 52 : 40;
   const distanceKm = roundDistanceKmHalf(match.distanceKm);
@@ -101,7 +101,7 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
             <span aria-hidden>·</span>
             <span>{match.confirmedTradesCount} trocas</span>
           </div>
-          <Button size="sm" onClick={() => setDrawerOpen(true)}>
+          <Button size="sm" onClick={() => setModalOpen(true)}>
             <MessageCircle className="mr-1.5 size-3.5" />
             Propor troca
           </Button>
@@ -110,23 +110,26 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
     </Card>
   );
 
-  const cardWithDrawer = (
+  const cardWithModal = (
     <>
       {inner}
-      <MatchTradeDrawer
-        matchedUserId={match.matchedUserId}
-        matchedUserNickname={match.displayNickname}
-        tradePointId={match.tradePointId}
-        theyHaveINeed={match.theyHaveINeed}
-        iHaveTheyNeed={match.iHaveTheyNeed}
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-      />
+      {modalOpen && (
+        <MatchTradeModal
+          matchedUserId={match.matchedUserId}
+          matchedUserNickname={match.displayNickname}
+          tradePointId={match.tradePointId}
+          distanceKm={distanceKm}
+          albumPct={match.albumCompletionPct}
+          tradesCount={match.confirmedTradesCount}
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+        />
+      )}
     </>
   );
 
   if (!isElite) {
-    return cardWithDrawer;
+    return cardWithModal;
   }
 
   return (
@@ -136,7 +139,7 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
         className
       )}
     >
-      <div className="rounded-[calc(1rem-1px)] bg-card">{cardWithDrawer}</div>
+      <div className="rounded-[calc(1rem-1px)] bg-card">{cardWithModal}</div>
     </div>
   );
 }

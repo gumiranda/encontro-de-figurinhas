@@ -783,3 +783,154 @@ export const backfillTradePointType = internalMutation({
     return { touched, done: page.isDone };
   },
 });
+
+const MAX_STICKERS_OVERLAP = 30;
+
+function countBy(arr: number[]): Map<number, number> {
+  const map = new Map<number, number>();
+  for (const n of arr) map.set(n, (map.get(n) ?? 0) + 1);
+  return map;
+}
+
+export type StickerWithQty = { num: number; qty: number };
+
+export type FullStickerOverlapResult = {
+  theyHaveINeed: StickerWithQty[];
+  iHaveTheyNeed: StickerWithQty[];
+  sections: {
+    code: string;
+    name: string;
+    startNumber: number;
+    endNumber: number;
+    goldenNumbers: number[];
+    legendNumbers: number[];
+  }[];
+  matchedUser: {
+    displayNickname: string;
+    avatarSeed: string;
+    albumCompletionPct: number;
+    confirmedTradesCount: number;
+    distanceKm: number;
+  };
+};
+
+export const getFullStickerOverlap = query({
+  args: {
+    matchedUserId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      theyHaveINeed: v.array(v.object({ num: v.number(), qty: v.number() })),
+      iHaveTheyNeed: v.array(v.object({ num: v.number(), qty: v.number() })),
+      sections: v.array(
+        v.object({
+          code: v.string(),
+          name: v.string(),
+          startNumber: v.number(),
+          endNumber: v.number(),
+          goldenNumbers: v.array(v.number()),
+          legendNumbers: v.array(v.number()),
+        })
+      ),
+      matchedUser: v.object({
+        displayNickname: v.string(),
+        avatarSeed: v.string(),
+        albumCompletionPct: v.number(),
+        confirmedTradesCount: v.number(),
+        distanceKm: v.number(),
+      }),
+    })
+  ),
+  handler: async (ctx, { matchedUserId, tradePointId }): Promise<FullStickerOverlapResult | null> => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") return null;
+    const me = auth.user;
+    if (me.isShadowBanned === true) return null;
+
+    const matchedUser = await ctx.db.get(matchedUserId);
+    if (!matchedUser) return null;
+    if (matchedUser.isBanned === true) return null;
+    if (matchedUser.isShadowBanned === true) return null;
+    if (matchedUser.deletionPending === true) return null;
+
+    const tradePoint = await ctx.db.get(tradePointId);
+    if (!tradePoint || tradePoint.status !== "approved") return null;
+
+    const precomputed = await ctx.db
+      .query("precomputedMatches")
+      .withIndex("by_user_point", (q) =>
+        q.eq("userId", me._id).eq("tradePointId", tradePointId)
+      )
+      .filter((q) => q.eq(q.field("matchedUserId"), matchedUserId))
+      .first();
+
+    let theyHaveINeedNums: number[];
+    let iHaveTheyNeedNums: number[];
+    let distanceKm: number;
+
+    if (precomputed) {
+      theyHaveINeedNums = precomputed.theyHaveINeed;
+      iHaveTheyNeedNums = precomputed.iHaveTheyNeed;
+      distanceKm = precomputed.distanceKm;
+    } else {
+      if (!matchedUser.hasCompletedStickerSetup) return null;
+      const theirDup = new Set(matchedUser.duplicates ?? []);
+      const theirMiss = new Set(matchedUser.missing ?? []);
+
+      theyHaveINeedNums = [];
+      for (const n of me.missing ?? []) {
+        if (theirDup.has(n)) theyHaveINeedNums.push(n);
+      }
+      theyHaveINeedNums.sort((a, b) => a - b);
+
+      iHaveTheyNeedNums = [];
+      for (const n of me.duplicates ?? []) {
+        if (theirMiss.has(n)) iHaveTheyNeedNums.push(n);
+      }
+      iHaveTheyNeedNums.sort((a, b) => a - b);
+
+      distanceKm = 0;
+      if (me.lat != null && me.lng != null && matchedUser.lat != null && matchedUser.lng != null) {
+        distanceKm = roundDistanceKmHalf(haversine(me.lat, me.lng, matchedUser.lat, matchedUser.lng));
+      }
+    }
+
+    const theirDupCounts = countBy(matchedUser.duplicates ?? []);
+    const myDupCounts = countBy(me.duplicates ?? []);
+
+    const theyHaveINeed: StickerWithQty[] = theyHaveINeedNums
+      .slice(0, MAX_STICKERS_OVERLAP)
+      .map((num) => ({ num, qty: theirDupCounts.get(num) ?? 1 }));
+
+    const iHaveTheyNeed: StickerWithQty[] = iHaveTheyNeedNums
+      .slice(0, MAX_STICKERS_OVERLAP)
+      .map((num) => ({ num, qty: myDupCounts.get(num) ?? 1 }));
+
+    const albumConfig = await ctx.db.query("albumConfig").first();
+    const sections = (albumConfig?.sections ?? [])
+      .filter((s) => !s.isExtra)
+      .map((s) => ({
+        code: s.code,
+        name: s.name,
+        startNumber: s.startNumber,
+        endNumber: s.endNumber,
+        goldenNumbers: s.goldenNumbers ?? [],
+        legendNumbers: (s.legendNumbers ?? []).map((l) => l.number),
+      }));
+
+    return {
+      theyHaveINeed,
+      iHaveTheyNeed,
+      sections,
+      matchedUser: {
+        displayNickname: matchedUser.displayNickname ?? matchedUser.nickname ?? matchedUser.name,
+        avatarSeed: matchedUserId,
+        albumCompletionPct: matchedUser.albumProgress ?? 0,
+        confirmedTradesCount: matchedUser.totalTrades ?? 0,
+        distanceKm,
+      },
+    };
+  },
+});
