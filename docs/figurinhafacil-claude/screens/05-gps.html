@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>05 · GPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+.gm { position:absolute; inset:0; padding:56px 24px 32px; display:flex; flex-direction:column;
+  background: radial-gradient(700px 500px at 50% 30%, rgba(55,102,255,.18), transparent 60%), var(--bg); overflow:auto;}
+.gm::-webkit-scrollbar{display:none;}
+.gm .radar-wrap { position:relative; height:240px; margin:24px auto 20px; width:240px;}
+.gm .radar { width:100%; height:100%; border-radius:50%; background:
+  radial-gradient(circle at center, rgba(149,170,255,.15), transparent 60%); border:1px solid rgba(149,170,255,.2); position:relative;}
+.gm .radar .ring { position:absolute; border-radius:50%; border:1px solid rgba(149,170,255,.15); top:50%; left:50%; transform:translate(-50%,-50%);}
+.gm .radar .r1 { width:70%; height:70%;}
+.gm .radar .r2 { width:40%; height:40%;}
+.gm .radar .me { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:16px; height:16px; border-radius:50%; background:var(--primary); box-shadow:0 0 0 6px rgba(149,170,255,.25), 0 0 20px rgba(149,170,255,.6);}
+.gm .radar .sweep { position:absolute; inset:0; border-radius:50%; background: conic-gradient(from 0deg, transparent 85%, rgba(79,243,37,.4) 95%, transparent 100%); animation: sweep 3s linear infinite;}
+@keyframes sweep { to { transform: rotate(360deg);}}
+.gm .pin-dot { position:absolute; width:8px; height:8px; border-radius:50%; background:var(--secondary); box-shadow:0 0 8px var(--secondary);}
+.gm .pin-dot.d1 { top:30%; left:22%;} .gm .pin-dot.d2 { top:20%; right:30%;} .gm .pin-dot.d3 { bottom:25%; right:18%; background:var(--tertiary); box-shadow:0 0 8px var(--tertiary);} .gm .pin-dot.d4 { bottom:30%; left:30%;}
+.gm h1 { font-size:28px; font-weight:900; line-height:1.05; text-align:center; margin-bottom:8px;}
+.gm h1 em { font-style:normal; background:linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.gm p.sub { color:var(--on-surface-variant); font-size:13px; text-align:center; margin-bottom:20px;}
+
+.detected-card { background:var(--surface-container); border:1px solid var(--secondary); border-radius:16px; padding:16px; margin-bottom:16px; display:flex; align-items:center; gap:12px;}
+.detected-card .ico { width:40px; height:40px; border-radius:12px; background:rgba(79,243,37,.15); color:var(--secondary); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.detected-card .t { font-family:var(--font-headline); font-weight:700; font-size:15px; }
+.detected-card .d { color:var(--on-surface-variant); font-size:12px; }
+
+.or-row { display:flex; align-items:center; gap:10px; margin:16px 0; color:var(--outline); font-size:10px; font-family:var(--font-headline); font-weight:700; letter-spacing:.2em; text-transform:uppercase;}
+.or-row::before,.or-row::after { content:''; flex:1; height:1px; background:var(--outline-variant);}
+
+.city-list { display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+.city-row { display:flex; align-items:center; gap:12px; padding:12px; background:var(--surface-container); border:1px solid var(--outline-variant); border-radius:12px; cursor:pointer;}
+.city-row:hover { border-color:var(--primary);}
+.city-row .pin { width:32px; height:32px; border-radius:10px; background:var(--surface-container-high); display:flex; align-items:center; justify-content:center; color:var(--primary);}
+.city-row .n { flex:1; font-family:var(--font-headline); font-weight:700; font-size:14px;}
+.city-row .n small { display:block; font-weight:500; color:var(--on-surface-variant); font-size:11px;}
+.city-row .c { color:var(--outline); font-size:11px; font-family:'JetBrains Mono',monospace;}
+
+.gd { position:absolute; inset:0; display:grid; grid-template-columns: 1fr 1fr; }
+.gd .left { padding:64px 56px; background: radial-gradient(500px 400px at 30% 30%, rgba(55,102,255,.15), transparent 60%), var(--bg); display:flex; flex-direction:column; justify-content:center;}
+.gd .right { background:var(--surface-container-low); border-left:1px solid var(--outline-variant); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;}
+.gd .right .radar-wrap { width:420px; height:420px; position:relative;}
+.gd .right .radar { width:100%; height:100%; border-radius:50%; border:1px solid rgba(149,170,255,.2); background: radial-gradient(circle at center, rgba(149,170,255,.12), transparent 70%); position:relative;}
+.gd .right .radar .ring { position:absolute; border-radius:50%; border:1px solid rgba(149,170,255,.15); top:50%; left:50%; transform:translate(-50%,-50%);}
+.gd .right .radar .r1 { width:75%; height:75%;}
+.gd .right .radar .r2 { width:50%; height:50%;}
+.gd .right .radar .r3 { width:25%; height:25%;}
+.gd .right .radar .me { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:24px; height:24px; border-radius:50%; background:var(--primary); box-shadow:0 0 0 10px rgba(149,170,255,.2), 0 0 30px rgba(149,170,255,.6);}
+.gd .right .radar .sweep { position:absolute; inset:0; border-radius:50%; background: conic-gradient(from 0deg, transparent 85%, rgba(79,243,37,.3) 95%, transparent 100%); animation: sweep 3s linear infinite;}
+.gd .right .pin-dot { position:absolute; width:12px; height:12px; border-radius:50%; box-shadow:0 0 10px currentColor;}
+.gd .right .p1 { top:25%; left:28%; background:var(--secondary); color:var(--secondary);}
+.gd .right .p2 { top:22%; right:30%; background:var(--tertiary); color:var(--tertiary);}
+.gd .right .p3 { bottom:20%; right:20%; background:var(--secondary); color:var(--secondary);}
+.gd .right .p4 { bottom:28%; left:22%; background:var(--primary); color:var(--primary);}
+
+.gd h1 { font-size:48px; line-height:1; font-weight:900; margin-bottom:16px;}
+.gd h1 em { font-style:normal; background:linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.gd p.sub { color:var(--on-surface-variant); font-size:15px; margin-bottom:28px; max-width:440px;}
+</style></head><body>
+<div class="page-canvas">
+  <div class="top"><a class="brand" href="../index.html"><span class="dot"></span><span class="name">Figurinha Fácil</span></a><div class="crumb">05 / 11 · <b>GPS / Localização</b></div></div>
+  <div class="page-head"><div><h1>GPS · <em>Localização</em></h1><p>Detecção automática com fallback para busca manual. Radar visual contextualiza "trocas perto de você".</p></div><div class="meta"><span class="chip"><span class="bullet"></span>MOBILE</span><span class="chip">DESKTOP</span><span class="chip">2 VARIAÇÕES</span></div></div>
+
+  <div class="frames">
+    <div class="frame-col">
+      <div class="label">Mobile · Detecção automática</div>
+      <div class="mobile-frame" data-tweak="gps" data-variant="default">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="mobile-statusbar"><span>9:41</span><span class="right"><span class="material-symbols-outlined" style="font-size:16px">signal_cellular_alt</span><span class="material-symbols-outlined" style="font-size:16px">wifi</span><span class="material-symbols-outlined" style="font-size:16px">battery_full</span></span></div>
+          <div class="gm">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><button class="btn-icon btn-ghost" style="width:36px;height:36px"><span class="material-symbols-outlined">close</span></button><span style="color:var(--outline); font-family:'JetBrains Mono',monospace; font-size:11px;">3 / 3</span></div>
+            <div class="radar-wrap">
+              <div class="radar">
+                <div class="ring r1"></div><div class="ring r2"></div>
+                <div class="sweep"></div>
+                <div class="pin-dot d1"></div><div class="pin-dot d2"></div><div class="pin-dot d3"></div><div class="pin-dot d4"></div>
+                <div class="me"></div>
+              </div>
+            </div>
+            <h1>Onde você <em>troca?</em></h1>
+            <p class="sub">Mostramos pontos e colecionadores próximos.</p>
+
+            <div class="detected-card">
+              <div class="ico"><span class="material-symbols-outlined">my_location</span></div>
+              <div style="flex:1"><div class="t">Detectamos: <span style="color:var(--secondary)">São Paulo</span></div><div class="d">Vila Madalena · ~320m de você</div></div>
+              <span class="pill pill-success">OK</span>
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%"><span class="material-symbols-outlined">check</span>Usar essa cidade</button>
+
+            <div class="or-row">ou escolher outra</div>
+            <div class="input-wrap" style="margin-bottom:12px;"><span class="material-symbols-outlined" style="color:var(--outline)">search</span><input placeholder="Digite uma cidade..."></div>
+            <div class="city-list">
+              <div class="city-row"><span class="pin"><span class="material-symbols-outlined" style="font-size:18px">location_on</span></span><div class="n">Rio de Janeiro <small>RJ · 1.840 colec.</small></div><span class="c">→</span></div>
+              <div class="city-row"><span class="pin"><span class="material-symbols-outlined" style="font-size:18px">location_on</span></span><div class="n">Belo Horizonte <small>MG · 942 colec.</small></div><span class="c">→</span></div>
+              <div class="city-row"><span class="pin"><span class="material-symbols-outlined" style="font-size:18px">location_on</span></span><div class="n">Curitiba <small>PR · 418 colec.</small></div><span class="c">→</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame-col">
+      <div class="label">Desktop · Split com radar</div>
+      <div class="desktop-frame">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="url">figurinhafacil.com.br/localizacao</div></div>
+        <div class="viewport" data-tweak="gps" data-variant="default">
+          <div class="gd">
+            <div class="left">
+              <div style="display:flex;align-items:center;gap:10px; margin-bottom:32px;"><span style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dim));display:flex;align-items:center;justify-content:center;color:var(--on-primary)"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span><span style="font-family:var(--font-headline);font-weight:800;font-size:16px">Figurinha Fácil</span></div>
+              <span style="font-family:'JetBrains Mono',monospace; color:var(--outline); font-size:12px; margin-bottom:16px;">PASSO 03 / 03</span>
+              <h1>Onde você <em>troca?</em></h1>
+              <p class="sub">Isso ajuda a mostrar matches perto de você. Você pode mudar depois.</p>
+
+              <div class="detected-card">
+                <div class="ico" style="width:48px;height:48px;border-radius:14px;"><span class="material-symbols-outlined" style="font-size:28px">my_location</span></div>
+                <div style="flex:1"><div class="t" style="font-size:17px;">Detectamos: <span style="color:var(--secondary)">São Paulo · Vila Madalena</span></div><div class="d" style="margin-top:4px">Baseado no seu IP e GPS · ~320m de precisão · 186 pontos ativos</div></div>
+                <span class="pill pill-success">Detectado</span>
+              </div>
+              <div style="display:flex; gap:10px; margin-bottom:24px;">
+                <button class="btn btn-primary btn-lg" style="flex:1"><span class="material-symbols-outlined">check</span>Usar essa cidade</button>
+                <button class="btn btn-ghost btn-lg"><span class="material-symbols-outlined">refresh</span></button>
+              </div>
+
+              <div class="or-row">ou busque outra</div>
+              <div class="input-wrap" style="margin-bottom:12px;"><span class="material-symbols-outlined" style="color:var(--outline)">search</span><input placeholder="Digite o nome da cidade..."></div>
+              <div class="city-list">
+                <div class="city-row"><span class="pin"><span class="material-symbols-outlined" style="font-size:18px">location_on</span></span><div class="n">Rio de Janeiro <small>RJ · 1.840 colec. · 112 pontos</small></div><span class="c">→</span></div>
+                <div class="city-row"><span class="pin"><span class="material-symbols-outlined" style="font-size:18px">location_on</span></span><div class="n">Belo Horizonte <small>MG · 942 colec. · 58 pontos</small></div><span class="c">→</span></div>
+              </div>
+            </div>
+            <div class="right">
+              <div class="radar-wrap">
+                <div class="radar">
+                  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+                  <div class="sweep"></div>
+                  <div class="pin-dot p1"></div><div class="pin-dot p2"></div><div class="pin-dot p3"></div><div class="pin-dot p4"></div>
+                  <div class="me"></div>
+                </div>
+                <div style="position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); text-align:center;">
+                  <div style="font-family:var(--font-headline); font-weight:800; font-size:20px; color:var(--secondary);">186 pontos</div>
+                  <div style="color:var(--on-surface-variant); font-size:12px; font-family:'JetBrains Mono',monospace;">num raio de 5km</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tweaks-panel open"><h4>Tweaks · GPS</h4>
+  <div class="tweaks-group"><label>Estado</label>
+    <div class="tweaks-seg" data-key="gps" data-attr="data-variant">
+      <button class="active" data-value="default">Detectado</button>
+      <button data-value="searching">Buscando</button>
+    </div></div>
+</div>
+<script src="../shared/tweaks.js"></script>
+</body></html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categorias & Mídia · Admin | Figurinha Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+body { background: var(--surface-dim); }
+.admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100dvh; }
+@media (max-width: 900px) { .admin-shell { grid-template-columns: 1fr; } }
+
+.sidebar { background: var(--surface-container-low); border-right: 1px solid rgba(255,255,255,.05); padding: 20px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100dvh; }
+@media (max-width: 900px) { .sidebar { position: static; height: auto; } }
+.sb-brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 28px; }
+.sb-section { font-family: 'Space Grotesk'; font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--outline); padding: 0 10px; margin: 20px 0 8px; }
+.sb-nav { display: flex; flex-direction: column; gap: 2px; }
+.sb-link { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 10px; font-size: .88rem; color: var(--on-surface-variant); transition: all .2s; font-weight: 500; }
+.sb-link:hover { background: rgba(255,255,255,.04); color: var(--on-surface); }
+.sb-link.active { background: rgba(149,170,255,.1); color: var(--primary); font-weight: 600; }
+.sb-link .badge { margin-left: auto; padding: 2px 7px; border-radius: 9999px; background: var(--surface-container-high); font-size: .68rem; font-family: 'Space Grotesk'; font-weight: 600; color: var(--on-surface-variant); }
+
+.admin-main { padding: 28px clamp(16px, 3vw, 40px); max-width: 1400px; }
+.page-head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.page-head h1 { font-family: 'Space Grotesk'; font-size: 2rem; font-weight: 700; letter-spacing: -0.025em; }
+.page-head p { color: var(--on-surface-variant); margin-top: 4px; }
+
+/* Main layout: two-column */
+.section-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-top: 36px;
+}
+@media (min-width: 1080px) { .section-split { grid-template-columns: 1.25fr 1fr; } }
+
+.block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.block-head h2 { font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.015em; }
+.block-head .sub { font-size: .8rem; color: var(--on-surface-variant); margin-top: 3px; }
+
+/* Categories tree */
+.cat-tree { display: flex; flex-direction: column; gap: 8px; }
+.cat-row {
+  display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.05);
+  transition: all .25s;
+}
+.cat-row:hover { border-color: rgba(149,170,255,.18); }
+.cat-row.child { margin-left: 32px; background: var(--surface-container-low); }
+.cat-drag { color: var(--outline); cursor: grab; padding: 2px; }
+.cat-icon-box { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: var(--on-surface); flex: 0 0 auto; }
+
+.cat-title { font-family: 'Space Grotesk'; font-weight: 700; font-size: .95rem; letter-spacing: -0.01em; }
+.cat-slug { font-family: 'JetBrains Mono'; font-size: .72rem; color: var(--on-surface-variant); margin-top: 2px; }
+.cat-meta { display: flex; gap: 14px; color: var(--on-surface-variant); font-size: .78rem; }
+.cat-meta strong { color: var(--on-surface); font-family: 'Space Grotesk'; font-weight: 700; }
+
+.cat-swatch { width: 10px; height: 32px; border-radius: 4px; }
+.action-btn { width: 30px; height: 30px; border-radius: 8px; display: inline-grid; place-items: center; color: var(--on-surface-variant); background: transparent; transition: all .2s; }
+.action-btn:hover { background: rgba(255,255,255,.05); color: var(--primary); }
+
+.add-cat { padding: 14px 16px; border-radius: 14px; border: 1px dashed rgba(255,255,255,.12); color: var(--outline); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; font-family: 'Space Grotesk'; font-weight: 600; }
+.add-cat:hover { border-color: var(--primary); color: var(--primary); background: rgba(149,170,255,.04); }
+
+/* Tags cloud */
+.tags-cloud { padding: 18px; border-radius: 16px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.04); display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-bubble { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9999px; background: var(--surface-container-high); color: var(--on-surface); font-family: 'Space Grotesk'; font-weight: 600; font-size: .78rem; transition: all .2s; border: 1px solid rgba(255,255,255,.04); }
+.tag-bubble:hover { border-color: rgba(149,170,255,.25); color: var(--primary); }
+.tag-bubble .num { color: var(--on-surface-variant); font-weight: 500; font-size: .7rem; }
+
+/* --- MEDIA --- */
+.media-section { margin-top: 56px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,.06); }
+
+.media-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+.media-search { flex: 1; min-width: 240px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.06); }
+.media-search input { flex: 1; }
+.filter-pills { display: flex; gap: 6px; }
+.filter-pill { padding: 7px 14px; border-radius: 9999px; background: var(--surface-container); font-family: 'Space Grotesk'; font-weight: 600; font-size: .78rem; color: var(--on-surface-variant); border: 1px solid rgba(255,255,255,.05); transition: all .2s; }
+.filter-pill:hover { color: var(--on-surface); }
+.filter-pill.active { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+
+/* Upload dropzone */
+.upload-dz {
+  margin-top: 20px;
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--surface-container-low);
+  border: 2px dashed rgba(149,170,255,.2);
+  display: flex; align-items: center; gap: 20px;
+  transition: all .25s;
+}
+.upload-dz:hover { border-color: rgba(149,170,255,.4); background: rgba(149,170,255,.04); }
+.upload-dz .ic { width: 56px; height: 56px; border-radius: 14px; background: rgba(149,170,255,.1); color: var(--primary); display: grid; place-items: center; flex: 0 0 auto; }
+.upload-dz h4 { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+.upload-dz p { font-size: .85rem; color: var(--on-surface-variant); margin-top: 3px; }
+.upload-dz .hint { margin-top: 10px; font-size: .72rem; color: var(--outline); font-family: 'JetBrains Mono'; }
+
+/* Media grid */
+.media-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.media-card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .25s;
+  cursor: pointer;
+}
+.media-card:hover { transform: translateY(-2px); border-color: rgba(149,170,255,.3); }
+.media-card.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(149,170,255,.3); }
+.media-card img { width: 100%; height: 100%; object-fit: cover; }
+.media-card .overlay-top { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; }
+.media-card .check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(255,255,255,.4); background: rgba(0,0,0,.4); backdrop-filter: blur(6px); display: grid; place-items: center; transition: all .2s; }
+.media-card.selected .check { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.media-card .type-pill { padding: 2px 7px; border-radius: 6px; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); font-family: 'JetBrains Mono'; font-size: .62rem; color: #fff; font-weight: 600; }
+.media-card .meta { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 12px 10px; background: linear-gradient(180deg, transparent, rgba(9,14,28,.95)); color: #fff; }
+.media-card .meta .name { font-family: 'Space Grotesk'; font-size: .76rem; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.media-card .meta .size { font-size: .68rem; opacity: .7; margin-top: 2px; }
+
+.media-stats { margin-top: 24px; padding: 16px 20px; border-radius: 14px; background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.04); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.stat-inline { display: flex; flex-direction: column; font-size: .78rem; color: var(--on-surface-variant); }
+.stat-inline strong { font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 700; color: var(--on-surface); letter-spacing: -0.01em; }
+
+.usage-bar { width: 240px; height: 8px; border-radius: 9999px; background: var(--surface-container-high); overflow: hidden; margin-top: 6px; }
+.usage-bar .fill { height: 100%; width: 42%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 9999px; }
+</style>
+</head>
+<body>
+<div class="admin-shell">
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <span class="brand-mark" style="width:30px;height:30px;"><span class="material-symbols-outlined" style="font-size:18px">stadium</span></span>
+    <div><div class="brand-name" style="font-size:.95rem;">Figurinha <span>Fácil</span></div><div style="font-size:.65rem; color:var(--tertiary); letter-spacing:.12em; text-transform:uppercase; font-family:'Space Grotesk'; font-weight:700;">Admin</div></div>
+  </div>
+
+  <div class="sb-section">Conteúdo</div>
+  <nav class="sb-nav">
+    <a href="admin-posts.html" class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">article</span>Posts<span class="badge">142</span></a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">drafts</span>Rascunhos<span class="badge">8</span></a>
+    <a class="sb-link active"><span class="material-symbols-outlined" style="font-size:20px">sell</span>Categorias</a>
+    <a class="sb-link active" style="margin-top:-2px;"><span class="material-symbols-outlined" style="font-size:20px">image</span>Mídia</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">forum</span>Comentários<span class="badge">24</span></a>
+  </nav>
+
+  <div class="sb-section">Distribuição</div>
+  <nav class="sb-nav">
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">mail</span>Newsletter</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">analytics</span>Analytics</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">search</span>SEO</a>
+  </nav>
+
+  <div class="sb-section">Time</div>
+  <nav class="sb-nav">
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">group</span>Autores</a>
+    <a class="sb-link"><span class="material-symbols-outlined" style="font-size:20px">settings</span>Configurações</a>
+  </nav>
+
+  <div style="margin-top: auto; padding: 10px; border-radius: 12px; background: var(--surface-container); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.04);">
+    <div class="avatar">LG</div>
+    <div style="flex:1; min-width:0;"><div style="font-family:'Space Grotesk'; font-weight:600; font-size:.85rem;">Lucas Garcia</div><div style="font-size:.7rem; color:var(--on-surface-variant);">Editor chefe</div></div>
+    <span class="material-symbols-outlined" style="font-size:18px; color:var(--outline);">more_vert</span>
+  </div>
+</aside>
+
+<main class="admin-main">
+
+  <div class="page-head">
+    <div>
+      <nav style="display:flex; gap:8px; font-size:.78rem; color:var(--on-surface-variant); margin-bottom:8px;">
+        <span>Admin</span><span style="opacity:.4">/</span><span style="color:var(--on-surface);">Taxonomia & Mídia</span>
+      </nav>
+      <h1>Taxonomia & Mídia</h1>
+      <p>Organize a estrutura do blog e gerencie todas as imagens e arquivos.</p>
+    </div>
+  </div>
+
+  <!-- ─── CATEGORIES + TAGS ─── -->
+  <div class="section-split">
+
+    <div>
+      <div class="block-head">
+        <div>
+          <h2>Categorias</h2>
+          <div class="sub">Estrutura de navegação principal do blog · arraste para reordenar</div>
+        </div>
+        <button class="btn btn-primary btn-sm"><span class="material-symbols-outlined" style="font-size:16px">add</span>Nova categoria</button>
+      </div>
+
+      <div class="cat-tree">
+
+        <div class="cat-row">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(149,170,255,.12); color: var(--primary);"><span class="material-symbols-outlined" style="font-size:20px">menu_book</span></div>
+            <div>
+              <div class="cat-title">Guias</div>
+              <div class="cat-slug">/blog/guias</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>38</strong> posts</span><span><strong>14k</strong>/mês</span></div>
+          <div class="cat-swatch" style="background: var(--primary);"></div>
+          <div>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </div>
+        </div>
+
+        <div class="cat-row child">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(149,170,255,.07); color: var(--primary); width:28px; height:28px;"><span class="material-symbols-outlined" style="font-size:16px">subdirectory_arrow_right</span></div>
+            <div>
+              <div class="cat-title" style="font-size:.88rem;">Trocas</div>
+              <div class="cat-slug">/blog/guias/trocas</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>12</strong> posts</span></div>
+          <div></div>
+          <div><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></div>
+        </div>
+
+        <div class="cat-row child">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(149,170,255,.07); color: var(--primary); width:28px; height:28px;"><span class="material-symbols-outlined" style="font-size:16px">subdirectory_arrow_right</span></div>
+            <div>
+              <div class="cat-title" style="font-size:.88rem;">Organização</div>
+              <div class="cat-slug">/blog/guias/organizacao</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>9</strong> posts</span></div>
+          <div></div>
+          <div><button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button></div>
+        </div>
+
+        <div class="cat-row">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(79,243,37,.12); color: var(--secondary);"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></div>
+            <div>
+              <div class="cat-title">Copa 2026</div>
+              <div class="cat-slug">/blog/copa-2026</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>28</strong> posts</span><span><strong>9.2k</strong>/mês</span></div>
+          <div class="cat-swatch" style="background: var(--secondary);"></div>
+          <div>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(255,201,101,.12); color: var(--tertiary);"><span class="material-symbols-outlined" style="font-size:20px">diamond</span></div>
+            <div>
+              <div class="cat-title">Raridades</div>
+              <div class="cat-slug">/blog/raridades</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>19</strong> posts</span><span><strong>6.4k</strong>/mês</span></div>
+          <div class="cat-swatch" style="background: var(--tertiary);"></div>
+          <div>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(236,72,153,.12); color: #ec4899;"><span class="material-symbols-outlined" style="font-size:20px">history_edu</span></div>
+            <div>
+              <div class="cat-title">História</div>
+              <div class="cat-slug">/blog/historia</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>14</strong> posts</span><span><strong>3.1k</strong>/mês</span></div>
+          <div class="cat-swatch" style="background: #ec4899;"></div>
+          <div>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <span class="material-symbols-outlined cat-drag" style="font-size:18px">drag_indicator</span>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cat-icon-box" style="background: rgba(16,185,129,.12); color: #10b981;"><span class="material-symbols-outlined" style="font-size:20px">record_voice_over</span></div>
+            <div>
+              <div class="cat-title">Entrevistas</div>
+              <div class="cat-slug">/blog/entrevistas</div>
+            </div>
+          </div>
+          <div class="cat-meta"><span><strong>11</strong> posts</span><span><strong>2.8k</strong>/mês</span></div>
+          <div class="cat-swatch" style="background: #10b981;"></div>
+          <div>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button>
+            <button class="action-btn"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button>
+          </div>
+        </div>
+
+        <button class="add-cat"><span class="material-symbols-outlined" style="font-size:18px">add</span>Adicionar categoria</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="block-head">
+        <div>
+          <h2>Tags em alta</h2>
+          <div class="sub">64 tags · tamanho proporcional ao uso</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">Ver todas</button>
+      </div>
+      <div class="tags-cloud">
+        <a class="tag-bubble" style="font-size: 1.2rem;">copa-2026 <span class="num">142</span></a>
+        <a class="tag-bubble" style="font-size: 1.05rem;">trocas <span class="num">87</span></a>
+        <a class="tag-bubble" style="font-size: 1rem;">figurinhas-raras <span class="num">64</span></a>
+        <a class="tag-bubble" style="font-size: .95rem;">iniciantes <span class="num">52</span></a>
+        <a class="tag-bubble" style="font-size: .88rem;">holograficas <span class="num">43</span></a>
+        <a class="tag-bubble">mercado <span class="num">38</span></a>
+        <a class="tag-bubble">selecao-brasileira <span class="num">34</span></a>
+        <a class="tag-bubble">seguranca <span class="num">29</span></a>
+        <a class="tag-bubble">organizacao <span class="num">26</span></a>
+        <a class="tag-bubble">historia <span class="num">21</span></a>
+        <a class="tag-bubble">pontos-verificados <span class="num">19</span></a>
+        <a class="tag-bubble">entrevista <span class="num">15</span></a>
+        <a class="tag-bubble">1970 <span class="num">12</span></a>
+        <a class="tag-bubble">album-ouro <span class="num">10</span></a>
+        <a class="tag-bubble">identificacao <span class="num">8</span></a>
+        <a class="tag-bubble">falsificacao <span class="num">7</span></a>
+      </div>
+
+      <!-- SEO snapshot por categoria -->
+      <div style="margin-top: 28px;">
+        <div class="block-head" style="margin-bottom:14px;">
+          <h2 style="font-size:1.05rem;">Performance por categoria</h2>
+        </div>
+        <div style="padding: 16px; border-radius: 14px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.04); display: flex; flex-direction: column; gap: 12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:9999px; background:var(--primary);"></span>
+            <span style="font-family:'Space Grotesk'; font-weight:600; font-size:.88rem; flex:1;">Guias</span>
+            <span style="font-size:.78rem; color:var(--on-surface-variant);">14.012 views</span>
+            <div style="width: 120px; height: 6px; border-radius: 9999px; background: var(--surface-container-high);"><div style="height:100%; width:88%; background:var(--primary); border-radius:9999px;"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:9999px; background:var(--secondary);"></span>
+            <span style="font-family:'Space Grotesk'; font-weight:600; font-size:.88rem; flex:1;">Copa 2026</span>
+            <span style="font-size:.78rem; color:var(--on-surface-variant);">9.231 views</span>
+            <div style="width: 120px; height: 6px; border-radius: 9999px; background: var(--surface-container-high);"><div style="height:100%; width:58%; background:var(--secondary); border-radius:9999px;"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:9999px; background:var(--tertiary);"></span>
+            <span style="font-family:'Space Grotesk'; font-weight:600; font-size:.88rem; flex:1;">Raridades</span>
+            <span style="font-size:.78rem; color:var(--on-surface-variant);">6.408 views</span>
+            <div style="width: 120px; height: 6px; border-radius: 9999px; background: var(--surface-container-high);"><div style="height:100%; width:40%; background:var(--tertiary); border-radius:9999px;"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:9999px; background:#ec4899;"></span>
+            <span style="font-family:'Space Grotesk'; font-weight:600; font-size:.88rem; flex:1;">História</span>
+            <span style="font-size:.78rem; color:var(--on-surface-variant);">3.108 views</span>
+            <div style="width: 120px; height: 6px; border-radius: 9999px; background: var(--surface-container-high);"><div style="height:100%; width:20%; background:#ec4899; border-radius:9999px;"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="width:8px; height:8px; border-radius:9999px; background:#10b981;"></span>
+            <span style="font-family:'Space Grotesk'; font-weight:600; font-size:.88rem; flex:1;">Entrevistas</span>
+            <span style="font-size:.78rem; color:var(--on-surface-variant);">2.812 views</span>
+            <div style="width: 120px; height: 6px; border-radius: 9999px; background: var(--surface-container-high);"><div style="height:100%; width:18%; background:#10b981; border-radius:9999px;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── MEDIA LIBRARY ─── -->
+  <section class="media-section">
+
+    <div class="page-head">
+      <div>
+        <h1 style="font-size:1.75rem;">Biblioteca de mídia</h1>
+        <p>Todas as imagens, vídeos e arquivos usados nos posts.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-ghost"><span class="material-symbols-outlined" style="font-size:18px">folder_open</span>Organizar</button>
+        <button class="btn btn-primary"><span class="material-symbols-outlined" style="font-size:18px">upload</span>Upload</button>
+      </div>
+    </div>
+
+    <div class="upload-dz">
+      <div class="ic"><span class="material-symbols-outlined" style="font-size:28px">cloud_upload</span></div>
+      <div style="flex:1;">
+        <h4>Arraste arquivos ou clique para enviar</h4>
+        <p>Otimização automática, conversão para WebP e geração de 3 tamanhos responsivos.</p>
+        <div class="hint">JPG, PNG, WEBP, GIF, MP4 · até 20MB por arquivo</div>
+      </div>
+      <button class="btn btn-secondary">Selecionar arquivos</button>
+    </div>
+
+    <div class="media-toolbar">
+      <div class="media-search">
+        <span class="material-symbols-outlined" style="color:var(--outline)">search</span>
+        <input type="text" placeholder="Buscar por nome, tag ou post...">
+      </div>
+      <div class="filter-pills">
+        <button class="filter-pill active">Todos<span style="opacity:.6; margin-left:4px;">487</span></button>
+        <button class="filter-pill">Imagens<span style="opacity:.6; margin-left:4px;">421</span></button>
+        <button class="filter-pill">Vídeos<span style="opacity:.6; margin-left:4px;">24</span></button>
+        <button class="filter-pill">Capas<span style="opacity:.6; margin-left:4px;">142</span></button>
+        <button class="filter-pill">Não usados<span style="opacity:.6; margin-left:4px;">12</span></button>
+      </div>
+    </div>
+
+    <div class="media-grid">
+      <div class="media-card selected">
+        <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"><span class="material-symbols-outlined" style="font-size:14px">check</span></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">cover-raras-2026.jpg</div><div class="size">240 KB · 1200×675</div></div>
+      </div>
+      <div class="media-card selected">
+        <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"><span class="material-symbols-outlined" style="font-size:14px">check</span></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">cover-trocar-seguranca.jpg</div><div class="size">186 KB · 1200×675</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">WEBP</div>
+        </div>
+        <div class="meta"><div class="name">messi-holo-detail.webp</div><div class="size">94 KB · 800×1200</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">selecao-br-pauta.jpg</div><div class="size">312 KB · 1200×800</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">trocas-em-rede.jpg</div><div class="size">221 KB · 1200×675</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">entrevista-sr-waldir.jpg</div><div class="size">195 KB · 1200×800</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">organizar-repetidas.jpg</div><div class="size">267 KB · 1200×800</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">primeiro-album.jpg</div><div class="size">148 KB · 1200×675</div></div>
+      </div>
+      <div class="media-card">
+        <div style="width:100%; height:100%; background:linear-gradient(135deg, #1a1f3a, #0b1020); display:grid; place-items:center; color:var(--primary);">
+          <span class="material-symbols-outlined" style="font-size:40px">play_circle</span>
+        </div>
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill" style="background:rgba(149,170,255,.3);">MP4</div>
+        </div>
+        <div class="meta"><div class="name">tutorial-troca-app.mp4</div><div class="size">4.2 MB · 0:42</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">ponto-fisico-sp.jpg</div><div class="size">312 KB · 1200×800</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1624280157150-4d1ed8632989?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">escudos-selecoes.jpg</div><div class="size">184 KB · 1200×675</div></div>
+      </div>
+      <div class="media-card">
+        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80" alt="">
+        <div class="overlay-top">
+          <div class="check"></div>
+          <div class="type-pill">JPG</div>
+        </div>
+        <div class="meta"><div class="name">colecionador-retrato.jpg</div><div class="size">240 KB · 1200×800</div></div>
+      </div>
+    </div>
+
+    <div class="media-stats">
+      <div class="stat-inline">Arquivos totais<strong>487</strong></div>
+      <div class="stat-inline">Selecionados<strong>2</strong></div>
+      <div class="stat-inline">Otimizados para WebP<strong>92%</strong></div>
+      <div class="stat-inline">Não usados em posts<strong style="color:var(--tertiary);">12</strong></div>
+      <div class="stat-inline" style="min-width: 240px;">
+        Armazenamento<strong>4.2 GB de 10 GB</strong>
+        <div class="usage-bar"><div class="fill"></div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

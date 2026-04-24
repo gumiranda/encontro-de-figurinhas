@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Figurinha Fácil | Guias, trocas e história do álbum da Copa 2026</title>
+<meta name="description" content="O melhor conteúdo para colecionadores: guias de trocas, história dos álbuns de Copa, rankings de figurinhas raras e histórias de torcedores pelo Brasil.">
+<meta property="og:title" content="Blog Figurinha Fácil — tudo sobre o álbum da Copa 2026">
+<meta property="og:description" content="Guias, rankings, histórias e tudo que o colecionador precisa saber.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Blog Figurinha Fácil",
+  "description": "Guias, trocas e história do álbum da Copa 2026",
+  "url": "https://figurinhafacil.com.br/blog"
+}
+</script>
+<style>
+/* ─── Hero ─── */
+.blog-hero {
+  position: relative;
+  padding: 64px 0 48px;
+  overflow: hidden;
+}
+.blog-hero::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -80px;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(149,170,255,.18), transparent 60%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+.blog-hero-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+@media (min-width: 900px) {
+  .blog-hero-grid { grid-template-columns: 1.1fr 1fr; align-items: end; }
+}
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.hero-sub {
+  margin-top: 24px;
+  max-width: 48ch;
+  color: var(--on-surface-variant);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.6;
+}
+
+.featured-card {
+  position: relative;
+  aspect-ratio: 4/5;
+  min-height: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(9,14,28,0) 30%, rgba(9,14,28,.95) 100%),
+    url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80') center/cover;
+  box-shadow: var(--shadow-ambient-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px;
+  transition: transform .5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.featured-card:hover { transform: translateY(-4px) scale(1.005); }
+.featured-card .spine {
+  position: absolute;
+  top: 24px; left: 24px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  background: var(--tertiary);
+  color: var(--on-tertiary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: .7rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.featured-card h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-top: 10px;
+  text-wrap: balance;
+}
+.featured-card .meta {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--on-surface-variant);
+  font-size: .82rem;
+  margin-top: 14px;
+}
+.featured-card .meta .dot { width: 3px; height: 3px; border-radius: 9999px; background: currentColor; opacity: .5; }
+
+/* ─── Filter bar ─── */
+.filter-bar {
+  display: flex; gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 8px 0 12px;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  border-radius: 9999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .02em;
+  color: var(--on-surface-variant);
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.06);
+  transition: all .25s ease;
+}
+.filter-chip:hover { color: var(--primary); border-color: rgba(149,170,255,.25); }
+.filter-chip.active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: transparent;
+  box-shadow: 0 0 16px rgba(149,170,255,.25);
+}
+.filter-chip .count {
+  margin-left: 6px;
+  opacity: .7;
+  font-size: .7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Post grid ─── */
+.section-head {
+  display: flex; align-items: end; justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-top: 32px;
+}
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.section-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: .85rem; }
+.section-link:hover { gap: 10px; }
+
+.post-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) { .post-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1080px) { .post-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.post-card {
+  display: flex; flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.post-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(149,170,255,.18);
+  box-shadow: var(--shadow-ambient-lg);
+}
+.post-card .thumb {
+  aspect-ratio: 16/10;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-variant);
+}
+.post-card .thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.post-card:hover .thumb img { transform: scale(1.05); }
+.post-card .thumb .cat {
+  position: absolute; top: 12px; left: 12px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  background: rgba(9, 14, 28, .8);
+  backdrop-filter: blur(8px);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.post-card .body { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.post-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.post-card .excerpt {
+  font-size: .875rem;
+  color: var(--on-surface-variant);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-card .meta {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  display: flex; align-items: center; gap: 10px;
+  font-size: .78rem;
+  color: var(--on-surface-variant);
+}
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--primary-dim), var(--secondary));
+  display: grid; place-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: .72rem;
+  color: var(--on-primary);
+  flex: 0 0 auto;
+}
+.read-time {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ─── Featured row — 2 big posts ─── */
+.big-pair {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) { .big-pair { grid-template-columns: 1fr 1fr; } }
+.big-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@media (min-width: 560px) { .big-card { grid-template-columns: 1fr 1.3fr; } }
+.big-card:hover { border-color: rgba(149,170,255,.18); transform: translateY(-2px); box-shadow: var(--shadow-ambient-lg); }
+.big-card .thumb {
+  aspect-ratio: 1/1;
+  background-size: cover;
+  background-position: center;
+  min-height: 200px;
+}
+.big-card .body { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+.big-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.big-card .excerpt { font-size: .875rem; color: var(--on-surface-variant); line-height: 1.55; }
+
+/* ─── Collection (série) ─── */
+.series-card {
+  position: relative;
+  border-radius: 24px;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 201, 101, .12), transparent 60%),
+    var(--surface-container-high);
+  border: 1px solid rgba(255, 201, 101, .15);
+  overflow: hidden;
+}
+.series-card::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255, 201, 101, .15), transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.series-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.series-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.series-episodes {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) { .series-episodes { grid-template-columns: 1fr 1fr; } }
+.episode {
+  display: flex; gap: 14px; align-items: center;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(9, 14, 28, .5);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .25s ease;
+}
+.episode:hover { border-color: rgba(255,201,101,.3); background: rgba(9,14,28,.7); }
+.episode-num {
+  width: 38px; height: 38px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--tertiary);
+  background: rgba(255, 201, 101, .08);
+  border: 1px solid rgba(255, 201, 101, .2);
+}
+.episode .info { flex: 1; min-width: 0; }
+.episode .info h4 { font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.episode .info p { font-size: .75rem; color: var(--on-surface-variant); margin-top: 3px; }
+
+/* ─── Newsletter CTA ─── */
+.newsletter {
+  position: relative;
+  padding: clamp(40px, 5vw, 64px);
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(149,170,255,.15), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(79,243,37,.1), transparent 55%),
+    var(--surface-container-high);
+  border: 1px solid rgba(149,170,255,.12);
+  text-align: center;
+}
+.newsletter h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
+  max-width: 22ch;
+  margin: 12px auto 0;
+}
+.newsletter p { max-width: 52ch; margin: 16px auto 32px; color: var(--on-surface-variant); }
+.newsletter-form {
+  display: flex; gap: 8px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 6px;
+  border-radius: 9999px;
+  background: var(--surface-container-low);
+  border: 1px solid rgba(255,255,255,.06);
+}
+.newsletter-form input {
+  flex: 1; padding: 10px 18px;
+  color: var(--on-surface);
+}
+.newsletter-form input::placeholder { color: var(--outline); }
+.newsletter-form button {
+  padding: 10px 22px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  color: var(--on-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: .85rem;
+  transition: transform .2s;
+}
+.newsletter-form button:hover { transform: translateY(-1px); }
+.newsletter-meta {
+  margin-top: 20px;
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .78rem;
+  color: var(--on-surface-variant);
+}
+
+/* ─── Trending sidebar ─── */
+.main-grid {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1080px) { .main-grid { grid-template-columns: 1fr 320px; } }
+
+.trending {
+  border-radius: 20px;
+  padding: 24px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  align-self: start;
+  position: sticky;
+  top: 80px;
+}
+.trending h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--tertiary);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.trending ol { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.trending li {
+  display: grid; grid-template-columns: auto 1fr; gap: 14px;
+  align-items: start;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.trending li:last-child { border: 0; padding-bottom: 0; }
+.trending .rank {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 1.4rem;
+  color: var(--outline);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.trending li:nth-child(-n+3) .rank { color: var(--primary); }
+.trending .t-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.trending .t-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .72rem;
+  color: var(--on-surface-variant);
+  margin-top: 6px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.stat-lbl { font-size: .65rem; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+
+/* ─── Category strip ─── */
+.cat-strip {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 720px) { .cat-strip { grid-template-columns: repeat(4, 1fr); } }
+.cat-card {
+  padding: 22px 20px;
+  border-radius: 18px;
+  background: var(--surface-container);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: all .35s cubic-bezier(0.32, 0.72, 0, 1);
+  position: relative;
+  overflow: hidden;
+}
+.cat-card:hover { transform: translateY(-2px); border-color: rgba(149,170,255,.18); }
+.cat-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+}
+.cat-card h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+.cat-card p { font-size: .78rem; color: var(--on-surface-variant); margin-top: 4px; }
+.cat-card .cnt { position: absolute; top: 18px; right: 20px; color: var(--outline); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: .78rem; font-variant-numeric: tabular-nums; }
+
+footer .footer-grid {
+  display: grid; gap: 32px;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+@media (max-width: 720px) { footer .footer-grid { grid-template-columns: 1fr 1fr; } }
+.footer h5 { font-family: 'Space Grotesk', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--outline); margin-bottom: 16px; }
+.footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer a { color: var(--on-surface-variant); font-size: .88rem; transition: color .2s; }
+.footer a:hover { color: var(--primary); }
+.footer-bottom { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: .78rem; color: var(--outline); }
+</style>
+</head>
+<body>
+
+<!-- ─── Top App Bar ─── -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span>
+      <span class="brand-name">Figurinha <span>Fácil</span></span>
+    </a>
+    <nav class="nav-main">
+      <a href="#" class="nav-link">Explorar</a>
+      <a href="#" class="nav-link">Como Funciona</a>
+      <a href="#" class="nav-link">Arenas</a>
+      <a href="#" class="nav-link active">Blog</a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn-icon" aria-label="Buscar"><span class="material-symbols-outlined">search</span></button>
+      <button class="btn btn-primary btn-sm">Entrar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ─── Hero ─── -->
+<section class="blog-hero">
+  <div class="container">
+    <div class="blog-hero-grid">
+      <div class="animate-fade-up">
+        <span class="eyebrow"><span class="live-dot" style="width:6px;height:6px"></span>Blog · Arena de conteúdo</span>
+        <h1 class="hero-title" style="margin-top:20px">
+          Tudo sobre o <span class="text-gradient">álbum da Copa</span> — da banca à estante.
+        </h1>
+        <p class="hero-sub">
+          Guias de trocas, histórias de colecionadores, raridades, rankings e os bastidores dos álbuns. Escrito por torcedores, pra torcedores.
+        </p>
+        <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg">
+            <span class="material-symbols-outlined" style="font-size:18px">bolt</span>
+            Ler os mais recentes
+          </button>
+          <button class="btn btn-ghost btn-lg">
+            <span class="material-symbols-outlined" style="font-size:18px">rss_feed</span>
+            Assinar newsletter
+          </button>
+        </div>
+        <div style="margin-top:36px; display:flex; gap:28px; flex-wrap:wrap; color:var(--on-surface-variant); font-size:.85rem;">
+          <div><strong style="color:var(--on-surface); font-family:'Space Grotesk'; font-size:1.25rem; font-weight:700;">142</strong> artigos publicados</div>
+          <div><strong style="color:var(--on-surface); font-family:'Space Grotesk'; font-size:1.25rem; font-weight:700;">32k</strong> leitores/mês</div>
+          <div><strong style="color:var(--on-surface); font-family:'Space Grotesk'; font-weight:700; font-size:1.25rem;">18</strong> autores</div>
+        </div>
+      </div>
+      <div class="animate-fade-up delay-2">
+        <a href="post.html" class="featured-card">
+          <span class="spine"><span class="material-symbols-outlined" style="font-size:14px">local_fire_department</span>Em alta agora</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+            <span class="chip chip-primary">Guia</span>
+            <span class="chip chip-secondary">Copa 2026</span>
+          </div>
+          <h2>As 12 figurinhas mais raras da Copa 2026 (e quanto valem hoje)</h2>
+          <div class="meta">
+            <div class="avatar">LG</div>
+            <span>Lucas Garcia</span>
+            <span class="dot"></span>
+            <span>6 min de leitura</span>
+            <span class="dot"></span>
+            <span>12 abr · 2026</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Filter bar ─── -->
+<section class="container" style="margin-top:12px;">
+  <div class="filter-bar">
+    <button class="filter-chip active">Todos <span class="count">142</span></button>
+    <button class="filter-chip">Guias <span class="count">38</span></button>
+    <button class="filter-chip">História <span class="count">24</span></button>
+    <button class="filter-chip">Raridades <span class="count">19</span></button>
+    <button class="filter-chip">Copa 2026 <span class="count">41</span></button>
+    <button class="filter-chip">Trocas seguras <span class="count">15</span></button>
+    <button class="filter-chip">Arenas <span class="count">12</span></button>
+    <button class="filter-chip">Entrevistas <span class="count">9</span></button>
+  </div>
+</section>
+
+<!-- ─── Two-column main ─── -->
+<section class="container" style="margin-top:32px;">
+  <div class="main-grid">
+    <div>
+
+      <!-- Em alta — big pair -->
+      <div class="section-head">
+        <div>
+          <span class="eyebrow" style="margin-bottom:8px"><span class="material-symbols-outlined" style="font-size:14px">trending_up</span>Em destaque</span>
+          <h2 class="section-title" style="margin-top:8px">Lidos nesta semana</h2>
+        </div>
+        <a href="#" class="section-link">Ver tudo <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></a>
+      </div>
+
+      <div class="big-pair">
+        <article class="big-card">
+          <div class="thumb" style="background-image: linear-gradient(135deg, rgba(149,170,255,.35), rgba(55,102,255,.35)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80');"></div>
+          <div class="body">
+            <div style="display:flex; gap:6px;">
+              <span class="chip chip-primary">Guia</span>
+            </div>
+            <h3>Como trocar figurinhas com segurança em pontos físicos</h3>
+            <p class="excerpt">Checklist prático, o que levar, como verificar autenticidade e como evitar os 3 golpes mais comuns em bancas e feiras.</p>
+            <div style="margin-top:auto; display:flex; align-items:center; gap:10px; font-size:.78rem; color:var(--on-surface-variant);">
+              <div class="avatar" style="background:linear-gradient(135deg, var(--tertiary), #f59e0b);">MR</div>
+              <span>Marina Ribeiro</span><span style="opacity:.4">·</span><span>5 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="big-card">
+          <div class="thumb" style="background-image: linear-gradient(135deg, rgba(79,243,37,.3), rgba(23,110,0,.5)), url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80');"></div>
+          <div class="body">
+            <div style="display:flex; gap:6px;">
+              <span class="chip chip-secondary">História</span>
+            </div>
+            <h3>De 1970 a 2026: a evolução do álbum da Copa no Brasil</h3>
+            <p class="excerpt">Seis décadas de figurinhas contadas em 12 capítulos. Do papel-pardo das bancas ao álbum digital que você conhece hoje.</p>
+            <div style="margin-top:auto; display:flex; align-items:center; gap:10px; font-size:.78rem; color:var(--on-surface-variant);">
+              <div class="avatar">PA</div>
+              <span>Pedro Almeida</span><span style="opacity:.4">·</span><span>11 min</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Últimos posts — grid -->
+      <div class="section-head">
+        <h2 class="section-title">Mais recentes</h2>
+        <a href="#" class="section-link">Todos os artigos <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></a>
+      </div>
+
+      <div class="post-grid">
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=800&q=80" alt="Figurinhas" loading="lazy">
+            <span class="cat" style="color:var(--tertiary); background:rgba(255,201,101,.15); border:1px solid rgba(255,201,101,.3); backdrop-filter:blur(8px);">Raridades</span>
+          </div>
+          <div class="body">
+            <h3>Messi rainbow holographic: como identificar a original</h3>
+            <p class="excerpt">Três detalhes invisíveis a olho nu que separam a legítima das falsificações que circulam nos grupos.</p>
+            <div class="meta">
+              <div class="avatar">LG</div>
+              <span>Lucas G.</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>4 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80" alt="São Paulo" loading="lazy">
+            <span class="cat" style="color:var(--primary); background:rgba(149,170,255,.15); border:1px solid rgba(149,170,255,.3); backdrop-filter:blur(8px);">Arenas</span>
+          </div>
+          <div class="body">
+            <h3>Os 7 melhores pontos de troca em São Paulo em 2026</h3>
+            <p class="excerpt">Do Largo da Batata ao Parque do Ibirapuera: o mapa atualizado das melhores rodas de troca da capital.</p>
+            <div class="meta">
+              <div class="avatar" style="background:linear-gradient(135deg, var(--secondary), var(--secondary-container));">JS</div>
+              <span>Julia Souza</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>8 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80" alt="Brasil" loading="lazy">
+            <span class="cat" style="color:var(--secondary); background:rgba(79,243,37,.15); border:1px solid rgba(79,243,37,.3); backdrop-filter:blur(8px);">Copa 2026</span>
+          </div>
+          <div class="body">
+            <h3>Seleção Brasileira: as 23 figurinhas confirmadas e o que esperar</h3>
+            <p class="excerpt">Análise técnica das páginas 34-37 do álbum: quem está, quem ficou de fora e as sensações do time.</p>
+            <div class="meta">
+              <div class="avatar">PA</div>
+              <span>Pedro A.</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>6 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" alt="Copa" loading="lazy">
+            <span class="cat" style="color:var(--primary); background:rgba(149,170,255,.15); border:1px solid rgba(149,170,255,.3); backdrop-filter:blur(8px);">Guia</span>
+          </div>
+          <div class="body">
+            <h3>Primeira vez colecionando? Comece por aqui</h3>
+            <p class="excerpt">Do álbum certo ao primeiro pacote: um guia passo-a-passo para quem está começando em 2026.</p>
+            <div class="meta">
+              <div class="avatar" style="background:linear-gradient(135deg, var(--tertiary), #f59e0b);">MR</div>
+              <span>Marina R.</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>5 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=800&q=80" alt="Rio" loading="lazy">
+            <span class="cat" style="color:var(--secondary); background:rgba(79,243,37,.15); border:1px solid rgba(79,243,37,.3); backdrop-filter:blur(8px);">Entrevista</span>
+          </div>
+          <div class="body">
+            <h3>"Completei 7 álbuns. O oitavo é o mais difícil." — Sr. Waldir, 72</h3>
+            <p class="excerpt">De Copacabana, ele guarda um álbum de cada Copa desde 1966. Uma conversa com o colecionador decano do Rio.</p>
+            <div class="meta">
+              <div class="avatar">CM</div>
+              <span>Camila Melo</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>12 min</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="thumb">
+            <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&q=80" alt="Troca" loading="lazy">
+            <span class="cat" style="color:var(--tertiary); background:rgba(255,201,101,.15); border:1px solid rgba(255,201,101,.3); backdrop-filter:blur(8px);">Trocas</span>
+          </div>
+          <div class="body">
+            <h3>O protocolo das "trocas em rede": como colecionar com 5+ amigos</h3>
+            <p class="excerpt">Organize um grupo, defina regras e complete seu álbum 3x mais rápido usando trocas em cadeia.</p>
+            <div class="meta">
+              <div class="avatar" style="background:linear-gradient(135deg, var(--secondary), var(--secondary-container));">JS</div>
+              <span>Julia S.</span>
+              <span class="read-time"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>7 min</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div style="margin-top:32px; text-align:center;">
+        <button class="btn btn-ghost btn-lg">
+          Carregar mais artigos
+          <span class="material-symbols-outlined" style="font-size:18px">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Series -->
+      <div class="section-head" style="padding-top:48px;">
+        <h2 class="section-title">Série em andamento</h2>
+      </div>
+
+      <article class="series-card">
+        <div class="series-head">
+          <div>
+            <span class="chip chip-tertiary" style="margin-bottom:10px;"><span class="material-symbols-outlined" style="font-size:14px">collections_bookmark</span>Série · 5/12</span>
+            <h3 class="series-title">História do Álbum da Copa</h3>
+            <p style="color:var(--on-surface-variant); margin-top:6px; max-width:52ch;">A saga dos álbuns da Panini no Brasil, contada de 1970 até hoje. Novo episódio toda quinta.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="flex-shrink:0;">
+            <span class="material-symbols-outlined" style="font-size:16px">bookmark_add</span>
+            Seguir série
+          </button>
+        </div>
+        <div class="series-episodes">
+          <a href="#" class="episode">
+            <div class="episode-num">01</div>
+            <div class="info"><h4>1970 — O começo do mito</h4><p>10 min · Pedro Almeida</p></div>
+            <span class="material-symbols-outlined" style="color:var(--tertiary)">check_circle</span>
+          </a>
+          <a href="#" class="episode">
+            <div class="episode-num">02</div>
+            <div class="info"><h4>1982 — A Copa do álbum quadradão</h4><p>8 min · Pedro Almeida</p></div>
+            <span class="material-symbols-outlined" style="color:var(--tertiary)">check_circle</span>
+          </a>
+          <a href="#" class="episode">
+            <div class="episode-num">03</div>
+            <div class="info"><h4>1994 — Tetra e a explosão no país</h4><p>9 min · Pedro Almeida</p></div>
+            <span class="material-symbols-outlined" style="color:var(--tertiary)">check_circle</span>
+          </a>
+          <a href="#" class="episode">
+            <div class="episode-num">04</div>
+            <div class="info"><h4>2006 — A era das raridades</h4><p>12 min · Pedro Almeida</p></div>
+            <span class="material-symbols-outlined" style="color:var(--tertiary)">check_circle</span>
+          </a>
+          <a href="#" class="episode" style="border-color:rgba(255,201,101,.4); background:rgba(255,201,101,.05);">
+            <div class="episode-num" style="color:var(--on-tertiary); background:var(--tertiary); border-color:var(--tertiary);">05</div>
+            <div class="info"><h4>2018 — Stickers em redes sociais</h4><p>11 min · Pedro Almeida</p></div>
+            <span class="chip chip-tertiary" style="font-size:.6rem; padding:3px 9px;">Novo</span>
+          </a>
+          <a href="#" class="episode" style="opacity:.55;">
+            <div class="episode-num" style="background:rgba(255,255,255,.03); color:var(--outline); border-color:rgba(255,255,255,.06);">06</div>
+            <div class="info"><h4>2026 — Álbum físico + digital</h4><p>Em breve · Quinta 19/04</p></div>
+            <span class="material-symbols-outlined" style="color:var(--outline)">schedule</span>
+          </a>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- ─── Sidebar: trending ─── -->
+    <aside class="trending">
+      <h4><span class="material-symbols-outlined" style="font-size:16px; color:var(--tertiary)">local_fire_department</span>Em alta agora</h4>
+      <ol>
+        <li>
+          <span class="rank">01</span>
+          <div>
+            <p class="t-title">As 12 figurinhas mais raras da Copa 2026</p>
+            <div class="t-meta"><span>Guia</span><span style="opacity:.4">·</span><span>8.2k leituras</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="rank">02</span>
+          <div>
+            <p class="t-title">Como trocar com segurança em pontos físicos</p>
+            <div class="t-meta"><span>Guia</span><span style="opacity:.4">·</span><span>6.4k leituras</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="rank">03</span>
+          <div>
+            <p class="t-title">De 1970 a 2026: a evolução do álbum</p>
+            <div class="t-meta"><span>História</span><span style="opacity:.4">·</span><span>5.1k leituras</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="rank">04</span>
+          <div>
+            <p class="t-title">Messi rainbow holographic: guia de identificação</p>
+            <div class="t-meta"><span>Raridades</span><span style="opacity:.4">·</span><span>4.8k leituras</span></div>
+          </div>
+        </li>
+        <li>
+          <span class="rank">05</span>
+          <div>
+            <p class="t-title">Os 7 melhores pontos de troca em SP</p>
+            <div class="t-meta"><span>Arenas</span><span style="opacity:.4">·</span><span>3.9k leituras</span></div>
+          </div>
+        </li>
+      </ol>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-num">142</div><div class="stat-lbl">artigos</div></div>
+        <div class="stat"><div class="stat-num" style="color:var(--primary)">32k</div><div class="stat-lbl">leitores/mês</div></div>
+        <div class="stat"><div class="stat-num" style="color:var(--tertiary)">18</div><div class="stat-lbl">autores</div></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ─── Category strip ─── -->
+<section class="container" style="margin-top:64px;">
+  <div class="section-head">
+    <h2 class="section-title">Navegue por categoria</h2>
+  </div>
+  <div class="cat-strip">
+    <a href="category.html" class="cat-card">
+      <span class="cnt">38</span>
+      <div class="cat-icon" style="background:rgba(149,170,255,.1); color:var(--primary);"><span class="material-symbols-outlined">menu_book</span></div>
+      <h4>Guias</h4>
+      <p>Como colecionar, trocar, organizar.</p>
+    </a>
+    <a href="category.html" class="cat-card">
+      <span class="cnt">24</span>
+      <div class="cat-icon" style="background:rgba(79,243,37,.1); color:var(--secondary);"><span class="material-symbols-outlined">history_edu</span></div>
+      <h4>História</h4>
+      <p>A saga dos álbuns de Copa.</p>
+    </a>
+    <a href="category.html" class="cat-card">
+      <span class="cnt">19</span>
+      <div class="cat-icon" style="background:rgba(255,201,101,.1); color:var(--tertiary);"><span class="material-symbols-outlined">diamond</span></div>
+      <h4>Raridades</h4>
+      <p>O que vale mais e por quê.</p>
+    </a>
+    <a href="category.html" class="cat-card">
+      <span class="cnt">41</span>
+      <div class="cat-icon" style="background:rgba(149,170,255,.1); color:var(--primary);"><span class="material-symbols-outlined">sports_soccer</span></div>
+      <h4>Copa 2026</h4>
+      <p>Tudo sobre a nova edição.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ─── Newsletter ─── -->
+<section class="container" style="margin-top:80px;">
+  <div class="newsletter">
+    <span class="eyebrow"><span class="material-symbols-outlined" style="font-size:14px">mail</span>Newsletter semanal</span>
+    <h3>Receba o melhor do álbum na sua caixa, toda sexta.</h3>
+    <p>Guias exclusivos, alertas de figurinha rara perto de você e entrevistas com colecionadores. Sem spam, sem enrolação.</p>
+    <form class="newsletter-form" onsubmit="event.preventDefault();">
+      <input type="email" placeholder="seu@email.com" required>
+      <button type="submit">Assinar grátis</button>
+    </form>
+    <p class="newsletter-meta">
+      <span class="live-dot"></span>
+      Junto com 12.400 colecionadores. Cancele quando quiser.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<!-- ─── Footer ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="#" class="brand" style="margin-bottom:16px;">
+          <span class="brand-mark"><span class="material-symbols-outlined" style="font-size:20px">stadium</span></span>
+          <span class="brand-name">Figurinha <span>Fácil</span></span>
+        </a>
+        <p style="color:var(--on-surface-variant); font-size:.88rem; max-width:36ch; margin-top:16px;">A maior rede de trocas de figurinhas do Brasil. Perto de você, com segurança.</p>
+      </div>
+      <div>
+        <h5>Produto</h5>
+        <ul>
+          <li><a href="#">Como funciona</a></li>
+          <li><a href="#">Arenas</a></li>
+          <li><a href="#">Premium</a></li>
+          <li><a href="#">App mobile</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Blog</h5>
+        <ul>
+          <li><a href="#">Guias</a></li>
+          <li><a href="#">História</a></li>
+          <li><a href="#">Raridades</a></li>
+          <li><a href="#">Newsletter</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Empresa</h5>
+        <ul>
+          <li><a href="#">Sobre</a></li>
+          <li><a href="#">Contato</a></li>
+          <li><a href="#">Termos</a></li>
+          <li><a href="#">Privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Figurinha Fácil. Feito para torcedores brasileiros.</span>
+      <span>Nenhuma afiliação oficial com FIFA ou Panini.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

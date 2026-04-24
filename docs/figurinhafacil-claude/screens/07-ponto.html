@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07 · Detalhe do ponto</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+/* ===== HERO cinematográfico ===== */
+.hero-img {
+  position:relative; width:100%; aspect-ratio: 16/10;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(79,243,37,.22), transparent 55%),
+    radial-gradient(circle at 75% 65%, rgba(149,170,255,.28), transparent 50%),
+    linear-gradient(155deg, #0b1a14 0%, #132033 55%, #1a1233 100%);
+  overflow:hidden;
+}
+.hero-img::after { content:''; position:absolute; inset:0; background:
+  linear-gradient(180deg, rgba(9,14,28,0) 0%, rgba(9,14,28,.1) 55%, rgba(9,14,28,.95) 100%); }
+.hero-img .stickers { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:10px; }
+.hero-img .stk {
+  width:58px; aspect-ratio: 3/4; border-radius: 10px;
+  background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 18px 40px rgba(0,0,0,.5);
+}
+.hero-img .stk:nth-child(1) { transform: rotate(-12deg) translateY(8px); }
+.hero-img .stk:nth-child(2) { transform: rotate(-4deg); }
+.hero-img .stk:nth-child(3) { transform: rotate(4deg); box-shadow: 0 22px 50px rgba(149,170,255,.25); border-color: rgba(149,170,255,.3);}
+.hero-img .stk:nth-child(4) { transform: rotate(10deg) translateY(14px); }
+.hero-img .live {
+  position:absolute; top:16px; left:16px; display:inline-flex; align-items:center; gap:8px;
+  background: rgba(9,14,28,.7); backdrop-filter: blur(12px);
+  border: 1px solid rgba(79,243,37,.4); color: var(--secondary);
+  padding:6px 12px; border-radius:999px;
+  font-family: var(--font-headline); font-weight:700; font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+}
+.hero-img .live .pulse { width:8px; height:8px; border-radius:50%; background: var(--secondary); box-shadow:0 0 12px var(--secondary); animation: pulseGlow 1.8s infinite;}
+.hero-img .back {
+  position:absolute; top:16px; right:16px; width:38px; height:38px; border-radius:50%;
+  background: rgba(9,14,28,.7); backdrop-filter: blur(12px); border:1px solid var(--outline-variant);
+  display:grid; place-items:center; color: var(--on-surface);
+}
+.hero-img .overlay-title {
+  position:absolute; left:16px; right:16px; bottom:14px; z-index:2;
+}
+.hero-img .overlay-title .type {
+  display:inline-flex; align-items:center; gap:6px; color: var(--tertiary);
+  font-family: var(--font-headline); font-weight:700; font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+}
+.hero-img .overlay-title h1 { font-size: 26px; line-height:1.05; margin-top:6px; font-weight:900; }
+.hero-img .overlay-title .addr { color: var(--on-surface-variant); font-size:13px; margin-top:4px; }
+
+/* ===== Live strip (colecionadores) ===== */
+.live-strip {
+  display:flex; align-items:center; gap:12px;
+  padding: 12px 16px; margin: 14px 16px 0;
+  background: var(--surface-container); border: 1px solid var(--outline-variant);
+  border-radius: 16px; position: relative; overflow:hidden;
+}
+.live-strip::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--secondary); }
+.live-strip .avs { display:flex; }
+.live-strip .av {
+  width:30px; height:30px; border-radius:50%; margin-left:-8px;
+  border: 2px solid var(--surface-container);
+  display:grid; place-items:center;
+  font-family: var(--font-headline); font-weight:800; font-size:11px;
+}
+.live-strip .av:nth-child(1){ background: linear-gradient(135deg, #ff9fa8, #ff6e84); color:#4b0012; margin-left:0;}
+.live-strip .av:nth-child(2){ background: linear-gradient(135deg, #ffd27a, var(--tertiary)); color:#5f4200;}
+.live-strip .av:nth-child(3){ background: linear-gradient(135deg, #a0ffa3, var(--secondary)); color:#0e4b00;}
+.live-strip .av:nth-child(4){ background: var(--surface-container-high); color:var(--on-surface-variant); font-size:10px;}
+.live-strip .txt { flex:1; font-size:13px; line-height:1.3; }
+.live-strip .txt b { font-family: var(--font-headline); font-weight:800; color: var(--on-surface); }
+.live-strip .txt span { color: var(--on-surface-variant); }
+
+/* ===== Stats pills (repetidas / faltantes) ===== */
+.stat-trio { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; padding: 14px 16px 0; }
+.stat-trio .st { background: var(--surface-container); border:1px solid var(--outline-variant); border-radius:14px; padding:12px; }
+.stat-trio .st .v { font-family: var(--font-headline); font-weight:900; font-size:22px; letter-spacing:-0.02em; }
+.stat-trio .st .v.g { color: var(--secondary); }
+.stat-trio .st .v.p { color: var(--primary); }
+.stat-trio .st .v.y { color: var(--tertiary); }
+.stat-trio .st .l { font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:var(--outline); margin-top:4px; font-family:var(--font-headline); font-weight:700; }
+
+/* ===== Info rows ===== */
+.info-block { padding: 16px; }
+.info-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--outline-variant); }
+.info-row:last-child { border-bottom:0; }
+.info-row .ico { width:36px; height:36px; border-radius:10px; background: var(--surface-container-high); display:grid; place-items:center; color: var(--primary); flex-shrink:0;}
+.info-row .bd { flex:1; min-width:0; }
+.info-row .tt { font-family: var(--font-headline); font-weight:700; font-size:13px; }
+.info-row .sb { font-size:12px; color: var(--on-surface-variant); margin-top:2px; line-height:1.4; }
+.info-row .sb b.open { color: var(--secondary); }
+.info-row .sb b.closed { color: var(--error); }
+.info-row .chev { color:var(--outline); align-self:center;}
+
+/* ===== Hours grid ===== */
+.hours { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; margin-top: 10px; }
+.hours .d { aspect-ratio: 1; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; background: var(--surface-container-high); border:1px solid var(--outline-variant);}
+.hours .d.today { background: rgba(79,243,37,.12); border-color: var(--secondary); }
+.hours .d.today .n { color: var(--secondary); }
+.hours .d.off { opacity:.35;}
+.hours .d .n { font-family: var(--font-headline); font-weight:800; font-size:11px; color: var(--on-surface); }
+.hours .d .h { font-family:'JetBrains Mono',monospace; font-size:8px; color: var(--outline);}
+
+/* ===== Collectors section ===== */
+.sec-title { font-family: var(--font-headline); font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color: var(--outline); margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center;}
+.sec-title a { color: var(--primary); text-decoration:none; font-size:11px; }
+.collectors { padding: 6px 16px 14px; }
+.coll-row {
+  display:flex; gap:12px; align-items:center; padding:10px 12px; margin-bottom:8px;
+  background: var(--surface-container); border:1px solid var(--outline-variant); border-radius:14px;
+}
+.coll-row .av { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; font-family: var(--font-headline); font-weight:800; flex-shrink:0; position:relative;}
+.coll-row .av .online { position:absolute; right:-1px; bottom:-1px; width:12px; height:12px; border-radius:50%; background: var(--secondary); border:2px solid var(--surface-container); }
+.coll-row .body { flex:1; min-width:0; }
+.coll-row .name { font-family:var(--font-headline); font-weight:700; font-size:14px; }
+.coll-row .sub { display:flex; gap:8px; font-size:11px; color: var(--on-surface-variant); margin-top:2px;}
+.coll-row .sub b.g { color: var(--secondary); font-family:var(--font-headline); font-weight:700;}
+.coll-row .sub b.y { color: var(--tertiary); font-family:var(--font-headline); font-weight:700;}
+.coll-row .match { display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+.coll-row .match .m { font-family: var(--font-headline); font-weight:900; font-size:16px; color: var(--secondary);}
+.coll-row .match .l { font-size:9px; text-transform:uppercase; letter-spacing:.14em; color:var(--outline);}
+
+/* ===== CTA bar fixa ===== */
+.cta-bar {
+  position:absolute; bottom:0; left:0; right:0;
+  background: rgba(13,19,35,.92); backdrop-filter: blur(20px);
+  border-top:1px solid var(--outline-variant);
+  padding: 12px 16px calc(12px + 16px);
+  display:grid; grid-template-columns: auto 1fr auto; gap:8px; z-index:30;
+}
+.cta-bar .save { width:48px; height:48px; border-radius:14px; background: var(--surface-container-high); border:1px solid var(--outline-variant); display:grid; place-items:center; color: var(--on-surface);}
+.cta-bar .save.on { background: rgba(255,201,101,.15); border-color: var(--tertiary); color: var(--tertiary); }
+.cta-bar .main { height:48px; border-radius:14px; background: var(--secondary); color: var(--on-secondary); display:flex; align-items:center; justify-content:center; gap:8px; font-family: var(--font-headline); font-weight:800; font-size:13px; letter-spacing:.1em; text-transform:uppercase; box-shadow: 0 10px 24px -6px rgba(79,243,37,.5);}
+.cta-bar .route { width:48px; height:48px; border-radius:14px; background: var(--primary); color: var(--on-primary); display:grid; place-items:center;}
+
+/* ===== Desktop-specific ===== */
+.d-wrap { position:absolute; inset:0; overflow:auto; background: var(--bg); }
+.d-wrap::-webkit-scrollbar{ width: 6px; } .d-wrap::-webkit-scrollbar-thumb{ background: var(--outline-variant); border-radius:3px;}
+.d-back { padding: 20px 40px 0; display:flex; align-items:center; gap:14px; }
+.d-back a { color: var(--on-surface-variant); text-decoration:none; font-family: var(--font-headline); font-weight:700; font-size:13px; display:inline-flex; align-items:center; gap:6px;}
+.d-back a:hover { color: var(--on-surface);}
+.d-back .crumb-sep { color: var(--outline-variant); }
+
+.d-grid { display:grid; grid-template-columns: 1fr 380px; gap: 32px; padding: 20px 40px 60px; max-width: 1400px; margin: 0 auto; }
+.d-hero {
+  position:relative; border-radius: 20px; overflow:hidden; aspect-ratio: 16/9;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(79,243,37,.22), transparent 55%),
+    radial-gradient(circle at 75% 65%, rgba(149,170,255,.28), transparent 50%),
+    linear-gradient(155deg, #0b1a14 0%, #132033 55%, #1a1233 100%);
+  border: 1px solid var(--outline-variant);
+}
+.d-hero::after { content:''; position:absolute; inset:0; background: linear-gradient(180deg, rgba(9,14,28,0), rgba(9,14,28,.7) 80%, rgba(9,14,28,.95));}
+.d-hero .stickers { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:20px; }
+.d-hero .stk { width:120px; aspect-ratio: 3/4; border-radius: 14px; background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 30px 60px rgba(0,0,0,.5);}
+.d-hero .stk:nth-child(1){ transform: rotate(-14deg) translateY(14px); }
+.d-hero .stk:nth-child(2){ transform: rotate(-5deg); }
+.d-hero .stk:nth-child(3){ transform: rotate(4deg); border-color: rgba(149,170,255,.35);}
+.d-hero .stk:nth-child(4){ transform: rotate(12deg) translateY(20px); }
+.d-hero .live {
+  position:absolute; top:20px; left:20px; display:inline-flex; align-items:center; gap:8px;
+  background: rgba(9,14,28,.7); backdrop-filter: blur(12px);
+  border: 1px solid rgba(79,243,37,.4); color: var(--secondary);
+  padding:8px 14px; border-radius:999px;
+  font-family: var(--font-headline); font-weight:700; font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+}
+.d-hero .live .pulse { width:8px; height:8px; border-radius:50%; background: var(--secondary); box-shadow:0 0 12px var(--secondary); animation: pulseGlow 1.8s infinite;}
+.d-hero .ov {
+  position:absolute; left:28px; right:28px; bottom:24px; z-index:2;
+  display:grid; grid-template-columns: 1fr auto; gap:20px; align-items:end;
+}
+.d-hero .ov .type { color: var(--tertiary); font-family: var(--font-headline); font-weight:700; font-size:11px; letter-spacing:.22em; text-transform:uppercase;}
+.d-hero .ov h1 { font-size: 44px; line-height:1; margin-top:8px; font-weight:900;}
+.d-hero .ov .addr { color: var(--on-surface-variant); margin-top:8px;}
+
+.d-sec { background: var(--surface-container-low); border:1px solid var(--outline-variant); border-radius:16px; padding: 20px; margin-top:20px;}
+.d-sec h3 { font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+.d-sec h3 .material-symbols-outlined { color: var(--primary); font-size:20px;}
+
+.d-stats { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-top:20px;}
+.d-stats .st { background: var(--surface-container); border:1px solid var(--outline-variant); border-radius:14px; padding:16px;}
+.d-stats .st .v { font-family: var(--font-headline); font-weight:900; font-size:28px; letter-spacing:-0.02em; }
+.d-stats .st .v.g { color: var(--secondary);}
+.d-stats .st .v.p { color: var(--primary);}
+.d-stats .st .v.y { color: var(--tertiary);}
+.d-stats .st .l { font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--outline); margin-top:6px; font-family:var(--font-headline); font-weight:700;}
+
+/* Right rail */
+.rail { position: sticky; top: 20px;}
+.rail .card { padding:0; overflow:hidden; background: var(--surface-container-low);}
+.rail .minimap { aspect-ratio: 16/10; position:relative;
+  background:
+    linear-gradient(115deg, #0b1020, #0d1527 50%, #0b1020),
+    radial-gradient(circle at 30% 40%, rgba(149,170,255,.1), transparent 50%);
+  border-bottom: 1px solid var(--outline-variant);
+}
+.rail .minimap::before { content:''; position:absolute; inset:0; background-image: linear-gradient(rgba(149,170,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(149,170,255,.05) 1px, transparent 1px); background-size: 30px 30px;}
+.rail .minimap .pin { position:absolute; left:50%; top:50%; transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center; }
+.rail .minimap .pin .bub { padding:6px 10px; border-radius:10px; background: var(--secondary); color: var(--on-secondary); font-family:var(--font-headline); font-weight:800; font-size:11px;}
+.rail .minimap .pin .stm { width:2px; height:10px; background: var(--secondary); opacity:.4;}
+.rail .minimap .pin .dt { width:10px; height:10px; border-radius:50%; background: var(--secondary); box-shadow: 0 0 14px var(--secondary);}
+.rail .addr-block { padding:16px;}
+.rail .addr-block .a1 { font-family: var(--font-headline); font-weight:700; font-size:14px;}
+.rail .addr-block .a2 { color: var(--on-surface-variant); font-size:12px; margin-top:2px; }
+.rail .addr-block .coords { margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:10px; color: var(--outline);}
+.rail .addr-block .actions { display:flex; gap:8px; margin-top:14px;}
+.rail .addr-block .actions .btn { flex:1; height:40px; font-size:11px;}
+
+.rail .next { background: var(--surface-container-low); border:1px solid var(--outline-variant); border-radius:16px; padding:16px; margin-top:16px;}
+.rail .next h4 { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--outline); margin-bottom:10px;}
+.rail .nb { display:flex; gap:10px; align-items:center; padding:10px; border-radius:12px; background: var(--surface-container); border:1px solid var(--outline-variant); margin-bottom:8px; text-decoration:none; color:inherit;}
+.rail .nb:hover { border-color: var(--primary); }
+.rail .nb .ic { width:36px; height:36px; border-radius:10px; background: var(--surface-container-high); display:grid; place-items:center; color:var(--primary); flex-shrink:0;}
+.rail .nb .bd{ flex:1; min-width:0;}
+.rail .nb .bd .n { font-family:var(--font-headline); font-weight:700; font-size:13px;}
+.rail .nb .bd .d { color:var(--on-surface-variant); font-size:11px; margin-top:2px; font-family:'JetBrains Mono',monospace;}
+
+.screen-body.ponto-m { overflow-y:auto; overflow-x:hidden; padding-bottom: 96px;}
+.screen-body.ponto-m::-webkit-scrollbar{display:none;}
+</style></head><body>
+<div class="page-canvas">
+  <div class="top"><a class="brand" href="../index.html"><span class="dot"></span><span class="name">Figurinha Fácil</span></a><div class="crumb">07 / 11 · <b>Detalhe do ponto</b></div></div>
+  <div class="page-head">
+    <div>
+      <h1>Ponto de <em>troca</em></h1>
+      <p>Página pública do local: hero com imagem, status ao vivo de colecionadores, horários, estatísticas de trocas e CTA direto para o WhatsApp + rota.</p>
+    </div>
+    <div class="meta"><span class="chip"><span class="bullet"></span>PÚBLICA</span><span class="chip">CORE</span></div>
+  </div>
+
+  <div class="frames">
+    <!-- =========== MOBILE =========== -->
+    <div class="frame-col">
+      <div class="label">Mobile · Detalhe + CTA fixo</div>
+      <div class="mobile-frame">
+        <div class="notch"></div>
+        <div class="mobile-statusbar"><span>9:41</span><div class="right"><span class="material-symbols-outlined" style="font-size:16px">signal_cellular_alt</span><span class="material-symbols-outlined" style="font-size:16px">wifi</span><span class="material-symbols-outlined" style="font-size:16px">battery_full</span></div></div>
+        <div class="screen">
+          <div class="screen-body ponto-m">
+
+            <div class="hero-img">
+              <div class="stickers">
+                <div class="stk"></div><div class="stk"></div><div class="stk"></div><div class="stk"></div>
+              </div>
+              <span class="live"><span class="pulse"></span>12 trocando agora</span>
+              <button class="back"><span class="material-symbols-outlined" style="font-size:20px">arrow_back</span></button>
+              <div class="overlay-title">
+                <span class="type"><span class="material-symbols-outlined" style="font-size:14px">local_cafe</span>Café · Jardins</span>
+                <h1>Padaria do Zé</h1>
+                <div class="addr">R. Augusta 1.284 · 840m de você</div>
+              </div>
+            </div>
+
+            <div class="live-strip">
+              <div class="avs">
+                <div class="av">AC</div><div class="av">MR</div><div class="av">JP</div><div class="av">+9</div>
+              </div>
+              <div class="txt"><b>12 colecionadores</b> <span>ativos na última hora</span></div>
+            </div>
+
+            <div class="stat-trio">
+              <div class="st"><div class="v g">847</div><div class="l">Trocas</div></div>
+              <div class="st"><div class="v p">4.8</div><div class="l">Avaliação</div></div>
+              <div class="st"><div class="v y">23</div><div class="l">Seus matches</div></div>
+            </div>
+
+            <div class="info-block">
+              <div class="info-row">
+                <div class="ico" style="color: var(--secondary)"><span class="material-symbols-outlined" style="font-size:20px">schedule</span></div>
+                <div class="bd">
+                  <div class="tt">Aberto agora</div>
+                  <div class="sb"><b class="open">Fecha 22:00</b> · Qua · <span>Pico de trocas 19h–21h</span></div>
+                  <div class="hours">
+                    <div class="d off"><div class="n">SEG</div><div class="h">—</div></div>
+                    <div class="d"><div class="n">TER</div><div class="h">8–22</div></div>
+                    <div class="d today"><div class="n">QUA</div><div class="h">8–22</div></div>
+                    <div class="d"><div class="n">QUI</div><div class="h">8–22</div></div>
+                    <div class="d"><div class="n">SEX</div><div class="h">8–23</div></div>
+                    <div class="d"><div class="n">SÁB</div><div class="h">9–23</div></div>
+                    <div class="d"><div class="n">DOM</div><div class="h">9–20</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="ico"><span class="material-symbols-outlined" style="font-size:20px">place</span></div>
+                <div class="bd">
+                  <div class="tt">R. Augusta, 1.284</div>
+                  <div class="sb">Jardins, São Paulo · 840m · 11min a pé</div>
+                </div>
+                <span class="material-symbols-outlined chev">chevron_right</span>
+              </div>
+
+              <div class="info-row">
+                <div class="ico" style="color: var(--tertiary)"><span class="material-symbols-outlined" style="font-size:20px">shield_person</span></div>
+                <div class="bd">
+                  <div class="tt">Anfitrião verificado</div>
+                  <div class="sb">Zé Mendes · colecionador desde 2010 · responde em ~8min</div>
+                </div>
+                <span class="material-symbols-outlined chev">chevron_right</span>
+              </div>
+            </div>
+
+            <div class="collectors">
+              <div class="sec-title">Colecionadores com match <a>ver todos →</a></div>
+
+              <div class="coll-row">
+                <div class="av" style="background: linear-gradient(135deg, #ff9fa8, #ff6e84); color:#4b0012">AC<span class="online"></span></div>
+                <div class="body">
+                  <div class="name">Ana Castro</div>
+                  <div class="sub"><b class="g">5 tem</b><span>·</span><b class="y">3 precisa</b><span>· 420m</span></div>
+                </div>
+                <div class="match"><div class="m">92%</div><div class="l">match</div></div>
+              </div>
+
+              <div class="coll-row">
+                <div class="av" style="background: linear-gradient(135deg, #ffd27a, var(--tertiary)); color:#5f4200">MR<span class="online"></span></div>
+                <div class="body">
+                  <div class="name">Marco Rivas</div>
+                  <div class="sub"><b class="g">7 tem</b><span>·</span><b class="y">2 precisa</b><span>· 610m</span></div>
+                </div>
+                <div class="match"><div class="m">84%</div><div class="l">match</div></div>
+              </div>
+
+              <div class="coll-row">
+                <div class="av" style="background: linear-gradient(135deg, #a0ffa3, var(--secondary)); color:#0e4b00">JP</div>
+                <div class="body">
+                  <div class="name">Julia Prado</div>
+                  <div class="sub"><b class="g">3 tem</b><span>·</span><b class="y">4 precisa</b><span>· aqui agora</span></div>
+                </div>
+                <div class="match"><div class="m">71%</div><div class="l">match</div></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="cta-bar">
+            <button class="save on" title="Salvar"><span class="material-symbols-outlined">bookmark</span></button>
+            <button class="main"><span class="material-symbols-outlined" style="font-size:20px">sms</span>Chamar no WhatsApp</button>
+            <button class="route" title="Rota"><span class="material-symbols-outlined">directions</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== DESKTOP =========== -->
+    <div class="frame-col">
+      <div class="label">Desktop · Hero + sidebar com mapa</div>
+      <div class="desktop-frame">
+        <div class="chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="url">figurinhafacil.com.br/ponto/padaria-do-ze</div>
+        </div>
+        <div class="viewport">
+          <div class="d-wrap">
+
+            <div class="d-back">
+              <a href="#"><span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>Voltar</a>
+              <span class="crumb-sep">/</span>
+              <a href="#">Mapa da arena</a>
+              <span class="crumb-sep">/</span>
+              <a href="#" style="color: var(--on-surface)">Padaria do Zé</a>
+            </div>
+
+            <div class="d-grid">
+              <div>
+                <div class="d-hero">
+                  <div class="stickers"><div class="stk"></div><div class="stk"></div><div class="stk"></div><div class="stk"></div></div>
+                  <span class="live"><span class="pulse"></span>12 colecionadores trocando agora</span>
+                  <div class="ov">
+                    <div>
+                      <span class="type"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">local_cafe</span> Café · Jardins · São Paulo</span>
+                      <h1>Padaria do Zé</h1>
+                      <div class="addr">R. Augusta, 1.284 · 840m de você · 11min a pé</div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                      <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">bookmark</span>Salvar</button>
+                      <button class="btn btn-ghost btn-sm"><span class="material-symbols-outlined" style="font-size:16px">share</span>Compartilhar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-stats">
+                  <div class="st"><div class="v g">847</div><div class="l">Trocas realizadas</div></div>
+                  <div class="st"><div class="v p">4.8<span style="font-size:14px; color:var(--outline)"> / 5</span></div><div class="l">Avaliação · 132 reviews</div></div>
+                  <div class="st"><div class="v y">23</div><div class="l">Seus matches aqui</div></div>
+                  <div class="st"><div class="v">~8<span style="font-size:14px; color:var(--outline)">min</span></div><div class="l">Resposta média</div></div>
+                </div>
+
+                <div class="d-sec">
+                  <h3><span class="material-symbols-outlined">schedule</span>Horários &amp; pico de trocas</h3>
+                  <div style="font-size:13px; color:var(--on-surface-variant); margin-bottom:10px;">
+                    <span style="color: var(--secondary); font-weight:800; font-family:var(--font-headline)">Aberto agora</span> · fecha 22:00 · pico 19h–21h
+                  </div>
+                  <div class="hours" style="grid-template-columns: repeat(7, 1fr); gap:8px;">
+                    <div class="d off"><div class="n">SEG</div><div class="h">fechado</div></div>
+                    <div class="d"><div class="n">TER</div><div class="h">8–22h</div></div>
+                    <div class="d today"><div class="n">QUA</div><div class="h">8–22h</div></div>
+                    <div class="d"><div class="n">QUI</div><div class="h">8–22h</div></div>
+                    <div class="d"><div class="n">SEX</div><div class="h">8–23h</div></div>
+                    <div class="d"><div class="n">SÁB</div><div class="h">9–23h</div></div>
+                    <div class="d"><div class="n">DOM</div><div class="h">9–20h</div></div>
+                  </div>
+                </div>
+
+                <div class="d-sec">
+                  <h3 style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="display:inline-flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">groups</span>Colecionadores com match</span>
+                    <a href="#" style="font-size:11px; color: var(--primary); text-decoration:none; font-family:var(--font-headline); letter-spacing:.14em; text-transform:uppercase;">Ver todos 12 →</a>
+                  </h3>
+                  <div class="collectors" style="padding:0;">
+                    <div class="coll-row">
+                      <div class="av" style="background: linear-gradient(135deg, #ff9fa8, #ff6e84); color:#4b0012">AC<span class="online"></span></div>
+                      <div class="body">
+                        <div class="name">Ana Castro</div>
+                        <div class="sub"><b class="g">5 tem seu precisa</b><span>·</span><b class="y">3 precisa seu tem</b><span>· 420m daqui</span></div>
+                      </div>
+                      <div class="match"><div class="m">92%</div><div class="l">match</div></div>
+                      <button class="btn btn-primary btn-sm">Chamar</button>
+                    </div>
+                    <div class="coll-row">
+                      <div class="av" style="background: linear-gradient(135deg, #ffd27a, var(--tertiary)); color:#5f4200">MR<span class="online"></span></div>
+                      <div class="body">
+                        <div class="name">Marco Rivas</div>
+                        <div class="sub"><b class="g">7 tem</b><span>·</span><b class="y">2 precisa</b><span>· 610m</span></div>
+                      </div>
+                      <div class="match"><div class="m">84%</div><div class="l">match</div></div>
+                      <button class="btn btn-primary btn-sm">Chamar</button>
+                    </div>
+                    <div class="coll-row">
+                      <div class="av" style="background: linear-gradient(135deg, #a0ffa3, var(--secondary)); color:#0e4b00">JP</div>
+                      <div class="body">
+                        <div class="name">Julia Prado</div>
+                        <div class="sub"><b class="g">3 tem</b><span>·</span><b class="y">4 precisa</b><span>· aqui agora</span></div>
+                      </div>
+                      <div class="match"><div class="m">71%</div><div class="l">match</div></div>
+                      <button class="btn btn-ghost btn-sm">Chamar</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- RAIL -->
+              <aside>
+                <div class="rail">
+                  <div class="card">
+                    <div class="minimap">
+                      <div class="pin">
+                        <div class="bub">Padaria do Zé</div>
+                        <div class="stm"></div><div class="dt"></div>
+                      </div>
+                    </div>
+                    <div class="addr-block">
+                      <div class="a1">R. Augusta, 1.284</div>
+                      <div class="a2">Jardins, São Paulo · SP · 01305-100</div>
+                      <div class="coords">-23.5544, -46.6626</div>
+                      <div class="actions">
+                        <button class="btn btn-success"><span class="material-symbols-outlined" style="font-size:16px">sms</span>WhatsApp</button>
+                        <button class="btn btn-ghost"><span class="material-symbols-outlined" style="font-size:16px">directions</span>Rota</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="next">
+                    <h4>Pontos próximos</h4>
+                    <a href="#" class="nb">
+                      <div class="ic"><span class="material-symbols-outlined" style="font-size:20px">sports_bar</span></div>
+                      <div class="bd"><div class="n">Boteco Central</div><div class="d">320m · 8 ativos</div></div>
+                    </a>
+                    <a href="#" class="nb">
+                      <div class="ic"><span class="material-symbols-outlined" style="font-size:20px">storefront</span></div>
+                      <div class="bd"><div class="n">Banca do Paulinho</div><div class="d">580m · 3 ativos</div></div>
+                    </a>
+                    <a href="#" class="nb">
+                      <div class="ic"><span class="material-symbols-outlined" style="font-size:20px">local_library</span></div>
+                      <div class="bd"><div class="n">Livraria da Vila</div><div class="d">920m · 6 ativos</div></div>
+                    </a>
+                  </div>
+                </div>
+              </aside>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body></html>
