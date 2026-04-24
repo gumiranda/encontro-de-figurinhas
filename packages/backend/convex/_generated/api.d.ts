@@ -41,6 +41,7 @@ import type * as revalidate from "../revalidate.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
 import type * as seedBlog from "../seedBlog.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
+import type * as seeds_seedTradePoints from "../seeds/seedTradePoints.js";
 import type * as siteStats from "../siteStats.js";
 import type * as states from "../states.js";
 import type * as stickers from "../stickers.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   seedAlbumConfig: typeof seedAlbumConfig;
   seedBlog: typeof seedBlog;
   "seeds/seedCities": typeof seeds_seedCities;
+  "seeds/seedTradePoints": typeof seeds_seedTradePoints;
   siteStats: typeof siteStats;
   states: typeof states;
   stickers: typeof stickers;

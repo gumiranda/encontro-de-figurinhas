@@ -29,6 +29,7 @@ ANALYZE=true npm run build --workspace=web
 ```
 
 Key libraries to watch:
+
 - **Leaflet**: 500KB+ (lazy-load via dynamic() for /arena, /map routes)
 - **dicebear**: 50KB (lazy-load for avatar pages only)
 - **react-leaflet-cluster**: 30KB (part of map bundle)

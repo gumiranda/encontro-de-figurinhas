@@ -48,5 +48,9 @@
   { "name": "Maua", "state": "SP", "slug": "maua-sp", "lat": -23.6678, "lng": -46.4614 },
   { "name": "Vila Velha", "state": "ES", "slug": "vila-velha-es", "lat": -20.3297, "lng": -40.2925 },
   { "name": "Sao Jose dos Campos", "state": "SP", "slug": "sao-jose-dos-campos-sp", "lat": -23.1896, "lng": -45.8841 },
-  { "name": "Mogi das Cruzes", "state": "SP", "slug": "mogi-das-cruzes-sp", "lat": -23.5225, "lng": -46.1883 }
+  { "name": "Mogi das Cruzes", "state": "SP", "slug": "mogi-das-cruzes-sp", "lat": -23.5225, "lng": -46.1883 },
+  { "name": "Barueri", "state": "SP", "slug": "barueri-sp", "lat": -23.5114, "lng": -46.8756 },
+  { "name": "Vitoria", "state": "ES", "slug": "vitoria-es", "lat": -20.2976, "lng": -40.2958 },
+  { "name": "Sao Jose", "state": "SC", "slug": "sao-jose-sc", "lat": -27.6136, "lng": -48.6278 },
+  { "name": "Palmas", "state": "TO", "slug": "palmas-to", "lat": -10.1689, "lng": -48.3317 }
 ]
