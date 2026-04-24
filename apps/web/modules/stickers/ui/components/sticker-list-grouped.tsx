@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import {
   buildSectionLookup,
   formatStickerNumber,
@@ -18,7 +18,7 @@ type Props = {
   variant?: ListKind;
 };
 
-export function StickerListGrouped({
+function StickerListGroupedBase({
   numbers,
   sections,
   onRemove,
@@ -26,6 +26,13 @@ export function StickerListGrouped({
 }: Props) {
   const lookup = useMemo(() => buildSectionLookup(sections), [sections]);
   const grouped = useMemo(() => groupBySections(numbers, lookup), [numbers, lookup]);
+
+  const handleRemove = useCallback(
+    (num: number) => {
+      onRemove(num);
+    },
+    [onRemove]
+  );
 
   if (numbers.length === 0) {
     return (
@@ -80,19 +87,19 @@ export function StickerListGrouped({
                     ? "text-secondary"
                     : "text-primary";
 
-                const borderStyle = isExtra ? "border-l-4 border-tertiary" : "";
+                const extraStyle = isExtra ? "ring-1 ring-inset ring-tertiary/30" : "";
 
                 return (
                   <div
                     key={num}
-                    className={`bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors ${borderStyle}`}
+                    className={`bg-surface-container-high p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-highest transition-colors ${extraStyle}`}
                   >
                     <span className={`font-headline font-bold ${textColor}`}>
                       {display}
                     </span>
                     <button
                       type="button"
-                      onClick={() => onRemove(num)}
+                      onClick={() => handleRemove(num)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive/60 hover:text-destructive"
                       aria-label={`Remover ${display}`}
                     >
@@ -108,3 +115,5 @@ export function StickerListGrouped({
     </div>
   );
 }
+
+export const StickerListGrouped = memo(StickerListGroupedBase);

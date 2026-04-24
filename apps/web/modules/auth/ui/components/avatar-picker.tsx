@@ -1,75 +1,213 @@
 "use client";
 
-import { Camera, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import Image from "next/image";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { Camera, Loader2, Sparkles, Upload } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@workspace/ui/components/button";
 
-interface AvatarPickerProps {
+export interface AvatarPickerProps {
   nickname?: string;
   imageUrl?: string | null;
 }
+
+const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"];
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const GENERIC_ERROR = "Algo deu errado. Tente de novo.";
 
 function initialsFrom(nickname: string | undefined) {
   const clean = nickname?.trim();
   if (!clean) return "FF";
   const parts = clean.split(/[\s_]+/).filter(Boolean);
-  if (parts.length === 0) return "FF";
   if (parts.length === 1) {
-    const first = parts[0];
-    return (first ? first.slice(0, 2) : "FF").toUpperCase();
+    return (parts[0] ?? "FF").slice(0, 2).toUpperCase();
   }
   const head = parts[0]?.[0] ?? "";
   const tail = parts[parts.length - 1]?.[0] ?? "";
-  return (head + tail).toUpperCase();
+  return (head + tail).toUpperCase() || "FF";
+}
+
+async function uploadToConvex(
+  uploadUrl: string,
+  payload: Blob,
+  contentType: string,
+): Promise<Id<"_storage">> {
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { "Content-Type": contentType },
+    body: payload,
+  });
+  if (!response.ok) throw new Error(`Upload falhou (${response.status})`);
+  const { storageId } = (await response.json()) as { storageId?: string };
+  if (!storageId) throw new Error("Resposta de upload inválida");
+  return storageId as Id<"_storage">;
 }
 
 export function AvatarPicker({ nickname, imageUrl }: AvatarPickerProps) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [isBusy, setIsBusy] = useState(false);
+
+  const generateUploadUrl = useMutation(api.users.generateAvatarUploadUrl);
+  const setAvatar = useMutation(api.users.setAvatar);
+
+  useEffect(() => {
+    void import("@dicebear/core");
+    void import("@dicebear/collection");
+  }, []);
+
   const initials = initialsFrom(nickname);
 
+  const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || isBusy) return;
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      toast.error("Envie uma imagem PNG ou JPG.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast.error("Imagem muito grande. Use até 5MB.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
+    setIsBusy(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const storageId = await uploadToConvex(uploadUrl, file, file.type);
+      await setAvatar({ storageId });
+      toast.success("Foto atualizada.");
+    } catch {
+      toast.error(GENERIC_ERROR);
+    } finally {
+      setIsBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (isBusy) return;
+
+    setIsBusy(true);
+    try {
+      const seed =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      const [{ createAvatar }, { avataaars }] = await Promise.all([
+        import("@dicebear/core"),
+        import("@dicebear/collection"),
+      ]);
+
+      const result = createAvatar(avataaars, { seed, size: 256 }).toString();
+      const svg =
+        typeof result === "string" ? result : await (result as Promise<string>);
+
+      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+      const uploadUrl = await generateUploadUrl();
+      const storageId = await uploadToConvex(uploadUrl, blob, "image/svg+xml");
+      await setAvatar({ storageId });
+      toast.success("Avatar gerado.");
+    } catch {
+      toast.error(GENERIC_ERROR);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
   return (
-    <div className="flex items-center gap-6">
-      <div className="relative">
-        <div
-          className="flex size-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-secondary)] font-[var(--font-headline)] text-3xl font-black text-[var(--landing-on-primary)] shadow-[0_10px_30px_rgba(149,170,255,0.35)]"
-          aria-hidden={imageUrl ? undefined : "true"}
-          role="img"
-          aria-label={imageUrl ? `Avatar de ${nickname ?? "você"}` : undefined}
-        >
+    <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
+      <div className="relative shrink-0">
+        <div className="relative flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-surface-container-low bg-primary font-headline text-3xl font-black text-on-primary lg:size-36">
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageUrl} alt="" className="size-full object-cover" />
+            <Image
+              src={imageUrl}
+              alt={nickname ? `Avatar de ${nickname}` : "Seu avatar"}
+              fill
+              sizes="(min-width: 1024px) 144px, 112px"
+              className="object-cover"
+            />
           ) : (
-            initials
+            <span aria-label={`Avatar padrão${nickname ? ` de ${nickname}` : ""}`}>
+              {initials}
+            </span>
           )}
         </div>
         <button
           type="button"
-          aria-label="Upload de foto (em breve)"
-          disabled
-          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-[var(--landing-outline-variant)]/40 bg-[var(--landing-surface-container-high)] text-[var(--landing-on-surface)] opacity-60 shadow-lg"
+          onClick={() => fileRef.current?.click()}
+          disabled={isBusy}
+          aria-busy={isBusy}
+          aria-label="Enviar foto"
+          className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border-4 border-[var(--surface-container-low)] bg-[var(--primary)] text-[var(--on-primary)] shadow-lg disabled:opacity-60"
         >
-          <Camera className="size-4" aria-hidden="true" />
+          {isBusy ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Camera className="size-4" aria-hidden="true" />
+          )}
         </button>
       </div>
 
-      <div className="space-y-2">
-        <p className="font-[var(--font-headline)] text-sm font-bold uppercase tracking-wider text-[var(--landing-on-surface)]">
+      <div className="min-w-0 flex-1 space-y-2">
+        <p className="font-[var(--font-headline)] text-sm font-bold uppercase tracking-wider text-[var(--on-surface)]">
           Seu avatar
         </p>
-        <p className="text-sm text-[var(--landing-on-surface-variant)]">
+        <p className="break-words text-sm text-[var(--on-surface-variant)]">
           {imageUrl
             ? "Foto sincronizada com sua conta."
             : "Usaremos suas iniciais até você subir uma foto."}
         </p>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled
-          className="h-auto p-0 text-xs uppercase tracking-wider text-[var(--landing-primary)]/70"
-          aria-label="Gerar avatar (em breve)"
-        >
-          <Sparkles className="mr-1 size-3.5" /> Gerar avatar (em breve)
-        </Button>
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/jpeg"
+            onChange={handleFile}
+            className="hidden"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={isBusy}
+            aria-busy={isBusy}
+            onClick={() => fileRef.current?.click()}
+            className="text-xs uppercase tracking-wider text-[var(--primary)]"
+          >
+            {isBusy ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Upload className="size-3.5" aria-hidden="true" />
+            )}
+            Enviar foto
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={isBusy}
+            aria-busy={isBusy}
+            onClick={handleGenerate}
+            className="text-xs uppercase tracking-wider text-[var(--primary)]"
+          >
+            {isBusy ? (
+              <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Sparkles className="size-3.5" aria-hidden="true" />
+            )}
+            Gerar avatar
+          </Button>
+        </div>
       </div>
     </div>
   );

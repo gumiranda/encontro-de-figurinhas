@@ -1,4 +1,5 @@
 export const FREE_USER_MAX_POINTS = 3;
+export const PREMIUM_USER_MAX_POINTS = 200;
 
 export const MAX_CHECKIN_DISTANCE_KM = 0.5;
 export const CHECKIN_DURATION_MS = 2 * 60 * 60 * 1000;

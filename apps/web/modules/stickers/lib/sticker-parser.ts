@@ -4,6 +4,7 @@ export type Section = {
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
+  flagEmoji?: string;
 };
 
 export type SectionLookup = {
@@ -14,6 +15,7 @@ export type SectionLookup = {
 export type ParseResult = {
   valid: number[];
   invalid: string[];
+  rejectedMultiCount: string[];
   formatted: string[];
 };
 
@@ -69,36 +71,48 @@ const MAX_PARSE_ENTRIES = 500;
 
 const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
 const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
+export const MULTI_COUNT_PREFIX = /^\d+[xX]/;
+export const GLOBAL_SINGLE = /^\d+$/;
+export const GLOBAL_RANGE = /^(\d+)-(\d+)$/;
 
-type ParseSegmentResult = {
-  valid: number[];
-  error: string | null;
-  formatted: string | null;
-};
+type ParseEntryResult =
+  | {
+      kind: "ok";
+      valid: number[];
+      formatted: string | null;
+    }
+  | {
+      kind: "invalid";
+      label: string;
+    }
+  | {
+      kind: "rejectMultiCount";
+      label: string;
+    };
 
 function parseSingle(
   code: string,
   num: number,
   codeMap: Map<string, Section>
-): ParseSegmentResult {
+): ParseEntryResult {
   if (!Number.isInteger(num)) {
-    return { valid: [], error: `${code}-${num}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${num}` };
   }
 
   const section = codeMap.get(code);
   if (!section) {
-    return { valid: [], error: `${code}-${num}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${num}` };
   }
 
   const sectionSize = section.endNumber - section.startNumber + 1;
   if (num < 1 || num > sectionSize) {
-    return { valid: [], error: `${code}-${num}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${num}` };
   }
 
   const absoluteNum = section.startNumber + num - 1;
   return {
+    kind: "ok",
     valid: [absoluteNum],
-    error: null,
     formatted: `${code}-${num}`,
   };
 }
@@ -108,23 +122,23 @@ function parseRange(
   start: number,
   end: number,
   codeMap: Map<string, Section>
-): ParseSegmentResult {
+): ParseEntryResult {
   if (!Number.isInteger(start) || !Number.isInteger(end)) {
-    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
   const section = codeMap.get(code);
   if (!section) {
-    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
   if (start > end) {
-    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
   const sectionSize = section.endNumber - section.startNumber + 1;
   if (start < 1 || end > sectionSize) {
-    return { valid: [], error: `${code}-${start}-${end}`, formatted: null };
+    return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
   const numbers: number[] = [];
@@ -135,13 +149,64 @@ function parseRange(
   const formatted =
     start === end ? `${code}-${start}` : `${code}-${start} a ${code}-${end}`;
 
-  return { valid: numbers, error: null, formatted };
+  return { kind: "ok", valid: numbers, formatted };
 }
 
-function parseEntry(entry: string, codeMap: Map<string, Section>): ParseSegmentResult {
-  const normalized = entry.trim().toUpperCase();
+function parseGlobalSingle(
+  num: number,
+  totalStickers: number
+): ParseEntryResult {
+  if (!Number.isInteger(num) || num < 1 || num > totalStickers) {
+    return { kind: "invalid", label: String(num) };
+  }
+
+  return {
+    kind: "ok",
+    valid: [num],
+    formatted: String(num),
+  };
+}
+
+function parseGlobalRange(
+  start: number,
+  end: number,
+  totalStickers: number
+): ParseEntryResult {
+  if (
+    !Number.isInteger(start) ||
+    !Number.isInteger(end) ||
+    start > end ||
+    start < 1 ||
+    end > totalStickers
+  ) {
+    return { kind: "invalid", label: `${start}-${end}` };
+  }
+
+  const numbers: number[] = [];
+  for (let i = start; i <= end; i++) {
+    numbers.push(i);
+  }
+
+  return {
+    kind: "ok",
+    valid: numbers,
+    formatted: start === end ? String(start) : `${start} a ${end}`,
+  };
+}
+
+function parseEntry(
+  entry: string,
+  codeMap: Map<string, Section>,
+  totalStickers: number
+): ParseEntryResult {
+  const originalEntry = entry.trim();
+  const normalized = originalEntry.toUpperCase();
   if (!normalized) {
-    return { valid: [], error: null, formatted: null };
+    return { kind: "invalid", label: originalEntry };
+  }
+
+  if (MULTI_COUNT_PREFIX.test(originalEntry)) {
+    return { kind: "rejectMultiCount", label: originalEntry };
   }
 
   const rangeMatch = normalized.match(RANGE_PATTERN);
@@ -165,12 +230,34 @@ function parseEntry(entry: string, codeMap: Map<string, Section>): ParseSegmentR
     }
   }
 
-  return { valid: [], error: entry.trim(), formatted: null };
+  const globalRangeMatch = normalized.match(GLOBAL_RANGE);
+  if (globalRangeMatch) {
+    const [, startStr, endStr] = globalRangeMatch;
+    if (startStr && endStr) {
+      return parseGlobalRange(
+        parseInt(startStr, 10),
+        parseInt(endStr, 10),
+        totalStickers
+      );
+    }
+  }
+
+  const globalSingleMatch = normalized.match(GLOBAL_SINGLE);
+  if (globalSingleMatch) {
+    return parseGlobalSingle(parseInt(normalized, 10), totalStickers);
+  }
+
+  return { kind: "invalid", label: originalEntry };
 }
 
-export function parseStickers(input: string, lookup: SectionLookup): ParseResult {
+export function parseStickers(
+  input: string,
+  lookup: SectionLookup,
+  totalStickers: number
+): ParseResult {
   const valid: number[] = [];
   const invalid: string[] = [];
+  const rejectedMultiCount: string[] = [];
   const formatted: string[] = [];
   const seen = new Set<number>();
 
@@ -183,10 +270,15 @@ export function parseStickers(input: string, lookup: SectionLookup): ParseResult
     .filter((e) => e.length > 0);
 
   for (const entry of entries) {
-    const result = parseEntry(entry, codeMap);
+    const result = parseEntry(entry, codeMap, totalStickers);
 
-    if (result.error) {
-      invalid.push(result.error);
+    if (result.kind === "invalid") {
+      invalid.push(result.label);
+      continue;
+    }
+
+    if (result.kind === "rejectMultiCount") {
+      rejectedMultiCount.push(result.label);
       continue;
     }
 
@@ -206,7 +298,7 @@ export function parseStickers(input: string, lookup: SectionLookup): ParseResult
 
   valid.sort((a, b) => a - b);
 
-  return { valid, invalid, formatted };
+  return { valid, invalid, rejectedMultiCount, formatted };
 }
 
 export function formatStickerNumber(

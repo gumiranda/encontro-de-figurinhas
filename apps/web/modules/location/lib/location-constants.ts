@@ -24,3 +24,5 @@ export const SUGGESTED_CITY_KEYS = citiesData.map((city) => ({
 }));
 
 export const DISTANCE_THRESHOLD_KM = 100;
+
+export const DEFAULT_NEARBY_RADIUS_KM = 5;

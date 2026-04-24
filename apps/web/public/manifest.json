@@ -4,8 +4,8 @@
   "description": "A maior rede de troca de figurinhas do Brasil",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3C82F6",
+  "background_color": "#090e1c",
+  "theme_color": "#95aaff",
   "orientation": "portrait-primary",
   "icons": [
     {

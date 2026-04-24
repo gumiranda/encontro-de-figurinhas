@@ -9,14 +9,14 @@ export function RoleBadge({ role }: RoleBadgeProps) {
   switch (role) {
     case "superadmin":
       return (
-        <Badge variant="default" className="bg-purple-600">
+        <Badge className="bg-primary-dim text-primary-foreground">
           <Shield className="mr-1 h-3 w-3" />
           Superadmin
         </Badge>
       );
     case "ceo":
       return (
-        <Badge variant="default" className="bg-amber-600">
+        <Badge className="bg-tertiary text-tertiary-foreground">
           <Crown className="mr-1 h-3 w-3" />
           CEO
         </Badge>

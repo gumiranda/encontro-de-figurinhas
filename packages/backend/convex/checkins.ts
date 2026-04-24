@@ -1,9 +1,9 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, mutation } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
-import { authErrorValidators, checkAuth } from "./lib/auth";
+import { checkAuth } from "./lib/auth";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
   CHECKIN_DURATION_MS,
@@ -20,22 +20,6 @@ export const create = mutation({
     lat: v.float64(),
     lng: v.float64(),
   },
-  returns: v.union(
-    v.object({
-      ok: v.literal(true),
-      expiresAt: v.number(),
-      replacedPrevious: v.boolean(),
-      renewed: v.boolean(),
-    }),
-    ...authErrorValidators,
-    v.object({
-      ok: v.literal(false),
-      error: v.literal("too-far"),
-      distanceMeters: v.number(),
-    }),
-    v.object({ ok: v.literal(false), error: v.literal("not-member") }),
-    v.object({ ok: v.literal(false), error: v.literal("point-unavailable") })
-  ),
   handler: async (ctx, { tradePointId, lat, lng }) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
@@ -129,6 +113,10 @@ export const create = mutation({
       expiresAt,
       createdAt: now,
       countedInPublic,
+      // Denormalized fields for listPresentMatchesAtPoint (avoids N+1 reads)
+      displayNickname: user.displayNickname ?? user.nickname ?? user.name,
+      avatarSeed: user.nickname ?? user._id,
+      duplicates: user.duplicates ?? [],
     });
 
     if (countedInPublic) {
@@ -181,10 +169,6 @@ export const create = mutation({
 
 export const cancelMine = mutation({
   args: {},
-  returns: v.union(
-    v.object({ ok: v.literal(true), cancelled: v.boolean() }),
-    ...authErrorValidators
-  ),
   handler: async (ctx) => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
@@ -218,11 +202,86 @@ export const cancelMine = mutation({
   },
 });
 
+/** User IDs with an active, public check-in at each of the caller's trade points (max 20 per point). */
+export const listPresentAtMyPoints = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") return { present: [] as Id<"users">[] };
+
+    const now = Date.now();
+
+    const myMemberships = await ctx.db
+      .query("userTradePoints")
+      .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
+      .take(100);
+
+    const presentUserIds: Id<"users">[] = [];
+
+    for (const m of myMemberships) {
+      const checkins = await ctx.db
+        .query("checkins")
+        .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+          q
+            .eq("tradePointId", m.tradePointId)
+            .eq("countedInPublic", true)
+            .gt("expiresAt", now)
+        )
+        .take(20);
+
+      for (const c of checkins) {
+        if (c.userId !== auth.user._id) {
+          presentUserIds.push(c.userId);
+        }
+      }
+    }
+
+    return { present: presentUserIds };
+  },
+});
+
+/** Active check-in for share CTA + “estou no ponto” empty states. */
+export const getMyActiveCheckinSummary = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return {
+        hasActiveCheckin: false as const,
+        tradePointSlug: null,
+        tradePointId: null,
+      };
+    }
+
+    const now = Date.now();
+    const active = await ctx.db
+      .query("checkins")
+      .withIndex("by_user_active", (q) =>
+        q.eq("userId", auth.user._id).gt("expiresAt", now)
+      )
+      .first();
+
+    if (!active) {
+      return {
+        hasActiveCheckin: false as const,
+        tradePointSlug: null,
+        tradePointId: null,
+      };
+    }
+
+    const point = await ctx.db.get(active.tradePointId);
+    return {
+      hasActiveCheckin: true as const,
+      tradePointSlug: point?.slug ?? null,
+      tradePointId: active.tradePointId,
+    };
+  },
+});
+
 const EXPIRE_BATCH_SIZE = 50;
 
 export const expireCheckins = internalMutation({
   args: {},
-  returns: v.object({ expired: v.number() }),
   handler: async (ctx) => {
     const now = Date.now();
     const expired = await ctx.db
@@ -230,6 +289,7 @@ export const expireCheckins = internalMutation({
       .withIndex("by_expiresAt", (q) => q.lte("expiresAt", now))
       .take(EXPIRE_BATCH_SIZE);
 
+    // Collect decrements per tradePoint (already consolidated)
     const decrements = new Map<Id<"tradePoints">, number>();
     for (const checkin of expired) {
       if (checkin.countedInPublic) {
@@ -238,20 +298,25 @@ export const expireCheckins = internalMutation({
           (decrements.get(checkin.tradePointId) ?? 0) + 1
         );
       }
-      await ctx.db.delete(checkin._id);
     }
 
-    for (const [tradePointId, count] of decrements) {
-      const point = await ctx.db.get(tradePointId);
-      if (point) {
-        await ctx.db.patch(tradePointId, {
-          activeCheckinsCount: Math.max(
-            0,
-            (point.activeCheckinsCount ?? 0) - count
-          ),
+    // BARRIER 1: Delete all checkins in parallel
+    await Promise.all(expired.map((c) => ctx.db.delete(c._id)));
+
+    // BARRIER 2: Batch get+patch for each unique tradePoint (after deletes complete)
+    const tradePointIds = [...decrements.keys()];
+    const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
+
+    await Promise.all(
+      tradePointIds.map((id, i) => {
+        const point = points[i];
+        if (!point) return;
+        const count = decrements.get(id) ?? 0;
+        return ctx.db.patch(id, {
+          activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
         });
-      }
-    }
+      })
+    );
 
     if (expired.length === EXPIRE_BATCH_SIZE) {
       await ctx.scheduler.runAfter(0, internal.checkins.expireCheckins, {});
@@ -283,11 +348,6 @@ export const cleanupForShadowBannedUser = internalMutation({
     ),
     chunk: v.optional(v.number()),
   },
-  returns: v.object({
-    deleted: v.number(),
-    phase: v.string(),
-    rescheduled: v.boolean(),
-  }),
   handler: async (ctx, { userId, phase = "checkins", chunk = 0 }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("cleanup-user-not-found");
@@ -319,6 +379,7 @@ export const cleanupForShadowBannedUser = internalMutation({
         )
         .take(CLEANUP_BATCH);
 
+      // Collect decrements per tradePoint
       const decrements = new Map<Id<"tradePoints">, number>();
       for (const c of batch) {
         if (c.countedInPublic) {
@@ -327,19 +388,25 @@ export const cleanupForShadowBannedUser = internalMutation({
             (decrements.get(c.tradePointId) ?? 0) + 1
           );
         }
-        await ctx.db.delete(c._id);
       }
-      for (const [pid, n] of decrements) {
-        const p = await ctx.db.get(pid);
-        if (p) {
-          await ctx.db.patch(pid, {
-            activeCheckinsCount: Math.max(
-              0,
-              (p.activeCheckinsCount ?? 0) - n
-            ),
+
+      // BARRIER 1: Delete all checkins in parallel
+      await Promise.all(batch.map((c) => ctx.db.delete(c._id)));
+
+      // BARRIER 2: Batch get+patch for each unique tradePoint
+      const tradePointIds = [...decrements.keys()];
+      const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
+
+      await Promise.all(
+        tradePointIds.map((id, i) => {
+          const point = points[i];
+          if (!point) return;
+          const count = decrements.get(id) ?? 0;
+          return ctx.db.patch(id, {
+            activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
           });
-        }
-      }
+        })
+      );
 
       if (batch.length === CLEANUP_BATCH) {
         const result = await rescheduleIfMore(ctx, {
@@ -371,7 +438,9 @@ export const cleanupForShadowBannedUser = internalMutation({
       .query("scoreBumps")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .take(CLEANUP_BATCH);
-    for (const r of scoreBumpBatch) await ctx.db.delete(r._id);
+
+    // Batch delete all scoreBumps in parallel
+    await Promise.all(scoreBumpBatch.map((r) => ctx.db.delete(r._id)));
 
     if (scoreBumpBatch.length === CLEANUP_BATCH) {
       const result = await rescheduleIfMore(ctx, {
@@ -409,14 +478,14 @@ export const decayPeakHours = internalMutation({
     cursor: v.optional(v.string()),
     chunk: v.optional(v.number()),
   },
-  returns: v.object({ processed: v.number(), rescheduled: v.boolean() }),
   handler: async (ctx, { cursor, chunk = 0 }) => {
     const page = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .paginate({ numItems: DECAY_BATCH, cursor: cursor ?? null });
 
-    let processed = 0;
+    // Collect patches to apply
+    const patches: { id: Id<"tradePoints">; peakHours: number[] }[] = [];
     for (const point of page.page) {
       if (!point.peakHours || point.peakHours.length === 0) continue;
       const decayed = point.peakHours.map((h) => {
@@ -425,9 +494,14 @@ export const decayPeakHours = internalMutation({
         const next = Math.floor(original * PEAK_HOURS_DECAY_FACTOR);
         return Math.max(next, PEAK_HOURS_FLOOR_AFTER_ACTIVITY);
       });
-      await ctx.db.patch(point._id, { peakHours: decayed });
-      processed++;
+      patches.push({ id: point._id, peakHours: decayed });
     }
+
+    // Batch apply all patches in parallel
+    await Promise.all(
+      patches.map((p) => ctx.db.patch(p.id, { peakHours: p.peakHours }))
+    );
+    const processed = patches.length;
 
     if (!page.isDone) {
       const result = await rescheduleIfMore(ctx, {
@@ -451,10 +525,6 @@ const PRUNE_MAX_CHUNKS = 100;
 
 export const pruneScoreBumps = internalMutation({
   args: { chunk: v.optional(v.number()) },
-  returns: v.object({
-    deleted: v.number(),
-    aborted: v.optional(v.boolean()),
-  }),
   handler: async (ctx, { chunk }) => {
     const cutoff = Date.now() - SCOREBUMP_RETENTION_MS;
     const expired = await ctx.db
@@ -462,9 +532,8 @@ export const pruneScoreBumps = internalMutation({
       .withIndex("by_at", (q) => q.lt("at", cutoff))
       .take(PRUNE_BATCH);
 
-    for (const row of expired) {
-      await ctx.db.delete(row._id);
-    }
+    // Batch delete all expired scoreBumps in parallel
+    await Promise.all(expired.map((row) => ctx.db.delete(row._id)));
 
     if (expired.length === PRUNE_BATCH) {
       const nextChunk = (chunk ?? 0) + 1;
@@ -479,5 +548,176 @@ export const pruneScoreBumps = internalMutation({
       });
     }
     return { deleted: expired.length };
+  },
+});
+
+const BACKFILL_BATCH = 50;
+
+/**
+ * Backfill denormalized fields (displayNickname, avatarSeed, duplicates) for existing check-ins.
+ * Idempotent: only patches rows missing the fields. Run once manually via dashboard.
+ */
+export const backfillCheckinDenormFields = internalMutation({
+  args: { cursor: v.optional(v.string()) },
+  handler: async (ctx, { cursor }) => {
+    const now = Date.now();
+    const page = await ctx.db
+      .query("checkins")
+      .withIndex("by_expiresAt", (q) => q.gt("expiresAt", now))
+      .paginate({ numItems: BACKFILL_BATCH, cursor: cursor ?? null });
+
+    const needsBackfill = page.page.filter(
+      (c) =>
+        c.displayNickname === undefined ||
+        c.avatarSeed === undefined ||
+        c.duplicates === undefined
+    );
+
+    if (needsBackfill.length === 0 && page.isDone) {
+      return { patched: 0, done: true };
+    }
+
+    const userIds = [...new Set(needsBackfill.map((c) => c.userId))];
+    const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
+    const userMap = new Map(
+      users.filter(Boolean).map((u) => [u!._id, u!])
+    );
+
+    await Promise.all(
+      needsBackfill.map((c) => {
+        const user = userMap.get(c.userId);
+        if (!user) return;
+        return ctx.db.patch(c._id, {
+          displayNickname: user.displayNickname ?? user.nickname ?? user.name,
+          avatarSeed: user.nickname ?? user._id,
+          duplicates: user.duplicates ?? [],
+        });
+      })
+    );
+
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(0, internal.checkins.backfillCheckinDenormFields, {
+        cursor: page.continueCursor,
+      });
+      return { patched: needsBackfill.length, done: false };
+    }
+
+    return { patched: needsBackfill.length, done: true };
+  },
+});
+
+const PRESENT_MATCHES_CAP = 50;
+const STICKER_SAMPLE_LIMIT = 20;
+
+const listPresentMatchesReturn = v.union(
+  v.object({ state: v.literal("needs-auth") }),
+  v.object({ state: v.literal("banned") }),
+  v.object({ state: v.literal("no-stickers") }),
+  v.object({ state: v.literal("no-needs") }),
+  v.object({ state: v.literal("not-found") }),
+  v.object({
+    state: v.literal("ready"),
+    matches: v.array(
+      v.object({
+        checkinId: v.id("checkins"),
+        displayNickname: v.string(),
+        avatarSeed: v.string(),
+        checkinAt: v.number(),
+        matchingStickers: v.array(v.number()),
+        totalMatches: v.number(),
+      })
+    ),
+    truncated: v.boolean(),
+  })
+);
+
+/**
+ * List users present at a trade point who have stickers the caller needs.
+ * Uses denormalized fields on check-ins to avoid N+1 reads.
+ */
+export const listPresentMatchesAtPoint = query({
+  args: { tradePointId: v.id("tradePoints") },
+  returns: listPresentMatchesReturn,
+  handler: async (ctx, { tradePointId }) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state === "needs-auth") {
+      return { state: "needs-auth" as const };
+    }
+    if (auth.state === "banned") {
+      return { state: "banned" as const };
+    }
+    if (auth.state !== "ok") {
+      return { state: "needs-auth" as const };
+    }
+    const user = auth.user;
+
+    if (!user.hasCompletedStickerSetup) {
+      return { state: "no-stickers" as const };
+    }
+
+    const myMissing = user.missing ?? [];
+    if (myMissing.length === 0) {
+      return { state: "no-needs" as const };
+    }
+
+    const point = await ctx.db.get(tradePointId);
+    if (!point || point.status !== "approved") {
+      return { state: "not-found" as const };
+    }
+
+    const myMissingSet = new Set(myMissing);
+    const now = Date.now();
+
+    const checkins = await ctx.db
+      .query("checkins")
+      .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+        q
+          .eq("tradePointId", tradePointId)
+          .eq("countedInPublic", true)
+          .gt("expiresAt", now)
+      )
+      .take(PRESENT_MATCHES_CAP);
+
+    const truncated = checkins.length === PRESENT_MATCHES_CAP;
+
+    const matchRows: {
+      checkinId: Id<"checkins">;
+      displayNickname: string;
+      avatarSeed: string;
+      checkinAt: number;
+      matchingStickers: number[];
+      totalMatches: number;
+    }[] = [];
+
+    for (const c of checkins) {
+      if (c.userId === user._id) continue;
+
+      const theirDuplicates = c.duplicates ?? [];
+      const matching = theirDuplicates.filter((n) => myMissingSet.has(n));
+
+      if (matching.length === 0) continue;
+
+      matchRows.push({
+        checkinId: c._id,
+        displayNickname: c.displayNickname ?? "Colecionador",
+        avatarSeed: c.avatarSeed ?? c.userId,
+        checkinAt: c.createdAt,
+        matchingStickers: matching.slice(0, STICKER_SAMPLE_LIMIT),
+        totalMatches: matching.length,
+      });
+    }
+
+    matchRows.sort((a, b) => {
+      if (b.totalMatches !== a.totalMatches) {
+        return b.totalMatches - a.totalMatches;
+      }
+      return b.checkinAt - a.checkinAt;
+    });
+
+    return {
+      state: "ready" as const,
+      matches: matchRows,
+      truncated,
+    };
   },
 });

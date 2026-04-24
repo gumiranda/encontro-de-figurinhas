@@ -318,6 +318,9 @@ Campos já existentes no código que o PRD v2 não previa (agora documentados):
 - `pendingSubmissionsCount`, `lastSubmissionAt` — rate limit anti-abuso.
 - `locationUpdatedAt`, `locationUpdateTimestamps: number[]` — rate limit de location updates.
 - `hasCompletedOnboarding` + `hasCompletedStickerSetup` — onboarding em 2 etapas.
+- `favoriteTradePointIds: v.optional(v.array(v.id("tradePoints")))` — array capado em 50 no MVP (`MAX_FAVORITE_TRADE_POINTS` em `users.ts`). Mesmo padrão de `duplicates`/`missing`: array no user doc, sem tabela auxiliar. Ramp-up para 200 previsto quando `premiumExpiresAt` entrar no schema.
+
+**Decisão de acesso — rotas do grupo `(arena)`:** `/map`, `/points/[tradePointId]`, `/stickers` e afins são **anon-read** (sem AuthGuard em `(arena)/layout.tsx`). Metadata bloqueia indexação (`robots: index=false`), mas anon pode navegar para browsing. Ações com side-effect (favoritar, check-in, avaliar) exigem auth via `requireAuth(ctx)` no Convex e a UI esconde os botões correspondentes via `isAuthenticated` lifting (ver `arena-map-frame.tsx`). SEO indexável fica nas rotas públicas dedicadas (`/ponto/[slug]`, `/cidade/[slug]`) fora do grupo `(arena)`.
 
 **tradePoints** — confirmar:
 

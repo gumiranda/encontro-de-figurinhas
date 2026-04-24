@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cards compartilháveis · Jogo Mais Chato</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display:ital@1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chato.css">
+<style>
+body { padding: 56px 24px; background: var(--surface-dim); }
+.wrap { max-width: 1240px; margin: 0 auto; }
+h1 { font-family: 'Bungee'; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.02em; }
+.lead { color: var(--on-surface-variant); margin-top: 10px; max-width: 58ch; }
+.cards-col { display: flex; flex-direction: column; gap: 40px; margin-top: 40px; }
+.card-wrap { display: flex; flex-direction: column; gap: 14px; }
+.card-meta { display: flex; justify-content: space-between; align-items: end; }
+.card-meta h3 { font-family: 'Bungee'; font-size: 1.2rem; }
+.card-meta .sub { color: var(--on-surface-variant); font-size: .85rem; margin-top: 3px; max-width: 60ch; }
+.ratio { background: #0b1020; border-radius: 18px; overflow: hidden; aspect-ratio: 1.91/1; position: relative; box-shadow: 0 30px 60px -20px rgba(0,0,0,.4); }
+
+/* ---------- V1: Navy + carimbo ---------- */
+.v1 {
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255,201,101,.15), transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(149,170,255,.12), transparent 55%),
+    #0b1020;
+  color: #fff;
+  padding: 44px 56px;
+  display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px;
+  position: relative;
+}
+.v1::before, .v1::after {
+  content: ''; position: absolute; inset: 16px;
+  border: 2px dashed rgba(255,255,255,.08); border-radius: 12px; pointer-events: none;
+}
+.v1 .head-row { display: flex; align-items: center; gap: 10px; }
+.v1 .brand-badge { padding: 5px 10px; border-radius: 8px; background: var(--chato-yellow); color: var(--chato-navy); font-family: 'Bungee'; font-size: .72rem; letter-spacing: .06em; }
+.v1 .rodada { font-family: 'JetBrains Mono'; font-size: .72rem; color: var(--chato-yellow); letter-spacing: .2em; text-transform: uppercase; }
+.v1 h2 { font-family: 'Bungee'; font-size: 3.4rem; line-height: .88; margin-top: 16px; letter-spacing: -0.025em; }
+.v1 h2 .hi { color: var(--chato-yellow); }
+.v1 .quote { font-family: 'DM Serif Display'; font-style: italic; font-size: 1.3rem; color: var(--chato-yellow); margin-top: 18px; line-height: 1.2; }
+.v1 .prova { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 20px; }
+.v1 .prova .stack { display: flex; }
+.v1 .prova .bubble { width: 28px; height: 28px; border-radius: 9999px; background: var(--surface-container); border: 2px solid #0b1020; display: grid; place-items: center; font-size: 14px; margin-left: -8px; }
+.v1 .prova .bubble:first-child { margin-left: 0; }
+.v1 .prova .txt { font-size: .82rem; color: rgba(255,255,255,.72); }
+.v1 .prova .txt strong { color: #fff; font-family: 'Bungee'; font-weight: 400; }
+.v1 .right { display: flex; flex-direction: column; justify-content: space-between; align-items: end; position: relative; }
+.v1 .matchbox { display: flex; align-items: center; gap: 16px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.06); border-radius: 16px; padding: 14px 18px; }
+.v1 .matchbox .flag-xl { width: 56px; height: 56px; font-size: 2.4rem; display: grid; place-items: center; }
+.v1 .matchbox .vs { font-family: 'Bungee'; font-size: 1.7rem; color: rgba(255,255,255,.3); }
+.v1 .score-block { display: flex; align-items: baseline; gap: 14px; margin-top: 10px; }
+.v1 .score-block .score { font-family: 'Bungee'; font-size: 2.6rem; letter-spacing: .06em; }
+.v1 .teams-txt { font-family: 'Space Grotesk'; font-weight: 700; font-size: .95rem; text-align: right; }
+.v1 .teams-txt .date { color: rgba(255,255,255,.5); font-weight: 500; font-size: .72rem; margin-top: 4px; }
+.v1 .stamp {
+  width: 150px; height: 150px;
+  border-radius: 9999px;
+  border: 3px double var(--chato-yellow);
+  color: var(--chato-yellow);
+  display: grid; place-items: center;
+  transform: rotate(-14deg);
+  position: absolute; top: -10px; right: -10px;
+  font-family: 'Bungee';
+  background: rgba(11,16,32,.4);
+}
+.v1 .stamp::before { content:''; position:absolute; inset:8px; border: 2px solid var(--chato-yellow); border-radius: 9999px; opacity:.6; }
+.v1 .stamp .big { font-size: 2.4rem; line-height: 1; }
+.v1 .stamp .sm { font-size: .6rem; letter-spacing: .2em; text-align: center; margin-top: 4px; }
+.v1 .foot {
+  position: absolute; bottom: 30px; left: 56px; right: 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Space Grotesk'; font-size: .78rem; color: rgba(255,255,255,.55);
+}
+.v1 .foot .qr { width: 44px; height: 44px; background: #fff; border-radius: 6px; padding: 4px; display: grid; place-items: center; }
+.v1 .foot .qr svg { width: 100%; height: 100%; }
+
+/* ---------- V2: Amarelo escancarado ---------- */
+.v2 {
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(11,16,32,.08), transparent 50%),
+    var(--chato-yellow);
+  color: var(--chato-navy);
+  padding: 44px 56px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.v2::after {
+  content: '🥱😴💤🪦⏱️🧊🥱😴💤🪦⏱️🧊🥱😴💤🪦⏱️🧊';
+  position: absolute; top: -60px; right: -20px;
+  font-size: 130px; line-height: 1;
+  transform: rotate(-8deg);
+  opacity: .08;
+  white-space: nowrap; pointer-events: none;
+}
+.v2 .top-row { display: flex; justify-content: space-between; align-items: start; position: relative; }
+.v2 .brand-row { display: flex; align-items: center; gap: 10px; }
+.v2 .ff-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--chato-navy); color: var(--chato-yellow); display: grid; place-items: center; font-family: 'Bungee'; font-size: .9rem; }
+.v2 .ff-txt { font-family: 'Bungee'; font-size: 1rem; line-height: 1; }
+.v2 .ff-txt small { display: block; font-family: 'Space Grotesk'; font-weight: 600; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; margin-top: 3px; color: rgba(11,16,32,.7); }
+.v2 .rodada-chip { padding: 5px 12px; border-radius: 9999px; background: var(--chato-navy); color: var(--chato-yellow); font-family: 'Bungee'; font-size: .7rem; letter-spacing: .08em; }
+.v2 .middle { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; margin: 6px 0; position: relative; z-index: 1; }
+.v2 .pct-block { display: flex; flex-direction: column; align-items: center; }
+.v2 .pct-block .num { font-family: 'Bungee'; font-size: 6.5rem; line-height: .85; letter-spacing: -0.04em; }
+.v2 .pct-block .pct-sign { font-family: 'Bungee'; font-size: 2.4rem; line-height: 1; margin-top: 6px; }
+.v2 .pct-block .lbl { font-family: 'Space Grotesk'; font-weight: 800; font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; margin-top: 4px; opacity: .75; }
+.v2 .right-block { display: flex; flex-direction: column; gap: 12px; }
+.v2 h2 { font-family: 'Bungee'; font-size: 2.2rem; line-height: .95; letter-spacing: -0.02em; }
+.v2 .teams-v2 { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--chato-navy); color: var(--chato-yellow); border-radius: 14px; }
+.v2 .teams-v2 .f { width: 44px; height: 44px; font-size: 2rem; display: grid; place-items: center; }
+.v2 .teams-v2 .score-inner { font-family: 'Bungee'; font-size: 1.8rem; letter-spacing: .08em; color: #fff; }
+.v2 .teams-v2 .tnames { font-family: 'Bungee'; font-size: 1rem; flex: 1; }
+.v2 .quote-v2 { font-family: 'DM Serif Display'; font-style: italic; font-size: 1.3rem; line-height: 1.2; padding-left: 16px; border-left: 4px solid var(--chato-navy); }
+.v2 .bot-row { display: flex; justify-content: space-between; align-items: end; position: relative; z-index: 1; }
+.v2 .cta-bot { font-family: 'Bungee'; font-size: 1.1rem; }
+.v2 .cta-bot .arrow { color: var(--chato-navy); opacity: .5; margin-left: 4px; }
+.v2 .cta-bot small { display: block; font-family: 'Space Grotesk'; font-weight: 700; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; margin-top: 2px; opacity: .65; }
+.v2 .qr-box { width: 56px; height: 56px; background: var(--chato-navy); border-radius: 10px; padding: 5px; display: grid; place-items: center; }
+.v2 .qr-box svg { width: 100%; height: 100%; color: var(--chato-yellow); }
+
+/* QR pattern (svg) */
+.qr-svg { display:block; }
+
+/* Variants grid */
+.variants-grid { display: grid; gap: 24px; grid-template-columns: 1fr; margin-top: 40px; }
+@media (min-width: 1024px) { .variants-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="micro-cap" style="color: var(--chato-yellow);">● Figurinha Fácil · JMC</span>
+  <h1 style="margin-top:10px;">Cards pra zoar <span style="color: var(--chato-yellow);">no grupo</span></h1>
+  <p class="lead">Open Graph (1.91:1) — otimizado pra link preview, WhatsApp feed e timeline. Duas direções visuais para A/B testar qual viraliza mais.</p>
+
+  <div class="variants-grid">
+
+    <!-- V1 -->
+    <div class="card-wrap">
+      <div class="card-meta">
+        <div>
+          <h3>v1 · <span style="color:var(--chato-yellow)">Certificado</span></h3>
+          <div class="sub">Navy sério, carimbo retrô. Vibe "documento oficial de tédio". Bom para zoar com cara de legitimidade.</div>
+        </div>
+        <span style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">1200 × 628</span>
+      </div>
+      <div class="ratio">
+        <div class="v1">
+          <div>
+            <div class="head-row">
+              <span class="brand-badge">FF</span>
+              <span class="rodada">Rodada 3 · Copa 2026</span>
+            </div>
+            <h2>Oficialmente<br><span class="hi">o mais chato</span><br>da rodada</h2>
+            <div class="quote">"devolve 90 minutos<br>da minha vida"</div>
+            <div class="prova">
+              <div class="stack">
+                <div class="bubble">🥱</div>
+                <div class="bubble">😴</div>
+                <div class="bubble">💤</div>
+                <div class="bubble">🪦</div>
+              </div>
+              <div class="txt"><strong>8.263</strong> torcedores votaram</div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="stamp">
+              <div><div class="big">72%</div><div class="sm">CHATO</div></div>
+            </div>
+            <div style="text-align:right; width:100%;">
+              <div class="matchbox" style="margin-left:auto;">
+                <div class="flag-xl">🇩🇪</div>
+                <div class="vs">×</div>
+                <div class="flag-xl">🇨🇭</div>
+              </div>
+              <div class="score-block" style="justify-content:flex-end;">
+                <div class="teams-txt">
+                  ALEMANHA × SUÍÇA
+                  <div class="date">0×0 · 14 jun · Grupo A</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="qr">
+                <svg viewBox="0 0 29 29" class="qr-svg"><rect width="29" height="29" fill="#fff"/><g fill="#0b1020">
+                  <rect x="0" y="0" width="7" height="7"/><rect x="22" y="0" width="7" height="7"/><rect x="0" y="22" width="7" height="7"/>
+                  <rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="24" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="24" width="3" height="3" fill="#fff"/>
+                  <rect x="9" y="1" width="1" height="1"/><rect x="11" y="2" width="1" height="2"/><rect x="13" y="1" width="2" height="1"/><rect x="16" y="3" width="1" height="2"/><rect x="18" y="1" width="1" height="1"/><rect x="20" y="2" width="1" height="1"/>
+                  <rect x="1" y="9" width="1" height="2"/><rect x="3" y="11" width="2" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="2" y="13" width="1" height="2"/><rect x="4" y="16" width="1" height="1"/><rect x="1" y="18" width="2" height="1"/><rect x="3" y="20" width="1" height="1"/>
+                  <rect x="9" y="9" width="2" height="2"/><rect x="12" y="10" width="1" height="3"/><rect x="14" y="9" width="3" height="1"/><rect x="15" y="11" width="2" height="2"/><rect x="18" y="10" width="1" height="1"/><rect x="19" y="12" width="2" height="1"/><rect x="10" y="14" width="3" height="1"/><rect x="13" y="16" width="1" height="2"/><rect x="16" y="15" width="1" height="2"/><rect x="18" y="17" width="2" height="1"/><rect x="11" y="19" width="1" height="2"/><rect x="14" y="20" width="2" height="1"/><rect x="17" y="19" width="1" height="2"/><rect x="9" y="22" width="1" height="2"/><rect x="11" y="23" width="2" height="1"/><rect x="14" y="25" width="1" height="2"/><rect x="16" y="22" width="1" height="1"/><rect x="18" y="23" width="1" height="2"/><rect x="20" y="25" width="2" height="1"/>
+                  <rect x="23" y="9" width="2" height="1"/><rect x="26" y="10" width="1" height="2"/><rect x="24" y="12" width="1" height="2"/><rect x="22" y="14" width="1" height="1"/><rect x="25" y="15" width="2" height="1"/><rect x="23" y="17" width="1" height="2"/><rect x="26" y="18" width="1" height="2"/><rect x="22" y="20" width="2" height="1"/>
+                </g></svg>
+              </div>
+              <span>figurinhafacil.com/<strong style="color:#fff;">chato</strong></span>
+            </div>
+            <span>vota aí → #JogoMaisChato</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V2 -->
+    <div class="card-wrap">
+      <div class="card-meta">
+        <div>
+          <h3>v2 · <span style="color:var(--chato-yellow)">Escancarado</span></h3>
+          <div class="sub">Amarelo meme, 72% gigante que para o scroll. Para quando o objetivo é pura viralização no feed.</div>
+        </div>
+        <span style="font-family:'JetBrains Mono'; font-size:.72rem; color:var(--outline);">1200 × 628</span>
+      </div>
+      <div class="ratio">
+        <div class="v2">
+          <div class="top-row">
+            <div class="brand-row">
+              <div class="ff-mark">FF</div>
+              <div class="ff-txt">JMC<small>Jogo Mais Chato</small></div>
+            </div>
+            <div class="rodada-chip">RODADA 3 · COPA 2026</div>
+          </div>
+
+          <div class="middle">
+            <div class="pct-block">
+              <div style="display:flex; align-items:start;">
+                <span class="num">72</span>
+                <span class="pct-sign">%</span>
+              </div>
+              <div class="lbl">De TÉDIO</div>
+            </div>
+            <div class="right-block">
+              <h2>Oficialmente<br>o mais <span style="background:var(--chato-navy); color:var(--chato-yellow); padding:0 8px;">CHATO</span></h2>
+              <div class="teams-v2">
+                <div class="f">🇩🇪</div>
+                <div class="tnames" style="color:#fff;">ALE <span class="score-inner">0×0</span> SUI</div>
+                <div class="f">🇨🇭</div>
+              </div>
+              <div class="quote-v2">"parecia Copa Kaiser"</div>
+            </div>
+          </div>
+
+          <div class="bot-row">
+            <div class="cta-bot">
+              vota o próximo<span class="arrow">→</span>
+              <small>figurinhafacil.com/chato</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="text-align:right; font-family:'Space Grotesk'; font-weight:700; font-size:.78rem;">
+                8.263 votos<br>
+                <span style="font-size:.65rem; font-weight:500; opacity:.6;">#JogoMaisChato</span>
+              </div>
+              <div class="qr-box">
+                <svg viewBox="0 0 29 29"><rect width="29" height="29" fill="#0b1020"/><g fill="#ffc965">
+                  <rect x="0" y="0" width="7" height="7"/><rect x="22" y="0" width="7" height="7"/><rect x="0" y="22" width="7" height="7"/>
+                  <rect x="2" y="2" width="3" height="3" fill="#0b1020"/><rect x="24" y="2" width="3" height="3" fill="#0b1020"/><rect x="2" y="24" width="3" height="3" fill="#0b1020"/>
+                  <rect x="9" y="1" width="1" height="1"/><rect x="11" y="2" width="1" height="2"/><rect x="13" y="1" width="2" height="1"/><rect x="16" y="3" width="1" height="2"/><rect x="18" y="1" width="1" height="1"/><rect x="20" y="2" width="1" height="1"/>
+                  <rect x="1" y="9" width="1" height="2"/><rect x="3" y="11" width="2" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="2" y="13" width="1" height="2"/><rect x="1" y="18" width="2" height="1"/>
+                  <rect x="9" y="9" width="2" height="2"/><rect x="12" y="10" width="1" height="3"/><rect x="14" y="9" width="3" height="1"/><rect x="15" y="11" width="2" height="2"/><rect x="18" y="10" width="1" height="1"/><rect x="19" y="12" width="2" height="1"/><rect x="10" y="14" width="3" height="1"/><rect x="13" y="16" width="1" height="2"/><rect x="16" y="15" width="1" height="2"/><rect x="18" y="17" width="2" height="1"/><rect x="11" y="19" width="1" height="2"/><rect x="14" y="20" width="2" height="1"/><rect x="17" y="19" width="1" height="2"/><rect x="9" y="22" width="1" height="2"/><rect x="11" y="23" width="2" height="1"/><rect x="14" y="25" width="1" height="2"/><rect x="16" y="22" width="1" height="1"/><rect x="18" y="23" width="1" height="2"/>
+                  <rect x="23" y="9" width="2" height="1"/><rect x="26" y="10" width="1" height="2"/><rect x="24" y="12" width="1" height="2"/><rect x="25" y="15" width="2" height="1"/><rect x="23" y="17" width="1" height="2"/><rect x="22" y="20" width="2" height="1"/>
+                </g></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:60px; padding: 24px 28px; border-radius: 18px; background: var(--surface-container); border: 1px solid rgba(255,255,255,.05); display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+    <div style="flex:1; min-width: 240px;">
+      <div class="micro-cap" style="color: var(--outline);">Observações</div>
+      <p style="font-size:.9rem; color: var(--on-surface-variant); margin-top:8px; line-height:1.5;">
+        Os dois cards usam o mesmo sistema: <strong style="color:var(--chato-yellow)">% + placar + bandeiras + frase + prova social + QR</strong>. A única variável entre rodadas é o conteúdo — toda a hierarquia se mantém estável.
+      </p>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <span class="chip chip-tertiary">A/B testável</span>
+      <span class="chip">Dinâmico via API</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

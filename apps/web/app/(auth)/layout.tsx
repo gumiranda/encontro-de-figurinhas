@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import "@workspace/ui/styles/landing-theme.css";
+import { Suspense } from "react";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   robots: {
@@ -10,9 +11,13 @@ export const metadata: Metadata = {
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="landing-theme dark min-h-screen bg-background text-foreground">
-      {children}
-    </div>
+    <Suspense>
+      <Providers>
+        <div className="dark min-h-screen min-w-0 overflow-x-clip bg-background text-foreground">
+          {children}
+        </div>
+      </Providers>
+    </Suspense>
   );
 };
 export default Layout;

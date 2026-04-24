@@ -21,12 +21,14 @@ import {
 } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { DownloadGuideButton } from "@/components/download-guide-button";
 import {
   BASE_URL,
   SITE_NAME,
   generateBreadcrumbSchema,
   generateCombinedSchema,
   generateFAQSchema,
+  generateCollectionPageSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -166,10 +168,13 @@ const articleSchema = {
   inLanguage: "pt-BR",
 };
 
+const collectionPageSchema = generateCollectionPageSchema();
+
 const combinedSchema = generateCombinedSchema([
   articleSchema,
   breadcrumbSchema,
   faqSchema,
+  collectionPageSchema,
 ]);
 
 const quickFacts = [
@@ -283,32 +288,32 @@ export default function AlbumCopaDoMundo2026Page() {
       <LandingHeader />
       <main
         id="main-content"
-        className="pt-24 min-h-screen text-[var(--landing-on-surface)]"
+        className="pt-24 min-h-screen text-[var(--on-surface)]"
       >
         {/* Hero */}
         <section className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 md:py-24">
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 text-sm text-[var(--landing-outline)]"
+            className="mb-8 text-sm text-[var(--outline)]"
           >
             <ol className="flex flex-wrap items-center gap-2">
               <li>
                 <Link
                   href="/"
-                  className="hover:text-[var(--landing-primary)] transition-colors"
+                  className="hover:text-[var(--primary)] transition-colors"
                 >
                   Início
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li className="text-[var(--landing-on-surface)] font-medium">
+              <li className="text-[var(--on-surface)] font-medium">
                 Álbum da Copa do Mundo 2026
               </li>
             </ol>
           </nav>
 
           <div className="space-y-6">
-            <Badge className="bg-[var(--landing-secondary-container)]/20 text-[var(--landing-secondary)] border border-[var(--landing-secondary)]/20 uppercase tracking-widest text-[10px] font-bold">
+            <Badge className="bg-[var(--secondary-container)]/20 text-[var(--secondary)] border border-[var(--secondary)]/20 uppercase tracking-widest text-[10px] font-bold">
               Guia Copa 2026
             </Badge>
 
@@ -319,7 +324,7 @@ export default function AlbumCopaDoMundo2026Page() {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-[var(--landing-on-surface-variant)] max-w-3xl leading-relaxed">
+            <p className="text-lg md:text-xl text-[var(--on-surface-variant)] max-w-3xl leading-relaxed">
               Com <strong>980 figurinhas</strong>, o álbum oficial da Panini para a
               FIFA World Cup 2026 é o maior da história. Neste guia você descobre{" "}
               <strong>quantas figurinhas tem</strong>, <strong>quanto custa o
@@ -327,7 +332,7 @@ export default function AlbumCopaDoMundo2026Page() {
               completar o álbum gastando menos trocando com outros colecionadores.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-[var(--landing-outline)]">
+            <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-[var(--outline)]">
               <span>Publicado em 17/04/2026</span>
               <span aria-hidden="true">•</span>
               <span>Leitura de 6 min</span>
@@ -351,16 +356,16 @@ export default function AlbumCopaDoMundo2026Page() {
               return (
                 <Card
                   key={fact.label}
-                  className="bg-[var(--landing-surface-container-high)] border-[var(--landing-outline-variant)]/10 text-[var(--landing-on-surface)]"
+                  className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
                 >
                   <CardHeader className="pb-2">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--landing-primary)]/10 flex items-center justify-center mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center mb-2">
                       <Icon
-                        className="h-5 w-5 text-[var(--landing-primary)]"
+                        className="h-5 w-5 text-[var(--primary)]"
                         aria-hidden="true"
                       />
                     </div>
-                    <CardDescription className="text-[10px] uppercase tracking-widest text-[var(--landing-outline)]">
+                    <CardDescription className="text-[10px] uppercase tracking-widest text-[var(--outline)]">
                       {fact.label}
                     </CardDescription>
                     <CardTitle className="text-2xl font-[var(--font-headline)]">
@@ -368,7 +373,7 @@ export default function AlbumCopaDoMundo2026Page() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <p className="text-sm text-[var(--landing-on-surface-variant)]">
+                    <p className="text-sm text-[var(--on-surface-variant)]">
                       {fact.detail}
                     </p>
                   </CardContent>
@@ -383,7 +388,7 @@ export default function AlbumCopaDoMundo2026Page() {
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
             O que é o álbum da Copa do Mundo 2026?
           </h2>
-          <div className="space-y-4 text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed">
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
             <p>
               O <strong>álbum da Copa do Mundo 2026</strong> é a coleção oficial
               da Panini para a <strong>FIFA World Cup 2026</strong>, o primeiro
@@ -409,39 +414,39 @@ export default function AlbumCopaDoMundo2026Page() {
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
             Quantas figurinhas tem o álbum da Copa 2026?
           </h2>
-          <div className="space-y-4 text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed">
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
             <p>
               O álbum tem <strong>980 figurinhas no total</strong>, sendo{" "}
               <strong>68 figurinhas especiais</strong> com efeito brilhante. É a
               maior coleção da história dos álbuns de Copa, superando o recorde
               anterior de 681 figurinhas da Copa de 2018 na Rússia.
             </p>
-            <div className="rounded-2xl border border-[var(--landing-outline-variant)]/20 bg-[var(--landing-surface-container-high)] p-6">
-              <h3 className="font-semibold mb-4 text-[var(--landing-on-surface)]">
+            <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-6">
+              <h3 className="font-semibold mb-4 text-[var(--on-surface)]">
                 Evolução dos álbuns de Copa (Panini)
               </h3>
               <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span>Copa 2014 (Brasil)</span>
-                  <span className="font-mono text-[var(--landing-primary)]">
+                  <span className="font-mono text-[var(--primary)]">
                     640 figurinhas
                   </span>
                 </li>
                 <li className="flex justify-between">
                   <span>Copa 2018 (Rússia)</span>
-                  <span className="font-mono text-[var(--landing-primary)]">
+                  <span className="font-mono text-[var(--primary)]">
                     681 figurinhas
                   </span>
                 </li>
                 <li className="flex justify-between">
                   <span>Copa 2022 (Catar)</span>
-                  <span className="font-mono text-[var(--landing-primary)]">
+                  <span className="font-mono text-[var(--primary)]">
                     670 figurinhas
                   </span>
                 </li>
                 <li className="flex justify-between font-bold">
                   <span>Copa 2026 (EUA/MEX/CAN)</span>
-                  <span className="font-mono text-[var(--landing-secondary)]">
+                  <span className="font-mono text-[var(--secondary)]">
                     980 figurinhas
                   </span>
                 </li>
@@ -455,7 +460,7 @@ export default function AlbumCopaDoMundo2026Page() {
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
             Quanto custa o álbum e o pacotinho da Copa 2026?
           </h2>
-          <p className="text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
+          <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
             O <strong>pacotinho da Copa 2026 custa R$ 7,00</strong> e vem com 7
             figurinhas — um reajuste em relação ao pacote de R$ 5,00 do último
             Mundial. O álbum aparece em quatro versões, e o preço muda conforme o
@@ -465,25 +470,25 @@ export default function AlbumCopaDoMundo2026Page() {
             {albumVersions.map((version) => (
               <Card
                 key={version.name}
-                className="bg-[var(--landing-surface-container-high)] border-[var(--landing-outline-variant)]/10 text-[var(--landing-on-surface)]"
+                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{version.name}</CardTitle>
-                    <span className="font-mono text-[var(--landing-primary)] font-bold">
+                    <span className="font-mono text-[var(--primary)] font-bold">
                       {version.price}
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-[var(--landing-on-surface-variant)]">
+                  <CardDescription className="text-[var(--on-surface-variant)]">
                     {version.description}
                   </CardDescription>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <p className="text-sm text-[var(--landing-outline)] mt-6 max-w-3xl">
+          <p className="text-sm text-[var(--outline)] mt-6 max-w-3xl">
             Valores de referência para o mercado brasileiro. Preços podem variar
             entre bancas, supermercados, Panini, Amazon, Magazine Luiza e Mercado
             Livre.
@@ -499,19 +504,19 @@ export default function AlbumCopaDoMundo2026Page() {
             {stickerTypes.map((type) => (
               <Card
                 key={type.title}
-                className="bg-[var(--landing-surface-container-high)] border-[var(--landing-outline-variant)]/10 text-[var(--landing-on-surface)]"
+                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
               >
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <Sparkles
-                      className="h-5 w-5 text-[var(--landing-secondary)]"
+                      className="h-5 w-5 text-[var(--secondary)]"
                       aria-hidden="true"
                     />
                     <CardTitle className="text-lg">{type.title}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-[var(--landing-on-surface-variant)]">
+                  <CardDescription className="text-[var(--on-surface-variant)]">
                     {type.description}
                   </CardDescription>
                 </CardContent>
@@ -525,7 +530,7 @@ export default function AlbumCopaDoMundo2026Page() {
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
             Como completar o álbum da Copa do Mundo 2026 gastando menos
           </h2>
-          <p className="text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
+          <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
             Comprando apenas pacotinhos até fechar o álbum, o gasto médio passa
             dos <strong>R$ 2.500</strong> — a lei das repetidas faz o custo
             explodir nas últimas figurinhas. Quem troca, gasta menos. Siga estes
@@ -535,16 +540,16 @@ export default function AlbumCopaDoMundo2026Page() {
             {completeSteps.map((step) => (
               <Card
                 key={step.number}
-                className="relative bg-[var(--landing-surface-container-high)] border-[var(--landing-outline-variant)]/10 text-[var(--landing-on-surface)]"
+                className="relative bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
               >
                 <CardHeader>
-                  <div className="absolute -top-4 left-4 w-8 h-8 rounded-full bg-[var(--landing-primary)] text-[var(--landing-on-primary)] flex items-center justify-center font-bold text-sm">
+                  <div className="absolute -top-4 left-4 w-8 h-8 rounded-full bg-[var(--primary)] text-[var(--on-primary)] flex items-center justify-center font-bold text-sm">
                     {step.number}
                   </div>
                   <CardTitle className="text-lg mt-2">{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-[var(--landing-on-surface-variant)]">
+                  <CardDescription className="text-[var(--on-surface-variant)]">
                     {step.description}
                   </CardDescription>
                 </CardContent>
@@ -558,7 +563,7 @@ export default function AlbumCopaDoMundo2026Page() {
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
             Seleções no álbum: a primeira Copa com 48 times
           </h2>
-          <div className="space-y-4 text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed">
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
             <p>
               Pela primeira vez, a Copa do Mundo reúne <strong>48 seleções</strong>{" "}
               — um salto em relação aos 32 times das edições anteriores. No álbum,
@@ -579,17 +584,17 @@ export default function AlbumCopaDoMundo2026Page() {
 
         {/* Onde trocar */}
         <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-          <div className="rounded-2xl border border-[var(--landing-outline-variant)]/20 bg-[var(--landing-surface-container-high)] p-8 md:p-12">
+          <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-8 md:p-12">
             <div className="flex items-center gap-3 mb-4">
               <Users
-                className="h-6 w-6 text-[var(--landing-primary)]"
+                className="h-6 w-6 text-[var(--primary)]"
                 aria-hidden="true"
               />
               <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold">
                 Trocar é o caminho mais barato para completar o álbum
               </h2>
             </div>
-            <p className="text-[var(--landing-on-surface-variant)] text-base md:text-lg leading-relaxed mb-6">
+            <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-6">
               O <strong>Figurinha Fácil</strong> é a maior rede de troca de
               figurinhas do Brasil. Você cadastra as figurinhas que tem repetidas
               e as que faltam, e a plataforma conecta você automaticamente com
@@ -601,7 +606,7 @@ export default function AlbumCopaDoMundo2026Page() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-lg border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-primary-dim)] text-[var(--landing-on-primary-container)] font-bold hover:opacity-95"
+                className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary-container)] font-bold hover:opacity-95"
               >
                 <Link href="/sign-up">
                   Criar conta grátis
@@ -612,7 +617,7 @@ export default function AlbumCopaDoMundo2026Page() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-lg border-[var(--landing-outline-variant)]/30 bg-transparent text-[var(--landing-on-surface)] hover:bg-[var(--landing-surface-variant)]"
+                className="rounded-lg border-[var(--outline-variant)]/30 bg-transparent text-[var(--on-surface)] hover:bg-[var(--surface-variant)]"
               >
                 <Link href="/como-funciona">Ver como funciona</Link>
               </Button>
@@ -635,7 +640,7 @@ export default function AlbumCopaDoMundo2026Page() {
             {FAQS.map((item) => (
               <Card
                 key={item.question}
-                className="bg-[var(--landing-surface-container-high)] border-[var(--landing-outline-variant)]/10 text-[var(--landing-on-surface)]"
+                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
               >
                 <CardHeader>
                   <CardTitle className="text-base md:text-lg">
@@ -643,7 +648,7 @@ export default function AlbumCopaDoMundo2026Page() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-[var(--landing-on-surface-variant)]">
+                  <p className="text-[var(--on-surface-variant)]">
                     {item.answer}
                   </p>
                 </CardContent>
@@ -655,19 +660,19 @@ export default function AlbumCopaDoMundo2026Page() {
         {/* Final CTA */}
         <section className="mx-auto max-w-5xl px-4 sm:px-6 py-16 md:py-24">
           <div className="text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--landing-secondary-container)]/20 border border-[var(--landing-secondary)]/20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--secondary-container)]/20 border border-[var(--secondary)]/20">
               <Trophy
-                className="w-4 h-4 text-[var(--landing-secondary)]"
+                className="w-4 h-4 text-[var(--secondary)]"
                 aria-hidden="true"
               />
-              <span className="text-[var(--landing-secondary)] text-[10px] font-bold tracking-[0.2em] uppercase">
+              <span className="text-[var(--secondary)] text-[10px] font-bold tracking-[0.2em] uppercase">
                 Rumo ao álbum completo
               </span>
             </div>
             <h2 className="font-[var(--font-headline)] text-2xl md:text-4xl font-bold max-w-2xl mx-auto">
               Comece a trocar figurinhas da Copa 2026 ainda hoje
             </h2>
-            <p className="text-[var(--landing-on-surface-variant)] text-base md:text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--on-surface-variant)] text-base md:text-lg max-w-2xl mx-auto">
               Milhares de colecionadores já estão usando o Figurinha Fácil para
               completar o álbum gastando muito menos. Cadastre-se grátis e encontre
               colecionadores perto de você.
@@ -676,18 +681,19 @@ export default function AlbumCopaDoMundo2026Page() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-lg border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-primary-dim)] text-[var(--landing-on-primary-container)] font-bold hover:opacity-95"
+                className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary-container)] font-bold hover:opacity-95"
               >
                 <Link href="/sign-up">
                   Cadastrar grátis
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+              <DownloadGuideButton />
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-lg border-[var(--landing-outline-variant)]/30 bg-transparent text-[var(--landing-on-surface)] hover:bg-[var(--landing-surface-variant)]"
+                className="rounded-lg border-[var(--outline-variant)]/30 bg-transparent text-[var(--on-surface)] hover:bg-[var(--surface-variant)]"
               >
                 <Link href="/">Voltar à página inicial</Link>
               </Button>

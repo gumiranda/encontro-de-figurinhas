@@ -1,0 +1,1 @@
+em @apps/web/app/(arena)/points/[tradePointId]/page.tsx precisa ter uma section onde detecta pessoas presentes no ponto que tem as figurinhas que eu preciso. e colocar essas figurinhas de forma organizada

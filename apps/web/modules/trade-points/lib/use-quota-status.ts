@@ -4,9 +4,10 @@ import { useQuery } from "convex/react";
 import { useMemo } from "react";
 import { api } from "@workspace/backend/_generated/api";
 
+export type QuotaTier = "available" | "limited" | "blocked";
+
 export type QuotaData = {
-  remaining: number;
-  limit: number;
+  tier: QuotaTier;
   unlimited: boolean;
   lastSubmissionAt: number | null;
 } | null;
@@ -23,8 +24,7 @@ export function useQuotaStatus(): QuotaStatus {
     () => ({
       quota,
       isLoading: quota === undefined,
-      isBlocked:
-        quota != null && !quota.unlimited && quota.remaining === 0,
+      isBlocked: quota?.tier === "blocked",
     }),
     [quota]
   );

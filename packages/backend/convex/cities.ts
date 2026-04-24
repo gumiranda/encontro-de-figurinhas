@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { rateLimiter } from "./lib/rateLimiter";
 
 export const search = query({
@@ -65,17 +66,131 @@ export const getAll = query({
   },
 });
 
-export const migrateSetCitiesActive = internalMutation({
+export const getAllSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const cities = await ctx.db.query("cities").collect();
+    const cities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .take(5000);
+
+    return cities.map((c) => c.slug);
+  },
+});
+
+export const listTopActiveForSSG = query({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .order("desc")
+      .take(500);
+    return cities.map((c) => c.slug);
+  },
+});
+
+export const listForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .take(5000);
+
+    return cities.map((c) => ({
+      slug: c.slug,
+      updatedAt: c._creationTime,
+    }));
+  },
+});
+
+export const listAllGroupedByState = query({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .take(5000);
+
+    const grouped: Record<string, Array<{ name: string; slug: string }>> = {};
+    for (const c of cities) {
+      if (!grouped[c.state]) grouped[c.state] = [];
+      grouped[c.state]!.push({ name: c.name, slug: c.slug });
+    }
+
+    return Object.entries(grouped)
+      .map(([state, cities]) => ({
+        state,
+        cities: cities.sort((a, b) => a.name.localeCompare(b.name)),
+      }))
+      .sort((a, b) => a.state.localeCompare(b.state));
+  },
+});
+
+export const getStatsBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    const city = await ctx.db
+      .query("cities")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+
+    if (!city) return null;
+
+    const [collectors, tradePoints] = await Promise.all([
+      ctx.db
+        .query("users")
+        .withIndex("by_city_not_shadowbanned", (q) =>
+          q.eq("cityId", city._id).eq("isShadowBanned", false)
+        )
+        .take(5000),
+      ctx.db
+        .query("tradePoints")
+        .withIndex("by_city_status", (q) =>
+          q.eq("cityId", city._id).eq("status", "approved")
+        )
+        .take(1000),
+    ]);
+
+    const activeCollectors = collectors.filter(
+      (u) => u.hasCompletedStickerSetup === true && u.isBanned !== true
+    );
+
+    return {
+      collectorsCount: activeCollectors.length,
+      tradePointsCount: tradePoints.length,
+    };
+  },
+});
+
+const MIGRATE_BATCH_SIZE = 500;
+
+export const migrateSetCitiesActive = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+  },
+  handler: async (ctx, { cursor }) => {
+    const page = await ctx.db
+      .query("cities")
+      .paginate({ numItems: MIGRATE_BATCH_SIZE, cursor: cursor ?? null });
+
     let updated = 0;
-    for (const city of cities) {
+    for (const city of page.page) {
       if (city.isActive === undefined) {
         await ctx.db.patch(city._id, { isActive: true });
         updated++;
       }
     }
-    return { updated };
+
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.cities.migrateSetCitiesActive,
+        { cursor: page.continueCursor }
+      );
+    }
+
+    return { updated, isDone: page.isDone };
   },
 });

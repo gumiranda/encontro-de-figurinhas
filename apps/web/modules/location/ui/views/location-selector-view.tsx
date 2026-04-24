@@ -3,7 +3,6 @@
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
-import { Heading, Text } from "@workspace/ui/components/typography";
 import {
   Dialog,
   DialogContent,
@@ -13,22 +12,34 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { useMutation } from "convex/react";
-import { AlertCircle, ArrowLeft, CheckCircle2, Info } from "lucide-react";
+import {
+  AlertCircle,
+  Info,
+  Landmark,
+  RefreshCw,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
 import type { CityWithCoords } from "../../lib/location-constants";
 import { resolveSetLocationToastMessage } from "../../lib/resolve-set-location-toast";
+import { stateCardSpec } from "../../lib/state-card-spec";
 import { useLocationFlow } from "../../lib/use-location-flow";
-import { GpsPermissionScreen } from "../components/gps-permission-screen";
-import { ManualSearchScreen } from "../components/manual-search-screen";
+import { CityList } from "../components/city-list";
+import { Radar } from "../components/radar-visual";
+import { StateCard } from "../components/state-card";
 
-interface LocationSelectorViewProps {
+export interface LocationSelectorViewProps {
   cities: CityWithCoords[];
   suggestedCities: CityWithCoords[];
   citiesError?: string;
   currentCityId?: Id<"cities">;
 }
+
+const SHARED_SUBTITLE =
+  "Mostramos pontos e colecionadores próximos. Você pode mudar a cidade depois.";
 
 export function LocationSelectorView({
   cities,
@@ -40,8 +51,6 @@ export function LocationSelectorView({
   const setLocationMutation = useMutation(api.users.setLocation);
 
   const {
-    viewState,
-    setViewState,
     selectedCityId,
     locationSource,
     getIpLocationAttestationToken,
@@ -57,7 +66,14 @@ export function LocationSelectorView({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSkipToManual = () => setViewState("manual");
+  const selectedCity = selectedCityId
+    ? cities.find((c) => c._id === selectedCityId) ?? null
+    : null;
+
+  const spec = stateCardSpec(selectedCity, locationSource, gpsStatus);
+
+  const radarMode: "idle" | "searching" =
+    gpsStatus === "checking" ? "searching" : "idle";
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -79,9 +95,16 @@ export function LocationSelectorView({
         ...(locationSource === "gps" && coords
           ? { lat: coords.lat, lng: coords.lng }
           : {}),
-        ...(locationSource === "ip" && ipToken ? { ipLocationToken: ipToken } : {}),
+        ...(locationSource === "ip" && ipToken
+          ? { ipLocationToken: ipToken }
+          : {}),
       });
-      router.push("/dashboard");
+      // Deixa o cliente Convex aplicar o snapshot do user antes do DashboardShell
+      // avaliar getCurrentUser (evita redirect falso para /cadastrar-figurinhas).
+      await new Promise<void>((resolve) => {
+        queueMicrotask(() => queueMicrotask(resolve));
+      });
+      router.replace("/dashboard");
     } catch (error) {
       toast.error(resolveSetLocationToastMessage(error));
     } finally {
@@ -89,104 +112,166 @@ export function LocationSelectorView({
     }
   };
 
-  const gpsDetectedCityLabel = useMemo(() => {
-    if (viewState !== "gps" || locationSource !== "gps") return undefined;
-    return cities.find((c) => c._id === selectedCityId)?.name;
-  }, [viewState, locationSource, cities, selectedCityId]);
+  const primaryAction = selectedCity ? handleConfirmLocation : requestPermission;
+
+  const primaryDisabled = spec.primaryDisabledByState || isSubmitting;
+
+  const sharedBanners = (
+    <>
+      {citiesError && (
+        <div
+          role="alert"
+          className="mb-2 flex gap-2 rounded-lg border border-[var(--tertiary)]/50 bg-[var(--tertiary)]/10 p-4 text-[var(--tertiary)]"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="min-w-0 space-y-1 text-sm">
+            <p>
+              Não foi possível carregar a lista de cidades. Detecção automática
+              indisponível — use a busca manual.
+            </p>
+            <p className="break-words opacity-90">{citiesError}</p>
+          </div>
+        </div>
+      )}
+
+      {!citiesError && cities.length === 0 && (
+        <div
+          role="status"
+          className="mb-2 flex gap-2 rounded-lg border border-[var(--outline-variant)]/30 bg-[var(--surface-container-high)] p-4 text-[var(--on-surface)]"
+        >
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--on-surface-variant)]" />
+          <p className="min-w-0 text-sm">
+            Ainda não há cidades na lista para sugestões automáticas. Use a busca
+            abaixo; se não aparecer resultado, tente novamente mais tarde.
+          </p>
+        </div>
+      )}
+    </>
+  );
 
   return (
-    <main className="landing-theme relative flex min-h-screen flex-col bg-[var(--landing-background)]">
-      <header
-        className="fixed top-0 w-full z-50 flex items-center gap-3 px-6 min-h-16 bg-[var(--landing-background)]"
+    <main className="relative flex min-h-screen flex-col bg-[var(--background)]">
+      {/* Mobile */}
+      <section
+        className="flex flex-1 flex-col gap-5 overflow-x-hidden bg-[radial-gradient(700px_500px_at_50%_30%,rgba(55,102,255,0.18),transparent_60%)] px-6 pb-12 md:hidden"
         style={{
-          paddingTop: "env(safe-area-inset-top, 0px)",
-          boxShadow: "0 25px 50px -12px rgba(149, 170, 255, 0.1)",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 56px)",
         }}
       >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <Heading
-          level={1}
-          className="font-headline font-bold tracking-tighter uppercase text-lg text-[var(--landing-primary)]"
-        >
-          figurinha fácil
-        </Heading>
-      </header>
-
-      <div
-        style={{ paddingTop: "calc(4rem + 2rem + env(safe-area-inset-top, 0px))" }}
-        className="pb-32 px-6 max-w-xl mx-auto w-full flex flex-col flex-1 stadium-gradient"
-      >
-        {citiesError && (
-          <div
-            role="alert"
-            className="mb-4 flex gap-2 rounded-lg border border-[var(--landing-tertiary)]/50 bg-[var(--landing-tertiary)]/10 p-4 text-[var(--landing-tertiary)]"
-          >
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-            <div className="text-sm space-y-1 min-w-0">
-              <Text variant="small" className="font-normal">
-                Não foi possível carregar a lista de cidades. Detecção automática
-                indisponível — use a busca manual.
-              </Text>
-              <Text variant="small" className="font-normal opacity-90 break-words">
-                {citiesError}
-              </Text>
-            </div>
-          </div>
-        )}
-
-        {!citiesError && cities.length === 0 && (
-          <div
-            role="status"
-            className="mb-4 flex gap-2 rounded-lg border border-[var(--landing-outline-variant)]/30 bg-[var(--landing-surface-container-high)] p-4 text-[var(--landing-on-surface)]"
-          >
-            <Info className="h-4 w-4 shrink-0 mt-0.5 text-[var(--landing-on-surface-variant)]" />
-            <div className="text-sm space-y-1 min-w-0">
-              <Text variant="small" className="font-normal">
-                Ainda não há cidades na lista para sugestões automáticas. Use a
-                busca abaixo; se não aparecer resultado, tente novamente mais tarde.
-              </Text>
-            </div>
-          </div>
-        )}
-
-        {viewState === "gps" && (
-          <GpsPermissionScreen
-            status={gpsStatus}
-            detectedCityLabel={gpsDetectedCityLabel}
-            onRequestPermission={requestPermission}
-            onSkipToManual={handleSkipToManual}
-          />
-        )}
-
-        {viewState === "manual" && (
-          <ManualSearchScreen
-            selectedCityId={selectedCityId}
-            onCitySelect={selectCityManual}
-            suggestedCities={suggestedCities}
-          />
-        )}
-
-        {selectedCityId && (
+        <div className="flex items-center justify-between">
           <Button
             type="button"
             variant="ghost"
-            onClick={handleConfirmLocation}
-            disabled={isSubmitting}
-            className="btn-primary-gradient mt-8 w-full"
+            size="icon"
+            className="h-9 w-9 text-[var(--on-surface)]"
+            onClick={handleBack}
+            aria-label="Voltar"
           >
-            {isSubmitting ? "Salvando..." : "Confirmar localização"}
-            <CheckCircle2 className="ml-2 h-5 w-5" />
+            <X className="h-5 w-5" />
           </Button>
-        )}
-      </div>
+          <span className="font-mono text-[11px] text-[var(--outline)]">
+            3 / 3
+          </span>
+        </div>
+
+        <Radar variant="mobile" mode={radarMode} className="my-2" />
+
+        <div className="space-y-2 text-center">
+          <h1 className="text-[28px] font-black leading-[1.05] tracking-tight text-[var(--on-surface)]">
+            Onde você{" "}
+            <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
+              troca?
+            </span>
+          </h1>
+          <p className="text-[13px] text-[var(--on-surface-variant)]">
+            {SHARED_SUBTITLE}
+          </p>
+        </div>
+
+        {sharedBanners}
+
+        <StateCard
+          size="mobile"
+          spec={spec}
+          onPrimary={primaryAction}
+          primaryDisabled={primaryDisabled}
+        />
+
+        {spec.showRetryLink && <RetryGpsLink onClick={requestPermission} />}
+
+        <OrDivider>ou escolher outra</OrDivider>
+
+        <CityAutocomplete value={selectedCityId} onChange={selectCityManual} />
+
+        <CityList
+          cities={suggestedCities}
+          selectedCityId={selectedCityId}
+          onSelect={selectCityManual}
+          max={3}
+        />
+      </section>
+
+      {/* Desktop */}
+      <section className="hidden min-h-screen grid-cols-2 md:grid">
+        <div className="flex flex-col justify-center gap-6 bg-[radial-gradient(400px_300px_at_30%_30%,rgba(55,102,255,0.08),transparent_60%)] px-14 py-16">
+          <div className="flex items-center gap-2.5">
+            <span
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-[var(--on-primary)] shadow-sm"
+              aria-hidden="true"
+            >
+              <Landmark className="h-4 w-4" strokeWidth={2} />
+            </span>
+            <span className="font-[var(--font-headline)] text-base font-semibold tracking-tight text-[var(--on-surface)]">
+              Figurinha Fácil
+            </span>
+          </div>
+
+          <span className="font-mono text-xs uppercase tracking-wider text-[var(--outline)]">
+            Passo 03 / 03
+          </span>
+
+          <div className="space-y-3">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight text-[var(--on-surface)]">
+              Onde você{" "}
+              <span className="text-primary">
+                troca?
+              </span>
+            </h1>
+            <p className="max-w-[440px] text-sm text-[var(--on-surface-variant)]">
+              {SHARED_SUBTITLE}
+            </p>
+          </div>
+
+          {sharedBanners}
+
+          <StateCard
+            size="desktop"
+            spec={spec}
+            onPrimary={primaryAction}
+            primaryDisabled={primaryDisabled}
+            refreshSlot={
+              spec.showRefresh ? (
+                <RefreshGpsButton onClick={requestPermission} />
+              ) : null
+            }
+          />
+
+          <OrDivider>ou busque outra</OrDivider>
+
+          <CityAutocomplete value={selectedCityId} onChange={selectCityManual} />
+
+          <CityList
+            cities={suggestedCities}
+            selectedCityId={selectedCityId}
+            onSelect={selectCityManual}
+            max={2}
+          />
+        </div>
+
+        <div className="relative flex items-center justify-center overflow-hidden border-l border-[var(--outline-variant)] bg-[var(--surface-container-low)]">
+          <Radar variant="desktop" mode={radarMode} />
+        </div>
+      </section>
 
       <Dialog
         open={shouldShowIpDialog}
@@ -210,12 +295,53 @@ export function LocationSelectorView({
             >
               Não, obrigado
             </Button>
-            <Button type="button" onClick={handleIpAccept} disabled={isIpAcceptInFlight}>
+            <Button
+              type="button"
+              onClick={handleIpAccept}
+              disabled={isIpAcceptInFlight}
+            >
               {isIpAcceptInFlight ? "Detectando..." : "Sim, detectar"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </main>
+  );
+}
+
+function OrDivider({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5 font-[var(--font-headline)] text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--outline)]">
+      <span className="h-px flex-1 bg-[var(--outline-variant)]" />
+      {children}
+      <span className="h-px flex-1 bg-[var(--outline-variant)]" />
+    </div>
+  );
+}
+
+function RetryGpsLink({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mx-auto flex cursor-pointer items-center gap-1.5 text-[13px] font-semibold text-[var(--primary)] transition-opacity hover:opacity-80"
+    >
+      <RefreshCw className="h-[14px] w-[14px]" />
+      Tentar GPS novamente
+    </button>
+  );
+}
+
+function RefreshGpsButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClick}
+      className="h-[52px] w-[52px] shrink-0 rounded-[14px] border-[var(--outline-variant)] bg-transparent p-0 text-[var(--on-surface)] hover:bg-[var(--surface-container-high)]"
+      aria-label="Tentar GPS novamente"
+    >
+      <RefreshCw className="h-5 w-5" />
+    </Button>
   );
 }

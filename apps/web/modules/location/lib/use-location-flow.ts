@@ -130,15 +130,11 @@ function toastIpLocationError(
 const nearestNotFoundMessage = (context: string): string =>
   `Não encontramos uma cidade ${context}. Use a busca manual.`;
 
-export type ViewState = "gps" | "manual";
-
 export type LocationSource = "gps" | "manual" | "ip";
 
 type GeolocationHook = ReturnType<typeof useGeolocation>;
 
 export type UseLocationFlowReturn = {
-  viewState: ViewState;
-  setViewState: (next: ViewState) => void;
   selectedCityId: Id<"cities"> | null;
   locationSource: LocationSource;
   getIpLocationAttestationToken: () => string | null;
@@ -154,7 +150,6 @@ export type UseLocationFlowReturn = {
 };
 
 export type LocationState = {
-  viewState: ViewState;
   selectedCityId: Id<"cities"> | null;
   locationSource: LocationSource;
   showIpConsent: boolean;
@@ -162,7 +157,6 @@ export type LocationState = {
 };
 
 export type LocationAction =
-  | { type: "SET_VIEW"; view: ViewState }
   | { type: "SET_GPS_SOURCE"; cityId?: Id<"cities"> }
   | { type: "SET_MANUAL_SOURCE"; cityId: Id<"cities"> }
   | { type: "SET_IP_SOURCE"; cityId: Id<"cities"> }
@@ -174,7 +168,6 @@ export type LocationAction =
 
 function initialLocationState(currentCityId?: Id<"cities">): LocationState {
   return {
-    viewState: "gps",
     selectedCityId: currentCityId ?? null,
     locationSource: "manual",
     showIpConsent: false,
@@ -187,8 +180,6 @@ export function locationReducer(
   action: LocationAction
 ): LocationState {
   switch (action.type) {
-    case "SET_VIEW":
-      return { ...state, viewState: action.view };
     case "SET_GPS_SOURCE":
       return {
         ...state,
@@ -326,40 +317,28 @@ export function useLocationFlow({
   useEffect(() => {
     if (citiesError) {
       toast.error("Erro ao carregar cidades. Use a busca manual.");
-      dispatch({ type: "SET_VIEW", view: "manual" });
       return;
     }
 
-    switch (gpsStatus) {
-      case "denied":
-      case "unavailable":
-        dispatch({ type: "SET_VIEW", view: "manual" });
-        break;
-      case "granted": {
-        if (!coords) break;
+    if (gpsStatus !== "granted" || !coords) return;
 
-        if (citiesStable.length === 0) {
-          dispatch({ type: "SET_GPS_SOURCE" });
-          toast.info("Use a busca manual para selecionar sua cidade.");
-          break;
-        }
+    if (citiesStable.length === 0) {
+      dispatch({ type: "SET_GPS_SOURCE" });
+      toast.info("Use a busca manual para selecionar sua cidade.");
+      return;
+    }
 
-        const nearest = findNearestCity(coords.lat, coords.lng, citiesStable);
-        if (nearest) {
-          dispatch({ type: "SET_GPS_SOURCE", cityId: nearest.city._id });
-          if (nearest.isDistant) {
-            toast.info(
-              `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
-            );
-          }
-        } else {
-          toast.info(nearestNotFoundMessage("na base para sua posição"));
-          dispatch({ type: "SET_GPS_SOURCE" });
-        }
-        break;
+    const nearest = findNearestCity(coords.lat, coords.lng, citiesStable);
+    if (nearest) {
+      dispatch({ type: "SET_GPS_SOURCE", cityId: nearest.city._id });
+      if (nearest.isDistant) {
+        toast.info(
+          `Cidade mais próxima encontrada: ${nearest.city.name} (${nearest.distance}km)`
+        );
       }
-      default:
-        break;
+    } else {
+      toast.info(nearestNotFoundMessage("na base para sua posição"));
+      dispatch({ type: "SET_GPS_SOURCE" });
     }
   }, [citiesError, gpsStatus, coords, citiesStable]);
 
@@ -367,10 +346,8 @@ export function useLocationFlow({
     return () => abortControllerRef.current?.abort();
   }, []);
 
-  function setViewState(next: ViewState): void {
-    dispatch({ type: "SET_VIEW", view: next });
-  }
-
+  // Intencional: após recusa explícita o diálogo IP não reabre nesta sessão.
+  // `sessionStorage` preserva a decisão até a aba fechar; retry do GPS não ressurge o prompt.
   function dismissIpConsent(): void {
     persistIpConsentDismissed();
     dispatch({ type: "DISMISS_IP_CONSENT" });
@@ -423,7 +400,6 @@ export function useLocationFlow({
     ipLocationAttestationRef.current;
 
   const {
-    viewState,
     selectedCityId,
     locationSource,
     showIpConsent,
@@ -431,11 +407,9 @@ export function useLocationFlow({
   } = state;
 
   const shouldShowIpDialog =
-    viewState === "manual" && gpsStatus === "denied" && showIpConsent;
+    gpsStatus === "denied" && showIpConsent && !selectedCityId;
 
   return {
-    viewState,
-    setViewState,
     selectedCityId,
     locationSource,
     getIpLocationAttestationToken,

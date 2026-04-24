@@ -1,15 +1,19 @@
-import { mutation, query } from "./_generated/server";
-import type { Doc } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
+import { mutation, query, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthenticatedUser } from "./lib/auth";
+import { requireAuth } from "./lib/auth";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
+import { scheduleDebouncedMatchRecompute } from "./matches";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
 
-/** Mínimo entre atualizações que alteram dados (mitiga alternância A↔B + recompute). */
-const RATE_LIMIT_MS = 5000;
+/** Mínimo entre salvamentos batch (recompute já é debounced em matches). */
+const RATE_LIMIT_MS = 400;
+
+/** Mínimo entre toggles — só evita double-click; recompute é debounced em matches. */
+const TOGGLE_RATE_LIMIT_MS = 100;
 
 type UserPatch = Partial<
   Pick<
@@ -17,18 +21,49 @@ type UserPatch = Partial<
     | "duplicates"
     | "missing"
     | "albumProgress"
+    | "albumCompletionPct"
     | "totalStickersOwned"
     | "lastActiveAt"
     | "hasCompletedStickerSetup"
   >
 >;
 
-// Query
+/**
+ * Present-matches reads denormalized `duplicates` on check-ins; keep in sync when the user edits stickers.
+ */
+async function syncActiveCheckinsStickerSnapshot(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  user: Doc<"users">,
+  duplicates: number[]
+) {
+  const now = Date.now();
+  const activeCheckins = await ctx.db
+    .query("checkins")
+    .withIndex("by_user_active", (q) =>
+      q.eq("userId", userId).gt("expiresAt", now)
+    )
+    .take(20);
+
+  if (activeCheckins.length === 0) return;
+
+  const displayNickname =
+    user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador";
+  const avatarSeed = user.nickname ?? userId;
+
+  for (const c of activeCheckins) {
+    await ctx.db.patch(c._id, {
+      duplicates,
+      displayNickname,
+      avatarSeed,
+    });
+  }
+}
+
 export const getUserStickers = query({
   args: {},
   handler: async (ctx) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Unauthorized");
+    const user = await requireAuth(ctx);
 
     const albumConfig = await ctx.db.query("albumConfig").first();
     return {
@@ -48,8 +83,7 @@ export const updateStickerList = mutation({
     finalize: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Unauthorized");
+    const user = await requireAuth(ctx);
 
     if (
       args.duplicates.length > MAX_STICKER_ARRAY_SIZE ||
@@ -96,7 +130,7 @@ export const updateStickerList = mutation({
       setsEqual(currentMiss, newMiss) &&
       !args.finalize
     ) {
-      return;
+      return null;
     }
 
     const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
@@ -124,6 +158,7 @@ export const updateStickerList = mutation({
       duplicates: args.duplicates,
       missing: args.missing,
       albumProgress,
+      albumCompletionPct: albumProgress,
       totalStickersOwned,
       lastActiveAt: Date.now(),
     };
@@ -133,5 +168,79 @@ export const updateStickerList = mutation({
     }
 
     await ctx.db.patch(user._id, patch);
+
+    const mergedUser = { ...user, ...patch };
+    await syncActiveCheckinsStickerSnapshot(
+      ctx,
+      user._id,
+      mergedUser,
+      args.duplicates
+    );
+
+    await scheduleDebouncedMatchRecompute(ctx, user._id);
+
+    return null;
+  },
+});
+
+export const toggleSticker = mutation({
+  args: {
+    number: v.number(),
+    target: v.union(
+      v.literal("missing"),
+      v.literal("duplicate"),
+      v.literal("clear")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
+    if (timeSinceLastUpdate < TOGGLE_RATE_LIMIT_MS) {
+      throw new Error("Aguarde um momento antes de continuar");
+    }
+
+    const config = await ctx.db.query("albumConfig").first();
+    const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+
+    const n = args.number;
+    if (!Number.isInteger(n) || n < 1 || n > maxSticker) {
+      throw new Error(`Número inválido (1-${maxSticker})`);
+    }
+
+    const currentDup = new Set<number>(user.duplicates ?? []);
+    const currentMiss = new Set<number>(user.missing ?? []);
+
+    if (args.target === "clear") {
+      currentDup.delete(n);
+      currentMiss.delete(n);
+    } else if (args.target === "duplicate") {
+      currentMiss.delete(n);
+      currentDup.add(n);
+    } else {
+      currentDup.delete(n);
+      currentMiss.add(n);
+    }
+
+    const nextDup = [...currentDup].sort((a, b) => a - b);
+    const nextMiss = [...currentMiss].sort((a, b) => a - b);
+
+    const totalStickersOwned = maxSticker - nextMiss.length;
+    const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
+
+    await ctx.db.patch(user._id, {
+      duplicates: nextDup,
+      missing: nextMiss,
+      albumProgress,
+      albumCompletionPct: albumProgress,
+      totalStickersOwned,
+      lastActiveAt: Date.now(),
+    });
+
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, user, nextDup);
+
+    await scheduleDebouncedMatchRecompute(ctx, user._id);
+
+    return { duplicates: nextDup, missing: nextMiss };
   },
 });

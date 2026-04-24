@@ -10,13 +10,18 @@ import {
 } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Pill, PillIndicator } from "@workspace/ui/components/kibo-ui/pill";
-import {
-  Status,
-  StatusIndicator,
-  StatusLabel,
-} from "@workspace/ui/components/kibo-ui/status";
 import { Text } from "@workspace/ui/components/typography";
+import type { QuotaTier } from "../../lib/use-quota-status";
 import { useQuotaStatus } from "../../lib/use-quota-status";
+
+const TIER_CONFIG: Record<
+  QuotaTier,
+  { indicator: "success" | "warning" | "error"; label: string }
+> = {
+  available: { indicator: "success", label: "Disponível" },
+  limited: { indicator: "warning", label: "Quase no limite" },
+  blocked: { indicator: "error", label: "Limite atingido" },
+};
 
 function QuotaCardImpl() {
   const { quota, isLoading } = useQuotaStatus();
@@ -50,7 +55,7 @@ function QuotaCardImpl() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Pill variant="default">
+          <Pill variant="outline">
             <PillIndicator variant="success" />
             Ilimitado
           </Pill>
@@ -62,18 +67,7 @@ function QuotaCardImpl() {
     );
   }
 
-  const statusValue =
-    quota.remaining === quota.limit
-      ? "online"
-      : quota.remaining > 0
-        ? "degraded"
-        : "offline";
-  const statusLabel =
-    statusValue === "online"
-      ? "Todas as sugestões disponíveis"
-      : statusValue === "degraded"
-        ? "Quota parcialmente usada"
-        : "Limite atingido";
+  const config = TIER_CONFIG[quota.tier];
 
   return (
     <Card>
@@ -84,19 +78,13 @@ function QuotaCardImpl() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Status status={statusValue}>
-            <StatusIndicator />
-            <StatusLabel>{statusLabel}</StatusLabel>
-          </Status>
-          <Pill variant="outline">
-            {quota.remaining}/{quota.limit}
-          </Pill>
-        </div>
+        <Pill variant="outline">
+          <PillIndicator variant={config.indicator} />
+          {config.label}
+        </Pill>
         <Text variant="muted" className="text-sm">
-          {quota.remaining > 0
-            ? `${quota.remaining} de ${quota.limit} sugestões restantes.`
-            : "Aguarde a revisão para enviar uma nova sugestão."}
+          Sua sugestão passará por avaliação administrativa. Contribuir com bons
+          pontos aumenta seu nível de confiança na arena.
         </Text>
       </CardContent>
     </Card>

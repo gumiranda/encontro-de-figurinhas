@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultado · Jogo Mais Chato</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="chato.css">
+<style>body { display:grid; place-items:center; padding:40px 16px; min-height:100dvh; }</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel">
+const { IOSDevice } = window;
+
+const ranking = [
+  { home:"Alemanha", away:"Suíça", hf:"🇩🇪", af:"🇨🇭", score:"0 × 0", pct:72, votes:5949 },
+  { home:"França", away:"Bélgica", hf:"🇫🇷", af:"🇧🇪", score:"1 × 1", pct:14, votes:1156 },
+  { home:"Argélia", away:"Itália", hf:"🇩🇿", af:"🇮🇹", score:"0 × 1", pct:8, votes:661 },
+  { home:"Uruguai", away:"Croácia", hf:"🇺🇾", af:"🇭🇷", score:"2 × 1", pct:4, votes:330 },
+  { home:"Coreia", away:"Dinamarca", hf:"🇰🇷", af:"🇩🇰", score:"1 × 1", pct:2, votes:167 },
+];
+
+function App() {
+  return (
+    <IOSDevice dark>
+      <div className="iscroll" style={{background:"var(--surface)"}}>
+        <header style={{padding:"14px 16px", display:"flex", alignItems:"center", gap:10}}>
+          <button style={{width:36,height:36,borderRadius:10,background:"var(--surface-container)",display:"grid",placeItems:"center"}}>
+            <span className="material-symbols-outlined" style={{fontSize:20}}>arrow_back</span>
+          </button>
+          <div style={{flex:1, textAlign:"center", fontSize:".78rem", color:"var(--on-surface-variant)", fontFamily:"'Space Grotesk'", fontWeight:600}}>Resultado · Rodada 3</div>
+          <button style={{width:36,height:36,borderRadius:10,background:"var(--surface-container)",display:"grid",placeItems:"center"}}>
+            <span className="material-symbols-outlined" style={{fontSize:20}}>ios_share</span>
+          </button>
+        </header>
+
+        {/* Winner / Certificado */}
+        <div style={{padding:"8px 20px 0", textAlign:"center"}}>
+          <div className="micro-cap" style={{color:"var(--chato-yellow)"}}>🏆 o campeão do tédio</div>
+          <h1 className="ff-display" style={{fontSize:"2.2rem", lineHeight:.92, marginTop:10, letterSpacing:"-0.02em"}}>
+            Oficialmente<br/><span style={{color:"var(--chato-yellow)"}}>o mais chato</span>
+          </h1>
+
+          <div style={{position:"relative", marginTop:24, padding:"28px 20px 24px", borderRadius:22, background:"linear-gradient(180deg, rgba(255,201,101,.1), rgba(149,170,255,.06))", border:"1px solid rgba(255,201,101,.2)"}}>
+            <div style={{position:"absolute", top:12, right:12}}>
+              <div className="cert-stamp" style={{width:86, height:86, transform:"rotate(-10deg)", padding:8}}>
+                <div className="pct" style={{fontSize:"1.3rem"}}>72%</div>
+                <div className="lbl" style={{fontSize:".5rem"}}>CHATO</div>
+              </div>
+            </div>
+
+            <div style={{display:"flex", alignItems:"center", justifyContent:"center", gap:14, marginBottom:16}}>
+              <div className="flag lg">🇩🇪</div>
+              <div className="ff-display" style={{fontSize:"2rem", color:"var(--on-surface-variant)"}}>0×0</div>
+              <div className="flag lg">🇨🇭</div>
+            </div>
+            <div className="ff-display" style={{fontSize:"1.1rem"}}>ALEMANHA × SUÍÇA</div>
+            <div style={{color:"var(--on-surface-variant)", fontSize:".78rem", marginTop:4}}>14 jun · Grupo A</div>
+
+            <div style={{marginTop:18, padding:"10px 14px", borderRadius:12, background:"rgba(0,0,0,.3)", fontFamily:"'DM Serif Display', serif", fontSize:"1rem", fontStyle:"italic", color:"var(--chato-yellow)"}}>
+              "devolve 90 minutos da minha vida"
+            </div>
+
+            <div style={{marginTop:14, fontSize:".72rem", color:"var(--outline)"}}>
+              5.949 de 8.263 torcedores concordaram
+            </div>
+          </div>
+
+          <button className="btn-meme" style={{width:"100%", marginTop:18}}>
+            GERAR CARD PRA ZOAR 📸
+          </button>
+        </div>
+
+        {/* Ranking */}
+        <div style={{padding:"32px 20px 28px"}}>
+          <div className="micro-cap" style={{color:"var(--outline)", marginBottom:14}}>Ranking da rodada</div>
+          <div style={{display:"flex", flexDirection:"column", gap:8}}>
+            {ranking.map((m, i) => (
+              <div key={i} style={{display:"grid", gridTemplateColumns:"auto 1fr auto", gap:12, alignItems:"center", padding:"12px 14px", borderRadius:14, background: i===0?"rgba(255,201,101,.08)":"var(--surface-container)", border: i===0?"1px solid rgba(255,201,101,.25)":"1px solid rgba(255,255,255,.04)"}}>
+                <div className="ff-display" style={{fontSize:"1.1rem", color: i===0?"var(--chato-yellow)":"var(--outline)", width:22}}>
+                  {i+1}
+                </div>
+                <div>
+                  <div style={{display:"flex", alignItems:"center", gap:6, fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:".85rem"}}>
+                    <span style={{fontSize:"1.1rem"}}>{m.hf}</span>
+                    <span>{m.home}</span>
+                    <span style={{color:"var(--outline)"}}>{m.score.split(" ")[0]} × {m.score.split(" ")[2]}</span>
+                    <span>{m.away}</span>
+                    <span style={{fontSize:"1.1rem"}}>{m.af}</span>
+                  </div>
+                  <div className="vbar" style={{marginTop:6, width:"90%"}}>
+                    <div className="fill" style={{width:`${m.pct}%`, background: i===0?"var(--chato-yellow)":"rgba(149,170,255,.4)"}}/>
+                  </div>
+                </div>
+                <div className="ff-display" style={{fontSize:"1.05rem", color:i===0?"var(--chato-yellow)":"var(--on-surface)"}}>{m.pct}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{padding:"0 20px 32px"}}>
+          <div style={{padding:16, borderRadius:14, background:"var(--surface-container)", border:"1px solid rgba(255,255,255,.05)", display:"flex", gap:12, alignItems:"center"}}>
+            <div style={{width:40, height:40, borderRadius:10, background:"rgba(79,243,37,.12)", color:"var(--secondary)", display:"grid", placeItems:"center"}}>
+              <span className="material-symbols-outlined" style={{fontSize:22}}>trending_up</span>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:".88rem"}}>Próxima rodada em 2 dias</div>
+              <div style={{fontSize:".72rem", color:"var(--on-surface-variant)"}}>te avisamos quando abrir votação</div>
+            </div>
+            <button style={{padding:"6px 12px", borderRadius:9999, background:"var(--chato-yellow)", color:"var(--chato-navy)", fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:".72rem"}}>Ativar</button>
+          </div>
+        </div>
+      </div>
+    </IOSDevice>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

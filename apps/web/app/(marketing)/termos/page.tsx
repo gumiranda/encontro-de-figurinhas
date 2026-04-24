@@ -46,7 +46,7 @@ export default function TermosPage() {
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
               <h1>Termos de Uso</h1>
               <p className="lead">
-                Última atualização: {new Date().toLocaleDateString("pt-BR")}
+                Última atualização: 20 de abril de 2026
               </p>
 
               <h2>1. Aceitação dos Termos</h2>

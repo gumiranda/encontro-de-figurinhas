@@ -1,58 +1,72 @@
 "use client";
 
+import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
+import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
-
-function StickerStatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "primary" | "secondary" | "tertiary" | "outline";
-}) {
-  const toneClass = {
-    primary: "text-primary",
-    secondary: "text-secondary",
-    tertiary: "text-tertiary",
-    outline: "text-on-surface-variant",
-  }[tone];
-  return (
-    <div className="rounded-xl border border-outline-variant/30 bg-surface-container p-4 text-center">
-      <p className={cn("font-headline text-2xl font-black", toneClass)}>{value}</p>
-      <p className="mt-1 text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">
-        {label}
-      </p>
-    </div>
-  );
-}
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  AppNavDrawer,
+  AppSidebarContent,
+  useAppNavGroups,
+} from "@/modules/shared/ui/components/app-nav-drawer";
+import { MobileBottomNav } from "@/modules/shared/ui/components/mobile-bottom-nav";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
-import { GlobalCheckbox } from "../components/global-checkbox";
-import { SectionAccordion } from "../components/section-accordion";
-import { StickerQuickInput } from "../components/sticker-quick-input";
-import { TabToggle } from "../components/tab-toggle";
+import { DesktopTopBar } from "../components/desktop-top-bar";
+import { MobileFabBar } from "../components/mobile-fab-bar";
+import { QuickEntryInput } from "../components/quick-entry-input";
+import { StatsCardRow } from "../components/stats-card-row";
+import {
+  StickerSectionGroup,
+  type SectionInfo,
+} from "../components/sticker-section-group";
+import { StickerTabs } from "../components/sticker-tabs";
 
-type Tab = ListKind;
-
-type TabConfig = {
-  list: number[];
-  add: (nums: number[]) => void;
-  remove: (num: number) => void;
-  bgClass: string;
-  textClass: string;
-  title: string;
-  selectAllLabel: string;
-  hint: string;
-  tabActiveClass: string;
+const SECTION_EMOJI: Record<string, string> = {
+  BRA: "🇧🇷",
+  ARG: "🇦🇷",
+  FRA: "🇫🇷",
+  ENG: "🏴",
+  ESP: "🇪🇸",
+  GER: "🇩🇪",
+  POR: "🇵🇹",
+  USA: "🇺🇸",
+  CAN: "🇨🇦",
+  MEX: "🇲🇽",
+  JPN: "🇯🇵",
+  KOR: "🇰🇷",
+  NED: "🇳🇱",
+  BEL: "🇧🇪",
+  SUI: "🇨🇭",
+  CRO: "🇭🇷",
+  EXT: "⭐️",
 };
 
-export function QuickRegisterView() {
+type RegisterModeSwitch = { href: string; label: string };
+
+export function QuickRegisterView({
+  registerModeSwitch,
+}: {
+  registerModeSwitch?: RegisterModeSwitch;
+} = {}) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>("duplicates");
+  const pathname = usePathname();
+  const { isAuthenticated } = useConvexAuth();
+
+  const navContext = useQuery(
+    api.users.getNavContext,
+    isAuthenticated ? {} : "skip"
+  );
+  const navReady = navContext !== undefined;
+  const hasCompletedSetup = navContext?.hasCompletedStickerSetup === true;
+
+  const navGroups = useAppNavGroups();
+
+  const [activeTab, setActiveTab] = useState<ListKind>("duplicates");
 
   const {
     duplicates,
@@ -61,194 +75,263 @@ export function QuickRegisterView() {
     totalStickers,
     isLoading,
     isSaving,
+    isDirty,
     error,
     canFinalize,
     addDuplicates,
-    removeDuplicate,
     addMissing,
+    removeDuplicate,
     removeMissing,
-    finalize,
     markAllInSection,
     clearSection,
     invertSection,
-    markAll,
-    clearAll,
+    finalize,
+    flush,
   } = useStickers();
 
-  const tabConfig: Record<Tab, TabConfig> = {
-    duplicates: {
-      list: duplicates,
-      add: addDuplicates,
-      remove: removeDuplicate,
-      bgClass: "bg-secondary-container/30",
-      textClass: "text-secondary",
-      title: "Suas Figurinhas",
-      selectAllLabel: "Tenho TODAS as figurinhas",
-      hint: "Marque todas e depois desmarque as que voce NAO tem repetida",
-      tabActiveClass: "bg-secondary/10 text-secondary",
+  const duplicatesSet = useMemo(() => new Set(duplicates), [duplicates]);
+  const missingSet = useMemo(() => new Set(missing), [missing]);
+
+  const haveCount = Math.max(0, totalStickers - missing.length);
+  const needCount = missing.length;
+
+  // Snapshot para contador "+N hoje": tomar só após o primeiro load do Convex.
+  // Diff desde o mount da view; reseta no reload (sessão-only).
+  const [snapshot, setSnapshot] = useState<{
+    haveBase: number;
+    dupsBase: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (isLoading || snapshot !== null) return;
+    setSnapshot({ haveBase: haveCount, dupsBase: duplicates.length });
+  }, [isLoading, snapshot, haveCount, duplicates.length]);
+
+  const addedHaveDiff = snapshot
+    ? Math.max(0, haveCount - snapshot.haveBase)
+    : 0;
+  const addedDupsDiff = snapshot
+    ? Math.max(0, duplicates.length - snapshot.dupsBase)
+    : 0;
+
+  const handleToggle = useCallback(
+    (num: number) => {
+      if (activeTab === "duplicates") {
+        if (duplicatesSet.has(num)) removeDuplicate(num);
+        else if (!missingSet.has(num)) addDuplicates([num]);
+      } else {
+        if (missingSet.has(num)) removeMissing(num);
+        else if (!duplicatesSet.has(num)) addMissing([num]);
+      }
     },
-    missing: {
-      list: missing,
-      add: addMissing,
-      remove: removeMissing,
-      bgClass: "bg-primary/20",
-      textClass: "text-primary",
-      title: "Minha Lista de Desejos",
-      selectAllLabel: "Preciso de TODAS as figurinhas",
-      hint: "Marque todas e depois desmarque as que voce JA tem",
-      tabActiveClass: "bg-primary/10 text-primary",
+    [
+      activeTab,
+      duplicatesSet,
+      missingSet,
+      addDuplicates,
+      addMissing,
+      removeDuplicate,
+      removeMissing,
+    ]
+  );
+
+  const handleQuickAdd = useCallback(
+    (nums: number[]) => {
+      if (activeTab === "duplicates") addDuplicates(nums);
+      else addMissing(nums);
     },
-  };
+    [activeTab, addDuplicates, addMissing]
+  );
 
-  const current = tabConfig[activeTab];
+  const handleBulkAction = useCallback(
+    (sectionCode: string, action: "all" | "none" | "invert") => {
+      if (action === "all") markAllInSection(sectionCode, activeTab);
+      else if (action === "none") clearSection(sectionCode, activeTab);
+      else invertSection(sectionCode, activeTab);
+    },
+    [activeTab, markAllInSection, clearSection, invertSection]
+  );
 
-  const handleToggle = (num: number, action: "add" | "remove") => {
-    const { add, remove } = tabConfig[activeTab];
-    if (action === "add") add([num]);
-    else remove(num);
-  };
-
-  const handleBulkAction = (
-    sectionCode: string,
-    action: "all" | "none" | "invert"
-  ) => {
-    if (action === "all") {
-      markAllInSection(sectionCode, activeTab);
-    } else if (action === "none") {
-      clearSection(sectionCode, activeTab);
-    } else {
-      invertSection(sectionCode, activeTab);
-    }
-  };
-
-  const handleFinalize = async () => {
+  const handleContinue = useCallback(async () => {
     try {
       await finalize();
       router.push("/selecionar-localizacao");
-    } catch {}
-  };
+    } catch {
+      /* erro exibido via state.error */
+    }
+  }, [finalize, router]);
 
-  if (isLoading) {
+  const ctaMode: "continue" | "save" = hasCompletedSetup ? "save" : "continue";
+
+  const modeSwitchLink = registerModeSwitch ? (
+    <Link
+      href={registerModeSwitch.href}
+      className="font-medium text-primary underline-offset-4 hover:underline"
+    >
+      {registerModeSwitch.label}
+    </Link>
+  ) : null;
+
+  const sectionsWithEmoji: SectionInfo[] = useMemo(
+    () =>
+      sections.map((s) => ({
+        ...s,
+        emoji: SECTION_EMOJI[s.code.toUpperCase()] ?? "🎫",
+      })),
+    [sections]
+  );
+
+  if (isLoading && sections.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-dim">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     );
   }
 
-  const totalCount = current.list.length;
-
-  const haveCount = Math.max(0, totalStickers - missing.length);
-
   return (
-    <div className="min-h-screen flex flex-col pb-24 bg-surface-dim text-on-surface font-body">
-      <header className="bg-surface-dim sticky top-0 z-50 flex items-center justify-between w-full px-6 h-16">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150"
-            aria-label="Voltar"
-          >
-            <ArrowLeft className="size-6" strokeWidth={2} />
-          </button>
-          <div>
-            <h1 className="font-headline font-bold text-lg uppercase tracking-tighter text-primary">
-              Álbum · Copa 2026
-            </h1>
-            <p className="text-xs text-on-surface-variant">
-              {totalStickers} figurinhas · {haveCount} tenho · {missing.length} preciso
-            </p>
-          </div>
+    <TooltipProvider delayDuration={250}>
+      <div className="flex min-h-screen bg-background text-foreground">
+        <aside className="hidden w-64 shrink-0 border-r bg-muted/40 md:block">
+          <AppSidebarContent groups={navGroups} pathname={pathname} />
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Mobile header */}
+          <header className="flex items-center justify-between gap-3 border-b border-outline-variant/40 bg-background px-4 py-3 md:hidden">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => router.back()}
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="size-5" />
+            </Button>
+            <div className="flex min-w-0 flex-1 flex-col items-center text-center">
+              <h1 className="truncate font-headline text-base font-black uppercase tracking-tight">
+                Álbum · Copa 2026
+              </h1>
+              <p className="text-[11px] text-on-surface-variant">
+                {totalStickers} figurinhas ·{" "}
+                <span className="font-bold text-secondary">
+                  {haveCount} tenho
+                </span>{" "}
+                ·{" "}
+                <span className="font-bold text-tertiary">
+                  {needCount} preciso
+                </span>
+              </p>
+              {modeSwitchLink ? (
+                <p className="mt-1 text-[11px]">{modeSwitchLink}</p>
+              ) : null}
+            </div>
+            <AppNavDrawer />
+          </header>
+
+          <main className="flex-1 overflow-auto px-4 pb-44 md:px-8 md:pb-10">
+            <div className="mx-auto w-full max-w-6xl space-y-6 pt-4 md:pt-8">
+              <DesktopTopBar
+                totalStickers={totalStickers}
+                isDirty={isDirty}
+                isSaving={isSaving}
+                ctaMode={ctaMode}
+                canContinue={canFinalize}
+                onContinue={handleContinue}
+                onFlush={flush}
+                modeSwitch={modeSwitchLink}
+              />
+
+              <StatsCardRow
+                have={haveCount}
+                duplicates={duplicates.length}
+                missing={needCount}
+                total={totalStickers}
+                className="hidden md:grid"
+              />
+
+              {/* Quick bar desktop */}
+              <div className="hidden flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container p-3 md:flex lg:flex-row lg:items-center">
+                <StickerTabs
+                  active={activeTab}
+                  onChange={setActiveTab}
+                  counts={{ have: haveCount, need: needCount }}
+                  variant="desktop-inline"
+                  className="w-fit"
+                />
+                <QuickEntryInput
+                  sections={sections}
+                  totalStickers={totalStickers}
+                  isLoading={isLoading}
+                  onAdd={handleQuickAdd}
+                  variant="desktop-inline"
+                  placeholder="Digite números · ex: 42, 108, 250"
+                  className="flex-1"
+                />
+              </div>
+
+              {/* Mobile tabs */}
+              <StickerTabs
+                active={activeTab}
+                onChange={setActiveTab}
+                counts={{ have: haveCount, need: needCount }}
+                variant="mobile"
+                className="md:hidden"
+              />
+
+              {/* Mobile quick entry */}
+              <div className="md:hidden">
+                <QuickEntryInput
+                  sections={sections}
+                  totalStickers={totalStickers}
+                  isLoading={isLoading}
+                  onAdd={handleQuickAdd}
+                  variant="mobile"
+                />
+              </div>
+
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                >
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-3 md:space-y-4">
+                {sectionsWithEmoji.map((section) => (
+                  <StickerSectionGroup
+                    key={section.code}
+                    section={section}
+                    mode={activeTab}
+                    duplicatesSet={duplicatesSet}
+                    missingSet={missingSet}
+                    variant="mobile"
+                    onToggle={handleToggle}
+                    onBulkAction={(action) =>
+                      handleBulkAction(section.code, action)
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          </main>
         </div>
-        <button
-          type="button"
-          className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-150"
-          aria-label="Configurações"
-        >
-          <Settings className="size-6" strokeWidth={2} />
-        </button>
-      </header>
 
-      <section className="hidden px-6 pt-6 lg:block">
-        <div className="mx-auto grid max-w-4xl grid-cols-4 gap-3">
-          <StickerStatCard label="Tenho" value={haveCount} tone="secondary" />
-          <StickerStatCard label="Duplicadas" value={duplicates.length} tone="primary" />
-          <StickerStatCard label="Preciso" value={missing.length} tone="tertiary" />
-          <StickerStatCard label="Total" value={totalStickers} tone="outline" />
-        </div>
-      </section>
-
-      <main className="flex-1 px-6 pt-6 max-w-2xl mx-auto w-full">
-        <TabToggle activeTab={activeTab} onTabChange={setActiveTab} tabConfig={tabConfig} />
-
-        <section className="mb-10">
-          <StickerQuickInput mode={activeTab} sections={sections} onAdd={current.add} />
-        </section>
-
-        {error && (
-          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-            {error}
-          </div>
-        )}
-
-        <section className="flex items-center justify-between mb-6">
-          <h2 className="font-headline font-bold text-lg tracking-tight text-on-surface">
-            {current.title}
-          </h2>
-          <div className={cn("rounded-full px-3 py-1", current.bgClass)}>
-            <span className={cn("font-bold text-xs uppercase tracking-widest", current.textClass)}>
-              Total: {totalCount} figurinha{totalCount !== 1 ? "s" : ""}
-            </span>
-          </div>
-        </section>
-
-        <GlobalCheckbox
-          checked={current.list.length === totalStickers}
-          onCheckedChange={(checked) => {
-            if (checked) markAll(activeTab);
-            else clearAll(activeTab);
-          }}
-          label={current.selectAllLabel}
-          hint={current.hint}
-          currentCount={current.list.length}
-          totalStickers={totalStickers}
+        <MobileFabBar
+          addedToday={addedHaveDiff}
+          addedDups={addedDupsDiff}
+          isDirty={isDirty}
+          isSaving={isSaving}
+          ctaMode={ctaMode}
+          canContinue={canFinalize}
+          onContinue={handleContinue}
+          onFlush={flush}
+          className={cn(!navReady && "pointer-events-none opacity-0")}
         />
 
-        <section className="pb-12">
-          <SectionAccordion
-            sections={sections}
-            mode={activeTab}
-            duplicates={duplicates}
-            missing={missing}
-            onToggle={handleToggle}
-            onBulkAction={handleBulkAction}
-          />
-        </section>
-      </main>
-
-      <div className="fixed bottom-0 left-0 right-0 p-6 z-40 bg-surface-dim/80 glass-effect">
-        <div className="max-w-2xl mx-auto">
-          <Button
-            onClick={handleFinalize}
-            disabled={!canFinalize}
-            className="w-full bg-gradient-to-r from-primary to-primary-dim text-primary-foreground py-4 h-auto rounded-xl font-headline font-bold text-lg uppercase tracking-widest active:scale-[0.98] transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-3"
-          >
-            {isSaving ? (
-              <span className="animate-pulse">Salvando...</span>
-            ) : (
-              <>
-                CONTINUAR PARA O MAPA
-                <ArrowRight className="size-5 shrink-0" strokeWidth={2} />
-              </>
-            )}
-          </Button>
-          {!canFinalize && !isSaving && (
-            <p className="text-center text-xs text-on-surface-variant mt-2">
-              Preencha figurinhas repetidas ou faltantes para continuar
-            </p>
-          )}
-        </div>
+        {navReady && hasCompletedSetup && <MobileBottomNav />}
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

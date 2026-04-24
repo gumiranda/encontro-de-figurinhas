@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Votação · Jogo Mais Chato</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="chato.css">
+<style>body { display:grid; place-items:center; padding:40px 16px; min-height:100dvh; }</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel">
+const { IOSDevice } = window;
+
+const reasons = [
+  { emo: "😴", txt: "Ninguém tentou nada" },
+  { emo: "🪦", txt: "Jogou pro empate" },
+  { emo: "📺", txt: "Dormi no 2º tempo" },
+  { emo: "⏱️", txt: "Devolve meus 90 min" },
+  { emo: "🥱", txt: "Parecia Copa Kaiser" },
+  { emo: "🧊", txt: "Gelou o estádio" },
+];
+
+function App() {
+  const [picked, setPicked] = React.useState([0, 3]);
+  const toggle = (i) => setPicked(p => p.includes(i) ? p.filter(x=>x!==i) : [...p, i]);
+  return (
+    <IOSDevice dark>
+      <div className="iscroll" style={{background:"var(--surface)"}}>
+        <header style={{padding:"14px 16px 8px", display:"flex", alignItems:"center", gap:10}}>
+          <button style={{width:36,height:36,borderRadius:10,background:"var(--surface-container)",display:"grid",placeItems:"center"}}>
+            <span className="material-symbols-outlined" style={{fontSize:20}}>arrow_back</span>
+          </button>
+          <div style={{flex:1, textAlign:"center"}}>
+            <div className="micro-cap" style={{color:"var(--chato-yellow)"}}>● rodada 3 · grupo A</div>
+          </div>
+          <button style={{width:36,height:36,borderRadius:10,background:"var(--surface-container)",display:"grid",placeItems:"center"}}>
+            <span className="material-symbols-outlined" style={{fontSize:20}}>share</span>
+          </button>
+        </header>
+
+        <div style={{padding:"20px 20px 0", textAlign:"center"}}>
+          <div style={{fontSize:".7rem", color:"var(--outline)", letterSpacing:".14em", textTransform:"uppercase"}}>Copa 2026 · 14 jun, 13h</div>
+
+          <div style={{marginTop:28, display:"grid", gridTemplateColumns:"1fr auto 1fr", alignItems:"center", gap:14}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:10}}>
+              <div className="flag xl">🇩🇪</div>
+              <div className="ff-display" style={{fontSize:".95rem"}}>ALEMANHA</div>
+              <div className="ff-display" style={{fontSize:"3.2rem", lineHeight:.8, color:"var(--on-surface-variant)"}}>0</div>
+            </div>
+            <div className="ff-display" style={{fontSize:"1.4rem", color:"var(--outline)"}}>×</div>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:10}}>
+              <div className="flag xl">🇨🇭</div>
+              <div className="ff-display" style={{fontSize:".95rem"}}>SUÍÇA</div>
+              <div className="ff-display" style={{fontSize:"3.2rem", lineHeight:.8, color:"var(--on-surface-variant)"}}>0</div>
+            </div>
+          </div>
+
+          <div style={{marginTop:24, display:"inline-flex", gap:6, padding:"6px 12px", borderRadius:9999, background:"rgba(255,201,101,.1)", border:"1px solid rgba(255,201,101,.3)", color:"var(--chato-yellow)", fontSize:".72rem", fontFamily:"'Space Grotesk'", fontWeight:700, letterSpacing:".1em", textTransform:"uppercase"}}>
+            🥱 2 chutes no gol · 1 falta · 0 emoção
+          </div>
+        </div>
+
+        <div style={{padding:"32px 20px 0"}}>
+          <div className="ff-display" style={{fontSize:"1.5rem", lineHeight:1, letterSpacing:"-0.015em"}}>
+            Por que esse jogo <span style={{color:"var(--chato-yellow)"}}>foi horroroso?</span>
+          </div>
+          <div style={{fontSize:".8rem", color:"var(--on-surface-variant)", marginTop:8}}>Marque quantas quiser. Vai aliviar.</div>
+
+          <div style={{marginTop:20, display:"grid", gridTemplateColumns:"1fr 1fr", gap:10}}>
+            {reasons.map((r, i) => (
+              <button key={i} onClick={()=>toggle(i)} style={{
+                padding:"14px 12px",
+                borderRadius:14,
+                background: picked.includes(i) ? "rgba(255,201,101,.1)" : "var(--surface-container)",
+                border: picked.includes(i) ? "2px solid var(--chato-yellow)" : "2px solid rgba(255,255,255,.05)",
+                textAlign:"left",
+                display:"flex", flexDirection:"column", gap:6,
+                transition:"all .15s"
+              }}>
+                <span style={{fontSize:"1.3rem"}}>{r.emo}</span>
+                <span style={{fontFamily:"'Space Grotesk'", fontWeight:600, fontSize:".82rem", lineHeight:1.25}}>{r.txt}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{position:"sticky", bottom:0, padding:"20px 20px 28px", background:"linear-gradient(180deg, transparent, var(--surface) 30%)", marginTop:24}}>
+          <button className="btn-meme" style={{width:"100%"}}>
+            COROAR COMO CHATO 👑
+          </button>
+          <div style={{textAlign:"center", fontSize:".7rem", color:"var(--outline)", marginTop:10}}>
+            você já votou em <strong>2 jogos</strong> dessa rodada
+          </div>
+        </div>
+      </div>
+    </IOSDevice>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

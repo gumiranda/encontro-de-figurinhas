@@ -1,5 +1,5 @@
 import { fetchQuery } from "convex/nextjs";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { api } from "@workspace/backend/_generated/api";
@@ -16,11 +16,12 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-const getCities = unstable_cache(
-  () => fetchQuery(api.cities.getAll),
-  ["cities-all-coords"],
-  { revalidate: 3600 }
-);
+async function getCities() {
+  "use cache";
+  cacheTag("cities");
+  cacheLife("hours");
+  return fetchQuery(api.cities.getAll);
+}
 
 export default async function SelecionarLocalizacaoPage() {
   const { userId, getToken } = await auth();

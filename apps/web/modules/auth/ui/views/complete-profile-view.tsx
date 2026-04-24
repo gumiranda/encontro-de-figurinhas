@@ -1,42 +1,77 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
-import { Button } from "@workspace/ui/components/button";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { CompleteProfileForm } from "../components/complete-profile-form";
+import { OnboardingProgress } from "../components/onboarding-progress";
 import { OnboardingStepper } from "../components/onboarding-stepper";
+import { SignOutButton } from "../components/sign-out-button";
+
+const CURRENT_STEP = 2;
+const TOTAL_STEPS = 3;
 
 export function CompleteProfileView() {
   const router = useRouter();
+  const { isLoaded: clerkLoaded, isSignedIn } = useAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+  // Clerk define sessão; a query pode retornar null enquanto o JWT Convex sincroniza.
+  // Não usar `isAuthenticated` no skip — senão `undefined` + loader bloqueado por `authLoading`.
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    clerkLoaded && isSignedIn ? {} : "skip"
+  );
   const createUser = useMutation(api.users.createUser);
-  const called = useRef(false);
 
-  // Create user if authenticated but doesn't exist in Convex
+  // Cria linha em `users` só quando o JWT Convex está pronto; antes disso `createUser` pode
+  // retornar null (sem identity no mutation) e o efeito reexecuta quando `isAuthenticated` estabiliza.
   useEffect(() => {
-    if (isAuthenticated && currentUser === null && !called.current) {
-      called.current = true;
-      createUser();
+    if (
+      !clerkLoaded ||
+      !isSignedIn ||
+      authLoading ||
+      !isAuthenticated ||
+      currentUser !== null ||
+      currentUser === undefined
+    ) {
+      return;
     }
-  }, [isAuthenticated, currentUser, createUser]);
 
-  // Already onboarded - redirect to dashboard
-  useEffect(() => {
-    if (currentUser?.hasCompletedOnboarding) {
-      router.replace("/cadastrar-figurinhas");
-    }
+    void createUser().catch(() => {});
+  }, [
+    clerkLoaded,
+    isSignedIn,
+    authLoading,
+    isAuthenticated,
+    currentUser,
+    createUser,
+  ]);
+
+  // Perfil já completo — alinhar ao dashboard-shell (próximo passo do funil ou dashboard).
+  // useLayoutEffect reduz flash de loader antes do replace.
+  useLayoutEffect(() => {
+    if (!currentUser?.hasCompletedOnboarding) return;
+
+    const next =
+      currentUser.hasCompletedStickerSetup !== true
+        ? "/cadastrar-figurinhas"
+        : !currentUser.locationSource
+          ? "/selecionar-localizacao"
+          : "/dashboard";
+
+    router.replace(next);
   }, [currentUser, router]);
 
-  // Middleware handles auth redirect to /sign-in
-  // Wait for auth and user data
+  // Middleware handles auth redirect to /sign-in.
+  // Não condicionar o loader a `useConvexAuth`: após router.back o token pode re-sync com
+  // authLoading true por tempo indefinido enquanto Clerk já está logado → loader eterno.
+  // A mutação createUser continua guardada por !authLoading && isAuthenticated.
   if (
-    authLoading ||
-    !isAuthenticated ||
+    !clerkLoaded ||
+    !isSignedIn ||
     currentUser === undefined ||
     !currentUser ||
     currentUser.hasCompletedOnboarding
@@ -45,50 +80,37 @@ export function CompleteProfileView() {
   }
 
   return (
-    <main className="landing-theme relative grid min-h-screen bg-[var(--landing-background)] stadium-gradient lg:grid-cols-[340px_1fr]">
-      <OnboardingStepper currentStep={2} />
+    <main className="relative grid min-h-screen min-w-0 bg-background stadium-gradient lg:grid-cols-[340px_1fr]">
+      <OnboardingStepper currentStep={CURRENT_STEP} />
 
-      <div className="flex flex-col">
-        <header className="flex items-center justify-between px-6 py-6">
-          <Button
-            variant="ghost"
-            className="group flex items-center gap-2 p-0 text-[var(--landing-on-surface)] hover:text-[var(--landing-primary)]"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="h-6 w-6" />
-            <span className="font-label text-sm font-medium">Voltar</span>
-          </Button>
-          <span className="text-xs uppercase tracking-widest text-[var(--landing-on-surface-variant)]">
-            Passo 02 / 03
-          </span>
-        </header>
+      <div className="flex min-w-0 flex-col overflow-x-clip">
+        <div className="mx-auto w-full max-w-[700px] px-6 pt-14 lg:px-20 lg:pt-20">
+          <header className="flex items-center justify-between lg:justify-end">
+            <SignOutButton iconOnly className="lg:hidden" label="Sair da conta" />
+            <span className="font-mono text-xs text-[var(--landing-on-surface-variant)] lg:hidden">
+              {CURRENT_STEP} / {TOTAL_STEPS}
+            </span>
+          </header>
 
-        <div className="px-6 lg:px-10">
-          <div
-            className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--landing-surface-container-high)]"
-            role="progressbar"
-            aria-valuenow={66}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Progresso do onboarding"
-          >
-            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)]" />
+          <div className="mt-6">
+            <OnboardingProgress currentStep={CURRENT_STEP} totalSteps={TOTAL_STEPS} />
           </div>
-        </div>
 
-        <section className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pb-12 pt-8 lg:px-10">
-          <div className="mb-8">
-            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--landing-on-surface)] lg:text-4xl">
-              Como te chamamos?
+          <div className="mb-8 mt-10 min-w-0">
+            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tight text-[var(--on-surface)] lg:text-4xl">
+              Como te{" "}
+              <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--tertiary)] bg-clip-text text-transparent">
+                chamamos?
+              </span>
             </h1>
-            <p className="mt-3 text-[var(--landing-on-surface-variant)]">
-              Escolha seu nome e @username. Eles vão aparecer para outros
-              colecionadores quando você agendar trocas.
+            <p className="mt-3 break-words text-pretty text-[var(--on-surface-variant)]">
+              Escolha um apelido único e confirme sua idade. Ele aparece nas propostas de
+              troca combinadas com outros colecionadores.
             </p>
           </div>
 
           <CompleteProfileForm />
-        </section>
+        </div>
       </div>
     </main>
   );

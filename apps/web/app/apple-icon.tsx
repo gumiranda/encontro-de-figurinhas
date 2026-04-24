@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BRAND_GRADIENTS, BRAND_COLORS } from "@workspace/ui/lib/design-tokens";
 
 export const runtime = "edge";
 
@@ -14,13 +15,13 @@ export default function AppleIcon() {
       <div
         style={{
           fontSize: 120,
-          background: "linear-gradient(135deg, #3C82F6 0%, #1E40AF 100%)",
+          background: BRAND_GRADIENTS.primary,
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "white",
+          color: BRAND_COLORS.onPrimary,
           borderRadius: 40,
           fontWeight: 700,
           fontFamily: "system-ui, sans-serif",
