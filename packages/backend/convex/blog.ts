@@ -97,33 +97,53 @@ export const getByCategory = query({
 
 export const getRelated = query({
   args: { slug: v.string(), limit: v.optional(v.number()) },
+  returns: v.array(
+    v.object({
+      _id: v.id("blogPosts"),
+      title: v.string(),
+      slug: v.string(),
+      excerpt: v.string(),
+      coverImage: v.optional(v.string()),
+      publishedAt: v.optional(v.number()),
+    })
+  ),
   handler: async (ctx, { slug, limit }) => {
+    const maxResults = limit ?? 3;
     const current = await ctx.db
       .query("blogPosts")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
 
-    if (!current) return [];
+    if (!current || current.status !== "published") return [];
 
-    const related = await ctx.db
+    const currentTags = new Set(current.tags);
+
+    const candidates = await ctx.db
       .query("blogPosts")
-      .withIndex("by_category_status", (q) =>
-        q.eq("category", current.category).eq("status", "published")
-      )
+      .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
       .order("desc")
-      .take((limit ?? 3) + 1);
+      .take(50);
 
-    return related
+    const scored = candidates
       .filter((p) => p.slug !== slug)
-      .slice(0, limit ?? 3)
-      .map((p) => ({
-        _id: p._id,
-        title: p.title,
-        slug: p.slug,
-        excerpt: p.excerpt,
-        coverImage: p.coverImage,
-        readingTime: p.readingTime,
-      }));
+      .map((p) => {
+        const commonTags = p.tags.filter((t) => currentTags.has(t)).length;
+        return { post: p, score: commonTags };
+      })
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return (b.post.publishedAt ?? 0) - (a.post.publishedAt ?? 0);
+      })
+      .slice(0, maxResults);
+
+    return scored.map(({ post }) => ({
+      _id: post._id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      coverImage: post.coverImage,
+      publishedAt: post.publishedAt,
+    }));
   },
 });
 

@@ -1,0 +1,30 @@
+.blog-prose :is(h2, h3, h4)[id] {
+  scroll-margin-top: calc(var(--header-h, 5rem) + 1rem);
+}
+
+.blog-prose > p:first-of-type:not(:has(img, iframe, blockquote))::first-letter {
+  font-family: var(--font-headline);
+  font-size: 4.25rem;
+  font-weight: 800;
+  line-height: 0.85;
+  float: left;
+  margin: 4px 14px 0 0;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media print {
+  .reading-progress,
+  .share-rail,
+  .blog-toc-desktop {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
