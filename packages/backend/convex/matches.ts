@@ -505,9 +505,7 @@ export const listPresentMatchRowsAtActivePoint = query({
     const now = Date.now();
     const active = await ctx.db
       .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", me._id).gt("expiresAt", now)
-      )
+      .withIndex("by_user_active", (q) => q.eq("userId", me._id).gt("expiresAt", now))
       .first();
 
     if (!active) {
@@ -553,16 +551,13 @@ export const listPresentMatchRowsAtActivePoint = query({
         if (theirMiss.has(n)) iHaveTheyNeed.push(n);
       }
 
-      const okBoth =
-        theyHaveINeed.length >= 1 && iHaveTheyNeed.length >= 1;
-      const okOneWay =
-        theyHaveINeed.length >= 1 || iHaveTheyNeed.length >= 1;
+      const okBoth = theyHaveINeed.length >= 1 && iHaveTheyNeed.length >= 1;
+      const okOneWay = theyHaveINeed.length >= 1 || iHaveTheyNeed.length >= 1;
       if (args.bidirectionalOnly ? !okBoth : !okOneWay) continue;
 
       matches.push({
         matchedUserId: other._id,
-        displayNickname:
-          other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
         avatarSeed: other._id,
         albumCompletionPct: other.albumProgress ?? 0,
         confirmedTradesCount: other.totalTrades ?? 0,
@@ -784,7 +779,7 @@ export const backfillTradePointType = internalMutation({
   },
 });
 
-const MAX_STICKERS_OVERLAP = 30;
+const MAX_STICKERS_OVERLAP = 60;
 
 function countBy(arr: number[]): Map<number, number> {
   const map = new Map<number, number>();
@@ -843,7 +838,10 @@ export const getFullStickerOverlap = query({
       }),
     })
   ),
-  handler: async (ctx, { matchedUserId, tradePointId }): Promise<FullStickerOverlapResult | null> => {
+  handler: async (
+    ctx,
+    { matchedUserId, tradePointId }
+  ): Promise<FullStickerOverlapResult | null> => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") return null;
     const me = auth.user;
@@ -892,8 +890,15 @@ export const getFullStickerOverlap = query({
       iHaveTheyNeedNums.sort((a, b) => a - b);
 
       distanceKm = 0;
-      if (me.lat != null && me.lng != null && matchedUser.lat != null && matchedUser.lng != null) {
-        distanceKm = roundDistanceKmHalf(haversine(me.lat, me.lng, matchedUser.lat, matchedUser.lng));
+      if (
+        me.lat != null &&
+        me.lng != null &&
+        matchedUser.lat != null &&
+        matchedUser.lng != null
+      ) {
+        distanceKm = roundDistanceKmHalf(
+          haversine(me.lat, me.lng, matchedUser.lat, matchedUser.lng)
+        );
       }
     }
 
@@ -925,7 +930,8 @@ export const getFullStickerOverlap = query({
       iHaveTheyNeed,
       sections,
       matchedUser: {
-        displayNickname: matchedUser.displayNickname ?? matchedUser.nickname ?? matchedUser.name,
+        displayNickname:
+          matchedUser.displayNickname ?? matchedUser.nickname ?? matchedUser.name,
         avatarSeed: matchedUserId,
         albumCompletionPct: matchedUser.albumProgress ?? 0,
         confirmedTradesCount: matchedUser.totalTrades ?? 0,
