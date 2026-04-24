@@ -146,9 +146,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         "@type": "ListItem",
         position: 3,
         name: post.title,
+        item: canonical,
       },
     ],
   };
+
+  const imageUrl = post.coverImage?.startsWith("http")
+    ? post.coverImage
+    : post.coverImage
+      ? `${BASE_URL}${post.coverImage}`
+      : `${BASE_URL}/opengraph-image`;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -164,7 +171,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       "@type": "Person",
       name: post.author.name,
     },
-    image: post.coverImage,
+    image: [imageUrl],
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": canonical,
