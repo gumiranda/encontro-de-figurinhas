@@ -599,7 +599,7 @@ export function MatchTradeModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex h-full max-h-dvh w-full max-w-[980px] flex-col overflow-hidden rounded-none border-0 p-0 md:h-auto md:max-h-[min(92vh,820px)] md:rounded-3xl md:border"
+        className="flex h-full max-h-dvh w-full max-w-[1280px] flex-col overflow-hidden rounded-none border-0 p-0 md:h-auto md:max-h-[min(92vh,880px)] md:rounded-3xl md:border lg:max-w-[1400px]"
         showCloseButton={false}
       >
         {open && (
