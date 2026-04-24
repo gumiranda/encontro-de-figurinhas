@@ -75,6 +75,7 @@ export default defineSchema({
     duplicates: v.optional(v.array(v.number())),
     missing: v.optional(v.array(v.number())),
     albumProgress: v.optional(v.number()),
+    albumCompletionPct: v.optional(v.number()),
     totalStickersOwned: v.optional(v.number()),
     hasCompletedStickerSetup: v.optional(v.boolean()),
 
@@ -259,18 +260,55 @@ export default defineSchema({
     userId: v.id("users"),
     matchedUserId: v.id("users"),
     tradePointId: v.id("tradePoints"),
+    tradePointSlug: v.string(),
     theyHaveINeed: v.array(v.number()),
     iHaveTheyNeed: v.array(v.number()),
     isBidirectional: v.boolean(),
     distanceKm: v.float64(),
     layer: v.union(v.literal(1), v.literal(2)),
-    matchScore: v.number(),
     computedAt: v.number(),
   })
     .index("by_user_layer", ["userId", "layer"])
     .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])
     .index("by_user_point", ["userId", "tradePointId"])
     .index("by_matchedUser", ["matchedUserId"]),
+
+  trades: defineTable({
+    initiatorId: v.id("users"),
+    counterpartyId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    pairKey: v.string(),
+    stickersInitiatorGave: v.array(v.number()),
+    stickersInitiatorReceived: v.array(v.number()),
+    status: v.union(
+      v.literal("pending_confirmation"),
+      v.literal("confirmed"),
+      v.literal("cancelled"),
+      v.literal("disputed"),
+      v.literal("expired")
+    ),
+    createdAt: v.number(),
+    confirmedAt: v.optional(v.number()),
+    disputedAt: v.optional(v.number()),
+    disputeReason: v.optional(v.string()),
+    expiredAt: v.optional(v.number()),
+  })
+    .index("by_initiator_status", ["initiatorId", "status", "createdAt"])
+    .index("by_counterparty_status", ["counterpartyId", "status", "createdAt"])
+    .index("by_tradePoint", ["tradePointId", "createdAt"])
+    .index("by_pairKey_created", ["pairKey", "createdAt"])
+    .index("by_pairKey_status_created", ["pairKey", "status", "createdAt"]),
+
+  userMatchInteractions: defineTable({
+    userId: v.id("users"),
+    matchedUserId: v.id("users"),
+    tradePointId: v.id("tradePoints"),
+    isHidden: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_matched_point", ["userId", "matchedUserId", "tradePointId"])
+    .index("by_user_hidden", ["userId", "isHidden", "updatedAt"]),
 
   blogPosts: defineTable({
     title: v.string(),
@@ -320,7 +358,8 @@ export default defineSchema({
       "createdAt",
     ])
     .index("by_target_category_recent", ["targetKey", "category", "createdAt"])
-    .index("by_target_unresolved", ["targetKey", "isResolved", "createdAt"]),
+    .index("by_target_unresolved", ["targetKey", "isResolved", "createdAt"])
+    .index("by_reporter_created", ["reporterId", "createdAt"]),
 
   siteStats: defineTable({
     matchRecomputeEnabled: v.optional(v.boolean()),

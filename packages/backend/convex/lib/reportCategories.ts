@@ -3,12 +3,10 @@ import type { QueryCtx } from "../_generated/server";
 import type { Doc } from "../_generated/dataModel";
 
 export const reportCategoryValidator = v.union(
-  v.literal("suspicious_behavior"),
-  v.literal("private_contact_attempt"),
-  v.literal("minor_approach"),
-  v.literal("inappropriate_content"),
-  v.literal("broken_whatsapp_link"),
-  v.literal("inactive_point"),
+  v.literal("safety"),
+  v.literal("fake_stickers"),
+  v.literal("no_show"),
+  v.literal("spam"),
   v.literal("other")
 );
 

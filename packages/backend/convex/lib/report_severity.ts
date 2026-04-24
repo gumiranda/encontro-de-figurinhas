@@ -1,20 +1,20 @@
 // Pure module — no Convex imports
 
 export const SAFETY_CATEGORIES = [
-  "suspicious_behavior",
-  "private_contact_attempt",
-  "minor_approach",
-  "inappropriate_content",
+  "safety",
 ] as const;
 
 export const OPERATIONAL_CATEGORIES = [
-  "broken_whatsapp_link",
-  "inactive_point",
+  "fake_stickers",
+  "no_show",
+  "spam",
   "other",
 ] as const;
 
 export const ADMIN_REVIEW_CATEGORIES = [
   ...SAFETY_CATEGORIES,
+  "fake_stickers",
+  "no_show",
   "other",
 ] as const;
 

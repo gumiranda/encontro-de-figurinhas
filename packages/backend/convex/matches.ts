@@ -1,11 +1,7 @@
 import { v } from "convex/values";
-import {
-  internalMutation,
-  query,
-  type MutationCtx,
-} from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import { internalMutation, query, type MutationCtx } from "./_generated/server";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { haversine } from "./lib/geo";
 
@@ -150,9 +146,7 @@ export const recomputeMatchCache = internalMutation({
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
 
     const accumulator: CachedMatch[] =
-      isContinuation && existing?.partialMatches
-        ? [...existing.partialMatches]
-        : [];
+      isContinuation && existing?.partialMatches ? [...existing.partialMatches] : [];
 
     const page = await ctx.db
       .query("users")
@@ -178,8 +172,7 @@ export const recomputeMatchCache = internalMutation({
         candidate.lat != null &&
         candidate.lng != null
       ) {
-        distanceMeters =
-          haversine(me.lat, me.lng, candidate.lat, candidate.lng) * 1000;
+        distanceMeters = haversine(me.lat, me.lng, candidate.lat, candidate.lng) * 1000;
       }
 
       accumulator.push({
@@ -207,8 +200,7 @@ export const recomputeMatchCache = internalMutation({
         partialMatches: topPartial,
         recomputeCursor: page.continueCursor,
         recomputedAt: existing?.recomputedAt ?? 0,
-        recomputeStartedAt:
-          existing?.recomputeStartedAt ?? Date.now(),
+        recomputeStartedAt: existing?.recomputeStartedAt ?? Date.now(),
         stale: true,
       });
       await ctx.scheduler.runAfter(0, internal.matches.recomputeMatchCache, {
@@ -275,10 +267,7 @@ const BATCH_RECOMPUTE_ACTIVE_WINDOW_MS = 6 * 60 * 60 * 1000;
 const BATCH_RECOMPUTE_PARTITION_THRESHOLD = 1000;
 const BATCH_RECOMPUTE_PAGE_SIZE = 200;
 
-function userQualifiesForBatchRecompute(
-  u: Doc<"users">,
-  cutoff: number
-): boolean {
+function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolean {
   return (
     u.cityId != null &&
     u.hasCompletedStickerSetup === true &&
@@ -396,6 +385,7 @@ export type ListMyMatchRow = {
   distanceKm: number;
   layer: 1 | 2;
   tradePointId: Id<"tradePoints">;
+  tradePointSlug: string;
 };
 
 const MATCH_STICKER_SAMPLE = 5;
@@ -424,44 +414,55 @@ export const listMyMatches = query({
         ? await ctx.db
             .query("precomputedMatches")
             .withIndex("by_user_layer_bidirectional", (q) =>
-              q
-                .eq("userId", userId)
-                .eq("layer", layer)
-                .eq("isBidirectional", true)
+              q.eq("userId", userId).eq("layer", layer).eq("isBidirectional", true)
             )
             .collect()
         : await ctx.db
             .query("precomputedMatches")
-            .withIndex("by_user_layer", (q) =>
-              q.eq("userId", userId).eq("layer", layer)
-            )
+            .withIndex("by_user_layer", (q) => q.eq("userId", userId).eq("layer", layer))
             .collect();
       rows.push(...chunk);
     }
 
-    rows.sort((a, b) => {
-      if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+    const hiddenInteractions = await ctx.db
+      .query("userMatchInteractions")
+      .withIndex("by_user_hidden", (q) => q.eq("userId", userId).eq("isHidden", true))
+      .collect();
+    const hiddenSet = new Set(
+      hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`)
+    );
+
+    const filteredRows = rows.filter(
+      (r) => !hiddenSet.has(`${r.matchedUserId}_${r.tradePointId}`)
+    );
+
+    filteredRows.sort((a, b) => {
+      const aScore =
+        Math.min(a.theyHaveINeed.length, a.iHaveTheyNeed.length) * 2 +
+        Math.max(a.theyHaveINeed.length, a.iHaveTheyNeed.length);
+      const bScore =
+        Math.min(b.theyHaveINeed.length, b.iHaveTheyNeed.length) * 2 +
+        Math.max(b.theyHaveINeed.length, b.iHaveTheyNeed.length);
+      if (bScore !== aScore) return bScore - aScore;
       return b.computedAt - a.computedAt;
     });
 
-    const matchedIds = [...new Set(rows.map((r) => r.matchedUserId))];
+    const matchedIds = [...new Set(filteredRows.map((r) => r.matchedUserId))];
     const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
     const otherById = new Map(
-      others
-        .filter((u): u is Doc<"users"> => u !== null)
-        .map((u) => [u._id, u])
+      others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
     );
 
     const matches: ListMyMatchRow[] = [];
-    for (const r of rows) {
+    for (const r of filteredRows) {
+      if (matches.length >= 50) break;
       const other = otherById.get(r.matchedUserId);
       if (!other) continue;
       if (other.isBanned === true || other.isShadowBanned === true) continue;
 
       matches.push({
         matchedUserId: r.matchedUserId,
-        displayNickname:
-          other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
         avatarSeed: r.matchedUserId,
         albumCompletionPct: other.albumProgress ?? 0,
         confirmedTradesCount: other.totalTrades ?? 0,
@@ -471,8 +472,121 @@ export const listMyMatches = query({
         distanceKm: roundDistanceKmHalf(r.distanceKm),
         layer: r.layer,
         tradePointId: r.tradePointId,
+        tradePointSlug: r.tradePointSlug,
       });
     }
+
+    return { matches };
+  },
+});
+
+const PRESENT_FALLBACK_CHECKIN_CAP = 50;
+
+/**
+ * Live rows for /matches when `precomputedMatches` is empty: overlap with people
+ * checked in at the caller's active point. Unlike intersecting `findUserMatches` with
+ * `listPresentAtMyPoints`, this does not miss someone who is physically present but
+ * outside the city cache top-N.
+ */
+export const listPresentMatchRowsAtActivePoint = query({
+  args: {
+    bidirectionalOnly: v.boolean(),
+  },
+  handler: async (ctx, args): Promise<{ matches: ListMyMatchRow[] }> => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") {
+      return { matches: [] };
+    }
+    const me = auth.user;
+    if (!me.hasCompletedStickerSetup) {
+      return { matches: [] };
+    }
+
+    const now = Date.now();
+    const active = await ctx.db
+      .query("checkins")
+      .withIndex("by_user_active", (q) =>
+        q.eq("userId", me._id).gt("expiresAt", now)
+      )
+      .first();
+
+    if (!active) {
+      return { matches: [] };
+    }
+
+    const point = await ctx.db.get(active.tradePointId);
+    if (!point || point.status !== "approved") {
+      return { matches: [] };
+    }
+
+    const myDupSorted = [...(me.duplicates ?? [])].sort((a, b) => a - b);
+    const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
+
+    const checkins = await ctx.db
+      .query("checkins")
+      .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+        q
+          .eq("tradePointId", active.tradePointId)
+          .eq("countedInPublic", true)
+          .gt("expiresAt", now)
+      )
+      .take(PRESENT_FALLBACK_CHECKIN_CAP);
+
+    const matches: ListMyMatchRow[] = [];
+
+    for (const c of checkins) {
+      if (c.userId === me._id) continue;
+
+      const other = await ctx.db.get(c.userId);
+      if (!other || !other.hasCompletedStickerSetup) continue;
+      if (other.isBanned === true || other.isShadowBanned === true) continue;
+
+      const theirDup = new Set<number>(other.duplicates ?? []);
+      const theirMiss = new Set<number>(other.missing ?? []);
+
+      const theyHaveINeed: number[] = [];
+      for (const n of myMissSorted) {
+        if (theirDup.has(n)) theyHaveINeed.push(n);
+      }
+      const iHaveTheyNeed: number[] = [];
+      for (const n of myDupSorted) {
+        if (theirMiss.has(n)) iHaveTheyNeed.push(n);
+      }
+
+      const okBoth =
+        theyHaveINeed.length >= 1 && iHaveTheyNeed.length >= 1;
+      const okOneWay =
+        theyHaveINeed.length >= 1 || iHaveTheyNeed.length >= 1;
+      if (args.bidirectionalOnly ? !okBoth : !okOneWay) continue;
+
+      matches.push({
+        matchedUserId: other._id,
+        displayNickname:
+          other.displayNickname ?? other.nickname ?? other.name,
+        avatarSeed: other._id,
+        albumCompletionPct: other.albumProgress ?? 0,
+        confirmedTradesCount: other.totalTrades ?? 0,
+        theyHaveINeed: theyHaveINeed.slice(0, MATCH_STICKER_SAMPLE),
+        iHaveTheyNeed: iHaveTheyNeed.slice(0, MATCH_STICKER_SAMPLE),
+        isBidirectional: okBoth,
+        distanceKm: roundDistanceKmHalf(0),
+        layer: 1,
+        tradePointId: active.tradePointId,
+        tradePointSlug: point.slug ?? "",
+      });
+    }
+
+    matches.sort((a, b) => {
+      const score = (r: ListMyMatchRow) =>
+        r.theyHaveINeed.length + r.iHaveTheyNeed.length;
+      const sa = score(a);
+      const sb = score(b);
+      if (sb !== sa) return sb - sa;
+      if (b.confirmedTradesCount !== a.confirmedTradesCount) {
+        return b.confirmedTradesCount - a.confirmedTradesCount;
+      }
+      return a.displayNickname.localeCompare(b.displayNickname);
+    });
 
     return { matches };
   },
@@ -551,9 +665,7 @@ export const findUserMatches = query({
     const userIds = top.map((m) => m.otherUserId);
     const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
     const userMap = new Map(
-      users
-        .filter((u): u is NonNullable<typeof u> => u !== null)
-        .map((u) => [u._id, u])
+      users.filter((u): u is NonNullable<typeof u> => u !== null).map((u) => [u._id, u])
     );
 
     const enriched: MatchView[] = [];
@@ -586,8 +698,7 @@ export const findUserMatches = query({
 
       enriched.push({
         otherUserId: m.otherUserId,
-        displayNickname:
-          other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
         reliabilityScore: other.reliabilityScore,
         totalTrades: other.totalTrades ?? 0,
         lastActiveAt: other.lastActiveAt ?? null,

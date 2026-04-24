@@ -14,10 +14,8 @@ import {
 } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
 import {
-  MINOR_APPROACH_EXTRA_MIN,
   REPORT_DEDUP_MS,
   SAFETY_CATEGORIES,
-  countExtraStickersOwned,
   reportCategoryValidator,
   tradePointReportTargetKey,
 } from "./lib/reportCategories";
@@ -457,13 +455,6 @@ export const submitReport = mutation({
       throw new ConvexError("already-reported");
     }
 
-    if (args.category === "minor_approach") {
-      const extraOwned = await countExtraStickersOwned(ctx, user);
-      if (Math.floor(extraOwned) < MINOR_APPROACH_EXTRA_MIN) {
-        throw new ConvexError("minor-approach-extra-requirement");
-      }
-    }
-
     const now = Date.now();
     const description =
       args.description === undefined
@@ -479,10 +470,6 @@ export const submitReport = mutation({
       isResolved: false,
       createdAt: now,
     });
-
-    if (args.category === "minor_approach") {
-      await ctx.db.patch(args.tradePointId, { requiresAdminReview: true });
-    }
 
     const safetyLiterals = SAFETY_CATEGORIES as readonly string[];
     if (safetyLiterals.includes(args.category)) {

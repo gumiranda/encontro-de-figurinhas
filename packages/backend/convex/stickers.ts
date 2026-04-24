@@ -21,6 +21,7 @@ type UserPatch = Partial<
     | "duplicates"
     | "missing"
     | "albumProgress"
+    | "albumCompletionPct"
     | "totalStickersOwned"
     | "lastActiveAt"
     | "hasCompletedStickerSetup"
@@ -157,6 +158,7 @@ export const updateStickerList = mutation({
       duplicates: args.duplicates,
       missing: args.missing,
       albumProgress,
+      albumCompletionPct: albumProgress,
       totalStickersOwned,
       lastActiveAt: Date.now(),
     };
@@ -230,6 +232,7 @@ export const toggleSticker = mutation({
       duplicates: nextDup,
       missing: nextMiss,
       albumProgress,
+      albumCompletionPct: albumProgress,
       totalStickersOwned,
       lastActiveAt: Date.now(),
     });

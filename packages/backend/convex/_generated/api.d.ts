@@ -29,6 +29,7 @@ import type * as lib_reportCategories from "../lib/reportCategories.js";
 import type * as lib_report_severity from "../lib/report_severity.js";
 import type * as lib_setLocationErrors from "../lib/setLocationErrors.js";
 import type * as lib_slug from "../lib/slug.js";
+import type * as lib_tradeHelpers from "../lib/tradeHelpers.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_userCoords from "../lib/userCoords.js";
 import type * as lib_utils from "../lib/utils.js";
@@ -44,6 +45,8 @@ import type * as siteStats from "../siteStats.js";
 import type * as states from "../states.js";
 import type * as stickers from "../stickers.js";
 import type * as tradePoints from "../tradePoints.js";
+import type * as trades from "../trades.js";
+import type * as userMatchInteractions from "../userMatchInteractions.js";
 import type * as userTradePoints from "../userTradePoints.js";
 import type * as users from "../users.js";
 
@@ -83,6 +86,7 @@ declare const fullApi: ApiFromModules<{
   "lib/report_severity": typeof lib_report_severity;
   "lib/setLocationErrors": typeof lib_setLocationErrors;
   "lib/slug": typeof lib_slug;
+  "lib/tradeHelpers": typeof lib_tradeHelpers;
   "lib/types": typeof lib_types;
   "lib/userCoords": typeof lib_userCoords;
   "lib/utils": typeof lib_utils;
@@ -98,6 +102,8 @@ declare const fullApi: ApiFromModules<{
   states: typeof states;
   stickers: typeof stickers;
   tradePoints: typeof tradePoints;
+  trades: typeof trades;
+  userMatchInteractions: typeof userMatchInteractions;
   userTradePoints: typeof userTradePoints;
   users: typeof users;
 }>;

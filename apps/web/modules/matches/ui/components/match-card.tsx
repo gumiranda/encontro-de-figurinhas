@@ -1,9 +1,11 @@
 "use client";
 
-import { ArrowLeftRight, Sparkles } from "lucide-react";
+import { ArrowLeftRight, MessageCircle, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 import type { ListMyMatchRow } from "@workspace/backend/convex/matches";
 import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
@@ -14,7 +16,9 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 
 import { formatDistanceKmLabel, roundDistanceKmHalf } from "../../lib/format-match-distance";
+import { MatchCardActions } from "./match-card-actions";
 import { MatchDicebearAvatar } from "./match-dicebear-avatar";
+import { MatchTradeDrawer } from "./match-trade-drawer";
 
 export type MatchCardProps = {
   match: ListMyMatchRow;
@@ -28,6 +32,7 @@ function stickerSampleLabel(nums: number[], max = 5): string {
 }
 
 export function MatchCard({ match, variant = "default", className }: MatchCardProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isElite = variant === "elite";
   const avatarSize = isElite ? 52 : 40;
   const distanceKm = roundDistanceKmHalf(match.distanceKm);
@@ -58,12 +63,20 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
               </CardDescription>
             </div>
           </div>
-          {match.isBidirectional && (
-            <Badge variant="secondary" className="shrink-0 text-xs">
-              <Sparkles className="mr-1 size-3" />
-              Mão dupla
-            </Badge>
-          )}
+          <div className="flex items-center gap-1">
+            {match.isBidirectional && (
+              <Badge variant="secondary" className="shrink-0 text-xs">
+                <Sparkles className="mr-1 size-3" />
+                Mão dupla
+              </Badge>
+            )}
+            <MatchCardActions
+              matchedUserId={match.matchedUserId}
+              matchedUserNickname={match.displayNickname}
+              tradePointId={match.tradePointId}
+              tradePointSlug={match.tradePointSlug}
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -82,19 +95,38 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-          <span>Álbum {match.albumCompletionPct}%</span>
-          <span aria-hidden>·</span>
-          <span>{match.confirmedTradesCount} trocas</span>
-          <span aria-hidden>·</span>
-          <span>Camada {match.layer}</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span>Álbum {match.albumCompletionPct}%</span>
+            <span aria-hidden>·</span>
+            <span>{match.confirmedTradesCount} trocas</span>
+          </div>
+          <Button size="sm" onClick={() => setDrawerOpen(true)}>
+            <MessageCircle className="mr-1.5 size-3.5" />
+            Propor troca
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 
+  const cardWithDrawer = (
+    <>
+      {inner}
+      <MatchTradeDrawer
+        matchedUserId={match.matchedUserId}
+        matchedUserNickname={match.displayNickname}
+        tradePointId={match.tradePointId}
+        theyHaveINeed={match.theyHaveINeed}
+        iHaveTheyNeed={match.iHaveTheyNeed}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+      />
+    </>
+  );
+
   if (!isElite) {
-    return inner;
+    return cardWithDrawer;
   }
 
   return (
@@ -104,7 +136,7 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
         className
       )}
     >
-      <div className="rounded-[calc(1rem-1px)] bg-card">{inner}</div>
+      <div className="rounded-[calc(1rem-1px)] bg-card">{cardWithDrawer}</div>
     </div>
   );
 }
