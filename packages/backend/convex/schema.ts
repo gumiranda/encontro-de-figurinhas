@@ -156,6 +156,7 @@ export default defineSchema({
     createdAt: v.number(),
     participantCount: v.optional(v.number()),
     activeCheckinsCount: v.optional(v.number()),
+    lastEvaluationAt: v.optional(v.number()),
 
     acceptsMail: v.optional(v.boolean()),
     pointType: v.optional(

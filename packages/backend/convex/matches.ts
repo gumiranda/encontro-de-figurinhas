@@ -416,18 +416,18 @@ export const listMyMatches = query({
             .withIndex("by_user_layer_bidirectional", (q) =>
               q.eq("userId", userId).eq("layer", layer).eq("isBidirectional", true)
             )
-            .collect()
+            .take(500)
         : await ctx.db
             .query("precomputedMatches")
             .withIndex("by_user_layer", (q) => q.eq("userId", userId).eq("layer", layer))
-            .collect();
+            .take(500);
       rows.push(...chunk);
     }
 
     const hiddenInteractions = await ctx.db
       .query("userMatchInteractions")
       .withIndex("by_user_hidden", (q) => q.eq("userId", userId).eq("isHidden", true))
-      .collect();
+      .take(500);
     const hiddenSet = new Set(
       hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`)
     );
@@ -530,12 +530,22 @@ export const listPresentMatchRowsAtActivePoint = query({
       )
       .take(PRESENT_FALLBACK_CHECKIN_CAP);
 
+    const otherIds = [
+      ...new Set(
+        checkins.filter((c) => c.userId !== me._id).map((c) => c.userId)
+      ),
+    ];
+    const others = await Promise.all(otherIds.map((id) => ctx.db.get(id)));
+    const otherById = new Map(
+      others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
+    );
+
     const matches: ListMyMatchRow[] = [];
 
     for (const c of checkins) {
       if (c.userId === me._id) continue;
 
-      const other = await ctx.db.get(c.userId);
+      const other = otherById.get(c.userId);
       if (!other || !other.hasCompletedStickerSetup) continue;
       if (other.isBanned === true || other.isShadowBanned === true) continue;
 

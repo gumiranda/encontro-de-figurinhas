@@ -141,8 +141,10 @@ export const getStatsBySlug = query({
     const [collectors, tradePoints] = await Promise.all([
       ctx.db
         .query("users")
-        .withIndex("by_city", (q) => q.eq("cityId", city._id))
-        .take(10000),
+        .withIndex("by_city_not_shadowbanned", (q) =>
+          q.eq("cityId", city._id).eq("isShadowBanned", false)
+        )
+        .take(5000),
       ctx.db
         .query("tradePoints")
         .withIndex("by_city_status", (q) =>
@@ -152,7 +154,7 @@ export const getStatsBySlug = query({
     ]);
 
     const activeCollectors = collectors.filter(
-      (u) => u.hasCompletedStickerSetup && !u.isShadowBanned && !u.isBanned
+      (u) => u.hasCompletedStickerSetup === true && u.isBanned !== true
     );
 
     return {

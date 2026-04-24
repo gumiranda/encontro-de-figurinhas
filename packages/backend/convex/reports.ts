@@ -3,6 +3,7 @@ import { mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthenticatedUser } from "./lib/auth";
 import {
+  EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
   reportCategoryValidator,
   REPORT_DEDUP_MS,
   SAFETY_AUTO_SUSPEND_THRESHOLD,
@@ -74,9 +75,11 @@ export const create = mutation({
     });
 
     if (args.tradePointId) {
-      await ctx.scheduler.runAfter(0, internal.reports.evaluateAutoAction, {
-        tradePointId: args.tradePointId,
-      });
+      await ctx.scheduler.runAfter(
+        EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
+        internal.reports.evaluateAutoAction,
+        { tradePointId: args.tradePointId }
+      );
     }
 
     return { reportId };
@@ -92,22 +95,37 @@ export const evaluateAutoAction = internalMutation({
     }
 
     const now = Date.now();
+    if (
+      point.lastEvaluationAt != null &&
+      now - point.lastEvaluationAt < EVALUATE_AUTO_ACTION_DEBOUNCE_MS
+    ) {
+      return null;
+    }
+
     const cooldownStart = point.suspendedFromReportsAt ?? 0;
     const windowStart = Math.max(now - SAFETY_WINDOW_MS, cooldownStart);
     const targetKey = tradePointReportTargetKey(tradePointId);
 
-    let safetyCount = 0;
-    for (const cat of SAFETY_CATEGORIES) {
-      const rows = await ctx.db
-        .query("reports")
-        .withIndex("by_target_category_recent", (q) =>
-          q.eq("targetKey", targetKey).eq("category", cat).gte("createdAt", windowStart)
-        )
-        .collect();
-      safetyCount += rows.filter(
-        (r) => r.resolvedAt == null && !r.isResolved
-      ).length;
-    }
+    const perCategoryCap = SAFETY_AUTO_SUSPEND_THRESHOLD + 1;
+    const buckets = await Promise.all(
+      SAFETY_CATEGORIES.map((cat) =>
+        ctx.db
+          .query("reports")
+          .withIndex("by_target_category_recent", (q) =>
+            q
+              .eq("targetKey", targetKey)
+              .eq("category", cat)
+              .gte("createdAt", windowStart)
+          )
+          .take(perCategoryCap)
+      )
+    );
+
+    const safetyCount = buckets
+      .flat()
+      .filter((r) => r.resolvedAt == null && !r.isResolved).length;
+
+    await ctx.db.patch(tradePointId, { lastEvaluationAt: now });
 
     if (safetyCount < SAFETY_AUTO_SUSPEND_THRESHOLD) {
       return null;

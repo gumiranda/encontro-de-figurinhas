@@ -14,6 +14,7 @@ import {
 } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
 import {
+  EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
   REPORT_DEDUP_MS,
   SAFETY_CATEGORIES,
   reportCategoryValidator,
@@ -473,9 +474,11 @@ export const submitReport = mutation({
 
     const safetyLiterals = SAFETY_CATEGORIES as readonly string[];
     if (safetyLiterals.includes(args.category)) {
-      await ctx.scheduler.runAfter(0, internal.reports.evaluateAutoAction, {
-        tradePointId: args.tradePointId,
-      });
+      await ctx.scheduler.runAfter(
+        EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
+        internal.reports.evaluateAutoAction,
+        { tradePointId: args.tradePointId }
+      );
     }
 
     return { ok: true as const };
@@ -543,7 +546,7 @@ export const getAllApprovedSlugs = query({
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(5000);
+      .take(15000);
 
     return points.map((p) => p.slug);
   },
@@ -664,6 +667,7 @@ export const listApprovedForSitemapPage = query({
 const RECONCILE_BATCH = 100;
 const RECONCILE_MAX_CHUNKS = 200;
 const RECONCILE_CHECKIN_CAP = 1000;
+const RECONCILE_PARTICIPANT_CAP = 10_000;
 
 export const reconcileActiveCheckinsCount = internalMutation({
   args: {
@@ -679,12 +683,18 @@ export const reconcileActiveCheckinsCount = internalMutation({
 
     let drifts = 0;
     for (const point of page.page) {
-      const active = await ctx.db
-        .query("checkins")
-        .withIndex("by_tradePoint_active", (q) =>
-          q.eq("tradePointId", point._id).gt("expiresAt", now)
-        )
-        .take(RECONCILE_CHECKIN_CAP);
+      const [active, members] = await Promise.all([
+        ctx.db
+          .query("checkins")
+          .withIndex("by_tradePoint_active", (q) =>
+            q.eq("tradePointId", point._id).gt("expiresAt", now)
+          )
+          .take(RECONCILE_CHECKIN_CAP),
+        ctx.db
+          .query("userTradePoints")
+          .withIndex("by_tradePoint", (q) => q.eq("tradePointId", point._id))
+          .take(RECONCILE_PARTICIPANT_CAP),
+      ]);
 
       if (active.length === RECONCILE_CHECKIN_CAP) {
         console.warn("reconcileActiveCheckinsCount: suspicious active count", {
@@ -695,17 +705,46 @@ export const reconcileActiveCheckinsCount = internalMutation({
         continue;
       }
 
-      const actual = active.filter((c) => c.countedInPublic).length;
-      const stored = point.activeCheckinsCount ?? 0;
-      if (actual !== stored) {
+      const patch: {
+        activeCheckinsCount?: number;
+        participantCount?: number;
+      } = {};
+
+      const actualActive = active.filter((c) => c.countedInPublic).length;
+      const storedActive = point.activeCheckinsCount ?? 0;
+      if (actualActive !== storedActive) {
         drifts++;
-        console.warn("reconcileActiveCheckinsCount: drift", {
+        console.warn("reconcileActiveCheckinsCount: active drift", {
           tradePointId: point._id,
           slug: point.slug,
-          stored,
-          actual,
+          stored: storedActive,
+          actual: actualActive,
         });
-        await ctx.db.patch(point._id, { activeCheckinsCount: actual });
+        patch.activeCheckinsCount = actualActive;
+      }
+
+      if (members.length < RECONCILE_PARTICIPANT_CAP) {
+        const storedParticipant = point.participantCount ?? 0;
+        if (members.length !== storedParticipant) {
+          drifts++;
+          console.warn("reconcileActiveCheckinsCount: participant drift", {
+            tradePointId: point._id,
+            slug: point.slug,
+            stored: storedParticipant,
+            actual: members.length,
+          });
+          patch.participantCount = members.length;
+        }
+      } else {
+        console.warn("reconcileActiveCheckinsCount: participant count capped", {
+          tradePointId: point._id,
+          slug: point.slug,
+          cap: RECONCILE_PARTICIPANT_CAP,
+        });
+      }
+
+      if (Object.keys(patch).length > 0) {
+        await ctx.db.patch(point._id, patch);
       }
     }
 

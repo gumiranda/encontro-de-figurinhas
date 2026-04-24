@@ -43,7 +43,7 @@ async function syncActiveCheckinsStickerSnapshot(
     .withIndex("by_user_active", (q) =>
       q.eq("userId", userId).gt("expiresAt", now)
     )
-    .collect();
+    .take(20);
 
   if (activeCheckins.length === 0) return;
 

@@ -214,7 +214,7 @@ export const listPresentAtMyPoints = query({
     const myMemberships = await ctx.db
       .query("userTradePoints")
       .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
-      .collect();
+      .take(100);
 
     const presentUserIds: Id<"users">[] = [];
 

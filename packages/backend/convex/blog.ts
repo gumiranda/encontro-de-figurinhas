@@ -63,7 +63,7 @@ export const getAllSlugs = query({
     const posts = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .collect();
+      .take(10000);
 
     return posts.map((p) => p.slug);
   },
@@ -133,7 +133,7 @@ export const listForSitemap = query({
     const posts = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .collect();
+      .take(10000);
 
     return posts.map((p) => ({
       slug: p.slug,
