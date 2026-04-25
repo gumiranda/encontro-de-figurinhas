@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -136,6 +137,7 @@ function matchesSearch(trade: ListMyTradeRow, query: string): boolean {
 }
 
 export function PropostasPageView() {
+  const router = useRouter();
   const { isAuthenticated } = useConvexAuth();
   const trades = useQuery(
     api.trades.listMyTrades,
@@ -394,7 +396,7 @@ export function PropostasPageView() {
                   onDecline={handleDecline}
                   onCancel={handleCancel}
                   onMessage={comingSoon("Chat")}
-                  onView={comingSoon("Detalhes")}
+                  onView={(id) => router.push(`/propostas/${id}`)}
                 />
               ))}
             </Section>

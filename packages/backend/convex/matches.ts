@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, query, type MutationCtx } from "./_generated/server";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
@@ -269,8 +270,9 @@ const BATCH_RECOMPUTE_ACTIVE_WINDOW_MS = 6 * 60 * 60 * 1000;
  * When active users (last 6h) exceed this count, we only fan out per-city jobs — never one
  * mutation that schedules everyone — so we stay within mutation time/write limits.
  */
-const BATCH_RECOMPUTE_PARTITION_THRESHOLD = 1000;
 const BATCH_RECOMPUTE_PAGE_SIZE = 200;
+const CITIES_SCAN_PAGE_SIZE = 100;
+const CITIES_SCAN_MAX_CHUNKS = 50;
 
 function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolean {
   return (
@@ -305,15 +307,17 @@ async function countActiveUsersInCity(
 
 /**
  * Cron: refresh match caches for users active in the last 6h.
- * If active user count exceeds {@link BATCH_RECOMPUTE_PARTITION_THRESHOLD}, fans out one
- * continuation per city (partition by `cityId`) to stay within mutation time/write limits.
+ * Scan mode paginates cities in chunks of CITIES_SCAN_PAGE_SIZE, scheduling per-city
+ * continuations and rescheduling itself until isDone (capped by CITIES_SCAN_MAX_CHUNKS).
  */
 export const batchRecomputeMatches = internalMutation({
   args: {
     cityId: v.optional(v.id("cities")),
     cursor: v.optional(v.union(v.string(), v.null())),
+    citiesCursor: v.optional(v.union(v.string(), v.null())),
+    citiesChunk: v.optional(v.number()),
   },
-  handler: async (ctx, { cityId, cursor }) => {
+  handler: async (ctx, { cityId, cursor, citiesCursor, citiesChunk = 0 }) => {
     const cutoff = Date.now() - BATCH_RECOMPUTE_ACTIVE_WINDOW_MS;
 
     if (cityId !== undefined) {
@@ -345,35 +349,39 @@ export const batchRecomputeMatches = internalMutation({
       };
     }
 
-    const cities = await ctx.db.query("cities").collect();
+    const citiesPage = await ctx.db.query("cities").paginate({
+      numItems: CITIES_SCAN_PAGE_SIZE,
+      cursor: citiesCursor ?? null,
+    });
 
     let totalActive = 0;
-    const cityCounts = new Map<Id<"cities">, number>();
-    for (const city of cities) {
+    let scheduled = 0;
+    for (const city of citiesPage.page) {
       const n = await countActiveUsersInCity(ctx, city._id, cutoff);
-      cityCounts.set(city._id, n);
       totalActive += n;
-    }
-
-    if (totalActive === 0) {
-      return {
-        mode: "scan" as const,
-        totalActive,
-        partitionedByCity: false,
-      };
-    }
-
-    const partitionedByCity = totalActive > BATCH_RECOMPUTE_PARTITION_THRESHOLD;
-
-    for (const city of cities) {
-      const n = cityCounts.get(city._id) ?? 0;
       if (n === 0) continue;
       await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
         cityId: city._id,
       });
+      scheduled += 1;
     }
 
-    return { mode: "scan" as const, totalActive, partitionedByCity };
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.matches.batchRecomputeMatches,
+      args: { citiesCursor: citiesPage.continueCursor },
+      hasMore: !citiesPage.isDone,
+      chunk: citiesChunk,
+      maxChunks: CITIES_SCAN_MAX_CHUNKS,
+      label: "batchRecomputeMatches.scan",
+    });
+
+    return {
+      mode: "scan" as const,
+      totalActive,
+      scheduled,
+      done: citiesPage.isDone,
+      aborted: tail.aborted ?? false,
+    };
   },
 });
 

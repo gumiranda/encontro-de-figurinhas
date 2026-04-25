@@ -265,10 +265,13 @@ export const getMyActiveCheckinSummary = query({
 });
 
 const EXPIRE_BATCH_SIZE = 50;
+const EXPIRE_MAX_CHUNKS = 200;
 
 export const expireCheckins = internalMutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { chunk = 0 }) => {
     const now = Date.now();
     const expired = await ctx.db
       .query("checkins")
@@ -304,11 +307,16 @@ export const expireCheckins = internalMutation({
       })
     );
 
-    if (expired.length === EXPIRE_BATCH_SIZE) {
-      await ctx.scheduler.runAfter(0, internal.checkins.expireCheckins, {});
-    }
+    const result = await rescheduleIfMore(ctx, {
+      self: internal.checkins.expireCheckins,
+      args: {},
+      hasMore: expired.length === EXPIRE_BATCH_SIZE,
+      chunk,
+      maxChunks: EXPIRE_MAX_CHUNKS,
+      label: "expireCheckins",
+    });
 
-    return { expired: expired.length };
+    return { expired: expired.length, aborted: result.aborted ?? false };
   },
 });
 

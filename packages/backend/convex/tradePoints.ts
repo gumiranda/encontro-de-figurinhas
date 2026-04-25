@@ -29,6 +29,15 @@ const NON_PUBLIC_TRADE_POINT_STATUSES = new Set<string>([
   "inactive",
 ]);
 
+const ALLOWED_COVER_CONTENT_TYPES = new Set<string>([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+const MAX_COVER_SIZE_BYTES = 5 * 1024 * 1024;
+const COVER_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
+const COVER_UPLOAD_MAX_PER_WINDOW = 10;
+
 const getByIdWhatsappValidator = v.union(
   v.object({ state: v.literal("ok"), link: v.string() }),
   v.object({ state: v.literal("blocked-link-invalid") }),
@@ -258,6 +267,17 @@ export const generateCoverUploadUrl = mutation({
     if (auth.state !== "ok") {
       throw new ConvexError(auth.state);
     }
+    const now = Date.now();
+    const cutoff = now - COVER_UPLOAD_WINDOW_MS;
+    const recent = (auth.user.coverUploadTimestamps ?? []).filter(
+      (t) => t >= cutoff
+    );
+    if (recent.length >= COVER_UPLOAD_MAX_PER_WINDOW) {
+      throw new ConvexError("rate-limited");
+    }
+    await ctx.db.patch(auth.user._id, {
+      coverUploadTimestamps: [...recent, now],
+    });
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -372,6 +392,17 @@ export const submitRequest = mutation({
     let coverImageStorageId: Id<"_storage"> | undefined;
     let coverImageUrl: string | undefined;
     if (args.coverStorageId) {
+      const metadata = await ctx.db.system.get(args.coverStorageId);
+      if (!metadata) {
+        return { ok: false as const, error: "invalid-cover" as const };
+      }
+      if (
+        !ALLOWED_COVER_CONTENT_TYPES.has(metadata.contentType ?? "") ||
+        metadata.size > MAX_COVER_SIZE_BYTES
+      ) {
+        await ctx.storage.delete(args.coverStorageId);
+        return { ok: false as const, error: "invalid-cover" as const };
+      }
       const url = await ctx.storage.getUrl(args.coverStorageId);
       if (!url) {
         return { ok: false as const, error: "invalid-cover" as const };
@@ -540,13 +571,23 @@ export const getBySlug = query({
   },
 });
 
+const SSG_MAX_SLUGS = 5000;
+const SSG_MAX_GROUPED = 2000;
+
+function assertSsgSecret(secret: string | undefined) {
+  const expected = process.env.SSG_SECRET;
+  if (!expected) throw new ConvexError("SSG_SECRET_NOT_CONFIGURED");
+  if (secret !== expected) throw new ConvexError("FORBIDDEN");
+}
+
 export const getAllApprovedSlugs = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { secret: v.string() },
+  handler: async (ctx, { secret }) => {
+    assertSsgSecret(secret);
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(15000);
+      .take(SSG_MAX_SLUGS);
 
     return points.map((p) => p.slug);
   },
@@ -590,12 +631,13 @@ export const listTopByCity = query({
 });
 
 export const listApprovedGroupedByCity = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { secret: v.string() },
+  handler: async (ctx, { secret }) => {
+    assertSsgSecret(secret);
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(5000);
+      .take(SSG_MAX_GROUPED);
 
     const cityIds = [...new Set(points.map((p) => p.cityId))];
     const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));

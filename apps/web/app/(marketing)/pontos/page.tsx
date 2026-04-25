@@ -26,7 +26,11 @@ async function loadTradePoints() {
   "use cache";
   cacheTag("trade-points");
   cacheLife("hours");
-  return convexServer.query(api.tradePoints.listApprovedGroupedByCity, {});
+  const secret = process.env.SSG_SECRET;
+  if (!secret) throw new Error("SSG_SECRET not configured");
+  return convexServer.query(api.tradePoints.listApprovedGroupedByCity, {
+    secret,
+  });
 }
 
 export default async function TradePointsHubPage() {

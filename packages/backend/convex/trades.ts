@@ -15,6 +15,7 @@ import { getPendingTradesCount } from "./lib/tradeHelpers";
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
 const HISTORY_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const LIST_MY_TRADES_CAP = 300;
 
 function computeLiveOverlap(
   user: Doc<"users">,
@@ -431,13 +432,15 @@ export const listMyTrades = query({
       ctx.db
         .query("trades")
         .withIndex("by_initiator_status", (q) => q.eq("initiatorId", user._id))
-        .collect(),
+        .order("desc")
+        .take(LIST_MY_TRADES_CAP),
       ctx.db
         .query("trades")
         .withIndex("by_counterparty_status", (q) =>
           q.eq("counterpartyId", user._id)
         )
-        .collect(),
+        .order("desc")
+        .take(LIST_MY_TRADES_CAP),
     ]);
 
     const trades: { trade: Doc<"trades">; role: "incoming" | "outgoing" }[] = [];
@@ -525,5 +528,74 @@ export const listMyTrades = query({
 
     rows.sort((a, b) => b.createdAt - a.createdAt);
     return rows;
+  },
+});
+
+export const getTradeById = query({
+  args: { tradeId: v.id("trades") },
+  handler: async (ctx, { tradeId }): Promise<ListMyTradeRow | null> => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+
+    const trade = await ctx.db.get(tradeId);
+    if (!trade) return null;
+
+    if (trade.initiatorId !== user._id && trade.counterpartyId !== user._id) {
+      return null;
+    }
+
+    const role: "incoming" | "outgoing" =
+      trade.initiatorId === user._id ? "outgoing" : "incoming";
+
+    const otherId =
+      role === "incoming" ? trade.initiatorId : trade.counterpartyId;
+    const [other, point] = await Promise.all([
+      ctx.db.get(otherId),
+      ctx.db.get(trade.tradePointId),
+    ]);
+
+    const stickersIGive =
+      role === "outgoing"
+        ? trade.stickersInitiatorGave
+        : trade.stickersInitiatorReceived;
+    const stickersIReceive =
+      role === "outgoing"
+        ? trade.stickersInitiatorReceived
+        : trade.stickersInitiatorGave;
+
+    const userMissing = new Set(user.missing ?? []);
+    const matchPctRaw =
+      userMissing.size > 0
+        ? Math.round((stickersIReceive.length / userMissing.size) * 100)
+        : null;
+    const matchPct =
+      matchPctRaw === null ? null : Math.min(matchPctRaw, 100);
+
+    const initiatorMessage =
+      role === "incoming" ? trade.initiatorMessage ?? null : null;
+
+    return {
+      _id: trade._id,
+      status: trade.status,
+      role,
+      createdAt: trade.createdAt,
+      expiresAt: trade.createdAt + TRADE_EXPIRATION_MS,
+      confirmedAt: trade.confirmedAt ?? null,
+      initiatorMessage,
+      stickersIGive,
+      stickersIReceive,
+      matchPct,
+      counterparty: {
+        _id: otherId,
+        name: other?.name ?? "Colecionador",
+        nickname: other?.displayNickname ?? other?.nickname ?? null,
+        avatarUrl: other?.avatarUrl ?? null,
+        totalTrades: other?.totalTrades ?? 0,
+        reliabilityScore: other?.reliabilityScore ?? 0,
+      },
+      tradePoint: point
+        ? { _id: point._id, name: point.name, address: point.address }
+        : null,
+    };
   },
 });

@@ -94,6 +94,8 @@ export default defineSchema({
     warningCount: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
 
+    coverUploadTimestamps: v.optional(v.array(v.number())),
+
     locationSource: v.optional(
       v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"))
     ),

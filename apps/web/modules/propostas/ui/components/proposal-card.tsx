@@ -21,6 +21,13 @@ import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 
+import {
+  gradientForId,
+  initials,
+  relativeFromNow,
+  relativeUntil,
+} from "../../lib/format";
+
 import { StickerChip } from "./sticker-chip";
 
 const MAX_CHIPS = 4;
@@ -37,46 +44,10 @@ type Props = {
   onView?: (id: ListMyTradeRow["_id"]) => void;
 };
 
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function relativeFromNow(ts: number): string {
-  const diff = Date.now() - ts;
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 60) return `há ${Math.max(1, minutes)}min`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `há ${hours}h`;
-  const days = Math.floor(hours / 24);
-  return `há ${days}d`;
-}
-
-function relativeUntil(ts: number): string {
-  const diff = ts - Date.now();
-  if (diff <= 0) return "expirada";
-  const hours = Math.floor(diff / 3_600_000);
-  if (hours < 24) return `Expira em ${Math.max(1, hours)}h`;
-  const days = Math.floor(hours / 24);
-  return `Expira em ${days}d`;
-}
-
-const AVATAR_GRADIENTS = [
-  "bg-gradient-to-br from-primary to-primary-dim text-primary-foreground",
-  "bg-gradient-to-br from-tertiary to-tertiary-dim text-tertiary-foreground",
-  "bg-gradient-to-br from-secondary to-secondary-dim text-secondary-foreground",
-  "bg-gradient-to-br from-[#c8a4ff] to-[#8a5cf6] text-[#2a1465]",
-] as const;
-
-function gradientForId(id: string): string {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
-  const idx = Math.abs(hash) % AVATAR_GRADIENTS.length;
-  return AVATAR_GRADIENTS[idx] ?? AVATAR_GRADIENTS[0];
+function expiresLabel(ts: number): string {
+  const v = relativeUntil(ts);
+  if (v === "expirada" || v === "sem prazo") return v;
+  return `Expira em ${v}`;
 }
 
 export function ProposalCard({
@@ -257,7 +228,7 @@ function StatusPill({
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-tertiary">
         <span className="size-1.5 animate-pulse rounded-full bg-current" />
-        {relativeUntil(expiresAt)}
+        {expiresLabel(expiresAt)}
       </span>
     );
   }
