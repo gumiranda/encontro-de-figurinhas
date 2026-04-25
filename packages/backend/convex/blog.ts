@@ -255,3 +255,55 @@ export const update = mutation({
     await ctx.db.patch(id, patch);
   },
 });
+
+// Post metrics for share rail
+export const getMetrics = query({
+  args: { postId: v.id("blogPosts") },
+  handler: async (ctx, { postId }) => {
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .first();
+    return metrics ?? { likes: 0, saves: 0, comments: 0 };
+  },
+});
+
+export const incrementMetric = mutation({
+  args: {
+    postId: v.id("blogPosts"),
+    metric: v.union(v.literal("likes"), v.literal("saves")),
+  },
+  handler: async (ctx, { postId, metric }) => {
+    const existing = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        [metric]: existing[metric] + 1,
+      });
+      return;
+    }
+
+    // Race-safe: if insert fails (another request won), retry with patch
+    try {
+      await ctx.db.insert("postMetrics", {
+        postId,
+        likes: metric === "likes" ? 1 : 0,
+        saves: metric === "saves" ? 1 : 0,
+        comments: 0,
+      });
+    } catch {
+      const created = await ctx.db
+        .query("postMetrics")
+        .withIndex("by_post", (q) => q.eq("postId", postId))
+        .first();
+      if (created) {
+        await ctx.db.patch(created._id, {
+          [metric]: created[metric] + 1,
+        });
+      }
+    }
+  },
+});

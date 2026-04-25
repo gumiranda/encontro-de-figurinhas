@@ -2,6 +2,45 @@
 
 import { useEffect, useState, useMemo } from "react";
 import type { TocItem } from "../lib/process-content";
+import { useReadingProgress } from "./reading-progress-provider";
+
+const RADIUS = 17;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+function ProgressCircle({ progress }: { progress: number }) {
+  const offset = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
+
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      className="w-10 h-10"
+      role="img"
+      aria-label={`${progress}% lido`}
+    >
+      <circle
+        cx="20"
+        cy="20"
+        r={RADIUS}
+        stroke="currentColor"
+        strokeWidth="3"
+        fill="none"
+        className="text-outline-variant/40"
+      />
+      <circle
+        cx="20"
+        cy="20"
+        r={RADIUS}
+        stroke="currentColor"
+        strokeWidth="3"
+        fill="none"
+        strokeDasharray={CIRCUMFERENCE}
+        strokeDashoffset={offset}
+        transform="rotate(-90 20 20)"
+        className="text-secondary drop-shadow-[0_0_4px_var(--secondary)]"
+      />
+    </svg>
+  );
+}
 
 interface BlogTocProps {
   headings: TocItem[];
@@ -12,6 +51,7 @@ interface BlogTocProps {
 
 export function BlogToc({ headings, variant, className, style }: BlogTocProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const progress = useReadingProgress();
 
   const stableHeadings = useMemo(() => headings, [JSON.stringify(headings)]);
 
@@ -82,6 +122,16 @@ export function BlogToc({ headings, variant, className, style }: BlogTocProps) {
         Neste artigo
       </p>
       <nav aria-label="Índice do artigo">{tocContent}</nav>
+
+      <div className="mt-8 pt-6 border-t border-outline-variant/40 flex items-center gap-2.5">
+        <ProgressCircle progress={progress} />
+        <div>
+          <div className="font-headline font-bold text-base">{progress}%</div>
+          <div className="text-[0.7rem] font-bold uppercase tracking-widest text-muted-foreground">
+            lido
+          </div>
+        </div>
+      </div>
     </aside>
   );
 }

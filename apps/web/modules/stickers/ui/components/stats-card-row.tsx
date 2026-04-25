@@ -11,7 +11,7 @@ export interface StatConfig {
   isHighlighted?: boolean;
 }
 
-interface StatsCardRowProps {
+export interface StatsCardRowProps {
   stats: StatConfig[];
   className?: string;
   loading?: boolean;

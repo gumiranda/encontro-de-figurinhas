@@ -21,9 +21,22 @@ import { JsonLd } from "@/components/json-ld";
 import { processContent } from "@/modules/blog/lib/process-content";
 import { calculateReadingTime } from "@/modules/blog/lib/reading-time";
 import { ReadingProgress } from "@/modules/blog/ui/reading-progress";
+import { ReadingProgressProvider } from "@/modules/blog/ui/reading-progress-provider";
 import { BlogToc } from "@/modules/blog/ui/blog-toc";
 import { ShareRail } from "@/modules/blog/ui/share-rail";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 import "@/modules/blog/ui/blog-prose.css";
+
+async function loadMetrics(postId: Id<"blogPosts">) {
+  "use cache";
+  cacheLife("minutes");
+  try {
+    const metrics = await convexServer.query(api.blog.getMetrics, { postId });
+    return metrics ?? { likes: 0, saves: 0, comments: 0 };
+  } catch {
+    return { likes: 0, saves: 0, comments: 0 };
+  }
+}
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -135,14 +148,16 @@ async function safeProcessContent(content: string) {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const [post, relatedPosts] = await Promise.all([
-    loadPost(slug),
-    loadRelated(slug),
-  ]);
+  const post = await loadPost(slug);
 
   if (!post) {
     notFound();
   }
+
+  const [relatedPosts, metrics] = await Promise.all([
+    loadRelated(slug),
+    loadMetrics(post._id),
+  ]);
 
   const { sanitizedHtml, headings, wordCount } = await safeProcessContent(
     post.content
@@ -275,7 +290,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       : null;
 
   return (
-    <>
+    <ReadingProgressProvider>
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={articleSchema} />
       {productSchemas.map((schema, i: number) => (
@@ -384,6 +399,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <ShareRail
               title={post.title}
               url={canonical}
+              postId={post._id}
+              counts={metrics}
               className="hidden xl:block sticky"
               style={{ top: "var(--header-h, 5rem)" }}
             />
@@ -517,6 +534,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </section>
       </main>
       <LandingFooter />
-    </>
+    </ReadingProgressProvider>
   );
 }

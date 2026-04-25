@@ -394,4 +394,11 @@ export default defineSchema({
     hardDeleteOversizedCount: v.optional(v.number()),
     lastReconcileAt: v.optional(v.number()),
   }),
+
+  postMetrics: defineTable({
+    postId: v.id("blogPosts"),
+    likes: v.number(),
+    saves: v.number(),
+    comments: v.number(),
+  }).index("by_post", ["postId"]),
 });

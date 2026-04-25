@@ -1,23 +1,46 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link2, Share2, MessageCircle } from "lucide-react";
+import { Link2, Share2, MessageCircle, Heart, Bookmark } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
+import { useMutation } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 
 interface ShareRailProps {
   title: string;
   url: string;
+  postId: Id<"blogPosts">;
+  counts: { likes: number; saves: number; comments: number };
   className?: string;
   style?: React.CSSProperties;
 }
 
-export function ShareRail({ title, url, className, style }: ShareRailProps) {
+export function ShareRail({
+  title,
+  url,
+  postId,
+  counts,
+  className,
+  style,
+}: ShareRailProps) {
   const [copied, setCopied] = useState(false);
   const [hasNativeShare, setHasNativeShare] = useState(false);
+  const [localCounts, setLocalCounts] = useState(counts);
+  const incrementMetric = useMutation(api.blog.incrementMetric);
 
   useEffect(() => {
     setHasNativeShare(typeof navigator !== "undefined" && "share" in navigator);
   }, []);
+
+  const handleMetric = async (metric: "likes" | "saves") => {
+    setLocalCounts((c) => ({ ...c, [metric]: c[metric] + 1 }));
+    try {
+      await incrementMetric({ postId, metric });
+    } catch {
+      setLocalCounts((c) => ({ ...c, [metric]: c[metric] - 1 }));
+    }
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -62,6 +85,30 @@ export function ShareRail({ title, url, className, style }: ShareRailProps) {
         Compartilhar
       </p>
       <div className="flex flex-col gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleMetric("likes")}
+          className="justify-start gap-2"
+        >
+          <Heart className="size-4" />
+          Curtir
+          <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
+            {localCounts.likes}
+          </span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleMetric("saves")}
+          className="justify-start gap-2"
+        >
+          <Bookmark className="size-4" />
+          Salvar
+          <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
+            {localCounts.saves}
+          </span>
+        </Button>
         <Button
           variant="ghost"
           size="sm"
