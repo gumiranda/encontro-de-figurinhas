@@ -24,6 +24,7 @@ import {
 } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { SectionLookupProvider } from "@/modules/stickers/lib/section-lookup-context";
 import {
   StatsCardRow,
   type StatConfig,
@@ -110,6 +111,7 @@ export function PropostasPageView() {
     api.trades.listMyTrades,
     isAuthenticated ? {} : "skip"
   );
+  const sections = useQuery(api.album.getSections, {});
 
   const [tab, setTab] = useState<TabValue>("recebidas");
   const [search, setSearch] = useState("");
@@ -219,6 +221,7 @@ export function PropostasPageView() {
   const comingSoon = (label: string) => () => toast.message(`${label} em breve.`);
 
   return (
+    <SectionLookupProvider sections={sections ?? []}>
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -337,6 +340,7 @@ export function PropostasPageView() {
         })}
       </div>
     </div>
+    </SectionLookupProvider>
   );
 }
 

@@ -183,7 +183,7 @@ export function ProposalCard({
           </div>
           <div className="flex flex-wrap gap-1">
             {givesPreview.map((n) => (
-              <StickerChip key={n} label={String(n)} />
+              <StickerChip key={n} num={n} />
             ))}
             {givesExtra > 0 && (
               <StickerChip label={`+${givesExtra}`} variant="more" />
@@ -198,7 +198,7 @@ export function ProposalCard({
           </div>
           <div className="flex flex-wrap gap-1">
             {receivesPreview.map((n) => (
-              <StickerChip key={n} label={String(n)} />
+              <StickerChip key={n} num={n} />
             ))}
             {receivesExtra > 0 && (
               <StickerChip label={`+${receivesExtra}`} variant="more" />
