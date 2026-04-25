@@ -13,6 +13,7 @@ import {
 import { checkRateLimit } from "./lib/rateLimit";
 import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
+import { getPendingProposalsForUserCount } from "./lib/tradeHelpers";
 
 export const getCurrentUser = query({
   args: {},
@@ -26,10 +27,15 @@ export const getNavContext = query({
   handler: async (ctx) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) return null;
+    const pendingProposalsCount = await getPendingProposalsForUserCount(
+      ctx,
+      user._id
+    );
     return {
       role: user.role,
       hasCompletedOnboarding: user.hasCompletedOnboarding ?? false,
       hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
+      pendingProposalsCount,
     };
   },
 });

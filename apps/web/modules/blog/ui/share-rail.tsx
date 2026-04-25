@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Link2, Share2, MessageCircle, Heart, Bookmark } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
-
-function getVisitorId(): string {
-  if (typeof window === "undefined") return "";
-  let id = localStorage.getItem("blog_visitor_id");
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("blog_visitor_id", id);
-  }
-  return id;
-}
+import { usePostMetrics } from "@/modules/blog/hooks/use-save-post";
+import {
+  copyToClipboard,
+  hasNativeShare,
+  nativeShare,
+  openWhatsApp,
+} from "@/modules/blog/lib/share";
 
 interface ShareRailProps {
   title: string;
@@ -35,86 +30,19 @@ export function ShareRail({
   style,
 }: ShareRailProps) {
   const [copied, setCopied] = useState(false);
-  const [hasNativeShare, setHasNativeShare] = useState(false);
-  const [visitorId, setVisitorId] = useState<string | null>(null);
-  const toggleMetric = useMutation(api.blog.toggleMetric);
-
-  // Fetch metrics with visitorId once available
-  const metrics = useQuery(
-    api.blog.getMetrics,
-    visitorId ? { postId, visitorId } : "skip"
-  );
-
-  const [localCounts, setLocalCounts] = useState(initialCounts);
-  const [userState, setUserState] = useState({ liked: false, saved: false });
+  const [showNativeShare, setShowNativeShare] = useState(false);
+  const { counts, userState, toggle } = usePostMetrics(postId, {
+    initialCounts,
+  });
 
   useEffect(() => {
-    setHasNativeShare(typeof navigator !== "undefined" && "share" in navigator);
-    setVisitorId(getVisitorId());
+    setShowNativeShare(hasNativeShare());
   }, []);
 
-  // Sync with server data when available
-  useEffect(() => {
-    if (metrics) {
-      setLocalCounts({ likes: metrics.likes, saves: metrics.saves });
-      setUserState({ liked: metrics.userLiked, saved: metrics.userSaved });
-    }
-  }, [metrics]);
-
-  const handleToggle = useCallback(
-    async (metric: "likes" | "saves") => {
-      if (!visitorId) return;
-
-      const stateKey = metric === "likes" ? "liked" : "saved";
-      const wasActive = userState[stateKey];
-      const delta = wasActive ? -1 : 1;
-
-      // Optimistic update
-      setUserState((s) => ({ ...s, [stateKey]: !wasActive }));
-      setLocalCounts((c) => ({ ...c, [metric]: Math.max(0, c[metric] + delta) }));
-
-      try {
-        await toggleMetric({ postId, visitorId, metric });
-      } catch {
-        // Revert on error
-        setUserState((s) => ({ ...s, [stateKey]: wasActive }));
-        setLocalCounts((c) => ({ ...c, [metric]: c[metric] - delta }));
-      }
-    },
-    [postId, visitorId, userState, toggleMetric]
-  );
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = url;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleWhatsApp = () => {
-    const text = encodeURIComponent(`${title}\n${url}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
-  };
-
-  const handleNativeShare = async () => {
-    if (!navigator.share) return;
-    try {
-      await navigator.share({ title, url });
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-    }
+  const handleCopy = async () => {
+    await copyToClipboard(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -130,7 +58,7 @@ export function ShareRail({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleToggle("likes")}
+          onClick={() => toggle("likes")}
           className="justify-start gap-2"
         >
           <Heart
@@ -138,13 +66,13 @@ export function ShareRail({
           />
           {userState.liked ? "Curtido" : "Curtir"}
           <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
-            {localCounts.likes}
+            {counts.likes}
           </span>
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleToggle("saves")}
+          onClick={() => toggle("saves")}
           className="justify-start gap-2"
         >
           <Bookmark
@@ -152,13 +80,13 @@ export function ShareRail({
           />
           {userState.saved ? "Salvo" : "Salvar"}
           <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
-            {localCounts.saves}
+            {counts.saves}
           </span>
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleCopyLink}
+          onClick={handleCopy}
           className="justify-start gap-2"
         >
           <Link2 className="size-4" />
@@ -167,17 +95,17 @@ export function ShareRail({
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleWhatsApp}
+          onClick={() => openWhatsApp(title, url)}
           className="justify-start gap-2"
         >
           <MessageCircle className="size-4" />
           WhatsApp
         </Button>
-        {hasNativeShare && (
+        {showNativeShare && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleNativeShare}
+            onClick={() => nativeShare(title, url)}
             className="justify-start gap-2"
           >
             <Share2 className="size-4" />

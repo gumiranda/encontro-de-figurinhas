@@ -13,3 +13,16 @@ export async function getPendingTradesCount(
     .collect();
   return asInitiator.length;
 }
+
+export async function getPendingProposalsForUserCount(
+  ctx: { db: QueryCtx["db"] },
+  userId: Id<"users">
+): Promise<number> {
+  const incoming = await ctx.db
+    .query("trades")
+    .withIndex("by_counterparty_status", (q) =>
+      q.eq("counterpartyId", userId).eq("status", "pending_confirmation")
+    )
+    .collect();
+  return incoming.length;
+}

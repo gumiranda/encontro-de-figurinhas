@@ -53,7 +53,56 @@ export const getBySlug = query({
       author: post.author,
       seoTitle: post.seoTitle,
       seoDescription: post.seoDescription,
+      views: post.views,
+      isTrending: post.isTrending,
+      titleHighlight: post.titleHighlight,
     };
+  },
+});
+
+const VIEW_IDEMPOTENCY_WINDOW_MS = 60 * 60 * 1000;
+const TITLE_HIGHLIGHT_MAX = 50;
+const AUTHOR_ROLE_MAX = 200;
+
+// Public (unauthenticated) view counter. Rate-bounded by per-(postId,key) idempotency window.
+// TODO: orphaned postViewIdempotency rows should be pruned by a cron (>1h old) — separate task.
+// TODO: when post is hard-deleted, drop matching idempotency rows.
+export const incrementView = mutation({
+  args: {
+    slug: v.string(),
+    idempotencyKey: v.string(),
+  },
+  handler: async (ctx, { slug, idempotencyKey }) => {
+    if (idempotencyKey.length < 8 || idempotencyKey.length > 64) return;
+
+    const post = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+
+    if (!post || post.status !== "published") return;
+
+    const existing = await ctx.db
+      .query("postViewIdempotency")
+      .withIndex("by_post_key", (q) =>
+        q.eq("postId", post._id).eq("key", idempotencyKey)
+      )
+      .first();
+
+    const now = Date.now();
+    if (existing && now - existing.at < VIEW_IDEMPOTENCY_WINDOW_MS) return;
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { at: now });
+    } else {
+      await ctx.db.insert("postViewIdempotency", {
+        postId: post._id,
+        key: idempotencyKey,
+        at: now,
+      });
+    }
+
+    await ctx.db.patch(post._id, { views: (post.views ?? 0) + 1 });
   },
 });
 
@@ -177,11 +226,24 @@ export const create = mutation({
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     status: v.union(v.literal("draft"), v.literal("published")),
+    titleHighlight: v.optional(v.string()),
+    isTrending: v.optional(v.boolean()),
+    authorRole: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user || user.role !== "admin") {
       throw new Error("Unauthorized");
+    }
+
+    if (
+      args.titleHighlight !== undefined &&
+      args.titleHighlight.length > TITLE_HIGHLIGHT_MAX
+    ) {
+      throw new Error(`titleHighlight max ${TITLE_HIGHLIGHT_MAX} chars`);
+    }
+    if (args.authorRole !== undefined && args.authorRole.length > AUTHOR_ROLE_MAX) {
+      throw new Error(`author.role max ${AUTHOR_ROLE_MAX} chars`);
     }
 
     const existing = await ctx.db
@@ -197,14 +259,16 @@ export const create = mutation({
     const readingTime = Math.ceil(wordCount / 200);
     const normalizedTags = args.tags.map((t) => t.trim().toLowerCase());
 
+    const { authorRole, ...rest } = args;
     const now = Date.now();
     const id = await ctx.db.insert("blogPosts", {
-      ...args,
+      ...rest,
       tags: normalizedTags,
       readingTime,
       author: {
         name: user.name,
         avatar: user.avatarUrl,
+        role: authorRole,
       },
       publishedAt: args.status === "published" ? now : undefined,
       createdAt: now,
@@ -227,11 +291,24 @@ export const update = mutation({
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     status: v.optional(v.union(v.literal("draft"), v.literal("published"))),
+    titleHighlight: v.optional(v.string()),
+    isTrending: v.optional(v.boolean()),
+    authorRole: v.optional(v.string()),
   },
-  handler: async (ctx, { id, ...updates }) => {
+  handler: async (ctx, { id, authorRole, ...updates }) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user || user.role !== "admin") {
       throw new Error("Unauthorized");
+    }
+
+    if (
+      updates.titleHighlight !== undefined &&
+      updates.titleHighlight.length > TITLE_HIGHLIGHT_MAX
+    ) {
+      throw new Error(`titleHighlight max ${TITLE_HIGHLIGHT_MAX} chars`);
+    }
+    if (authorRole !== undefined && authorRole.length > AUTHOR_ROLE_MAX) {
+      throw new Error(`author.role max ${AUTHOR_ROLE_MAX} chars`);
     }
 
     const post = await ctx.db.get(id);
@@ -250,6 +327,10 @@ export const update = mutation({
 
     if (updates.status === "published" && post.status !== "published") {
       patch.publishedAt = Date.now();
+    }
+
+    if (authorRole !== undefined) {
+      patch.author = { ...post.author, role: authorRole };
     }
 
     await ctx.db.patch(id, patch);

@@ -288,11 +288,14 @@ export default defineSchema({
       v.literal("pending_confirmation"),
       v.literal("confirmed"),
       v.literal("cancelled"),
+      v.literal("declined"),
       v.literal("disputed"),
       v.literal("expired")
     ),
     createdAt: v.number(),
     confirmedAt: v.optional(v.number()),
+    declinedAt: v.optional(v.number()),
+    declineReason: v.optional(v.string()),
     disputedAt: v.optional(v.number()),
     disputeReason: v.optional(v.string()),
     expiredAt: v.optional(v.number()),
@@ -328,12 +331,16 @@ export default defineSchema({
     author: v.object({
       name: v.string(),
       avatar: v.optional(v.string()),
+      role: v.optional(v.string()),
     }),
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     publishedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    views: v.optional(v.number()),
+    isTrending: v.optional(v.boolean()),
+    titleHighlight: v.optional(v.string()),
     // SEO/AEO structured data fields
     products: v.optional(
       v.array(
@@ -401,6 +408,15 @@ export default defineSchema({
     saves: v.number(),
     comments: v.number(),
   }).index("by_post", ["postId"]),
+
+  postViewIdempotency: defineTable({
+    postId: v.id("blogPosts"),
+    key: v.string(),
+    at: v.number(),
+  })
+    .index("by_post_key", ["postId", "key"])
+    .index("by_post_at", ["postId", "at"])
+    .index("by_at", ["at"]),
 
   postUserInteractions: defineTable({
     postId: v.id("blogPosts"),

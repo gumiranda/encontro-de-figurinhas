@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, Calendar, ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Flame } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -24,6 +24,9 @@ import { ReadingProgress } from "@/modules/blog/ui/reading-progress";
 import { ReadingProgressProvider } from "@/modules/blog/ui/reading-progress-provider";
 import { BlogToc } from "@/modules/blog/ui/blog-toc";
 import { ShareRail } from "@/modules/blog/ui/share-rail";
+import { HeroActions } from "@/modules/blog/ui/hero-actions";
+import { BlogMetaRow } from "@/modules/blog/ui/blog-meta-row";
+import { ViewTracker } from "@/modules/blog/ui/view-tracker";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import "@/modules/blog/ui/blog-prose.css";
 
@@ -116,12 +119,20 @@ export async function generateMetadata({
   };
 }
 
-function formatDate(timestamp: number) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(timestamp));
+function renderTitle(title: string, highlight?: string) {
+  if (!highlight) return title;
+  const lc = title.toLowerCase();
+  const i = lc.indexOf(highlight.toLowerCase());
+  if (i < 0) return title;
+  return (
+    <>
+      {title.slice(0, i)}
+      <span className="text-tertiary">
+        {title.slice(i, i + highlight.length)}
+      </span>
+      {title.slice(i + highlight.length)}
+    </>
+  );
 }
 
 // Prevent XSS via JSON-LD injection
@@ -289,103 +300,155 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         }
       : null;
 
+  const author = post.author as typeof post.author & { role?: string };
+
   return (
     <ReadingProgressProvider>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={articleSchema} />
-      {productSchemas.map((schema, i: number) => (
-        <JsonLd key={`product-${i}`} data={schema} />
-      ))}
-      {faqSchema && <JsonLd data={faqSchema} />}
-      <ReadingProgress />
-      <LandingHeader />
-      <main className="pt-24 min-h-screen">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-primary/5 to-background py-16">
-          <div className="container mx-auto px-4">
-            <nav className="mb-8 text-sm text-muted-foreground">
-              <ol className="flex items-center gap-2 flex-wrap">
-                <li>
-                  <Link href="/" className="hover:text-primary">
-                    Início
-                  </Link>
-                </li>
-                <li>/</li>
-                <li>
-                  <Link href="/blog" className="hover:text-primary">
-                    Blog
-                  </Link>
-                </li>
-                <li>/</li>
-                <li className="text-foreground font-medium line-clamp-1">
-                  {post.title}
-                </li>
-              </ol>
-            </nav>
+      <div
+        className="dark min-h-screen text-foreground"
+        style={{ backgroundColor: "#090e1c" }}
+      >
+        <JsonLd data={breadcrumbSchema} />
+        <JsonLd data={articleSchema} />
+        {productSchemas.map((schema, i: number) => (
+          <JsonLd key={`product-${i}`} data={schema} />
+        ))}
+        {faqSchema && <JsonLd data={faqSchema} />}
+        <ReadingProgress />
+        <LandingHeader />
+        <ViewTracker slug={slug} />
+        <main className="pt-24">
+          {/* Hero */}
+          <section className="py-12 md:py-20">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <nav className="mb-8 text-sm text-muted-foreground" aria-label="Breadcrumb">
+                <ol className="flex items-center gap-2 flex-wrap">
+                  <li>
+                    <Link href="/blog" className="hover:text-foreground transition-colors">
+                      Blog
+                    </Link>
+                  </li>
+                  <li className="text-muted-foreground/60">/</li>
+                  <li>
+                    <Link
+                      href={`/blog?categoria=${encodeURIComponent(post.category)}`}
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {post.category}
+                    </Link>
+                  </li>
+                  <li className="text-muted-foreground/60">/</li>
+                  <li className="text-foreground font-medium line-clamp-1">
+                    {post.title}
+                  </li>
+                </ol>
+              </nav>
 
-            <div className="max-w-3xl">
-              <div className="flex gap-2 flex-wrap mb-4">
-                <Badge variant="secondary">{post.category}</Badge>
-                {post.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="outline">
+              <div className="flex gap-2 flex-wrap mb-6">
+                <Badge
+                  variant="outline"
+                  className="uppercase tracking-wider px-3 py-1 rounded-full bg-white/[0.04] border-white/10 text-foreground/90"
+                >
+                  {post.category}
+                </Badge>
+                {post.tags.slice(0, 2).map((tag, idx) => (
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className={`uppercase tracking-wider px-3 py-1 rounded-full bg-transparent ${
+                      idx === 0
+                        ? "border-emerald-500/40 text-emerald-400"
+                        : "border-amber-500/40 text-amber-400"
+                    }`}
+                  >
                     {tag}
                   </Badge>
                 ))}
               </div>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight mb-6">
-                {post.title}
+              <h1
+                id="post-title"
+                className="font-headline font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.05] text-foreground"
+              >
+                {renderTitle(post.title, post.titleHighlight)}
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mt-6">
                 {post.excerpt}
               </p>
 
-              <div className="flex items-center gap-6 flex-wrap">
+              <div className="mt-10 flex items-center gap-5 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <Avatar>
+                  <Avatar className="size-12 bg-gradient-to-br from-emerald-500 to-blue-500">
                     {post.author.avatar && (
-                      <AvatarImage src={post.author.avatar} />
+                      <AvatarImage src={post.author.avatar} alt={post.author.name} />
                     )}
-                    <AvatarFallback>
-                      {post.author.name.charAt(0).toUpperCase()}
+                    <AvatarFallback className="bg-transparent text-white font-bold">
+                      {(post.author.name?.trim() || "?")
+                        .split(/\s+/)
+                        .slice(0, 2)
+                        .map((p) => p.charAt(0).toUpperCase())
+                        .join("") || "?"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-medium">{post.author.name}</span>
+                  <div className="leading-tight">
+                    <p className="font-bold text-foreground">{post.author.name}</p>
+                    {author.role && (
+                      <p className="text-sm text-muted-foreground">{author.role}</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  {post.publishedAt && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(post.publishedAt)}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {readingTime} min de leitura
-                  </span>
+                <span
+                  className="hidden sm:block h-8 w-px bg-outline-variant/40"
+                  aria-hidden
+                />
+
+                <BlogMetaRow
+                  publishedAt={post.publishedAt}
+                  readingTime={readingTime}
+                  views={post.views}
+                />
+
+                <div className="ml-auto">
+                  <HeroActions
+                    postId={post._id}
+                    title={post.title}
+                    url={canonical}
+                    initialCounts={{ likes: metrics.likes, saves: metrics.saves }}
+                  />
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Cover Image */}
-        {post.coverImage && (
-          <section className="container mx-auto px-4 -mt-8">
-            <div className="relative aspect-video max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg">
-              <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                priority
-                sizes="(min-width: 1280px) 800px, 100vw"
-                className="object-cover"
-              />
-            </div>
           </section>
-        )}
+
+          {/* Cover */}
+          {post.coverImage && (
+            <section className="container mx-auto px-4 max-w-5xl">
+              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-outline-variant/20">
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  priority
+                  sizes="(min-width: 1280px) 1024px, 100vw"
+                  className="object-cover"
+                />
+                {post.isTrending && (
+                  <div className="absolute top-4 left-4 z-10">
+                    <Badge
+                      variant="premium"
+                      className="uppercase tracking-wider gap-1.5 px-3 py-1.5 text-xs"
+                      aria-label="Este artigo está em tendência"
+                    >
+                      <Flame className="size-3.5" aria-hidden />
+                      Em alta
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
         {/* Mobile TOC */}
         <div className="xl:hidden container mx-auto px-4 mt-8 mb-4">
@@ -532,8 +595,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </Button>
           </div>
         </section>
-      </main>
-      <LandingFooter />
+        </main>
+        <LandingFooter />
+      </div>
     </ReadingProgressProvider>
   );
 }

@@ -103,7 +103,7 @@ export function PropostasPageView() {
 
   const confirmTrade = useMutation(api.trades.confirm);
   const cancelTrade = useMutation(api.trades.cancel);
-  const disputeTrade = useMutation(api.trades.dispute);
+  const declineTrade = useMutation(api.trades.decline);
 
   const groups = useMemo(
     () => groupTrades(trades ?? []),
@@ -206,7 +206,7 @@ export function PropostasPageView() {
   };
   const handleDecline = async (id: ListMyTradeRow["_id"]) => {
     try {
-      await disputeTrade({ tradeId: id, reason: "declined" });
+      await declineTrade({ tradeId: id });
       toast.success("Proposta recusada.");
     } catch (err) {
       toast.error("Não foi possível recusar agora.");

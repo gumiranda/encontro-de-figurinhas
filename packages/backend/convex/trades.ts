@@ -346,6 +346,36 @@ export const dispute = mutation({
   },
 });
 
+export const decline = mutation({
+  args: {
+    tradeId: v.id("trades"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) throw new ConvexError("AUTH_REQUIRED");
+
+    const trade = await ctx.db.get(args.tradeId);
+    if (!trade) throw new ConvexError("NOT_FOUND");
+
+    if (trade.counterpartyId !== user._id) throw new ConvexError("FORBIDDEN");
+    if (trade.status !== "pending_confirmation") throw new ConvexError("STATE_CHANGED");
+
+    const sanitizedReason = args.reason?.trim();
+    if (sanitizedReason && sanitizedReason.length > 200) {
+      throw new ConvexError("REASON_TOO_LONG");
+    }
+
+    await ctx.db.patch(args.tradeId, {
+      status: "declined",
+      declinedAt: Date.now(),
+      declineReason: sanitizedReason || undefined,
+    });
+
+    return { status: "declined" as const };
+  },
+});
+
 export const expireTrade = internalMutation({
   args: {
     tradeId: v.id("trades"),
