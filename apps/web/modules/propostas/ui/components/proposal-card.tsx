@@ -7,9 +7,9 @@ import {
   Bell,
   Calendar,
   Check,
+  ChevronRight,
   MapPin,
   MessageSquare,
-  Repeat2,
   Star,
   Undo2,
   X,
@@ -318,11 +318,17 @@ function ActionRow({
             Cancelar
           </Button>
         )}
+        {onView && <DetailsButton onClick={onView} />}
       </div>
     );
   }
   if (section === "history") {
-    return null;
+    if (!onView) return null;
+    return (
+      <div className="flex flex-wrap gap-1.5 lg:justify-end">
+        <DetailsButton onClick={onView} />
+      </div>
+    );
   }
   // urgent + unread: incoming actions
   if (role !== "incoming") return null;
@@ -340,17 +346,7 @@ function ActionRow({
           <X className="size-4" />
         </Button>
       )}
-      {onView && (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onView}
-          className="h-8 gap-1.5 px-3 text-primary hover:bg-primary/10"
-        >
-          <Repeat2 className="size-3.5" />
-          Contraproposta
-        </Button>
-      )}
+      {onView && <DetailsButton onClick={onView} />}
       {onAccept && (
         <Button
           size="sm"
@@ -363,6 +359,20 @@ function ActionRow({
         </Button>
       )}
     </div>
+  );
+}
+
+function DetailsButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      size="sm"
+      variant="ghost"
+      onClick={onClick}
+      className="h-8 gap-1.5 px-3 text-primary hover:bg-primary/10"
+    >
+      Detalhes
+      <ChevronRight className="size-3.5" />
+    </Button>
   );
 }
 

@@ -13,6 +13,7 @@ import {
   requireAdmin,
 } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
+import { rateLimiter } from "./lib/rateLimiter";
 import {
   EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
   REPORT_DEDUP_MS,
@@ -601,6 +602,10 @@ export const getAllApprovedSlugs = query({
 export const listTopForSSG = query({
   args: {},
   handler: async (ctx) => {
+    const status = await rateLimiter.check(ctx, "publicTradePointsList", {
+      key: "global",
+    });
+    if (!status.ok) throw new ConvexError("rate-limited");
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
@@ -613,6 +618,10 @@ export const listTopForSSG = query({
 export const listTopByCity = query({
   args: { citySlug: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, { citySlug, limit }) => {
+    const status = await rateLimiter.check(ctx, "publicTradePointsList", {
+      key: "global",
+    });
+    if (!status.ok) throw new ConvexError("rate-limited");
     const city = await ctx.db
       .query("cities")
       .withIndex("by_slug", (q) => q.eq("slug", citySlug))
@@ -690,10 +699,12 @@ export const listApprovedGroupedByCity = query({
 
 export const listApprovedForSitemapPage = query({
   args: {
+    secret: v.string(),
     cursor: v.optional(v.union(v.string(), v.null())),
     pageSize: v.optional(v.number()),
   },
-  handler: async (ctx, { cursor, pageSize }) => {
+  handler: async (ctx, { secret, cursor, pageSize }) => {
+    assertSsgSecret(secret);
     const size = Math.min(Math.max(pageSize ?? 5000, 1), 5000);
     const result = await ctx.db
       .query("tradePoints")

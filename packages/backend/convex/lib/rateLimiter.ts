@@ -39,4 +39,22 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: HOUR,
     capacity: 3,
   },
+
+  // siteStats.get — pública, sem auth, lookup tiny mas vetor DDoS de billing
+  publicSiteStats: {
+    kind: "token bucket",
+    rate: 600,
+    period: MINUTE,
+    capacity: 1200,
+    shards: 4,
+  },
+
+  // tradePoints SSG/listing endpoints públicos
+  publicTradePointsList: {
+    kind: "token bucket",
+    rate: 300,
+    period: MINUTE,
+    capacity: 600,
+    shards: 4,
+  },
 });
