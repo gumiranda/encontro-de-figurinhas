@@ -301,9 +301,14 @@ export const cancelPendingPoint = mutation({
     }
 
     const now = Date.now();
+    if (point.coverImageStorageId) {
+      await ctx.storage.delete(point.coverImageStorageId);
+    }
     await ctx.db.patch(tradePointId, {
       status: "cancelled",
       cancelledAt: now,
+      coverImageStorageId: undefined,
+      coverImageUrl: undefined,
     });
     await decrementPendingCount(ctx, user._id);
 

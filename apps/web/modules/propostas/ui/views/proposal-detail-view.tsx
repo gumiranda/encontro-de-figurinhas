@@ -13,6 +13,8 @@ import type { ListMyTradeRow } from "@workspace/backend/convex/trades";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
+import { SectionLookupProvider } from "@/modules/stickers/lib/section-lookup-context";
+
 import { mapTradeError } from "../../lib/format";
 
 import { ProposalDetailFooter } from "../components/proposal-detail-footer";
@@ -28,6 +30,7 @@ export function ProposalDetailView({ id }: { id: Id<"trades"> }) {
     api.trades.getTradeById,
     isAuthenticated ? { tradeId: id } : "skip"
   );
+  const sections = useQuery(api.album.getSections, {});
 
   const confirmTrade = useMutation(api.trades.confirm);
   const declineTrade = useMutation(api.trades.decline);
@@ -84,25 +87,27 @@ export function ProposalDetailView({ id }: { id: Id<"trades"> }) {
     run(() => cancelTrade({ tradeId: trade._id }), "Proposta cancelada.");
 
   return (
-    <div className="space-y-5 pb-24">
-      <h1 className="sr-only">
-        Proposta com {breadcrumbName} — {ratio}
-      </h1>
-      <Breadcrumb name={breadcrumbName} ratio={ratio} />
-      <ProposalDetailHero trade={trade} />
-      <ProposalDetailInsights trade={trade} />
-      {trade.initiatorMessage && (
-        <Message text={trade.initiatorMessage} from={breadcrumbName} />
-      )}
-      <ProposalDetailTradeGrid trade={trade} />
-      <ProposalDetailFooter
-        trade={trade}
-        isPending={isPending}
-        onAccept={handleAccept}
-        onDecline={handleDecline}
-        onCancel={handleCancel}
-      />
-    </div>
+    <SectionLookupProvider sections={sections ?? []}>
+      <div className="space-y-5 pb-24">
+        <h1 className="sr-only">
+          Proposta com {breadcrumbName} — {ratio}
+        </h1>
+        <Breadcrumb name={breadcrumbName} ratio={ratio} />
+        <ProposalDetailHero trade={trade} />
+        <ProposalDetailInsights trade={trade} />
+        {trade.initiatorMessage && (
+          <Message text={trade.initiatorMessage} from={breadcrumbName} />
+        )}
+        <ProposalDetailTradeGrid trade={trade} />
+        <ProposalDetailFooter
+          trade={trade}
+          isPending={isPending}
+          onAccept={handleAccept}
+          onDecline={handleDecline}
+          onCancel={handleCancel}
+        />
+      </div>
+    </SectionLookupProvider>
   );
 }
 
