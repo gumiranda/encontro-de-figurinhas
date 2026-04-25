@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { rateLimiter } from "./lib/rateLimiter";
 
 export const search = query({
@@ -93,15 +94,37 @@ export const listTopActiveForSSG = query({
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
+    const usersWithSetup = await ctx.db
+      .query("users")
+      .withIndex("by_sticker_setup", (q) =>
+        q.eq("hasCompletedStickerSetup", true)
+      )
+      .take(10000);
+
+    const activeCityIds = new Set<Id<"cities">>();
+    for (const u of usersWithSetup) {
+      if (
+        u.cityId &&
+        u.isShadowBanned !== true &&
+        u.isBanned !== true
+      ) {
+        activeCityIds.add(u.cityId);
+      }
+    }
+
+    if (activeCityIds.size === 0) return [];
+
     const cities = await ctx.db
       .query("cities")
       .withIndex("by_isActive", (q) => q.eq("isActive", true))
       .take(5000);
 
-    return cities.map((c) => ({
-      slug: c.slug,
-      updatedAt: c._creationTime,
-    }));
+    return cities
+      .filter((c) => activeCityIds.has(c._id))
+      .map((c) => ({
+        slug: c.slug,
+        updatedAt: c._creationTime,
+      }));
   },
 });
 
@@ -138,7 +161,7 @@ export const getStatsBySlug = query({
 
     if (!city) return null;
 
-    const [collectors, tradePoints] = await Promise.all([
+    const [collectors, tradePoints, config] = await Promise.all([
       ctx.db
         .query("users")
         .withIndex("by_city_not_shadowbanned", (q) =>
@@ -151,15 +174,55 @@ export const getStatsBySlug = query({
           q.eq("cityId", city._id).eq("status", "approved")
         )
         .take(1000),
+      ctx.db.query("albumConfig").first(),
     ]);
 
     const activeCollectors = collectors.filter(
       (u) => u.hasCompletedStickerSetup === true && u.isBanned !== true
     );
 
+    const offeredCount = new Map<number, number>();
+    const wantedCount = new Map<number, number>();
+    for (const u of activeCollectors) {
+      for (const n of u.duplicates ?? []) {
+        offeredCount.set(n, (offeredCount.get(n) ?? 0) + 1);
+      }
+      for (const n of u.missing ?? []) {
+        wantedCount.set(n, (wantedCount.get(n) ?? 0) + 1);
+      }
+    }
+
+    const formatSticker = (n: number) => {
+      const section = config?.sections.find(
+        (s) => n >= s.startNumber && n <= s.endNumber
+      );
+      if (!section) {
+        return {
+          number: n,
+          code: `#${n}`,
+          teamName: "",
+          flagEmoji: "",
+        };
+      }
+      return {
+        number: n,
+        code: `${section.code}-${n - section.startNumber + 1}`,
+        teamName: section.name,
+        flagEmoji: section.flagEmoji ?? "",
+      };
+    };
+
+    const topN = (map: Map<number, number>, limit: number) =>
+      Array.from(map.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .map(([n, count]) => ({ ...formatSticker(n), count }));
+
     return {
       collectorsCount: activeCollectors.length,
       tradePointsCount: tradePoints.length,
+      topOffered: topN(offeredCount, 5),
+      topWanted: topN(wantedCount, 5),
     };
   },
 });

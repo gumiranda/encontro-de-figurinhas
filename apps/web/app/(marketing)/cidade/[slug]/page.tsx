@@ -12,9 +12,10 @@ import {
 import { stateCodeToName, stateCodeToSlug } from "@/lib/states";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { ArrowRight, Calendar, MapPin, Navigation, Store, Users } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Navigation, Store, TrendingDown, TrendingUp, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
@@ -87,6 +88,8 @@ export default async function CityPage({ params }: CityPageProps) {
 
   const collectorsCount = stats?.collectorsCount ?? 0;
   const tradePointsCount = stats?.tradePointsCount ?? 0;
+  const topOffered = stats?.topOffered ?? [];
+  const topWanted = stats?.topWanted ?? [];
   const visiblePoints = topPoints.slice(0, 20);
   const hasMorePoints = tradePointsCount > visiblePoints.length;
 
@@ -230,6 +233,114 @@ export default async function CityPage({ params }: CityPageProps) {
             </div>
           </div>
         </section>
+
+        {(topOffered.length > 0 || topWanted.length > 0) && (
+          <section className="py-16 md:py-24 border-b bg-muted/30">
+            <div className="container mx-auto px-4">
+              <div className="max-w-5xl mx-auto">
+                <div className="mb-10">
+                  <h2 className="text-2xl md:text-3xl font-headline font-bold">
+                    Oferta e demanda em {city.name}
+                  </h2>
+                  <p className="text-muted-foreground mt-2">
+                    Figurinhas mais repetidas e mais procuradas pelos {collectorsCount}{" "}
+                    {collectorsCount === 1 ? "colecionador" : "colecionadores"} ativos da cidade.
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {topOffered.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                            <TrendingUp className="h-5 w-5 text-emerald-600" />
+                          </div>
+                          <div>
+                            <CardTitle>Mais ofertadas</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              Repetidas em {city.name}
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-3">
+                          {topOffered.map((s) => (
+                            <li
+                              key={s.number}
+                              className="flex items-center justify-between"
+                            >
+                              <span className="flex items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="font-mono"
+                                >
+                                  {s.code}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {s.flagEmoji} {s.teamName}
+                                </span>
+                              </span>
+                              <span className="text-sm font-medium text-emerald-600">
+                                {s.count}{" "}
+                                {s.count === 1 ? "oferta" : "ofertas"}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {topWanted.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                            <TrendingDown className="h-5 w-5 text-rose-600" />
+                          </div>
+                          <div>
+                            <CardTitle>Mais procuradas</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              Faltam para colecionadores de {city.name}
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-3">
+                          {topWanted.map((s) => (
+                            <li
+                              key={s.number}
+                              className="flex items-center justify-between"
+                            >
+                              <span className="flex items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="font-mono"
+                                >
+                                  {s.code}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {s.flagEmoji} {s.teamName}
+                                </span>
+                              </span>
+                              <span className="text-sm font-medium text-rose-600">
+                                {s.count}{" "}
+                                {s.count === 1
+                                  ? "procurando"
+                                  : "procurando"}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {visiblePoints.length > 0 && (
           <section className="py-16 md:py-24 border-b">
