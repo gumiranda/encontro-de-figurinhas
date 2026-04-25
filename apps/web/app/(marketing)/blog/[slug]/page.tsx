@@ -400,7 +400,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               title={post.title}
               url={canonical}
               postId={post._id}
-              counts={metrics}
+              initialCounts={{ likes: metrics.likes, saves: metrics.saves }}
               className="hidden xl:block sticky"
               style={{ top: "var(--header-h, 5rem)" }}
             />

@@ -1,6 +1,7 @@
 import { v, ConvexError } from "convex/values";
 import {
   mutation,
+  query,
   internalMutation,
   type MutationCtx,
 } from "./_generated/server";
@@ -13,6 +14,7 @@ import { getPendingTradesCount } from "./lib/tradeHelpers";
 
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
+const HISTORY_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
 function computeLiveOverlap(
   user: Doc<"users">,
@@ -357,5 +359,141 @@ export const expireTrade = internalMutation({
       status: "expired",
       expiredAt: Date.now(),
     });
+  },
+});
+
+export type ListMyTradeRow = {
+  _id: Id<"trades">;
+  status: Doc<"trades">["status"];
+  role: "incoming" | "outgoing";
+  createdAt: number;
+  expiresAt: number;
+  confirmedAt: number | null;
+  initiatorMessage: string | null;
+  stickersIGive: number[];
+  stickersIReceive: number[];
+  matchPct: number | null;
+  counterparty: {
+    _id: Id<"users">;
+    name: string;
+    nickname: string | null;
+    avatarUrl: string | null;
+    totalTrades: number;
+    reliabilityScore: number;
+  };
+  tradePoint: {
+    _id: Id<"tradePoints">;
+    name: string;
+    address: string;
+  } | null;
+};
+
+export const listMyTrades = query({
+  args: {},
+  handler: async (ctx): Promise<ListMyTradeRow[]> => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return [];
+
+    const now = Date.now();
+    const cutoff = now - HISTORY_WINDOW_MS;
+
+    const [asInitiator, asCounterparty] = await Promise.all([
+      ctx.db
+        .query("trades")
+        .withIndex("by_initiator_status", (q) => q.eq("initiatorId", user._id))
+        .collect(),
+      ctx.db
+        .query("trades")
+        .withIndex("by_counterparty_status", (q) =>
+          q.eq("counterpartyId", user._id)
+        )
+        .collect(),
+    ]);
+
+    const trades: { trade: Doc<"trades">; role: "incoming" | "outgoing" }[] = [];
+    for (const t of asInitiator) trades.push({ trade: t, role: "outgoing" });
+    for (const t of asCounterparty) trades.push({ trade: t, role: "incoming" });
+
+    const filtered = trades.filter(({ trade }) => {
+      if (
+        trade.status === "pending_confirmation" ||
+        trade.status === "confirmed"
+      ) {
+        return true;
+      }
+      return trade.createdAt >= cutoff;
+    });
+
+    const userIds = new Set<Id<"users">>();
+    const tradePointIds = new Set<Id<"tradePoints">>();
+    for (const { trade, role } of filtered) {
+      const otherId = role === "incoming" ? trade.initiatorId : trade.counterpartyId;
+      userIds.add(otherId);
+      tradePointIds.add(trade.tradePointId);
+    }
+
+    const [users, points] = await Promise.all([
+      Promise.all(Array.from(userIds).map((id) => ctx.db.get(id))),
+      Promise.all(Array.from(tradePointIds).map((id) => ctx.db.get(id))),
+    ]);
+
+    const userMap = new Map<Id<"users">, Doc<"users">>();
+    for (const u of users) {
+      if (u) userMap.set(u._id, u);
+    }
+    const pointMap = new Map<Id<"tradePoints">, Doc<"tradePoints">>();
+    for (const p of points) {
+      if (p) pointMap.set(p._id, p);
+    }
+
+    const userMissing = new Set(user.missing ?? []);
+    const userMissingCount = userMissing.size;
+
+    const rows: ListMyTradeRow[] = filtered.map(({ trade, role }) => {
+      const otherId = role === "incoming" ? trade.initiatorId : trade.counterpartyId;
+      const other = userMap.get(otherId);
+      const point = pointMap.get(trade.tradePointId);
+
+      const stickersIGive =
+        role === "outgoing"
+          ? trade.stickersInitiatorGave
+          : trade.stickersInitiatorReceived;
+      const stickersIReceive =
+        role === "outgoing"
+          ? trade.stickersInitiatorReceived
+          : trade.stickersInitiatorGave;
+
+      const matchPct =
+        userMissingCount > 0
+          ? Math.round((stickersIReceive.length / userMissingCount) * 100)
+          : null;
+
+      return {
+        _id: trade._id,
+        status: trade.status,
+        role,
+        createdAt: trade.createdAt,
+        expiresAt: trade.createdAt + TRADE_EXPIRATION_MS,
+        confirmedAt: trade.confirmedAt ?? null,
+        initiatorMessage: trade.initiatorMessage ?? null,
+        stickersIGive,
+        stickersIReceive,
+        matchPct,
+        counterparty: {
+          _id: otherId,
+          name: other?.name ?? "Colecionador",
+          nickname: other?.displayNickname ?? other?.nickname ?? null,
+          avatarUrl: other?.avatarUrl ?? null,
+          totalTrades: other?.totalTrades ?? 0,
+          reliabilityScore: other?.reliabilityScore ?? 0,
+        },
+        tradePoint: point
+          ? { _id: point._id, name: point.name, address: point.address }
+          : null,
+      };
+    });
+
+    rows.sort((a, b) => b.createdAt - a.createdAt);
+    return rows;
   },
 });

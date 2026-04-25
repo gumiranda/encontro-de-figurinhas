@@ -401,4 +401,13 @@ export default defineSchema({
     saves: v.number(),
     comments: v.number(),
   }).index("by_post", ["postId"]),
+
+  postUserInteractions: defineTable({
+    postId: v.id("blogPosts"),
+    visitorId: v.string(),
+    liked: v.boolean(),
+    saved: v.boolean(),
+  })
+    .index("by_post_visitor", ["postId", "visitorId"])
+    .index("by_visitor", ["visitorId"]),
 });

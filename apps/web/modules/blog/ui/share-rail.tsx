@@ -1,17 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link2, Share2, MessageCircle, Heart, Bookmark } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
+
+function getVisitorId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem("blog_visitor_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("blog_visitor_id", id);
+  }
+  return id;
+}
 
 interface ShareRailProps {
   title: string;
   url: string;
   postId: Id<"blogPosts">;
-  counts: { likes: number; saves: number; comments: number };
+  initialCounts: { likes: number; saves: number };
   className?: string;
   style?: React.CSSProperties;
 }
@@ -20,27 +30,59 @@ export function ShareRail({
   title,
   url,
   postId,
-  counts,
+  initialCounts,
   className,
   style,
 }: ShareRailProps) {
   const [copied, setCopied] = useState(false);
   const [hasNativeShare, setHasNativeShare] = useState(false);
-  const [localCounts, setLocalCounts] = useState(counts);
-  const incrementMetric = useMutation(api.blog.incrementMetric);
+  const [visitorId, setVisitorId] = useState<string | null>(null);
+  const toggleMetric = useMutation(api.blog.toggleMetric);
+
+  // Fetch metrics with visitorId once available
+  const metrics = useQuery(
+    api.blog.getMetrics,
+    visitorId ? { postId, visitorId } : "skip"
+  );
+
+  const [localCounts, setLocalCounts] = useState(initialCounts);
+  const [userState, setUserState] = useState({ liked: false, saved: false });
 
   useEffect(() => {
     setHasNativeShare(typeof navigator !== "undefined" && "share" in navigator);
+    setVisitorId(getVisitorId());
   }, []);
 
-  const handleMetric = async (metric: "likes" | "saves") => {
-    setLocalCounts((c) => ({ ...c, [metric]: c[metric] + 1 }));
-    try {
-      await incrementMetric({ postId, metric });
-    } catch {
-      setLocalCounts((c) => ({ ...c, [metric]: c[metric] - 1 }));
+  // Sync with server data when available
+  useEffect(() => {
+    if (metrics) {
+      setLocalCounts({ likes: metrics.likes, saves: metrics.saves });
+      setUserState({ liked: metrics.userLiked, saved: metrics.userSaved });
     }
-  };
+  }, [metrics]);
+
+  const handleToggle = useCallback(
+    async (metric: "likes" | "saves") => {
+      if (!visitorId) return;
+
+      const stateKey = metric === "likes" ? "liked" : "saved";
+      const wasActive = userState[stateKey];
+      const delta = wasActive ? -1 : 1;
+
+      // Optimistic update
+      setUserState((s) => ({ ...s, [stateKey]: !wasActive }));
+      setLocalCounts((c) => ({ ...c, [metric]: Math.max(0, c[metric] + delta) }));
+
+      try {
+        await toggleMetric({ postId, visitorId, metric });
+      } catch {
+        // Revert on error
+        setUserState((s) => ({ ...s, [stateKey]: wasActive }));
+        setLocalCounts((c) => ({ ...c, [metric]: c[metric] - delta }));
+      }
+    },
+    [postId, visitorId, userState, toggleMetric]
+  );
 
   const handleCopyLink = async () => {
     try {
@@ -88,11 +130,13 @@ export function ShareRail({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleMetric("likes")}
+          onClick={() => handleToggle("likes")}
           className="justify-start gap-2"
         >
-          <Heart className="size-4" />
-          Curtir
+          <Heart
+            className={`size-4 ${userState.liked ? "fill-current text-red-500" : ""}`}
+          />
+          {userState.liked ? "Curtido" : "Curtir"}
           <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
             {localCounts.likes}
           </span>
@@ -100,11 +144,13 @@ export function ShareRail({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => handleMetric("saves")}
+          onClick={() => handleToggle("saves")}
           className="justify-start gap-2"
         >
-          <Bookmark className="size-4" />
-          Salvar
+          <Bookmark
+            className={`size-4 ${userState.saved ? "fill-current text-primary" : ""}`}
+          />
+          {userState.saved ? "Salvo" : "Salvar"}
           <span className="ml-auto text-xs text-muted-foreground font-medium hidden sm:inline">
             {localCounts.saves}
           </span>

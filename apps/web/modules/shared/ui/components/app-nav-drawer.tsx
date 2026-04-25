@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeftRight,
+  Inbox,
   LayoutDashboard,
   ListPlus,
   Map as MapIcon,
@@ -77,6 +78,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             icon: ListPlus,
           },
           { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
+          { label: "Propostas", href: "/propostas", icon: Inbox },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
       },
