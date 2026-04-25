@@ -21,7 +21,8 @@ export type FiltersAction =
   | { type: "setNearOnly"; nearOnly: boolean }
   | { type: "setRaresOnly"; raresOnly: boolean }
   | { type: "setSortByMatch"; sortByMatch: boolean }
-  | { type: "clearClientFilters" };
+  | { type: "clearClientFilters" }
+  | { type: "clearAllFilters" };
 
 export const initialMatchesFiltersState: FiltersState = {
   layer: null,
@@ -51,6 +52,8 @@ export function filtersReducer(
       return { ...state, sortByMatch: action.sortByMatch };
     case "clearClientFilters":
       return { ...state, nearOnly: false, raresOnly: false, sortByMatch: false };
+    case "clearAllFilters":
+      return initialMatchesFiltersState;
     default:
       return state;
   }
@@ -94,5 +97,15 @@ export function useMatchesFilters() {
 
   const hasActiveClientFilters = state.nearOnly || state.raresOnly;
 
-  return { state, dispatch, queryArgs, clientFilters, hasActiveClientFilters };
+  const hasActiveFilters = useMemo(
+    () =>
+      state.layer !== null ||
+      !state.bidirectionalOnly ||
+      state.verifiedOnly ||
+      state.nearOnly ||
+      state.raresOnly,
+    [state.layer, state.bidirectionalOnly, state.verifiedOnly, state.nearOnly, state.raresOnly]
+  );
+
+  return { state, dispatch, queryArgs, clientFilters, hasActiveClientFilters, hasActiveFilters };
 }

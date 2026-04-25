@@ -223,16 +223,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     },
   };
 
+  // Product/FAQ types (optional fields added to schema)
+  type ProductField = {
+    name: string;
+    sku?: string;
+    price: number;
+    priceCurrency: string;
+    image?: string;
+    description?: string;
+    url?: string;
+    availability?: string;
+  };
+  type FaqField = { question: string; answer: string };
+  const postWithSeo = post as typeof post & {
+    products?: ProductField[];
+    faqs?: FaqField[];
+  };
+
   // Product JSON-LD (from structured Convex field)
-  const productSchemas = (post.products ?? []).map((p) => ({
-    "@context": "https://schema.org",
-    "@type": "Product",
+  const productSchemas = (postWithSeo.products ?? []).map((p: ProductField) => ({
+    "@context": "https://schema.org" as const,
+    "@type": "Product" as const,
     name: sanitizeJsonLdValue(p.name),
     sku: p.sku,
     description: p.description ? sanitizeJsonLdValue(p.description) : undefined,
     image: p.image,
     offers: {
-      "@type": "Offer",
+      "@type": "Offer" as const,
       price: p.price,
       priceCurrency: p.priceCurrency,
       availability: p.availability ?? "https://schema.org/InStock",
@@ -242,15 +259,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   // FAQ JSON-LD (from structured Convex field)
   const faqSchema =
-    post.faqs && post.faqs.length > 0
+    postWithSeo.faqs && postWithSeo.faqs.length > 0
       ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: post.faqs.map((f) => ({
-            "@type": "Question",
+          "@context": "https://schema.org" as const,
+          "@type": "FAQPage" as const,
+          mainEntity: postWithSeo.faqs.map((f: FaqField) => ({
+            "@type": "Question" as const,
             name: sanitizeJsonLdValue(f.question),
             acceptedAnswer: {
-              "@type": "Answer",
+              "@type": "Answer" as const,
               text: sanitizeJsonLdValue(f.answer),
             },
           })),
@@ -261,7 +278,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <>
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={articleSchema} />
-      {productSchemas.map((schema, i) => (
+      {productSchemas.map((schema, i: number) => (
         <JsonLd key={`product-${i}`} data={schema} />
       ))}
       {faqSchema && <JsonLd data={faqSchema} />}

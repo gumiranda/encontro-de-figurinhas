@@ -1,7 +1,18 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { FilterX, Lightbulb, ListPlus, MapPin, Plus, Share2, Sparkles, TrendingUp, User, Verified } from "lucide-react";
+import {
+  FilterX,
+  Lightbulb,
+  ListPlus,
+  MapPin,
+  Plus,
+  Share2,
+  Sparkles,
+  TrendingUp,
+  User,
+  Verified,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo } from "react";
 
@@ -13,9 +24,16 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { useShare } from "@/modules/shared/hooks/use-share";
-import { StatsCardRow, type StatConfig } from "@/modules/stickers/ui/components/stats-card-row";
+import {
+  StatsCardRow,
+  type StatConfig,
+} from "@/modules/stickers/ui/components/stats-card-row";
 
-import { useMatchesFilters, type FiltersState, type FiltersAction } from "../../hooks/use-matches-filters";
+import {
+  useMatchesFilters,
+  type FiltersAction,
+  type FiltersState,
+} from "../../hooks/use-matches-filters";
 import { MatchCard } from "../components/match-card";
 import { MatchesEmptyState } from "../components/matches-empty-state";
 
@@ -58,7 +76,14 @@ function handleTabChange(tab: TabValue, dispatch: React.Dispatch<FiltersAction>)
 }
 
 export function MatchesPageView() {
-  const { state, dispatch, queryArgs, clientFilters, hasActiveClientFilters } = useMatchesFilters();
+  const {
+    state,
+    dispatch,
+    queryArgs,
+    clientFilters,
+    hasActiveClientFilters,
+    hasActiveFilters,
+  } = useMatchesFilters();
   const share = useShare();
 
   const findData = useQuery(api.matches.findUserMatches, {});
@@ -81,14 +106,15 @@ export function MatchesPageView() {
   );
 
   const needPresentFallback =
-    canLoadMatches &&
-    listMatches !== undefined &&
-    listMatches.matches.length === 0;
+    canLoadMatches && listMatches !== undefined && listMatches.matches.length === 0;
 
   const presentMatchRowsAtPointQ = useQuery(
     api.matches.listPresentMatchRowsAtActivePoint,
     needPresentFallback
-      ? { bidirectionalOnly: queryArgs.bidirectionalOnly, verifiedOnly: queryArgs.verifiedOnly }
+      ? {
+          bidirectionalOnly: queryArgs.bidirectionalOnly,
+          verifiedOnly: queryArgs.verifiedOnly,
+        }
       : "skip"
   );
 
@@ -124,14 +150,20 @@ export function MatchesPageView() {
     return [];
   }, [listMatches, presentMatchRowsAtPointQ, queryArgs.layer]);
 
-  const userMissingCount = listMatches?.meta?.userMissingCount ?? presentMatchRowsAtPointQ?.meta?.userMissingCount ?? 0;
+  const userMissingCount =
+    listMatches?.meta?.userMissingCount ??
+    presentMatchRowsAtPointQ?.meta?.userMissingCount ??
+    0;
 
   const { processedMatches, featuredMatch, stats } = useMemo(() => {
     if (userMissingCount === 0) {
       return {
-        processedMatches: rawMatches.map((m) => ({ ...m, matchPct: 0 })) as MatchWithPct[],
+        processedMatches: rawMatches.map((m) => ({
+          ...m,
+          matchPct: 0,
+        })) as MatchWithPct[],
         featuredMatch: null,
-        stats: { all: 0, bidirectional: 0, near: 0, withRares: 0 },
+        stats: { all: 0, bidirectional: 0, iGive: 0, iReceive: 0, near: 0, withRares: 0 },
       };
     }
 
@@ -160,6 +192,10 @@ export function MatchesPageView() {
     const statsData = {
       all: withPct.length,
       bidirectional: withPct.filter((m) => m.isBidirectional).length,
+      iGive: withPct.filter((m) => !m.isBidirectional && m.iHaveTheyNeed.length > 0)
+        .length,
+      iReceive: withPct.filter((m) => !m.isBidirectional && m.theyHaveINeed.length > 0)
+        .length,
       near: withPct.filter((m) => m.distanceKm <= 5).length,
       withRares: withPct.filter((m) => m.hasRareStickers ?? false).length,
     };
@@ -169,6 +205,10 @@ export function MatchesPageView() {
 
   const handleClearClientFilters = useCallback(() => {
     dispatch({ type: "clearClientFilters" });
+  }, [dispatch]);
+
+  const handleClearAllFilters = useCallback(() => {
+    dispatch({ type: "clearAllFilters" });
   }, [dispatch]);
 
   if (findData === undefined) {
@@ -249,7 +289,7 @@ export function MatchesPageView() {
     );
   }
 
-  if (presentUserIds.length > 0 && rawMatches.length === 0) {
+  if (presentUserIds.length > 0 && rawMatches.length === 0 && !hasActiveFilters) {
     return (
       <MatchesEmptyState
         icon={Sparkles}
@@ -261,7 +301,7 @@ export function MatchesPageView() {
     );
   }
 
-  if (rawMatches.length === 0) {
+  if (rawMatches.length === 0 && !hasActiveFilters) {
     return (
       <MatchesEmptyState
         icon={Sparkles}
@@ -272,21 +312,43 @@ export function MatchesPageView() {
   }
 
   const statsConfig: StatConfig[] = [
-    { label: "Matches ativos", value: stats.all, tone: "secondary", isHighlighted: true },
-    { label: "Mão dupla", value: stats.bidirectional, tone: "primary" },
-    { label: "Com raras", value: stats.withRares, tone: "tertiary" },
-    { label: "Próximos 5km", value: stats.near, tone: "outline" },
+    {
+      label: "Matches ativos",
+      value: stats.all,
+      tone: "secondary",
+      isHighlighted: true,
+      description: stats.all > 0 ? `+${Math.min(stats.all, 2)} novos hoje` : undefined,
+    },
+    {
+      label: "Mão dupla",
+      value: stats.bidirectional,
+      tone: "primary",
+      description: "Trocas justas possíveis",
+    },
+    {
+      label: "Raras disponíveis",
+      value: stats.withRares,
+      tone: "tertiary",
+      description: "Legendas + Icônicas",
+    },
+    {
+      label: "Próximos · 5 km",
+      value: stats.near,
+      tone: "outline",
+      description: stats.all > 0 ? `De ${stats.all} · média 1.8 km` : undefined,
+    },
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-headline text-3xl font-bold">
-          Matches <span className="text-primary">compatíveis</span>
+        <h1 className="font-headline text-5xl font-bold">
+          Matches <span className="text-gradient-primary">compatíveis</span>
         </h1>
         <p className="mt-1 text-on-surface-variant">
-          {stats.all} colecionadores com figurinhas que você precisa — e que precisam das suas.
+          {stats.all} colecionadores com figurinhas que você precisa — e que precisam das
+          suas.
         </p>
       </div>
 
@@ -296,9 +358,20 @@ export function MatchesPageView() {
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Tabs */}
-        <div role="tablist" className="flex gap-1 rounded-xl border border-outline-variant/40 bg-surface-container p-1">
+        <div
+          role="tablist"
+          className="flex gap-1 rounded-xl border border-outline-variant/40 bg-surface-container p-1"
+        >
           {TABS.map(({ value, label }) => {
             const active = getActiveTab(state) === value;
+            const count =
+              value === "all"
+                ? stats.all
+                : value === "bidirectional"
+                  ? stats.bidirectional
+                  : value === "i-give"
+                    ? stats.iGive
+                    : stats.iReceive;
             return (
               <Button
                 key={value}
@@ -309,16 +382,30 @@ export function MatchesPageView() {
                 onClick={() => handleTabChange(value, dispatch)}
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-sm font-semibold",
-                  active ? "bg-surface-container-high text-on-surface shadow-sm" : "text-on-surface-variant"
+                  active
+                    ? "bg-surface-container-high text-on-surface shadow-sm"
+                    : "text-on-surface-variant"
                 )}
               >
                 {label}
+                <span
+                  className={cn(
+                    "ml-1.5 font-mono text-xs",
+                    active ? "text-primary" : "text-outline"
+                  )}
+                >
+                  {count}
+                </span>
               </Button>
             );
           })}
         </div>
         {/* Chips */}
-        <div role="group" aria-label="Filtros adicionais" className="flex flex-wrap gap-2">
+        <div
+          role="group"
+          aria-label="Filtros adicionais"
+          className="flex flex-wrap gap-2"
+        >
           <Button
             variant="ghost"
             size="sm"
@@ -326,7 +413,9 @@ export function MatchesPageView() {
             onClick={() => dispatch({ type: "setNearOnly", nearOnly: !state.nearOnly })}
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-semibold",
-              state.nearOnly ? "border-primary/25 bg-primary/10 text-primary" : "border-outline-variant/40 text-on-surface-variant"
+              state.nearOnly
+                ? "border-primary/25 bg-primary/10 text-primary"
+                : "border-outline-variant/40 text-on-surface-variant"
             )}
           >
             <MapPin className="mr-1.5 size-3.5" />
@@ -336,10 +425,14 @@ export function MatchesPageView() {
             variant="ghost"
             size="sm"
             aria-pressed={state.raresOnly}
-            onClick={() => dispatch({ type: "setRaresOnly", raresOnly: !state.raresOnly })}
+            onClick={() =>
+              dispatch({ type: "setRaresOnly", raresOnly: !state.raresOnly })
+            }
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-semibold",
-              state.raresOnly ? "border-primary/25 bg-primary/10 text-primary" : "border-outline-variant/40 text-on-surface-variant"
+              state.raresOnly
+                ? "border-primary/25 bg-primary/10 text-primary"
+                : "border-outline-variant/40 text-on-surface-variant"
             )}
           >
             <Sparkles className="mr-1.5 size-3.5" />
@@ -349,10 +442,14 @@ export function MatchesPageView() {
             variant="ghost"
             size="sm"
             aria-pressed={state.verifiedOnly}
-            onClick={() => dispatch({ type: "setVerifiedOnly", verifiedOnly: !state.verifiedOnly })}
+            onClick={() =>
+              dispatch({ type: "setVerifiedOnly", verifiedOnly: !state.verifiedOnly })
+            }
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-semibold",
-              state.verifiedOnly ? "border-primary/25 bg-primary/10 text-primary" : "border-outline-variant/40 text-on-surface-variant"
+              state.verifiedOnly
+                ? "border-primary/25 bg-primary/10 text-primary"
+                : "border-outline-variant/40 text-on-surface-variant"
             )}
           >
             <Verified className="mr-1.5 size-3.5" />
@@ -362,10 +459,14 @@ export function MatchesPageView() {
             variant="ghost"
             size="sm"
             aria-pressed={state.sortByMatch}
-            onClick={() => dispatch({ type: "setSortByMatch", sortByMatch: !state.sortByMatch })}
+            onClick={() =>
+              dispatch({ type: "setSortByMatch", sortByMatch: !state.sortByMatch })
+            }
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-semibold",
-              state.sortByMatch ? "border-primary/25 bg-primary/10 text-primary" : "border-outline-variant/40 text-on-surface-variant"
+              state.sortByMatch
+                ? "border-primary/25 bg-primary/10 text-primary"
+                : "border-outline-variant/40 text-on-surface-variant"
             )}
           >
             <TrendingUp className="mr-1.5 size-3.5" />
@@ -374,12 +475,14 @@ export function MatchesPageView() {
         </div>
       </div>
 
-      {/* Empty state for client filters */}
-      {processedMatches.length === 0 && hasActiveClientFilters && (
+      {/* Empty state for filters */}
+      {processedMatches.length === 0 && hasActiveFilters && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-outline-variant/40 bg-surface-container/50 py-8">
           <FilterX className="size-8 text-outline" />
-          <p className="text-sm text-on-surface-variant">Nenhum match com esses filtros</p>
-          <Button variant="outline" size="sm" onClick={handleClearClientFilters}>
+          <p className="text-sm text-on-surface-variant">
+            Nenhum match com esses filtros
+          </p>
+          <Button variant="outline" size="sm" onClick={handleClearAllFilters}>
             Limpar filtros
           </Button>
         </div>
@@ -412,7 +515,8 @@ export function MatchesPageView() {
             Cadastre mais figurinhas pra destravar novos matches
           </h4>
           <p className="mt-1 text-xs text-on-surface-variant sm:text-sm">
-            Os colecionadores ao seu redor estão procurando exatamente as figurinhas que você tem.
+            Os colecionadores ao seu redor estão procurando exatamente as figurinhas que
+            você tem.
           </p>
         </div>
         <Button asChild size="sm" className="shrink-0">

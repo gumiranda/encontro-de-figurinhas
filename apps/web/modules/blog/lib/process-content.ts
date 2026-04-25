@@ -17,7 +17,7 @@ const sanitizeSchema = {
     "h1", "h2", "h3", "h4", "h5", "h6",
     "p", "ul", "ol", "li", "a", "strong", "em", "b", "i",
     "code", "pre", "blockquote", "img",
-    "figure", "figcaption", "aside", "section", "span",
+    "figure", "figcaption", "aside", "section", "span", "div",
     "br", "hr", "table", "thead", "tbody", "tr", "th", "td",
   ],
   // NO: svg, iframe, object, embed, math, script, style, form, input
@@ -29,6 +29,7 @@ const sanitizeSchema = {
     section: ["aria-labelledby", "class"],
     figure: ["class"],
     span: ["class"],
+    div: ["class"],
     p: ["class"],
     h1: ["id"], h2: ["id"], h3: ["id"], h4: ["id"], h5: ["id"], h6: ["id"],
   },
@@ -43,13 +44,159 @@ const classAllowlist: Record<string, string[]> = {
   aside: ["blog-card", "card-grid", "callout", "callout-warn"],
   figure: ["blog-card", "card-grid", "rarity-card"],
   section: ["blog-card", "card-grid", "inline-cta"],
-  span: ["rarity-rank", "rarity-price", "rarity-info", "callout-icon"],
+  span: ["rarity-rank", "rarity-price", "amount", "label", "callout-icon"],
+  div: ["rarity-info", "rarity-price"],
   p: ["lead"],
 };
 
-// Rehype plugin: semantic transform (div.callout → aside.callout)
+// Warning keywords for callout detection
+const WARN_KEYWORDS = /\b(atenção|cuidado|aviso|alerta|importante|warning)\b/i;
+const INFO_KEYWORDS = /\b(dica|nota|lembre|saiba|info|tip)\b/i;
+const CTA_KEYWORDS = /\b(começar|criar conta|cadastr|inscreva|baixar|download|experimente)\b/i;
+// Price pattern: R$ followed by numbers (with optional . or , separators)
+const PRICE_PATTERN = /R\$\s*[\d.,]+/;
+
+// Rehype plugin: auto-detect semantic patterns and transform
 function rehypeSemanticTransform() {
   return (tree: Root) => {
+    let foundLead = false;
+
+    // First pass: find and mark lead paragraph (first substantial <p>)
+    visit(tree, "element", (node: Element, index, parent) => {
+      if (foundLead) return;
+      if (node.tagName !== "p") return;
+      if (!parent || parent.type !== "root") return;
+
+      const text = toString(node);
+      // Lead: first paragraph with >80 chars, no images
+      if (text.length > 80 && !hasChildTag(node, "img")) {
+        node.properties = { ...node.properties, class: "lead" };
+        foundLead = true;
+      }
+    });
+
+    // Second pass: transform blockquotes to callouts
+    visit(tree, "element", (node: Element) => {
+      if (node.tagName !== "blockquote") return;
+
+      const text = toString(node);
+      const isWarn = WARN_KEYWORDS.test(text);
+      const isInfo = INFO_KEYWORDS.test(text) || text.length > 50;
+
+      if (isWarn || isInfo) {
+        node.tagName = "aside";
+        node.properties = {
+          ...node.properties,
+          role: "note",
+          class: isWarn
+            ? "blog-card card-grid callout callout-warn"
+            : "blog-card card-grid callout",
+        };
+      }
+    });
+
+    // Third pass: transform ordered lists with prices to rarity cards
+    visit(tree, "element", (node: Element, index, parent) => {
+      if (node.tagName !== "ol") return;
+
+      const items = node.children.filter(
+        (c): c is Element => c.type === "element" && c.tagName === "li"
+      );
+
+      // Check if list items have price patterns
+      const hasRarityPattern = items.some((li) => {
+        const text = toString(li);
+        return PRICE_PATTERN.test(text);
+      });
+
+      if (!hasRarityPattern || items.length === 0) return;
+
+      // Transform each <li> to a rarity card figure
+      const rarityCards: Element[] = items.map((li, i) => {
+        const text = toString(li);
+        const priceMatch = text.match(PRICE_PATTERN);
+        const price = priceMatch ? priceMatch[0] : "";
+        // Extract title: everything before the price or em-dash
+        const titlePart = text.split(/[—–-]\s*R\$/)[0] || text.split(PRICE_PATTERN)[0] || text;
+        const title = titlePart.replace(/^\d+[\.\)]\s*/, "").trim();
+
+        return {
+          type: "element" as const,
+          tagName: "figure",
+          properties: { class: "blog-card card-grid rarity-card" },
+          children: [
+            {
+              type: "element" as const,
+              tagName: "span",
+              properties: { class: "rarity-rank" },
+              children: [{ type: "text" as const, value: String(i + 1).padStart(2, "0") }],
+            },
+            {
+              type: "element" as const,
+              tagName: "div",
+              properties: { class: "rarity-info" },
+              children: [
+                {
+                  type: "element" as const,
+                  tagName: "h4",
+                  properties: {},
+                  children: [{ type: "text" as const, value: title }],
+                },
+              ],
+            },
+            ...(price
+              ? [
+                  {
+                    type: "element" as const,
+                    tagName: "div",
+                    properties: { class: "rarity-price" },
+                    children: [
+                      {
+                        type: "element" as const,
+                        tagName: "span",
+                        properties: { class: "amount" },
+                        children: [{ type: "text" as const, value: price }],
+                      },
+                      {
+                        type: "element" as const,
+                        tagName: "span",
+                        properties: { class: "label" },
+                        children: [{ type: "text" as const, value: "valor médio" }],
+                      },
+                    ],
+                  },
+                ]
+              : []),
+          ],
+        };
+      });
+
+      // Replace <ol> with the rarity cards
+      if (parent && typeof index === "number") {
+        (parent.children as Element[]).splice(index, 1, ...rarityCards);
+      }
+    });
+
+    // Fourth pass: detect CTA paragraphs (links with CTA text)
+    visit(tree, "element", (node: Element) => {
+      if (node.tagName !== "p") return;
+
+      const hasCtaLink = node.children.some((child) => {
+        if (child.type !== "element" || child.tagName !== "a") return false;
+        const linkText = toString(child);
+        return CTA_KEYWORDS.test(linkText);
+      });
+
+      if (hasCtaLink) {
+        node.tagName = "section";
+        node.properties = {
+          ...node.properties,
+          class: "blog-card card-grid inline-cta",
+        };
+      }
+    });
+
+    // Fifth pass: handle explicit div classes (backwards compat)
     visit(tree, "element", (node: Element) => {
       const classes = getClasses(node);
 
@@ -77,6 +224,12 @@ function rehypeSemanticTransform() {
       }
     });
   };
+}
+
+function hasChildTag(node: Element, tagName: string): boolean {
+  return node.children.some(
+    (c) => c.type === "element" && c.tagName === tagName
+  );
 }
 
 // Rehype plugin: validate links (block bad protocols, force rel on external)
