@@ -53,7 +53,11 @@ export function ShareRail({ title, url, className, style }: ShareRailProps) {
   };
 
   return (
-    <aside className={`share-rail ${className ?? ""}`} style={style}>
+    <aside
+      className={`share-rail ${className ?? ""}`}
+      style={style}
+      aria-label="Compartilhar artigo"
+    >
       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
         Compartilhar
       </p>

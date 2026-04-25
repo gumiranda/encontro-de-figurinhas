@@ -1,8 +1,23 @@
-.blog-prose :is(h2, h3, h4)[id] {
+/* RGB custom props for alpha variants */
+:root {
+  --accent-primary-rgb: 149 170 255;
+  --warn-rgb: 180 140 50;
+  --warn-bg-rgb: 255 201 101;
+}
+
+/* Headings with scroll margin for fixed header */
+.blog-prose :is(h1, h2, h3, h4, h5, h6)[id] {
   scroll-margin-top: calc(var(--header-h, 5rem) + 1rem);
 }
 
-.blog-prose > p:first-of-type:not(:has(img, iframe, blockquote))::first-letter {
+/* Lead paragraph */
+.blog-prose p.lead {
+  font-size: clamp(1.125rem, 1.6vw, 1.3rem);
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.blog-prose p.lead::first-letter {
   font-family: var(--font-headline);
   font-size: 4.25rem;
   font-weight: 900;
@@ -15,16 +30,175 @@
   color: transparent;
 }
 
+/* Fallback drop cap for posts without .lead */
+.blog-prose > p:first-of-type:not(.lead):not(:has(img, iframe, blockquote))::first-letter {
+  font-family: var(--font-headline);
+  font-size: 4.25rem;
+  font-weight: 900;
+  line-height: 0.85;
+  float: left;
+  margin: 4px 14px 0 0;
+  background: linear-gradient(135deg, hsl(45 93% 58%), hsl(38 92% 50%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Base card (applied via semantic transform) */
+.blog-prose .blog-card {
+  padding: 1.375rem 1.5rem;
+  border-radius: 1rem;
+  background: var(--surface-container);
+  border: 1px solid rgb(var(--accent-primary-rgb) / 0.15);
+  margin: 2em 0;
+}
+
+/* Shared grid layout */
+.blog-prose .card-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Callout */
+.blog-prose aside.callout {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.blog-prose aside.callout-warn {
+  background: rgb(var(--warn-bg-rgb) / 0.05);
+  border-color: rgb(var(--warn-bg-rgb) / 0.15);
+}
+
+.blog-prose .callout-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+  background: rgb(var(--accent-primary-rgb) / 0.1);
+  color: rgb(var(--accent-primary-rgb));
+  display: grid;
+  place-items: center;
+}
+
+.blog-prose aside.callout-warn .callout-icon {
+  background: rgb(var(--warn-bg-rgb) / 0.1);
+  color: rgb(var(--warn-rgb));
+}
+
+/* Rarity card */
+.blog-prose figure.rarity-card {
+  grid-template-columns: auto 1fr auto;
+  gap: 1.25rem;
+}
+
+.blog-prose .rarity-rank {
+  width: 3.5rem;
+  height: 4.5rem;
+  border-radius: 0.625rem;
+  background: linear-gradient(135deg, rgb(var(--warn-bg-rgb)), hsl(38 92% 45%));
+  color: hsl(0 0% 10%);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  box-shadow: 0 4px 12px rgb(var(--warn-bg-rgb) / 0.25);
+}
+
+.blog-prose .rarity-info h4 {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.blog-prose .rarity-price {
+  text-align: right;
+}
+
+.blog-prose .rarity-price .amount {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--secondary);
+  letter-spacing: -0.02em;
+}
+
+.blog-prose .rarity-price .label {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 640px) {
+  .blog-prose figure.rarity-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .blog-prose .rarity-price {
+    grid-column: 1 / -1;
+    text-align: left;
+    border-top: 1px solid rgb(255 255 255 / 0.05);
+    padding-top: 0.625rem;
+  }
+}
+
+/* Inline CTA */
+.blog-prose section.inline-cta {
+  grid-template-columns: 1fr auto;
+  gap: 1.25rem;
+  background: radial-gradient(circle at top right, rgb(79 243 37 / 0.1), transparent 60%),
+    var(--surface-container-high, var(--surface-container));
+  border-color: rgb(79 243 37 / 0.15);
+}
+
+.blog-prose section.inline-cta h4 {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+
+.blog-prose section.inline-cta p {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  margin-top: 0.375rem;
+}
+
+@media (max-width: 640px) {
+  .blog-prose section.inline-cta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Focus states */
+.blog-prose a:focus-visible,
+.blog-prose button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Print styles */
 @media print {
   .reading-progress,
   .share-rail,
-  .blog-toc-desktop {
+  .blog-toc-desktop,
+  section.inline-cta,
+  aside.callout {
     display: none !important;
   }
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .read-progress-bar,
+  .blog-prose * {
+    transition: none !important;
   }
 }

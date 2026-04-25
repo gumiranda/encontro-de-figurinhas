@@ -4,12 +4,14 @@ import { useEffect, useState, useRef } from "react";
 
 export function ReadingProgress() {
   const [progress, setProgress] = useState(0);
+  const [displayProgress, setDisplayProgress] = useState(0);
   const ticking = useRef(false);
 
   useEffect(() => {
     const updateProgress = () => {
       const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       setProgress(Math.min(100, Math.max(0, scrollPercent)));
       ticking.current = false;
@@ -28,17 +30,26 @@ export function ReadingProgress() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Debounce ARIA updates to integer % changes only (prevents AT spam)
+  useEffect(() => {
+    const rounded = Math.round(progress);
+    if (rounded !== displayProgress) {
+      setDisplayProgress(rounded);
+    }
+  }, [progress, displayProgress]);
+
   return (
     <div
       className="reading-progress fixed top-0 left-0 right-0 h-1 z-50 bg-muted/30"
       role="progressbar"
-      aria-valuenow={Math.round(progress)}
+      aria-valuenow={displayProgress}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Progresso de leitura"
+      aria-valuetext={`${displayProgress}% lido`}
     >
       <div
-        className="h-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-150 ease-out"
+        className="read-progress-bar h-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>

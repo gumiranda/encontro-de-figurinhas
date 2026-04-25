@@ -334,6 +334,29 @@ export default defineSchema({
     publishedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    // SEO/AEO structured data fields
+    products: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          sku: v.optional(v.string()),
+          price: v.number(),
+          priceCurrency: v.string(),
+          image: v.optional(v.string()),
+          description: v.optional(v.string()),
+          url: v.optional(v.string()),
+          availability: v.optional(v.string()),
+        })
+      )
+    ),
+    faqs: v.optional(
+      v.array(
+        v.object({
+          question: v.string(),
+          answer: v.string(),
+        })
+      )
+    ),
   })
     .index("by_slug", ["slug"])
     .index("by_status_publishedAt", ["status", "publishedAt"])

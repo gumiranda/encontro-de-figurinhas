@@ -111,6 +111,28 @@ function formatDate(timestamp: number) {
   }).format(new Date(timestamp));
 }
 
+// Prevent XSS via JSON-LD injection
+function sanitizeJsonLdValue(val: string): string {
+  return val
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e");
+}
+
+async function safeProcessContent(content: string) {
+  try {
+    return await processContent(content);
+  } catch (e) {
+    console.error("Content processing failed:", e);
+    return {
+      sanitizedHtml: "<p>Erro ao processar conteúdo.</p>",
+      headings: [],
+      wordCount: 0,
+    };
+  }
+}
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const [post, relatedPosts] = await Promise.all([
@@ -122,7 +144,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const { sanitizedHtml, headings } = await processContent(post.content);
+  const { sanitizedHtml, headings, wordCount } = await safeProcessContent(
+    post.content
+  );
   const readingTime = calculateReadingTime(sanitizedHtml);
   const canonical = `${BASE_URL}/blog/${post.slug}`;
 
@@ -145,7 +169,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {
         "@type": "ListItem",
         position: 3,
-        name: post.title,
+        name: sanitizeJsonLdValue(post.title),
         item: canonical,
       },
     ],
@@ -160,7 +184,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: post.title,
+    headline: sanitizeJsonLdValue(post.title),
     datePublished: post.publishedAt
       ? new Date(post.publishedAt).toISOString()
       : undefined,
@@ -169,9 +193,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       : undefined,
     author: {
       "@type": "Person",
-      name: post.author.name,
+      name: sanitizeJsonLdValue(post.author.name),
     },
-    image: [imageUrl],
+    image: {
+      "@type": "ImageObject",
+      url: imageUrl,
+      width: 1200,
+      height: 630,
+    },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": canonical,
@@ -184,16 +213,58 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         url: `${BASE_URL}/logo.svg`,
       },
     },
+    wordCount,
+    articleSection: post.category,
+    keywords: post.tags.join(", "),
+    inLanguage: "pt-BR",
     speakable: {
       "@type": "SpeakableSpecification",
-      cssSelector: [".blog-prose h2", ".blog-prose > p:first-of-type"],
+      cssSelector: [".blog-prose p.lead", ".blog-prose h2"],
     },
   };
+
+  // Product JSON-LD (from structured Convex field)
+  const productSchemas = (post.products ?? []).map((p) => ({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: sanitizeJsonLdValue(p.name),
+    sku: p.sku,
+    description: p.description ? sanitizeJsonLdValue(p.description) : undefined,
+    image: p.image,
+    offers: {
+      "@type": "Offer",
+      price: p.price,
+      priceCurrency: p.priceCurrency,
+      availability: p.availability ?? "https://schema.org/InStock",
+      url: p.url,
+    },
+  }));
+
+  // FAQ JSON-LD (from structured Convex field)
+  const faqSchema =
+    post.faqs && post.faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: post.faqs.map((f) => ({
+            "@type": "Question",
+            name: sanitizeJsonLdValue(f.question),
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: sanitizeJsonLdValue(f.answer),
+            },
+          })),
+        }
+      : null;
 
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={articleSchema} />
+      {productSchemas.map((schema, i) => (
+        <JsonLd key={`product-${i}`} data={schema} />
+      ))}
+      {faqSchema && <JsonLd data={faqSchema} />}
       <ReadingProgress />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
