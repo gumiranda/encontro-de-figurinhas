@@ -12,7 +12,8 @@
     "dev:local": "pnpm env:dev && turbo dev",
     "dev:prod": "pnpm env:prod && turbo dev",
     "backend:dev": "pnpm --filter @workspace/backend dev:env-dev",
-    "backend:prod": "pnpm --filter @workspace/backend dev:env-prod"
+    "backend:prod": "pnpm --filter @workspace/backend dev:env-prod",
+    "seed:convex": "pnpm --filter @workspace/backend seed:convex"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

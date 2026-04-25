@@ -140,6 +140,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${BASE_URL}/raras`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE_URL}/pontos`,
       lastModified: now,
       changeFrequency: "daily",
@@ -198,6 +204,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const rarePages: MetadataRoute.Sitemap = teams.map((slug) => ({
+    url: `${BASE_URL}/raras/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: post.updatedAt ? new Date(post.updatedAt) : now,
@@ -210,6 +223,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...cityPages,
     ...statePages,
     ...teamPages,
+    ...rarePages,
     ...stickerPages,
     ...tradePointPages,
     ...blogPages,

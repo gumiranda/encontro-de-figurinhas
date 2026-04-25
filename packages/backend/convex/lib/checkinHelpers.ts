@@ -20,6 +20,10 @@ export async function getActiveCheckin(
 /**
  * Build denormalized fields for checkin document.
  * Avoids N+1 reads when querying present users at a trade point.
+ *
+ * WRITE-side: source is a user doc. Uses richer fallback chain
+ * (displayNickname → nickname → name → "Colecionador").
+ * Pair with normalizeCheckinDenorm for the read-side.
  */
 export function buildCheckinDenormFields(user: Doc<"users">) {
   return {
@@ -27,6 +31,34 @@ export function buildCheckinDenormFields(user: Doc<"users">) {
       user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador",
     avatarSeed: user.nickname ?? user._id,
     duplicates: user.duplicates ?? [],
+    userMissing: user.missing ?? [],
+    albumCompletionPct: user.albumCompletionPct ?? 0,
+    totalTrades: user.totalTrades ?? 0,
+    isPremium: user.isPremium ?? false,
+    isVerified: user.isVerified ?? false,
+  };
+}
+
+/**
+ * READ-side normalizer: returns the same denorm shape with defaults applied.
+ * Source is a checkin doc (already-denormalized fields), not a user doc.
+ *
+ * `hasProfileData` distinguishes "denorm not yet written" (old checkin from
+ * before the schema extension landed) from "user genuinely has 0% / 0 trades",
+ * so the UI can render `—` vs `0%`.
+ */
+export function normalizeCheckinDenorm(c: Doc<"checkins">) {
+  const hasProfileData = c.albumCompletionPct !== undefined;
+  return {
+    displayNickname: c.displayNickname ?? "Colecionador",
+    avatarSeed: c.avatarSeed ?? c.userId,
+    duplicates: c.duplicates ?? [],
+    userMissing: c.userMissing ?? [],
+    albumCompletionPct: c.albumCompletionPct ?? 0,
+    totalTrades: c.totalTrades ?? 0,
+    isPremium: c.isPremium ?? false,
+    isVerified: c.isVerified ?? false,
+    hasProfileData,
   };
 }
 

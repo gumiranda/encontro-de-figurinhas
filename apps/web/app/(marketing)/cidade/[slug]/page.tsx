@@ -47,7 +47,7 @@ async function loadCityTopPoints(slug: string) {
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const city = await loadCity(slug);
+  const [city, stats] = await Promise.all([loadCity(slug), loadCityStats(slug)]);
 
   if (!city) {
     return {
@@ -55,7 +55,17 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     };
   }
 
-  return generateCityMetadata(city.name, city.slug, city.state);
+  const isEmpty =
+    !stats || (stats.collectorsCount === 0 && stats.tradePointsCount === 0);
+
+  const base = generateCityMetadata(city.name, city.slug, city.state);
+  if (isEmpty) {
+    return {
+      ...base,
+      robots: { index: false, follow: true },
+    };
+  }
+  return base;
 }
 
 export async function generateStaticParams() {

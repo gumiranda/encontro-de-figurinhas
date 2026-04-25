@@ -44,6 +44,9 @@ export default defineSchema({
     pendingSubmissionsCount: v.number(),
     lastSubmissionAt: v.optional(v.number()),
     totalTrades: v.optional(v.number()),
+    isVerified: v.optional(v.boolean()),
+    ratingAvg: v.optional(v.number()),
+    ratingCount: v.optional(v.number()),
     isShadowBanned: v.optional(v.boolean()),
     isBanned: v.optional(v.boolean()),
 
@@ -205,6 +208,11 @@ export default defineSchema({
     displayNickname: v.optional(v.string()),
     avatarSeed: v.optional(v.string()),
     duplicates: v.optional(v.array(v.number())),
+    userMissing: v.optional(v.array(v.number())),
+    albumCompletionPct: v.optional(v.number()),
+    totalTrades: v.optional(v.number()),
+    isPremium: v.optional(v.boolean()),
+    isVerified: v.optional(v.boolean()),
   })
     .index("by_tradePoint_active", ["tradePointId", "expiresAt"])
     .index("by_user", ["userId"])

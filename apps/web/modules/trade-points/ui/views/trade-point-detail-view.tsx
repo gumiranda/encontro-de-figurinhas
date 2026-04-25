@@ -400,12 +400,13 @@ export function TradePointDetailView({ tradePointId }: Props) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         <div className="space-y-6 md:col-span-8">
           <PointLifecycleCard />
+          <PresentMatchesSection
+            tradePointId={point._id}
+            whatsappHref={whatsapp.state === "ok" ? whatsapp.link : null}
+          />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start xl:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] xl:gap-6">
             <PeakHoursChart peakHours={stablePeakHours} />
-            <div className="min-w-0 space-y-4">
-              <PresentMatchesSection tradePointId={point._id} />
-              <MatchesSection tradePointId={point._id} />
-            </div>
+            <MatchesSection tradePointId={point._id} />
           </div>
           <PointStatsStrip
             confidenceScore={point.confidenceScore}

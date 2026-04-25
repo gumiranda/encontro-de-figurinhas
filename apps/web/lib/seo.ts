@@ -1036,6 +1036,77 @@ export function generateSoftwareApplicationSchema() {
   };
 }
 
+export function generateRareMetadata(
+  teamName: string,
+  teamSlug: string,
+  flagEmoji: string,
+  legendCount: number,
+  goldenCount: number
+): Metadata {
+  const total = legendCount + goldenCount;
+  const title = `Figurinhas Raras ${teamName} ${flagEmoji} Copa 2026 | ${SITE_NAME}`;
+  const description = `As ${total} figurinhas raras da ${teamName} no álbum da Copa 2026: ${legendCount} lendas e ${goldenCount} douradas. Veja quais são, raridade e como trocar.`;
+  return {
+    title,
+    description,
+    keywords: [
+      `figurinhas raras ${teamName}`,
+      `figurinhas raras ${teamName} copa 2026`,
+      `figurinhas douradas ${teamName}`,
+      `lendas ${teamName} copa 2026`,
+      `troca figurinhas raras ${teamName}`,
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/raras/${teamSlug}`,
+      type: "website",
+    },
+    twitter: { title, description },
+    alternates: { canonical: `${BASE_URL}/raras/${teamSlug}` },
+  };
+}
+
+export function generateRareCollectionSchema(
+  teamName: string,
+  teamSlug: string,
+  legendNames: string[],
+  goldenCount: number
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Figurinhas Raras ${teamName} - Copa 2026`,
+    description: `Coleção das figurinhas raras (lendas e douradas) da seleção ${teamName} no álbum da Copa do Mundo 2026.`,
+    url: `${BASE_URL}/raras/${teamSlug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    about: {
+      "@type": "SportsTeam",
+      name: `Seleção ${teamName}`,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: legendNames.length + goldenCount,
+      itemListElement: [
+        ...legendNames.map((name, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: `Lenda: ${name}`,
+        })),
+        ...Array.from({ length: goldenCount }).map((_, i) => ({
+          "@type": "ListItem",
+          position: legendNames.length + i + 1,
+          name: `Figurinha Dourada ${i + 1}`,
+        })),
+      ],
+    },
+  };
+}
+
 // QAPage schema for AEO (alternative to FAQPage)
 export function generateQAPageSchema(
   questions: Array<{

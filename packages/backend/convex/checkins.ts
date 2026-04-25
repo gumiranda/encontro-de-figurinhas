@@ -8,6 +8,7 @@ import {
   arraysEqual,
   buildCheckinDenormFields,
   getActiveCheckin,
+  normalizeCheckinDenorm,
 } from "./lib/checkinHelpers";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
@@ -602,6 +603,24 @@ export const backfillCheckinDenormFields = internalMutation({
 const PRESENT_MATCHES_CAP = 50;
 const STICKER_SAMPLE_LIMIT = 20;
 
+const matchRowValidator = v.object({
+  checkinId: v.id("checkins"),
+  userId: v.id("users"),
+  displayNickname: v.string(),
+  avatarSeed: v.string(),
+  checkinAt: v.number(),
+  distanceMeters: v.number(),
+  matchingStickers: v.array(v.number()),
+  totalMatches: v.number(),
+  myMatchingStickers: v.array(v.number()),
+  myMatchingTotal: v.number(),
+  albumCompletionPct: v.number(),
+  totalTrades: v.number(),
+  isPremium: v.boolean(),
+  isVerified: v.boolean(),
+  hasProfileData: v.boolean(),
+});
+
 const listPresentMatchesReturn = v.union(
   v.object({ state: v.literal("needs-auth") }),
   v.object({ state: v.literal("banned") }),
@@ -610,17 +629,9 @@ const listPresentMatchesReturn = v.union(
   v.object({ state: v.literal("not-found") }),
   v.object({
     state: v.literal("ready"),
-    matches: v.array(
-      v.object({
-        checkinId: v.id("checkins"),
-        displayNickname: v.string(),
-        avatarSeed: v.string(),
-        checkinAt: v.number(),
-        matchingStickers: v.array(v.number()),
-        totalMatches: v.number(),
-      })
-    ),
+    matches: v.array(matchRowValidator),
     truncated: v.boolean(),
+    myMissingCount: v.number(),
   })
 );
 
@@ -659,6 +670,7 @@ export const listPresentMatchesAtPoint = query({
     }
 
     const myMissingSet = new Set(myMissing);
+    const myDupSet = new Set(user.duplicates ?? []);
     const now = Date.now();
 
     const checkins = await ctx.db
@@ -673,30 +685,58 @@ export const listPresentMatchesAtPoint = query({
 
     const truncated = checkins.length === PRESENT_MATCHES_CAP;
 
-    const matchRows: {
+    type MatchRow = {
       checkinId: Id<"checkins">;
+      userId: Id<"users">;
       displayNickname: string;
       avatarSeed: string;
       checkinAt: number;
+      distanceMeters: number;
       matchingStickers: number[];
       totalMatches: number;
-    }[] = [];
+      myMatchingStickers: number[];
+      myMatchingTotal: number;
+      albumCompletionPct: number;
+      totalTrades: number;
+      isPremium: boolean;
+      isVerified: boolean;
+      hasProfileData: boolean;
+    };
+
+    const matchRows: MatchRow[] = [];
 
     for (const c of checkins) {
       if (c.userId === user._id) continue;
 
-      const theirDuplicates = c.duplicates ?? [];
-      const matching = theirDuplicates.filter((n) => myMissingSet.has(n));
-
+      const norm = normalizeCheckinDenorm(c);
+      const matching = norm.duplicates.filter((n) => myMissingSet.has(n));
       if (matching.length === 0) continue;
+
+      // Reverse direction: my dups ∩ their missing.
+      // Set on the smaller-iteration side (myDupSet via for-of).
+      // userMissing stays server-internal — never emitted in matchRowValidator.
+      const theirMissingSet = new Set(norm.userMissing);
+      const myMatching: number[] = [];
+      for (const n of myDupSet) {
+        if (theirMissingSet.has(n)) myMatching.push(n);
+      }
 
       matchRows.push({
         checkinId: c._id,
-        displayNickname: c.displayNickname ?? "Colecionador",
-        avatarSeed: c.avatarSeed ?? c.userId,
+        userId: c.userId,
+        displayNickname: norm.displayNickname,
+        avatarSeed: norm.avatarSeed,
         checkinAt: c.createdAt,
+        distanceMeters: c.distanceMeters,
         matchingStickers: matching.slice(0, STICKER_SAMPLE_LIMIT),
         totalMatches: matching.length,
+        myMatchingStickers: myMatching.slice(0, STICKER_SAMPLE_LIMIT),
+        myMatchingTotal: myMatching.length,
+        albumCompletionPct: norm.albumCompletionPct,
+        totalTrades: norm.totalTrades,
+        isPremium: norm.isPremium,
+        isVerified: norm.isVerified,
+        hasProfileData: norm.hasProfileData,
       });
     }
 
@@ -711,6 +751,7 @@ export const listPresentMatchesAtPoint = query({
       state: "ready" as const,
       matches: matchRows,
       truncated,
+      myMissingCount: myMissing.length,
     };
   },
 });

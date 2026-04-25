@@ -256,9 +256,21 @@ export default async function TeamPage({ params }: TeamPageProps) {
                         {i < section.legendNumbers.length - 1 ? ", " : "."}
                       </span>
                     ))}{" "}
-                    Essas figurinhas são especialmente valorizadas pelos colecionadores.
+                    Essas figurinhas são especialmente valorizadas pelos colecionadores.{" "}
+                    <Link href={`/raras/${section.slug}`} className="text-primary hover:underline">
+                      Ver todas as figurinhas raras da {section.name}
+                    </Link>
+                    .
                   </p>
                 </>
+              )}
+              {!hasLegends && hasGolden && (
+                <p>
+                  <Link href={`/raras/${section.slug}`} className="text-primary hover:underline">
+                    Ver as figurinhas douradas da {section.name}
+                  </Link>
+                  .
+                </p>
               )}
 
               <h3>Como trocar figurinhas da {section.name}</h3>
