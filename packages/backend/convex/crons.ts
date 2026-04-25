@@ -45,4 +45,11 @@ crons.cron(
   {}
 );
 
+crons.cron(
+  "cleanup orphan cover storage",
+  "0 2 * * *",
+  internal.tradePoints.cleanupOrphanCoverStorage,
+  {}
+);
+
 export default crons;

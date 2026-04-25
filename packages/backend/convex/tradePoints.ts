@@ -7,6 +7,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import {
   checkAuth,
   getAuthenticatedUser,
@@ -825,6 +826,58 @@ export const reconcileActiveCheckinsCount = internalMutation({
     }
 
     return { processed: page.page.length, drifts, rescheduled: false };
+  },
+});
+
+const ORPHAN_STORAGE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const ORPHAN_STORAGE_BATCH = 100;
+const ORPHAN_STORAGE_MAX_CHUNKS = 200;
+
+export const cleanupOrphanCoverStorage = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    chunk: v.optional(v.number()),
+    refsBuilt: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const cutoff = Date.now() - ORPHAN_STORAGE_TTL_MS;
+
+    const referenced = new Set<string>();
+    const tradePointsAll = await ctx.db.query("tradePoints").take(50_000);
+    for (const p of tradePointsAll) {
+      if (p.coverImageStorageId) referenced.add(p.coverImageStorageId);
+    }
+    const usersAll = await ctx.db.query("users").take(50_000);
+    for (const u of usersAll) {
+      if (u.avatarStorageId) referenced.add(u.avatarStorageId);
+    }
+
+    const page = await ctx.db.system
+      .query("_storage")
+      .paginate({ numItems: ORPHAN_STORAGE_BATCH, cursor: cursor ?? null });
+
+    let deleted = 0;
+    for (const entry of page.page) {
+      if (entry._creationTime > cutoff) continue;
+      if (referenced.has(entry._id)) continue;
+      await ctx.storage.delete(entry._id);
+      deleted += 1;
+    }
+
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.tradePoints.cleanupOrphanCoverStorage,
+      args: { cursor: page.continueCursor },
+      hasMore: !page.isDone,
+      chunk,
+      maxChunks: ORPHAN_STORAGE_MAX_CHUNKS,
+      label: "cleanupOrphanCoverStorage",
+    });
+
+    return {
+      deleted,
+      done: page.isDone,
+      aborted: tail.aborted ?? false,
+    };
   },
 });
 

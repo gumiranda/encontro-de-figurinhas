@@ -4,6 +4,12 @@ import { convexServer, api } from "@/lib/convex-server";
 
 const BASE_URL = "https://figurinhafacil.com.br";
 
+function getSsgSecret(): string {
+  const secret = process.env.SSG_SECRET;
+  if (!secret) throw new Error("SSG_SECRET not configured");
+  return secret;
+}
+
 async function loadCitiesForSitemap() {
   "use cache";
   cacheTag("sitemap");
@@ -23,6 +29,7 @@ async function loadTradePointsForSitemap() {
       continueCursor: string | null;
       isDone: boolean;
     } = await convexServer.query(api.tradePoints.listApprovedForSitemapPage, {
+      secret: getSsgSecret(),
       cursor,
       pageSize: 5000,
     });
