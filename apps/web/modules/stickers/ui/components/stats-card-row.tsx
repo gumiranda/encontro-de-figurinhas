@@ -1,15 +1,26 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
+
+export type StatDescriptionTone = "warning" | "success" | "muted";
 
 export interface StatConfig {
   label: string;
   value: number;
   tone: "secondary" | "primary" | "tertiary" | "outline";
   description?: string;
+  descriptionIcon?: LucideIcon;
+  descriptionTone?: StatDescriptionTone;
   isHighlighted?: boolean;
 }
+
+const DESCRIPTION_TONE_CLASS: Record<StatDescriptionTone, string> = {
+  warning: "text-tertiary",
+  success: "text-secondary",
+  muted: "text-on-surface-variant",
+};
 
 export interface StatsCardRowProps {
   stats: StatConfig[];
@@ -66,30 +77,48 @@ export function StatsCardRow({
         className
       )}
     >
-      {stats.map(({ label, value, tone, description, isHighlighted }) => (
-        <div
-          key={label}
-          className={cn(
-            "rounded-2xl border border-outline-variant/40 bg-surface-container p-4",
-            isHighlighted && "border-secondary/25 bg-gradient-to-br from-secondary/10 to-secondary/2"
-          )}
-        >
-          <p
+      {stats.map(
+        ({
+          label,
+          value,
+          tone,
+          description,
+          descriptionIcon: DescIcon,
+          descriptionTone = "muted",
+          isHighlighted,
+        }) => (
+          <div
+            key={label}
             className={cn(
-              "font-headline text-[26px] font-black leading-none tabular-nums",
-              TONE_CLASS[tone]
+              "rounded-2xl border border-outline-variant/40 bg-surface-container p-4",
+              isHighlighted && "border-secondary/25 bg-gradient-to-br from-secondary/10 to-secondary/2"
             )}
           >
-            {value}
-          </p>
-          <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
-            {label}
-          </p>
-          {description && (
-            <p className="mt-1 text-xs text-on-surface-variant">{description}</p>
-          )}
-        </div>
-      ))}
+            <p className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+              {label}
+            </p>
+            <p
+              className={cn(
+                "mt-2 font-headline text-[32px] font-black leading-none tabular-nums",
+                TONE_CLASS[tone]
+              )}
+            >
+              {value}
+            </p>
+            {description && (
+              <p
+                className={cn(
+                  "mt-2 inline-flex items-center gap-1 text-xs",
+                  DESCRIPTION_TONE_CLASS[descriptionTone]
+                )}
+              >
+                {DescIcon && <DescIcon className="size-3" aria-hidden />}
+                {description}
+              </p>
+            )}
+          </div>
+        )
+      )}
     </div>
   );
 }

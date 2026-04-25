@@ -2,11 +2,15 @@
 
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import {
+  CheckCircle2,
+  Clock,
   Filter as FilterIcon,
   Inbox,
+  MapPin,
   Plus,
   Search,
   SlidersHorizontal,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -92,6 +96,32 @@ function groupTrades(trades: ListMyTradeRow[]): Groups {
   return g;
 }
 
+const MONTH_ABBR = [
+  "jan", "fev", "mar", "abr", "mai", "jun",
+  "jul", "ago", "set", "out", "nov", "dez",
+];
+
+function expiringTodayCount(urgent: ListMyTradeRow[]): number {
+  const cutoff = Date.now() + 24 * 60 * 60 * 1000;
+  return urgent.filter((t) => t.expiresAt <= cutoff).length;
+}
+
+function weeklyEnviadasDelta(sent: ListMyTradeRow[]): number {
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return sent.filter((t) => t.createdAt >= cutoff).length;
+}
+
+function firstTradeMonthLabel(list: ListMyTradeRow[]): string | null {
+  const stamps = list
+    .filter((t): t is ListMyTradeRow & { confirmedAt: number } =>
+      t.status === "confirmed" && typeof t.confirmedAt === "number"
+    )
+    .map((t) => t.confirmedAt);
+  if (stamps.length === 0) return null;
+  const d = new Date(Math.min(...stamps));
+  return `desde ${MONTH_ABBR[d.getMonth()]}/${d.getFullYear()}`;
+}
+
 function matchesSearch(trade: ListMyTradeRow, query: string): boolean {
   if (!query.trim()) return true;
   const needle = query.toLowerCase();
@@ -141,8 +171,6 @@ export function PropostasPageView() {
         Date.now() - t.confirmedAt < ACCEPTANCE_WINDOW_MS
     ).length;
     const totalReceived = groups.urgent.length + groups.unread.length;
-    const totalActive =
-      totalReceived + groups.sent.length + groups.scheduled.length;
     const acceptanceTotal = list.filter(
       (t) =>
         (t.status === "confirmed" || t.status === "expired") &&
@@ -152,34 +180,46 @@ export function PropostasPageView() {
       acceptanceTotal > 0
         ? Math.round((acceptedThisMonth / acceptanceTotal) * 100)
         : null;
+    const expiringToday = expiringTodayCount(groups.urgent);
+    const weeklyDelta = weeklyEnviadasDelta(groups.sent);
+    const firstMonth = firstTradeMonthLabel(list);
     return [
       {
         label: "Aguardando você",
         value: totalReceived,
         tone: "tertiary",
         description:
-          groups.urgent.length > 0
-            ? `${groups.urgent.length} expiram em breve`
-            : "Sem urgências",
-        isHighlighted: groups.urgent.length > 0,
+          expiringToday > 0
+            ? `${expiringToday} expiram hoje`
+            : undefined,
+        descriptionIcon: expiringToday > 0 ? Clock : undefined,
+        descriptionTone: "warning",
+        isHighlighted: expiringToday > 0,
       },
       {
         label: "Enviadas",
         value: groups.sent.length,
         tone: "primary",
-        description: totalActive > 0 ? `${totalActive} ativas` : undefined,
+        description:
+          weeklyDelta > 0 ? `+${weeklyDelta} esta semana` : undefined,
+        descriptionIcon: weeklyDelta > 0 ? TrendingUp : undefined,
+        descriptionTone: "success",
       },
       {
-        label: "Aceitas (30d)",
+        label: "Aceitas (mês)",
         value: acceptedThisMonth,
         tone: "secondary",
         description:
           acceptanceRate !== null ? `${acceptanceRate}% taxa` : undefined,
+        descriptionIcon: acceptanceRate !== null ? CheckCircle2 : undefined,
+        descriptionTone: "success",
       },
       {
-        label: "Trocas totais",
+        label: "Figurinhas trocadas",
         value: list.filter((t) => t.status === "confirmed").length,
         tone: "outline",
+        description: firstMonth ?? undefined,
+        descriptionTone: "muted",
       },
     ];
   }, [trades, groups]);
@@ -234,11 +274,19 @@ export function PropostasPageView() {
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 text-xs uppercase tracking-wide"
+          >
             <SlidersHorizontal className="size-4" />
             Filtros
           </Button>
-          <Button asChild size="sm" className="gap-2">
+          <Button
+            asChild
+            size="sm"
+            className="gap-2 text-xs uppercase tracking-wide"
+          >
             <Link href="/matches">
               <Plus className="size-4" />
               Nova proposta
@@ -285,9 +333,23 @@ export function PropostasPageView() {
             className="pl-9"
           />
         </div>
-        <Button variant="outline" size="sm" className="gap-1.5" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={comingSoon("Ordenação")}
+        >
           <FilterIcon className="size-3.5" />
           Mais recentes
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={() => toast.message("Filtro de regiões em breve.")}
+        >
+          <MapPin className="size-3.5" />
+          Todas regiões
         </Button>
         <span className="ml-auto text-xs text-on-surface-variant">
           {visibleCount} {visibleCount === 1 ? "proposta" : "propostas"}

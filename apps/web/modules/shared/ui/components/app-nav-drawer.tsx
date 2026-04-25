@@ -132,17 +132,22 @@ interface SidebarContentProps {
 export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarContentProps) {
   return (
     <>
-      <div className="p-6">
-        <h1 className="font-[var(--font-headline)] text-xl font-bold tracking-tight">
-          Figurinha Fácil
-        </h1>
+      <div className="flex items-center gap-2 px-6 py-5">
+        <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground font-headline text-sm font-black">
+          FF
+        </div>
+        <span className="font-headline text-base font-bold tracking-tight">
+          figurinhafácil
+        </span>
       </div>
       <nav className="space-y-6 px-4">
-        {groups.map((group) => (
-          <div key={group.title} className="space-y-1">
-            <p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-muted-foreground">
-              {group.title}
-            </p>
+        {groups.map((group, groupIndex) => (
+          <div key={group.title || `group-${groupIndex}`} className="space-y-1">
+            {group.title && (
+              <p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-muted-foreground">
+                {group.title}
+              </p>
+            )}
             {group.items.map((item) => {
               const Icon = item.icon;
               const isActive =
