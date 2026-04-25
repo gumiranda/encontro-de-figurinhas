@@ -43,6 +43,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/perfil": "Perfil",
   "/ajustes": "Ajustes",
   "/meus-pontos": "Meus pontos",
+  "/cadastrar-figurinhas/quick": "Adicionar figurinhas",
 };
 
 function titleCase(segment: string): string {
