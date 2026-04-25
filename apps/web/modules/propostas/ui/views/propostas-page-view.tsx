@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { api } from "@workspace/backend/_generated/api";
 import type { ListMyTradeRow } from "@workspace/backend/convex/trades";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
@@ -35,60 +34,74 @@ import { PropostasEmptyState } from "../components/propostas-empty-state";
 
 const URGENT_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 const SCHEDULED_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+const ACCEPTANCE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
+type SectionKey = "urgent" | "unread" | "scheduled" | "sent" | "history";
 type TabValue = "recebidas" | "enviadas" | "em-andamento" | "historico";
 
-const TABS: { value: TabValue; label: string }[] = [
-  { value: "recebidas", label: "Recebidas" },
-  { value: "enviadas", label: "Enviadas" },
-  { value: "em-andamento", label: "Em andamento" },
-  { value: "historico", label: "Histórico" },
-];
-
-type GroupedTrades = {
-  urgent: ListMyTradeRow[];
-  unread: ListMyTradeRow[];
-  scheduled: ListMyTradeRow[];
-  sent: ListMyTradeRow[];
-  history: ListMyTradeRow[];
+type SectionDef = {
+  key: SectionKey;
+  title: string;
+  tone: "error" | "tertiary" | "secondary" | "primary" | "outline";
+  tabs: TabValue[];
 };
 
-function groupTrades(trades: ListMyTradeRow[]): GroupedTrades {
+const SECTIONS: SectionDef[] = [
+  { key: "urgent", title: "Expira em breve", tone: "error", tabs: ["recebidas"] },
+  { key: "unread", title: "Novas para responder", tone: "tertiary", tabs: ["recebidas"] },
+  { key: "scheduled", title: "Aceitas — combinar encontro", tone: "secondary", tabs: ["em-andamento"] },
+  { key: "sent", title: "Enviadas por você — aguardando", tone: "primary", tabs: ["enviadas"] },
+  { key: "history", title: "Histórico", tone: "outline", tabs: ["historico"] },
+];
+
+const TABS: { value: TabValue; label: string; sections: SectionKey[] }[] = [
+  { value: "recebidas", label: "Recebidas", sections: ["urgent", "unread"] },
+  { value: "enviadas", label: "Enviadas", sections: ["sent"] },
+  { value: "em-andamento", label: "Em andamento", sections: ["scheduled"] },
+  { value: "historico", label: "Histórico", sections: ["history"] },
+];
+
+type Groups = Record<SectionKey, ListMyTradeRow[]>;
+const EMPTY_GROUPS = (): Groups => ({
+  urgent: [],
+  unread: [],
+  scheduled: [],
+  sent: [],
+  history: [],
+});
+
+function groupTrades(trades: ListMyTradeRow[]): Groups {
   const now = Date.now();
-  const groups: GroupedTrades = {
-    urgent: [],
-    unread: [],
-    scheduled: [],
-    sent: [],
-    history: [],
-  };
+  const g = EMPTY_GROUPS();
   for (const t of trades) {
     if (t.status === "pending_confirmation" && t.role === "incoming") {
-      if (t.expiresAt - now < URGENT_THRESHOLD_MS) groups.urgent.push(t);
-      else groups.unread.push(t);
+      (t.expiresAt - now < URGENT_THRESHOLD_MS ? g.urgent : g.unread).push(t);
     } else if (
       t.status === "confirmed" &&
       t.confirmedAt &&
       now - t.confirmedAt < SCHEDULED_WINDOW_MS
     ) {
-      groups.scheduled.push(t);
+      g.scheduled.push(t);
     } else if (t.status === "pending_confirmation" && t.role === "outgoing") {
-      groups.sent.push(t);
+      g.sent.push(t);
     } else {
-      groups.history.push(t);
+      g.history.push(t);
     }
   }
-  return groups;
+  return g;
 }
 
 function matchesSearch(trade: ListMyTradeRow, query: string): boolean {
   if (!query.trim()) return true;
   const needle = query.toLowerCase();
-  if (trade.counterparty.name.toLowerCase().includes(needle)) return true;
-  if (trade.counterparty.nickname?.toLowerCase().includes(needle)) return true;
-  if (trade.tradePoint?.name.toLowerCase().includes(needle)) return true;
-  const stickers = [...trade.stickersIGive, ...trade.stickersIReceive];
-  return stickers.some((n) => String(n).includes(needle));
+  return (
+    trade.counterparty.name.toLowerCase().includes(needle) ||
+    (trade.counterparty.nickname?.toLowerCase().includes(needle) ?? false) ||
+    (trade.tradePoint?.name.toLowerCase().includes(needle) ?? false) ||
+    [...trade.stickersIGive, ...trade.stickersIReceive].some((n) =>
+      String(n).includes(needle)
+    )
+  );
 }
 
 export function PropostasPageView() {
@@ -105,23 +118,30 @@ export function PropostasPageView() {
   const cancelTrade = useMutation(api.trades.cancel);
   const declineTrade = useMutation(api.trades.decline);
 
-  const groups = useMemo(
-    () => groupTrades(trades ?? []),
-    [trades]
-  );
+  const groups = useMemo(() => groupTrades(trades ?? []), [trades]);
+
+  const filteredGroups = useMemo<Groups>(() => {
+    const out = EMPTY_GROUPS();
+    const activeSections =
+      TABS.find((t) => t.value === tab)?.sections ?? [];
+    for (const key of activeSections) {
+      out[key] = groups[key].filter((t) => matchesSearch(t, search));
+    }
+    return out;
+  }, [groups, tab, search]);
 
   const stats: StatConfig[] = useMemo(() => {
-    const acceptedThisMonth = (trades ?? []).filter(
+    const list = trades ?? [];
+    const acceptedThisMonth = list.filter(
       (t) =>
         t.status === "confirmed" &&
         t.confirmedAt &&
-        Date.now() - t.confirmedAt < 30 * 24 * 60 * 60 * 1000
+        Date.now() - t.confirmedAt < ACCEPTANCE_WINDOW_MS
     ).length;
     const totalReceived = groups.urgent.length + groups.unread.length;
-    const expiringToday = groups.urgent.length;
     const totalActive =
       totalReceived + groups.sent.length + groups.scheduled.length;
-    const acceptanceTotal = (trades ?? []).filter(
+    const acceptanceTotal = list.filter(
       (t) =>
         (t.status === "confirmed" || t.status === "expired") &&
         t.role === "incoming"
@@ -136,10 +156,10 @@ export function PropostasPageView() {
         value: totalReceived,
         tone: "tertiary",
         description:
-          expiringToday > 0
-            ? `${expiringToday} expiram em breve`
+          groups.urgent.length > 0
+            ? `${groups.urgent.length} expiram em breve`
             : "Sem urgências",
-        isHighlighted: expiringToday > 0,
+        isHighlighted: groups.urgent.length > 0,
       },
       {
         label: "Enviadas",
@@ -156,78 +176,47 @@ export function PropostasPageView() {
       },
       {
         label: "Trocas totais",
-        value: (trades ?? []).filter((t) => t.status === "confirmed").length,
+        value: list.filter((t) => t.status === "confirmed").length,
         tone: "outline",
       },
     ];
   }, [trades, groups]);
 
-  const tabCounts: Record<TabValue, number> = {
-    recebidas: groups.urgent.length + groups.unread.length,
-    enviadas: groups.sent.length,
-    "em-andamento": groups.scheduled.length,
-    historico: groups.history.length,
-  };
-
-  const filteredGroups = useMemo<Partial<GroupedTrades>>(() => {
-    const apply = (rows: ListMyTradeRow[]) =>
-      rows.filter((t) => matchesSearch(t, search));
-    switch (tab) {
-      case "recebidas":
-        return {
-          urgent: apply(groups.urgent),
-          unread: apply(groups.unread),
-        };
-      case "enviadas":
-        return { sent: apply(groups.sent) };
-      case "em-andamento":
-        return { scheduled: apply(groups.scheduled) };
-      case "historico":
-        return { history: apply(groups.history) };
-    }
-  }, [groups, tab, search]);
-
-  const visibleCount = Object.values(filteredGroups)
-    .filter(Boolean)
-    .reduce((acc, list) => acc + (list?.length ?? 0), 0);
-
   if (trades === undefined) return <PropostasPageSkeleton />;
 
+  const visibleCount = SECTIONS.reduce(
+    (acc, s) => acc + filteredGroups[s.key].length,
+    0
+  );
   const hasAnyTrade = trades.length > 0;
 
-  const handleAccept = async (id: ListMyTradeRow["_id"]) => {
+  const callMutation = async (
+    mut: (a: { tradeId: ListMyTradeRow["_id"] }) => Promise<unknown>,
+    id: ListMyTradeRow["_id"],
+    success: string,
+    failure: string
+  ) => {
     try {
-      await confirmTrade({ tradeId: id });
-      toast.success("Proposta aceita. Combine o encontro pelo chat.");
+      await mut({ tradeId: id });
+      toast.success(success);
     } catch (err) {
-      toast.error("Não foi possível aceitar agora.");
+      toast.error(failure);
       console.error(err);
     }
   };
-  const handleDecline = async (id: ListMyTradeRow["_id"]) => {
-    try {
-      await declineTrade({ tradeId: id });
-      toast.success("Proposta recusada.");
-    } catch (err) {
-      toast.error("Não foi possível recusar agora.");
-      console.error(err);
-    }
-  };
-  const handleCancel = async (id: ListMyTradeRow["_id"]) => {
-    try {
-      await cancelTrade({ tradeId: id });
-      toast.success("Proposta cancelada.");
-    } catch (err) {
-      toast.error("Não foi possível cancelar agora.");
-      console.error(err);
-    }
-  };
-  const handleMessage = () => {
-    toast.message("Chat em breve.");
-  };
-  const handleView = () => {
-    toast.message("Detalhes em breve.");
-  };
+
+  const handleAccept = (id: ListMyTradeRow["_id"]) =>
+    callMutation(
+      confirmTrade,
+      id,
+      "Proposta aceita. Combine o encontro pelo chat.",
+      "Não foi possível aceitar agora."
+    );
+  const handleDecline = (id: ListMyTradeRow["_id"]) =>
+    callMutation(declineTrade, id, "Proposta recusada.", "Não foi possível recusar agora.");
+  const handleCancel = (id: ListMyTradeRow["_id"]) =>
+    callMutation(cancelTrade, id, "Proposta cancelada.", "Não foi possível cancelar agora.");
+  const comingSoon = (label: string) => () => toast.message(`${label} em breve.`);
 
   return (
     <div className="space-y-6">
@@ -259,21 +248,27 @@ export function PropostasPageView() {
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
         <TabsList className="bg-surface-container-low">
-          {TABS.map(({ value, label }) => (
-            <TabsTrigger key={value} value={value} className="gap-2">
-              {label}
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 font-mono text-[10px] font-bold",
-                  tab === value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-surface-container-highest text-on-surface-variant"
-                )}
-              >
-                {tabCounts[value]}
-              </span>
-            </TabsTrigger>
-          ))}
+          {TABS.map(({ value, label, sections }) => {
+            const count = sections.reduce(
+              (acc, k) => acc + groups[k].length,
+              0
+            );
+            return (
+              <TabsTrigger key={value} value={value} className="gap-2">
+                {label}
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 font-mono text-[10px] font-bold",
+                    tab === value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-surface-container-highest text-on-surface-variant"
+                  )}
+                >
+                  {count}
+                </span>
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
       </Tabs>
 
@@ -315,87 +310,31 @@ export function PropostasPageView() {
       )}
 
       <div className="space-y-3">
-        {filteredGroups.urgent && filteredGroups.urgent.length > 0 && (
-          <Section
-            title="Expira em breve"
-            tone="error"
-            count={filteredGroups.urgent.length}
-          >
-            {filteredGroups.urgent.map((t) => (
-              <ProposalCard
-                key={t._id}
-                trade={t}
-                section="urgent"
-                onAccept={handleAccept}
-                onDecline={handleDecline}
-                onView={handleView}
-              />
-            ))}
-          </Section>
-        )}
-        {filteredGroups.unread && filteredGroups.unread.length > 0 && (
-          <Section
-            title="Novas para responder"
-            tone="tertiary"
-            count={filteredGroups.unread.length}
-          >
-            {filteredGroups.unread.map((t) => (
-              <ProposalCard
-                key={t._id}
-                trade={t}
-                section="unread"
-                onAccept={handleAccept}
-                onDecline={handleDecline}
-                onView={handleView}
-              />
-            ))}
-          </Section>
-        )}
-        {filteredGroups.scheduled && filteredGroups.scheduled.length > 0 && (
-          <Section
-            title="Aceitas — combinar encontro"
-            tone="secondary"
-            count={filteredGroups.scheduled.length}
-          >
-            {filteredGroups.scheduled.map((t) => (
-              <ProposalCard
-                key={t._id}
-                trade={t}
-                section="scheduled"
-                onMessage={handleMessage}
-                onView={handleView}
-              />
-            ))}
-          </Section>
-        )}
-        {filteredGroups.sent && filteredGroups.sent.length > 0 && (
-          <Section
-            title="Enviadas por você — aguardando"
-            tone="primary"
-            count={filteredGroups.sent.length}
-          >
-            {filteredGroups.sent.map((t) => (
-              <ProposalCard
-                key={t._id}
-                trade={t}
-                section="sent"
-                onCancel={handleCancel}
-                onMessage={handleMessage}
-              />
-            ))}
-          </Section>
-        )}
-        {filteredGroups.history && filteredGroups.history.length > 0 && (
-          <Section
-            title="Histórico"
-            tone="outline"
-            count={filteredGroups.history.length}
-          >
-            {filteredGroups.history.map((t) => (
-              <ProposalCard key={t._id} trade={t} section="history" />
-            ))}
-          </Section>
-        )}
+        {SECTIONS.map((s) => {
+          const list = filteredGroups[s.key];
+          if (list.length === 0) return null;
+          return (
+            <Section
+              key={s.key}
+              title={s.title}
+              tone={s.tone}
+              count={list.length}
+            >
+              {list.map((t) => (
+                <ProposalCard
+                  key={t._id}
+                  trade={t}
+                  section={s.key}
+                  onAccept={handleAccept}
+                  onDecline={handleDecline}
+                  onCancel={handleCancel}
+                  onMessage={comingSoon("Chat")}
+                  onView={comingSoon("Detalhes")}
+                />
+              ))}
+            </Section>
+          );
+        })}
       </div>
     </div>
   );
@@ -408,11 +347,11 @@ function Section({
   children,
 }: {
   title: string;
-  tone: "error" | "tertiary" | "secondary" | "primary" | "outline";
+  tone: SectionDef["tone"];
   count: number;
   children: React.ReactNode;
 }) {
-  const toneClass: Record<typeof tone, string> = {
+  const toneClass: Record<SectionDef["tone"], string> = {
     error: "text-error",
     tertiary: "text-tertiary",
     secondary: "text-secondary",
@@ -447,38 +386,11 @@ function PropostasPageSkeleton() {
         <Skeleton className="h-9 w-48" />
         <Skeleton className="mt-2 h-5 w-80" />
       </div>
-      <div className="grid gap-3 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-2xl border border-outline-variant/40 bg-surface-container p-4"
-          >
-            <Skeleton className="h-8 w-16" />
-            <Skeleton className="mt-2 h-3 w-20" />
-          </div>
-        ))}
-      </div>
+      <StatsCardRow stats={[]} loading />
       <Skeleton className="h-10 w-80 rounded-xl" />
       <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <Skeleton className="size-12 rounded-xl" />
-                <div className="flex-1">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="mt-1 h-3 w-24" />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Skeleton className="h-12 w-full rounded-lg" />
-              <div className="flex justify-end gap-2">
-                <Skeleton className="h-8 w-20 rounded-md" />
-                <Skeleton className="h-8 w-24 rounded-md" />
-              </div>
-            </CardContent>
-          </Card>
+          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
         ))}
       </div>
     </div>

@@ -89,11 +89,19 @@ function StickerGridBase({
           }
         );
 
+        const label = `${sectionCode}-${relativeNum}`;
+
         if (state === "blocked") {
           return (
             <Tooltip key={num}>
               <TooltipTrigger asChild>
-                <button type="button" className={buttonClasses} disabled>
+                <button
+                  type="button"
+                  className={buttonClasses}
+                  disabled
+                  aria-label={`Figurinha ${label}, bloqueada`}
+                  title={label}
+                >
                   {relativeNum}
                 </button>
               </TooltipTrigger>
@@ -116,6 +124,8 @@ function StickerGridBase({
             onClick={handleStickerButtonClick}
             className={buttonClasses}
             aria-pressed={state === "duplicate" || state === "missing"}
+            aria-label={`Figurinha ${label}`}
+            title={label}
           >
             {relativeNum}
           </button>

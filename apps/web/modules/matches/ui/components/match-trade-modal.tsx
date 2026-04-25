@@ -19,6 +19,8 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { getRelativeNum } from "@/modules/stickers/lib/sticker-parser";
+
 import { MatchDicebearAvatar } from "./match-dicebear-avatar";
 
 type Fairness = "ok" | "warn" | "none";
@@ -99,11 +101,14 @@ function StickerCard({ sticker, section, selected, onToggle, variant }: StickerC
   const isRare =
     section?.goldenNumbers.includes(sticker.num) ||
     section?.legendNumbers.includes(sticker.num);
+  const relativeNum = section ? getRelativeNum(sticker.num, section) : sticker.num;
+  const displayLabel = section ? `${section.code}-${relativeNum}` : String(sticker.num);
 
   return (
     <button
       type="button"
       onClick={onToggle}
+      aria-label={`Figurinha ${displayLabel}${sticker.qty > 1 ? `, ${sticker.qty} repetidas` : ""}${selected ? ", selecionada" : ""}`}
       className={cn(
         "group relative flex aspect-[3/4] flex-col items-center justify-center rounded-xl border-[1.5px] font-mono text-sm font-semibold transition-all duration-150",
         "hover:-translate-y-0.5 hover:shadow-md",
@@ -132,7 +137,7 @@ function StickerCard({ sticker, section, selected, onToggle, variant }: StickerC
       )}
 
       {/* Number */}
-      <span className="relative mt-2 text-base font-bold text-foreground">{sticker.num}</span>
+      <span className="relative mt-2 text-base font-bold text-foreground">{relativeNum}</span>
 
       {/* Quantity */}
       {sticker.qty > 1 && (

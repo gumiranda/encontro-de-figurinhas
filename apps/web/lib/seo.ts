@@ -327,6 +327,7 @@ export function generateSportsTeamSchema(
 
 export function generateStickerMetadata(
   number: number,
+  displayLabel: string,
   teamName: string,
   flagEmoji: string,
   isGolden: boolean,
@@ -338,22 +339,22 @@ export function generateStickerMetadata(
     : isGolden
       ? " (Dourada)"
       : "";
-  const title = `Figurinha ${number} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
+  const title = `Figurinha ${displayLabel} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
   const description = isLegend
-    ? `Figurinha ${number} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
+    ? `Figurinha ${displayLabel} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
     : isGolden
-      ? `Figurinha dourada ${number} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
-      : `Figurinha ${number} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
+      ? `Figurinha dourada ${displayLabel} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
+      : `Figurinha ${displayLabel} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
 
   return {
     title,
     description,
     keywords: [
-      `figurinha ${number}`,
-      `figurinha ${number} copa 2026`,
-      `figurinha ${teamName} ${number}`,
+      `figurinha ${displayLabel}`,
+      `figurinha ${displayLabel} copa 2026`,
+      `figurinha ${teamName} ${displayLabel}`,
       ...(isLegend && legendName ? [`figurinha ${legendName}`] : []),
-      ...(isGolden ? [`figurinha dourada ${number}`] : []),
+      ...(isGolden ? [`figurinha dourada ${displayLabel}`] : []),
     ],
     openGraph: {
       title,
@@ -373,6 +374,7 @@ export function generateStickerMetadata(
 
 export function generateProductSchema(
   number: number,
+  displayLabel: string,
   teamName: string,
   isGolden: boolean,
   isLegend: boolean,
@@ -387,8 +389,8 @@ export function generateProductSchema(
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: `Figurinha ${number} - ${teamName}${specialLabel}`,
-    description: `Figurinha número ${number} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
+    name: `Figurinha ${displayLabel} - ${teamName}${specialLabel}`,
+    description: `Figurinha ${displayLabel} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
     category: "Figurinhas Colecionáveis",
     brand: {
       "@type": "Brand",

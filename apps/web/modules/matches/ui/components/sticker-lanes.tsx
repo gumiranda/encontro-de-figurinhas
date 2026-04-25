@@ -2,37 +2,13 @@
 
 import { ArrowLeftRight, ArrowRight, ArrowLeft } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { StickerChip } from "@/components/sticker-chip";
 
 interface StickerLanesProps {
   theyHaveINeed: number[];
   iHaveTheyNeed: number[];
   rareNumbers?: Set<number>;
   className?: string;
-}
-
-function StickerNumber({
-  num,
-  isRare,
-  lane,
-}: {
-  num: number;
-  isRare: boolean;
-  lane: "give" | "receive";
-}) {
-  return (
-    <span
-      className={cn(
-        "min-w-7 rounded-lg px-2 py-1 text-center font-mono text-xs font-semibold",
-        isRare
-          ? "border border-tertiary/25 bg-tertiary/15 text-tertiary"
-          : lane === "give"
-            ? "bg-tertiary/10 text-tertiary"
-            : "bg-primary/10 text-primary"
-      )}
-    >
-      {num}
-    </span>
-  );
 }
 
 export function StickerLanes({
@@ -66,7 +42,7 @@ export function StickerLanes({
         <div className="mt-1.5 flex flex-wrap gap-1">
           {iHaveTheyNeed.length > 0 ? (
             iHaveTheyNeed.map((num) => (
-              <StickerNumber key={num} num={num} isRare={rareNumbers.has(num)} lane="give" />
+              <StickerChip key={num} num={num} isRare={rareNumbers.has(num)} variant="give" />
             ))
           ) : (
             <span className="text-xs text-outline">—</span>
@@ -87,7 +63,7 @@ export function StickerLanes({
         <div className="mt-1.5 flex flex-wrap gap-1">
           {theyHaveINeed.length > 0 ? (
             theyHaveINeed.map((num) => (
-              <StickerNumber key={num} num={num} isRare={rareNumbers.has(num)} lane="receive" />
+              <StickerChip key={num} num={num} isRare={rareNumbers.has(num)} variant="receive" />
             ))
           ) : (
             <span className="text-xs text-outline">—</span>

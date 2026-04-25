@@ -24,6 +24,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { useShare } from "@/modules/shared/hooks/use-share";
+import { SectionLookupProvider } from "@/modules/stickers/lib/section-lookup-context";
 import {
   StatsCardRow,
   type StatConfig,
@@ -87,6 +88,7 @@ export function MatchesPageView() {
   const share = useShare();
 
   const findData = useQuery(api.matches.findUserMatches, {});
+  const sectionsQ = useQuery(api.album.getSections, {});
 
   const canLoadMatches =
     findData !== undefined &&
@@ -489,20 +491,22 @@ export function MatchesPageView() {
       )}
 
       {/* Matches grid */}
-      {processedMatches.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {processedMatches.map((match) => {
-            const isFeatured = featuredMatch?.matchedUserId === match.matchedUserId;
-            return (
-              <MatchCard
-                key={`${match.matchedUserId}-${match.tradePointId}-${match.layer}`}
-                match={match}
-                matchPct={match.matchPct}
-                variant={isFeatured ? "featured" : "default"}
-              />
-            );
-          })}
-        </div>
+      {processedMatches.length > 0 && sectionsQ && (
+        <SectionLookupProvider sections={sectionsQ}>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {processedMatches.map((match) => {
+              const isFeatured = featuredMatch?.matchedUserId === match.matchedUserId;
+              return (
+                <MatchCard
+                  key={`${match.matchedUserId}-${match.tradePointId}-${match.layer}`}
+                  match={match}
+                  matchPct={match.matchPct}
+                  variant={isFeatured ? "featured" : "default"}
+                />
+              );
+            })}
+          </div>
+        </SectionLookupProvider>
       )}
 
       {/* Insight CTA */}
