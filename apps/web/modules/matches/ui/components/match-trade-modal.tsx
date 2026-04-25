@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation } from "convex/react";
-import { ArrowRight, ArrowUpRight, ArrowDownLeft, Check, Search, X, Repeat } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ArrowDownLeft, Check, MessageCircle, Search, X, Repeat } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -374,6 +375,100 @@ function ExchangeWidget({ giveCount, receiveCount }: ExchangeWidgetProps) {
   );
 }
 
+const MAX_MESSAGE_LENGTH = 200;
+
+type Preset = { value: string; label: string };
+
+type MessageInputRowProps = {
+  firstName: string;
+  tradePointName: string;
+  message: string;
+  onMessageChange: (msg: string) => void;
+};
+
+function MessageInputRow({ firstName, tradePointName, message, onMessageChange }: MessageInputRowProps) {
+  const presets: Preset[] = useMemo(() => [
+    { value: "Posso hoje", label: "Posso hoje" },
+    {
+      value: tradePointName,
+      label: tradePointName.length > 20 ? `${tradePointName.slice(0, 20)}…` : tradePointName
+    },
+  ], [tradePointName]);
+
+  const isAtLimit = message.length >= MAX_MESSAGE_LENGTH;
+
+  const handlePresetClick = (value: string) => {
+    const newMsg = message ? `${message} ${value}` : value;
+    if (newMsg.length <= MAX_MESSAGE_LENGTH) {
+      onMessageChange(newMsg.trim());
+    }
+  };
+
+  const isPresetIncluded = (value: string) => message.includes(value);
+  const wouldExceedLimit = (value: string) => (message.length + value.length + 1) > MAX_MESSAGE_LENGTH;
+
+  return (
+    <div
+      className="col-span-full mt-4 space-y-2"
+      role="group"
+      aria-labelledby="message-label"
+    >
+      <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-ring">
+        <MessageCircle className="size-4 text-muted-foreground" aria-hidden="true" />
+        <label id="message-label" className="sr-only">
+          Mensagem opcional para {firstName}
+        </label>
+        <Input
+          value={message}
+          onChange={(e) => onMessageChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+          placeholder={`Mensagem opcional para ${firstName}...`}
+          className="flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+          aria-describedby="message-counter"
+        />
+        <span
+          id="message-counter"
+          className={cn(
+            "text-xs tabular-nums transition-colors",
+            isAtLimit ? "text-destructive" : "text-muted-foreground"
+          )}
+          aria-live="polite"
+        >
+          {message.length}/{MAX_MESSAGE_LENGTH}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Mensagens rápidas">
+        {presets.map(({ value, label }) => {
+          const included = isPresetIncluded(value);
+          const exceeds = wouldExceedLimit(value);
+          const disabled = included || exceeds;
+          const ariaLabel = included
+            ? `${label} (já adicionado)`
+            : exceeds
+              ? `${label} (excede limite)`
+              : `Adicionar: ${label}`;
+
+          return (
+            <Button
+              key={value}
+              variant="outline"
+              size="sm"
+              disabled={disabled}
+              onClick={() => handlePresetClick(value)}
+              aria-label={ariaLabel}
+              className={cn(
+                "h-7 max-w-[140px] truncate text-xs",
+                disabled && "opacity-50"
+              )}
+            >
+              {label}
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export type MatchTradeModalProps = {
   matchedUserId: Id<"users">;
   matchedUserNickname: string;
@@ -399,6 +494,13 @@ function MatchTradeModalContent({
   const [stickersIGive, setStickersIGive] = useState<Set<number>>(new Set());
   const [stickersIReceive, setStickersIReceive] = useState<Set<number>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setStickersIGive(new Set());
+    setStickersIReceive(new Set());
+    setMessage("");
+  }, [matchedUserId]);
 
   const data = useQuery(api.matches.getFullStickerOverlap, {
     matchedUserId,
@@ -450,12 +552,13 @@ function MatchTradeModalContent({
         tradePointId,
         stickersIGive: [...stickersIGive],
         stickersIReceive: [...stickersIReceive],
+        message: message.trim() || undefined,
       });
       toast.success("Proposta de troca enviada!");
       onOpenChange(false);
       onSuccess?.();
     } catch (err) {
-      const message =
+      const errorMessage =
         err instanceof Error && err.message.includes("TOO_MANY_PENDING")
           ? "Você já tem muitas trocas pendentes"
           : err instanceof Error && err.message.includes("ALREADY_PENDING")
@@ -466,8 +569,10 @@ function MatchTradeModalContent({
                 ? "Figurinha inválida para esta troca"
                 : err instanceof Error && err.message.includes("STICKERS_CHANGED")
                   ? "Algumas figurinhas já foram trocadas"
-                  : "Erro ao enviar proposta";
-      toast.error(message);
+                  : err instanceof Error && err.message.includes("MESSAGE_TOO_LONG")
+                    ? "Mensagem muito longa"
+                    : "Erro ao enviar proposta";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -498,7 +603,7 @@ function MatchTradeModalContent({
       100
   );
 
-  const firstName = matchedUserNickname.split(" ")[0];
+  const firstName = matchedUserNickname.split(" ")[0] ?? "";
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -529,7 +634,7 @@ function MatchTradeModalContent({
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-5 md:overflow-visible md:p-6">
+      <div className="min-h-0 flex-1 overflow-y-auto p-5 md:p-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr]">
           <StickerColumn
             title="Você oferece"
@@ -553,6 +658,13 @@ function MatchTradeModalContent({
             sections={data.sections}
             sectionMap={sectionMap}
             variant="receive"
+          />
+
+          <MessageInputRow
+            firstName={firstName}
+            tradePointName={data.tradePointName ?? ""}
+            message={message}
+            onMessageChange={setMessage}
           />
         </div>
       </div>
@@ -602,6 +714,7 @@ export function MatchTradeModal({
         className="flex h-full max-h-dvh w-full max-w-[1280px] flex-col overflow-hidden rounded-none border-0 p-0 md:h-auto md:max-h-[min(92vh,880px)] md:rounded-3xl md:border lg:max-w-[1400px]"
         showCloseButton={false}
       >
+        <DialogTitle className="sr-only">Propor troca</DialogTitle>
         {open && (
           <MatchTradeModalContent {...props} onOpenChange={onOpenChange} />
         )}

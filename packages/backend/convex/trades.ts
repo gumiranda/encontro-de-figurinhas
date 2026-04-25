@@ -75,8 +75,9 @@ export const initiate = mutation({
     matchedUserId: v.id("users"),
     stickersIGive: v.array(v.number()),
     stickersIReceive: v.array(v.number()),
-    /** Required when no `precomputedMatches` row exists (e.g. live “present at point” cards). */
+    /** Required when no `precomputedMatches` row exists (e.g. live "present at point" cards). */
     tradePointId: v.optional(v.id("tradePoints")),
+    message: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
@@ -158,6 +159,11 @@ export const initiate = mutation({
 
     const pairKey = [user._id, args.matchedUserId].sort().join("_");
 
+    const sanitizedMessage = args.message?.trim();
+    if (sanitizedMessage && sanitizedMessage.length > 200) {
+      throw new ConvexError("MESSAGE_TOO_LONG");
+    }
+
     const existing = await ctx.db
       .query("trades")
       .withIndex("by_pairKey_status_created", (q) =>
@@ -175,6 +181,7 @@ export const initiate = mutation({
       stickersInitiatorReceived: args.stickersIReceive,
       status: "pending_confirmation",
       createdAt: Date.now(),
+      initiatorMessage: sanitizedMessage || undefined,
     });
 
     await ctx.scheduler.runAfter(TRADE_EXPIRATION_MS, internal.trades.expireTrade, {

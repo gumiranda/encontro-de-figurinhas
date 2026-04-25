@@ -293,6 +293,7 @@ export default defineSchema({
     disputedAt: v.optional(v.number()),
     disputeReason: v.optional(v.string()),
     expiredAt: v.optional(v.number()),
+    initiatorMessage: v.optional(v.string()),
   })
     .index("by_initiator_status", ["initiatorId", "status", "createdAt"])
     .index("by_counterparty_status", ["counterpartyId", "status", "createdAt"])

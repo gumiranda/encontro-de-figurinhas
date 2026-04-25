@@ -817,6 +817,7 @@ export type FullStickerOverlapResult = {
     confirmedTradesCount: number;
     distanceKm: number;
   };
+  tradePointName: string;
 };
 
 export const getFullStickerOverlap = query({
@@ -846,6 +847,7 @@ export const getFullStickerOverlap = query({
         confirmedTradesCount: v.number(),
         distanceKm: v.number(),
       }),
+      tradePointName: v.string(),
     })
   ),
   handler: async (
@@ -947,6 +949,7 @@ export const getFullStickerOverlap = query({
         confirmedTradesCount: matchedUser.totalTrades ?? 0,
         distanceKm,
       },
+      tradePointName: tradePoint.name,
     };
   },
 });
