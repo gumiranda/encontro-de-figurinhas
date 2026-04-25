@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Detalhe da proposta — Figurinha Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<style>
+body { background: var(--bg); min-height:100dvh; font-family: var(--font-body); color: var(--on-surface); }
+.app { display:grid; grid-template-columns: 240px 1fr; min-height:100dvh; }
+
+/* SIDEBAR */
+.sidebar { background: var(--surface-container-low); border-right: 1px solid rgba(255,255,255,.05); padding: 22px 14px; display:flex; flex-direction:column; gap: 4px; position: sticky; top:0; height:100dvh; }
+.brand { display:flex; align-items:center; gap:10px; padding: 4px 10px 18px; }
+.brand .mark { width:32px; height:32px; border-radius:9px; background: linear-gradient(135deg, var(--primary), var(--primary-dim)); display:grid; place-items:center; color: var(--on-primary); font-family: var(--font-headline); font-weight:800; font-size:.95rem; }
+.brand .name { font-family: var(--font-headline); font-weight:800; letter-spacing:-.01em; }
+.nav-item { display:flex; align-items:center; gap:12px; padding: 9px 12px; border-radius: 10px; color: var(--on-surface-variant); text-decoration:none; font-size: .9rem; font-weight:600; cursor:pointer; }
+.nav-item:hover { background: rgba(255,255,255,.03); color: var(--on-surface); }
+.nav-item.active { background: rgba(149,170,255,.1); color: var(--primary); }
+.nav-item .material-symbols-outlined { font-size: 20px; }
+.nav-item .badge { margin-left:auto; padding: 2px 7px; border-radius: 9999px; background: var(--tertiary); color: var(--on-tertiary); font-size: .65rem; font-weight: 800; font-family: 'JetBrains Mono'; }
+.nav-section { font-size: .65rem; color: var(--outline); letter-spacing:.18em; text-transform:uppercase; font-weight:700; padding: 14px 12px 6px; }
+
+/* TOPBAR */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding: 14px 36px; border-bottom: 1px solid rgba(255,255,255,.05); position: sticky; top:0; background: rgba(9,14,28,.85); backdrop-filter: blur(12px); z-index: 5; }
+.crumb { display:flex; align-items:center; gap:8px; font-size: .82rem; color: var(--on-surface-variant); }
+.crumb a { color: var(--on-surface-variant); text-decoration:none; }
+.crumb .sep { opacity:.4; }
+.crumb b { color: var(--on-surface); }
+.tb-right { display:flex; align-items:center; gap: 12px; }
+.icon-btn { width:36px; height:36px; border-radius: 10px; display:grid; place-items:center; background: var(--surface-container); border: 1px solid rgba(255,255,255,.05); color: var(--on-surface-variant); cursor:pointer; }
+.avatar-sm { width:36px; height:36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-dim)); display:grid; place-items:center; color: var(--on-primary); font-family: var(--font-headline); font-weight:800; font-size:.78rem; }
+
+/* MAIN */
+.main { padding: 24px 36px 60px; max-width: 1400px; }
+
+/* HERO */
+.hero { background: linear-gradient(180deg, rgba(255,201,101,.04) 0%, var(--surface-container-low) 100%); border: 1px solid rgba(255,201,101,.12); border-radius: 20px; padding: 22px 26px; margin-bottom: 22px; position: relative; overflow: hidden; }
+.hero::before { content:''; position: absolute; top:0; left:0; bottom:0; width: 4px; background: var(--tertiary); }
+.hero-row { display:grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; }
+.proposer { display:flex; align-items:center; gap: 16px; }
+.proposer .av { width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, var(--tertiary), var(--tertiary-dim)); display:grid; place-items:center; color: var(--on-tertiary); font-family: var(--font-headline); font-weight:800; font-size: 1.4rem; flex-shrink:0; position: relative; }
+.proposer .av .pres { position:absolute; bottom:-3px; right:-3px; width: 16px; height:16px; border-radius:9999px; background: var(--secondary); border: 3px solid var(--surface-container-low); }
+.proposer .who { display:flex; flex-direction:column; gap: 4px; }
+.proposer .label { font-size: .68rem; color: var(--tertiary); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.proposer .name { font-family: var(--font-headline); font-weight: 800; font-size: 1.45rem; letter-spacing:-.02em; display:flex; align-items:center; gap:8px; }
+.proposer .name .verified { color: var(--primary); font-size: 1rem; }
+.proposer .meta { display:flex; align-items:center; gap: 10px; font-size: .82rem; color: var(--on-surface-variant); flex-wrap: wrap; }
+.proposer .meta .d { width: 3px; height: 3px; border-radius: 9999px; background: var(--outline); }
+.proposer .meta b { color: var(--on-surface); font-family: var(--font-headline); font-weight:700; }
+.timer { text-align:right; }
+.timer .lbl { font-size: .68rem; color: var(--tertiary); letter-spacing:.14em; text-transform:uppercase; font-weight: 800; }
+.timer .val { font-family: var(--font-headline); font-weight: 800; font-size: 1.8rem; letter-spacing:-.02em; color: var(--tertiary); display:flex; align-items:center; gap: 8px; justify-content:flex-end; margin-top: 4px; }
+.timer .val .material-symbols-outlined { font-size: 20px; }
+.timer .ts { font-size: .72rem; color: var(--outline); margin-top: 4px; font-family: 'JetBrains Mono'; }
+
+/* TWO COLUMN TRADE */
+.section-title { font-family: var(--font-headline); font-weight: 800; font-size: .9rem; letter-spacing:-.01em; color: var(--on-surface); padding: 0 4px 10px; display:flex; align-items:center; gap: 10px; }
+.section-title::before { content:''; width: 4px; height: 16px; border-radius: 2px; background: var(--primary); }
+.section-title .count { font-size: .7rem; color: var(--outline); font-family: 'JetBrains Mono'; font-weight:600; margin-left: auto; letter-spacing:0; }
+
+.trade-grid { display:grid; grid-template-columns: 1fr 56px 1fr; gap: 16px; margin-bottom: 22px; align-items: stretch; }
+.trade-col { background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.05); border-radius: 18px; padding: 18px; display:flex; flex-direction: column; gap: 14px; }
+.trade-col.give { border-color: rgba(255,201,101,.12); }
+.trade-col.get { border-color: rgba(149,170,255,.12); }
+.trade-col .head { display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+.trade-col .head .left { display:flex; align-items:center; gap: 10px; }
+.dir-ico { width: 38px; height: 38px; border-radius: 11px; display:grid; place-items:center; font-size: 20px; }
+.dir-give { background: rgba(255,201,101,.12); color: var(--tertiary); }
+.dir-get { background: rgba(149,170,255,.12); color: var(--primary); }
+.dir-label { font-family: var(--font-headline); font-weight:800; font-size: 1rem; letter-spacing:-.01em; }
+.dir-sub { font-size: .72rem; color: var(--on-surface-variant); margin-top: 2px; }
+.value-tag { padding: 4px 10px; border-radius: 9999px; font-size: .7rem; font-weight: 700; }
+.value-tag.give { background: rgba(255,201,101,.1); color: var(--tertiary); }
+.value-tag.get { background: rgba(149,170,255,.1); color: var(--primary); }
+
+/* CARDS GRID */
+.cards-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.card-tile { background: var(--surface-container); border: 1.5px solid rgba(255,255,255,.05); border-radius: 14px; padding: 14px; position: relative; transition: all .15s; cursor: pointer; }
+.card-tile:hover { transform: translateY(-2px); border-color: rgba(149,170,255,.2); }
+.card-tile.rare { background: linear-gradient(160deg, rgba(255,201,101,.06) 0%, var(--surface-container) 60%); border-color: rgba(255,201,101,.22); }
+.card-tile.legend { background: linear-gradient(160deg, rgba(255,201,101,.1) 0%, rgba(79,243,37,.05) 100%); border-color: rgba(255,201,101,.35); }
+.card-img { aspect-ratio: 3/4; border-radius: 9px; background: linear-gradient(160deg, rgba(149,170,255,.16), rgba(149,170,255,.04)); margin-bottom: 10px; position: relative; overflow:hidden; display:flex; align-items: center; justify-content:center; }
+.card-tile.rare .card-img { background: linear-gradient(160deg, rgba(255,201,101,.18), rgba(255,201,101,.04)); }
+.card-tile.legend .card-img { background: linear-gradient(160deg, rgba(255,201,101,.22), rgba(79,243,37,.08)); }
+.card-img .num { font-family: var(--font-headline); font-weight: 800; font-size: 2rem; color: var(--on-surface); letter-spacing:-.03em; }
+.card-tile.rare .card-img .num { color: var(--tertiary); }
+.card-img .shine { position: absolute; top:6px; left:6px; right:6px; height: 18%; border-radius: 4px; background: linear-gradient(180deg, rgba(255,255,255,.18), transparent); }
+.card-img .badge-rare { position:absolute; top: 8px; right: 8px; padding: 2px 7px; border-radius: 9999px; background: var(--tertiary); color: var(--on-tertiary); font-size: .58rem; font-weight: 800; letter-spacing: .08em; font-family: 'JetBrains Mono'; }
+.card-img .badge-legend { position:absolute; top: 8px; right: 8px; padding: 2px 7px; border-radius: 9999px; background: linear-gradient(135deg, var(--tertiary), var(--secondary)); color: var(--on-tertiary); font-size: .58rem; font-weight: 800; letter-spacing: .06em; font-family: 'JetBrains Mono'; }
+.card-info .team { font-size: .65rem; color: var(--on-surface-variant); letter-spacing: .14em; text-transform: uppercase; font-weight: 700; }
+.card-info .player { font-family: var(--font-headline); font-weight: 700; font-size: .92rem; line-height: 1.2; margin-top: 3px; }
+.card-info .role { font-size: .7rem; color: var(--outline); margin-top: 2px; }
+.card-stats { display:flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.04); }
+.card-stats .qty { font-family: 'JetBrains Mono'; font-size: .72rem; color: var(--secondary); font-weight: 700; }
+.card-stats .qty.zero { color: var(--error); }
+.card-stats .market { font-family: 'JetBrains Mono'; font-size: .72rem; color: var(--outline); font-weight: 600; }
+
+/* CENTER ARROW */
+.center-arrow { display:flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.center-arrow .ax { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--tertiary), var(--primary)); color: var(--on-primary); display:grid; place-items:center; box-shadow: 0 8px 24px -6px rgba(149,170,255,.4); }
+.center-arrow .ax .material-symbols-outlined { font-size: 26px; }
+.center-arrow .balance { background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.05); border-radius: 12px; padding: 10px 8px; text-align:center; min-width: 56px; }
+.center-arrow .balance .pair { font-family: var(--font-headline); font-weight: 800; font-size: 1.2rem; line-height:1; letter-spacing:-.02em; }
+.center-arrow .balance .pair .l { color: var(--tertiary); }
+.center-arrow .balance .pair .r { color: var(--primary); }
+.center-arrow .balance .pair .sep { color: var(--outline); }
+.center-arrow .balance .lbl { font-size: .55rem; color: var(--outline); letter-spacing:.12em; text-transform:uppercase; font-weight:700; margin-top:4px; }
+.center-arrow .fairness { padding: 5px 10px; border-radius: 9999px; font-size: .68rem; font-weight: 700; text-align: center; }
+.fairness.ok { background: rgba(79,243,37,.1); color: var(--secondary); }
+
+/* INSIGHT BAR */
+.insights { display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+.insight { background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.05); border-radius: 14px; padding: 14px 16px; }
+.insight .ic { width: 32px; height: 32px; border-radius: 9px; display:grid; place-items:center; margin-bottom: 8px; }
+.insight .ic .material-symbols-outlined { font-size: 18px; }
+.insight.match .ic { background: rgba(79,243,37,.1); color: var(--secondary); }
+.insight.value .ic { background: rgba(255,201,101,.12); color: var(--tertiary); }
+.insight.album .ic { background: rgba(149,170,255,.1); color: var(--primary); }
+.insight.dist .ic { background: rgba(255,255,255,.04); color: var(--on-surface-variant); }
+.insight .lbl { font-size: .68rem; color: var(--on-surface-variant); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+.insight .val { font-family: var(--font-headline); font-weight: 800; font-size: 1.3rem; letter-spacing:-.02em; margin-top: 3px; }
+.insight .hint { font-size: .72rem; color: var(--on-surface-variant); margin-top: 3px; }
+
+/* MESSAGE */
+.message { background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.05); border-radius: 16px; padding: 18px 20px; margin-bottom: 22px; }
+.message .head { display:flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.message .head .ic { width: 28px; height: 28px; border-radius: 8px; background: rgba(149,170,255,.1); color: var(--primary); display:grid; place-items:center; }
+.message .head .ic .material-symbols-outlined { font-size: 16px; }
+.message .head .lbl { font-family: var(--font-headline); font-weight:700; font-size: .85rem; }
+.message .body { font-size: .92rem; color: var(--on-surface); line-height: 1.5; padding-left: 38px; }
+.message .body .quote { color: var(--on-surface-variant); font-style: italic; }
+
+/* FOOT */
+.foot-actions { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 10px; align-items: center; padding: 18px 22px; background: var(--surface-container-low); border: 1px solid rgba(255,255,255,.05); border-radius: 16px; position: sticky; bottom: 16px; box-shadow: 0 14px 40px -12px rgba(0,0,0,.6); }
+.foot-summary { display:flex; align-items:center; gap: 16px; font-size: .85rem; color: var(--on-surface-variant); }
+.foot-summary strong { color: var(--on-surface); font-family: var(--font-headline); font-weight:700; }
+.foot-summary .seg { display:flex; align-items:center; gap: 8px; }
+.foot-summary .ic { width: 24px; height: 24px; border-radius: 8px; display:grid; place-items:center; }
+.foot-summary .ic.g { background: rgba(255,201,101,.14); color: var(--tertiary); }
+.foot-summary .ic.r { background: rgba(149,170,255,.14); color: var(--primary); }
+.foot-summary .ic .material-symbols-outlined { font-size: 14px; }
+
+.btn { padding: 12px 22px; border-radius: 12px; font-family: var(--font-body); font-weight: 700; font-size: .9rem; border: none; cursor: pointer; display:inline-flex; align-items:center; gap:8px; transition: all .15s; }
+.btn .material-symbols-outlined { font-size: 18px; }
+.btn-decline { background: rgba(255,110,132,.08); color: var(--error); }
+.btn-decline:hover { background: rgba(255,110,132,.16); }
+.btn-counter { background: var(--surface-container); color: var(--on-surface); border: 1px solid rgba(255,255,255,.06); }
+.btn-counter:hover { background: var(--surface-container-high); }
+.btn-accept { background: var(--secondary); color: var(--on-secondary); box-shadow: 0 8px 24px -8px rgba(79,243,37,.5); }
+.btn-accept:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -8px rgba(79,243,37,.6); }
+
+@media (max-width: 1100px) {
+  .trade-grid { grid-template-columns: 1fr; }
+  .center-arrow { flex-direction: row; padding: 6px 0; }
+  .insights { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 1024px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display:none; }
+  .main { padding: 20px; }
+  .hero-row { grid-template-columns: 1fr; }
+  .timer { text-align:left; }
+  .timer .val { justify-content: flex-start; }
+  .foot-actions { grid-template-columns: 1fr 1fr; }
+  .foot-summary { grid-column: 1/-1; justify-content: center; flex-wrap:wrap; }
+}
+</style>
+</head><body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">FF</div><div class="name">figurinhafácil</div></div>
+    <a class="nav-item"><span class="material-symbols-outlined">dashboard</span>Início</a>
+    <a class="nav-item"><span class="material-symbols-outlined">style</span>Meu álbum</a>
+    <a class="nav-item"><span class="material-symbols-outlined">favorite</span>Matches<span class="badge" style="background:var(--secondary); color: var(--on-secondary);">12</span></a>
+    <a class="nav-item active"><span class="material-symbols-outlined">forum</span>Propostas<span class="badge">3</span></a>
+    <a class="nav-item"><span class="material-symbols-outlined">map</span>Mapa</a>
+    <a class="nav-item"><span class="material-symbols-outlined">groups</span>Comunidade</a>
+    <div class="nav-section">Conta</div>
+    <a class="nav-item"><span class="material-symbols-outlined">person</span>Perfil</a>
+    <a class="nav-item"><span class="material-symbols-outlined">settings</span>Ajustes</a>
+  </aside>
+
+  <div>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="crumb">
+        <a>Início</a><span class="sep material-symbols-outlined" style="font-size:14px">chevron_right</span>
+        <a>Propostas</a><span class="sep material-symbols-outlined" style="font-size:14px">chevron_right</span>
+        <b>Marina Rezende · 3:3</b>
+      </div>
+      <div class="tb-right">
+        <button class="icon-btn" title="Compartilhar"><span class="material-symbols-outlined">share</span></button>
+        <button class="icon-btn" title="Mais"><span class="material-symbols-outlined">more_vert</span></button>
+        <div class="avatar-sm">TS</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-row">
+          <div class="proposer">
+            <div class="av">MR<div class="pres"></div></div>
+            <div class="who">
+              <span class="label">Proposta recebida de</span>
+              <div class="name">Marina Rezende <span class="verified material-symbols-outlined">verified</span></div>
+              <div class="meta">
+                <span>@marinare</span><span class="d"></span>
+                <span>Pinheiros · <b>1.2 km</b></span><span class="d"></span>
+                <span>⭐ <b>4.8</b> · 47 trocas</span><span class="d"></span>
+                <span>Resposta média <b>~12min</b></span>
+              </div>
+            </div>
+          </div>
+          <div class="timer">
+            <div class="lbl">Expira em</div>
+            <div class="val"><span class="material-symbols-outlined">schedule</span>04h 12min</div>
+            <div class="ts">enviada há 1d 19h 48min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div class="insights">
+        <div class="insight match">
+          <div class="ic"><span class="material-symbols-outlined">favorite</span></div>
+          <div class="lbl">Compatibilidade</div>
+          <div class="val" style="color:var(--secondary)">92%</div>
+          <div class="hint">Match alto — vocês têm necessidades opostas</div>
+        </div>
+        <div class="insight value">
+          <div class="ic"><span class="material-symbols-outlined">balance</span></div>
+          <div class="lbl">Equilíbrio</div>
+          <div class="val">Justo</div>
+          <div class="hint">Você ganha 1 lendária a mais</div>
+        </div>
+        <div class="insight album">
+          <div class="ic"><span class="material-symbols-outlined">menu_book</span></div>
+          <div class="lbl">Impacto no álbum</div>
+          <div class="val">+3 novas</div>
+          <div class="hint">Álbum vai de <b>78%</b> → <b>82%</b></div>
+        </div>
+        <div class="insight dist">
+          <div class="ic"><span class="material-symbols-outlined">directions_walk</span></div>
+          <div class="lbl">Distância</div>
+          <div class="val">1.2 km</div>
+          <div class="hint">Padaria do Zé · 14min a pé</div>
+        </div>
+      </div>
+
+      <!-- MESSAGE -->
+      <div class="message">
+        <div class="head">
+          <div class="ic"><span class="material-symbols-outlined">chat_bubble</span></div>
+          <div class="lbl">Mensagem da Marina</div>
+        </div>
+        <div class="body">
+          <span class="quote">"Oi! Vi que você tá precisando da LGD21 (Pelé legend) e eu tenho repetida. Topa trocar pelas BRA1 e BRA2 que tô atrás faz tempo? Tô em Pinheiros, posso encontrar na Padaria do Zé hoje à tarde 🤝"</span>
+        </div>
+      </div>
+
+      <!-- TRADE -->
+      <div class="trade-grid">
+        <!-- GIVE -->
+        <div class="trade-col give">
+          <div class="head">
+            <div class="left">
+              <div class="dir-ico dir-give"><span class="material-symbols-outlined">call_made</span></div>
+              <div>
+                <div class="dir-label">Você dá</div>
+                <div class="dir-sub">3 figurinhas suas</div>
+              </div>
+            </div>
+            <span class="value-tag give">Valor ~R$ 18</span>
+          </div>
+          <div class="cards-grid">
+            <div class="card-tile">
+              <div class="card-img">
+                <span class="shine"></span>
+                <span class="num">1</span>
+              </div>
+              <div class="card-info">
+                <div class="team">Brasil</div>
+                <div class="player">Alisson Becker</div>
+                <div class="role">Goleiro · Liverpool</div>
+              </div>
+              <div class="card-stats">
+                <span class="qty">Você tem ×3</span>
+                <span class="market">~R$ 4</span>
+              </div>
+            </div>
+            <div class="card-tile rare">
+              <div class="card-img">
+                <span class="shine"></span>
+                <span class="badge-rare">RARA</span>
+                <span class="num">2</span>
+              </div>
+              <div class="card-info">
+                <div class="team">Brasil</div>
+                <div class="player">Marquinhos</div>
+                <div class="role">Zagueiro · PSG</div>
+              </div>
+              <div class="card-stats">
+                <span class="qty">Você tem ×2</span>
+                <span class="market">~R$ 9</span>
+              </div>
+            </div>
+            <div class="card-tile" style="grid-column: 1 / -1;">
+              <div style="display:flex; gap: 14px; align-items:center;">
+                <div class="card-img" style="width: 70px; aspect-ratio: 3/4; flex-shrink:0; margin: 0;">
+                  <span class="shine"></span>
+                  <span class="num" style="font-size: 1.4rem;">5</span>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div class="card-info">
+                    <div class="team">Argentina</div>
+                    <div class="player">Lionel Messi</div>
+                    <div class="role">Atacante · Capitão · Inter Miami</div>
+                  </div>
+                  <div class="card-stats" style="border:none; padding-top: 6px;">
+                    <span class="qty">Você tem ×4</span>
+                    <span class="market">~R$ 5</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER -->
+        <div class="center-arrow">
+          <div class="balance">
+            <div class="pair"><span class="l">3</span> <span class="sep">→</span> <span class="r">3</span></div>
+            <div class="lbl">balanço</div>
+          </div>
+          <div class="ax"><span class="material-symbols-outlined">swap_horiz</span></div>
+          <div class="fairness ok">✓ Justa</div>
+        </div>
+
+        <!-- GET -->
+        <div class="trade-col get">
+          <div class="head">
+            <div class="left">
+              <div class="dir-ico dir-get"><span class="material-symbols-outlined">call_received</span></div>
+              <div>
+                <div class="dir-label">Você recebe</div>
+                <div class="dir-sub">3 figurinhas dela · 1 lendária</div>
+              </div>
+            </div>
+            <span class="value-tag get">Valor ~R$ 24</span>
+          </div>
+          <div class="cards-grid">
+            <div class="card-tile legend">
+              <div class="card-img">
+                <span class="shine"></span>
+                <span class="badge-legend">LENDA</span>
+                <span class="num">21</span>
+              </div>
+              <div class="card-info">
+                <div class="team">Lendas</div>
+                <div class="player">Pelé</div>
+                <div class="role">Atacante · Brasil 1958–1970</div>
+              </div>
+              <div class="card-stats">
+                <span class="qty zero">Você não tem</span>
+                <span class="market">~R$ 14</span>
+              </div>
+            </div>
+            <div class="card-tile">
+              <div class="card-img">
+                <span class="shine"></span>
+                <span class="num">22</span>
+              </div>
+              <div class="card-info">
+                <div class="team">Portugal</div>
+                <div class="player">Cristiano R.</div>
+                <div class="role">Atacante · Al-Nassr</div>
+              </div>
+              <div class="card-stats">
+                <span class="qty zero">Você não tem</span>
+                <span class="market">~R$ 6</span>
+              </div>
+            </div>
+            <div class="card-tile" style="grid-column: 1 / -1;">
+              <div style="display:flex; gap: 14px; align-items:center;">
+                <div class="card-img" style="width: 70px; aspect-ratio: 3/4; flex-shrink:0; margin: 0;">
+                  <span class="shine"></span>
+                  <span class="num" style="font-size: 1.4rem;">25</span>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div class="card-info">
+                    <div class="team">Inglaterra</div>
+                    <div class="player">Harry Kane</div>
+                    <div class="role">Atacante · Bayern de Munique</div>
+                  </div>
+                  <div class="card-stats" style="border:none; padding-top: 6px;">
+                    <span class="qty zero">Você não tem</span>
+                    <span class="market">~R$ 4</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY / TRUST -->
+      <div class="section-title">Histórico com Marina <span class="count">3 trocas anteriores · todas concluídas</span></div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px;">
+        <div style="background: var(--surface-container-low); border:1px solid rgba(255,255,255,.05); border-radius: 12px; padding: 12px 14px;">
+          <div style="font-size:.7rem; color: var(--outline); letter-spacing:.1em; text-transform: uppercase; font-weight:700;">14 mar 2026</div>
+          <div style="font-family:var(--font-headline); font-weight:700; font-size:.88rem; margin-top: 4px;">5:5 · álbum Champions</div>
+          <div style="font-size:.74rem; color: var(--secondary); margin-top: 4px; display:flex; align-items:center; gap:4px;"><span class="material-symbols-outlined" style="font-size:13px">check_circle</span>Concluída · ⭐ 5</div>
+        </div>
+        <div style="background: var(--surface-container-low); border:1px solid rgba(255,255,255,.05); border-radius: 12px; padding: 12px 14px;">
+          <div style="font-size:.7rem; color: var(--outline); letter-spacing:.1em; text-transform: uppercase; font-weight:700;">28 jan 2026</div>
+          <div style="font-family:var(--font-headline); font-weight:700; font-size:.88rem; margin-top: 4px;">2:2 · álbum Libertadores</div>
+          <div style="font-size:.74rem; color: var(--secondary); margin-top: 4px; display:flex; align-items:center; gap:4px;"><span class="material-symbols-outlined" style="font-size:13px">check_circle</span>Concluída · ⭐ 5</div>
+        </div>
+        <div style="background: var(--surface-container-low); border:1px solid rgba(255,255,255,.05); border-radius: 12px; padding: 12px 14px;">
+          <div style="font-size:.7rem; color: var(--outline); letter-spacing:.1em; text-transform: uppercase; font-weight:700;">12 dez 2025</div>
+          <div style="font-family:var(--font-headline); font-weight:700; font-size:.88rem; margin-top: 4px;">4:4 · álbum Brasileirão</div>
+          <div style="font-size:.74rem; color: var(--secondary); margin-top: 4px; display:flex; align-items:center; gap:4px;"><span class="material-symbols-outlined" style="font-size:13px">check_circle</span>Concluída · ⭐ 4</div>
+        </div>
+      </div>
+
+      <!-- FOOT -->
+      <div class="foot-actions">
+        <div class="foot-summary">
+          <div class="seg"><div class="ic g"><span class="material-symbols-outlined">call_made</span></div><span>Dando <strong>3</strong></span></div>
+          <div class="seg"><div class="ic r"><span class="material-symbols-outlined">call_received</span></div><span>Recebendo <strong>3</strong> <span style="color:var(--tertiary)">(1 lenda)</span></span></div>
+        </div>
+        <div></div>
+        <button class="btn btn-decline"><span class="material-symbols-outlined">close</span>Recusar</button>
+        <button class="btn btn-counter"><span class="material-symbols-outlined">edit</span>Contraproposta</button>
+        <button class="btn btn-accept"><span class="material-symbols-outlined">check</span>Aceitar troca</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body></html>
