@@ -119,7 +119,6 @@ export function MatchCard({ match, variant = "default", className }: MatchCardPr
           matchedUserNickname={match.displayNickname}
           tradePointId={match.tradePointId}
           distanceKm={distanceKm}
-          albumPct={match.albumCompletionPct}
           tradesCount={match.confirmedTradesCount}
           open={modalOpen}
           onOpenChange={setModalOpen}

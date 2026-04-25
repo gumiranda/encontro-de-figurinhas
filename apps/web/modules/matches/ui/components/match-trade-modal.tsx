@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import type { StickerWithQty } from "@workspace/backend/convex/matches";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -165,7 +164,6 @@ type StickerColumnProps = {
   stickers: StickerWithQty[];
   selected: Set<number>;
   onToggle: (num: number) => void;
-  sections: Section[];
   sectionMap: Map<number, Section>;
   variant: "give" | "receive";
 };
@@ -185,7 +183,6 @@ function StickerColumn({
   const filteredStickers = useMemo(() => {
     let result = stickers;
 
-    // Apply search
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((s) => {
@@ -197,7 +194,6 @@ function StickerColumn({
       });
     }
 
-    // Apply filter
     if (filter === "rare") {
       result = result.filter((s) => {
         const sec = sectionMap.get(s.num);
@@ -484,7 +480,6 @@ export type MatchTradeModalProps = {
   matchedUserNickname: string;
   tradePointId: Id<"tradePoints">;
   distanceKm: number;
-  albumPct: number;
   tradesCount: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -496,7 +491,6 @@ function MatchTradeModalContent({
   matchedUserNickname,
   tradePointId,
   distanceKm,
-  albumPct,
   tradesCount,
   onOpenChange,
   onSuccess,
@@ -592,13 +586,11 @@ function MatchTradeModalContent({
   const receiveCount = stickersIReceive.size;
   const canSubmit = giveCount > 0 && receiveCount > 0 && !isSubmitting;
 
-  // Count rare stickers being received
   const rareReceiveCount = [...stickersIReceive].filter((num) => {
     const sec = sectionMap.get(num);
     return sec?.goldenNumbers.includes(num) || sec?.legendNumbers.includes(num);
   }).length;
 
-  // Match percentage calculation
   const matchPct = Math.round(
     (Math.min(data.theyHaveINeed.length, data.iHaveTheyNeed.length) /
       Math.max(data.theyHaveINeed.length, data.iHaveTheyNeed.length, 1)) *
@@ -644,7 +636,6 @@ function MatchTradeModalContent({
             stickers={data.iHaveTheyNeed}
             selected={stickersIGive}
             onToggle={toggleGive}
-            sections={data.sections}
             sectionMap={sectionMap}
             variant="give"
           />
@@ -657,7 +648,6 @@ function MatchTradeModalContent({
             stickers={data.theyHaveINeed}
             selected={stickersIReceive}
             onToggle={toggleReceive}
-            sections={data.sections}
             sectionMap={sectionMap}
             variant="receive"
           />
