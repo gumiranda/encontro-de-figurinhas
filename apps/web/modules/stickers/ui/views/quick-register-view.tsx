@@ -19,7 +19,7 @@ import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { DesktopTopBar } from "../components/desktop-top-bar";
 import { MobileFabBar } from "../components/mobile-fab-bar";
 import { QuickEntryInput } from "../components/quick-entry-input";
-import { StatsCardRow } from "../components/stats-card-row";
+import { StickerStatsRow } from "../components/stats-card-row";
 import {
   StickerSectionGroup,
   type SectionInfo,
@@ -241,7 +241,7 @@ export function QuickRegisterView({
                 modeSwitch={modeSwitchLink}
               />
 
-              <StatsCardRow
+              <StickerStatsRow
                 have={haveCount}
                 duplicates={duplicates.length}
                 missing={needCount}

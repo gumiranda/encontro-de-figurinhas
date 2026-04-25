@@ -23,7 +23,7 @@ import {
 import { Label } from "@workspace/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
 import { FullPageLoader } from "@/components/full-page-loader";
-import { useShare } from "../../lib/use-share";
+import { useShare } from "@/modules/shared/hooks/use-share";
 import { useStableValue } from "../../lib/use-stable-value";
 import { useTradePoint } from "../../lib/use-trade-point";
 import { BannedState } from "../components/banned-state";

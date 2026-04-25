@@ -72,6 +72,9 @@ export default defineSchema({
     guardianEmail: v.optional(v.string()),
 
     // Sticker fields (PRD §4.3)
+    // Note: Convex has 8192 element array limit. Currently safe (album ~700 stickers).
+    // stickers.ts enforces MAX_STICKER_ARRAY_SIZE = 1000. If future albums exceed this,
+    // consider splitting into userStickers table with userId + stickerNumber index.
     duplicates: v.optional(v.array(v.number())),
     missing: v.optional(v.array(v.number())),
     albumProgress: v.optional(v.number()),

@@ -5,7 +5,7 @@ import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { derivePointStatus } from "../../lib/derive-point-status";
-import { formatDistance } from "../../lib/format-distance";
+import { formatDistance } from "../../../shared/lib/format-distance";
 import type { TradePointMapItem } from "../../lib/use-arena-map";
 import { FavoriteButton } from "./favorite-button";
 import { StatusPill } from "./status-pill";

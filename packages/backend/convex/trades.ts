@@ -7,8 +7,9 @@ import {
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { getAuthenticatedUser } from "./lib/auth";
-import { getPendingTradesCount } from "./lib/tradeHelpers";
+import { getActiveCheckin } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import { getPendingTradesCount } from "./lib/tradeHelpers";
 
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
@@ -41,19 +42,12 @@ async function assertBothPublicCheckinAtPoint(
   counterpartyId: Id<"users">,
   tradePointId: Id<"tradePoints">
 ): Promise<void> {
-  const now = Date.now();
-  const a = await ctx.db
-    .query("checkins")
-    .withIndex("by_user_active", (q) =>
-      q.eq("userId", userId).gt("expiresAt", now)
-    )
-    .first();
-  const b = await ctx.db
-    .query("checkins")
-    .withIndex("by_user_active", (q) =>
-      q.eq("userId", counterpartyId).gt("expiresAt", now)
-    )
-    .first();
+  // Parallel queries for both users' active checkins
+  const [a, b] = await Promise.all([
+    getActiveCheckin(ctx, userId),
+    getActiveCheckin(ctx, counterpartyId),
+  ]);
+
   if (
     !a ||
     a.tradePointId !== tradePointId ||

@@ -4,6 +4,11 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth } from "./lib/auth";
+import {
+  arraysEqual,
+  buildCheckinDenormFields,
+  getActiveCheckin,
+} from "./lib/checkinHelpers";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
   CHECKIN_DURATION_MS,
@@ -61,12 +66,7 @@ export const create = mutation({
     const now = Date.now();
     const expiresAt = now + CHECKIN_DURATION_MS;
 
-    const previous = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).gt("expiresAt", now)
-      )
-      .first();
+    const previous = await getActiveCheckin(ctx, user._id);
 
     // Renewal no MESMO ponto: só estende expiresAt. Sem flicker UI, sem bump.
     if (previous && previous.tradePointId === tradePointId) {
@@ -114,9 +114,7 @@ export const create = mutation({
       createdAt: now,
       countedInPublic,
       // Denormalized fields for listPresentMatchesAtPoint (avoids N+1 reads)
-      displayNickname: user.displayNickname ?? user.nickname ?? user.name,
-      avatarSeed: user.nickname ?? user._id,
-      duplicates: user.duplicates ?? [],
+      ...buildCheckinDenormFields(user),
     });
 
     if (countedInPublic) {
@@ -176,13 +174,7 @@ export const cancelMine = mutation({
     }
     const user = auth.user;
 
-    const now = Date.now();
-    const active = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).gt("expiresAt", now)
-      )
-      .first();
+    const active = await getActiveCheckin(ctx, user._id);
 
     if (!active) return { ok: true as const, cancelled: false };
 
@@ -240,7 +232,7 @@ export const listPresentAtMyPoints = query({
   },
 });
 
-/** Active check-in for share CTA + “estou no ponto” empty states. */
+/** Active check-in for share CTA + "estou no ponto" empty states. */
 export const getMyActiveCheckinSummary = query({
   args: {},
   handler: async (ctx) => {
@@ -253,13 +245,7 @@ export const getMyActiveCheckinSummary = query({
       };
     }
 
-    const now = Date.now();
-    const active = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", auth.user._id).gt("expiresAt", now)
-      )
-      .first();
+    const active = await getActiveCheckin(ctx, auth.user._id);
 
     if (!active) {
       return {
@@ -484,7 +470,7 @@ export const decayPeakHours = internalMutation({
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .paginate({ numItems: DECAY_BATCH, cursor: cursor ?? null });
 
-    // Collect patches to apply
+    // Collect patches to apply (skip if values unchanged to reduce writes)
     const patches: { id: Id<"tradePoints">; peakHours: number[] }[] = [];
     for (const point of page.page) {
       if (!point.peakHours || point.peakHours.length === 0) continue;
@@ -494,7 +480,10 @@ export const decayPeakHours = internalMutation({
         const next = Math.floor(original * PEAK_HOURS_DECAY_FACTOR);
         return Math.max(next, PEAK_HOURS_FLOOR_AFTER_ACTIVITY);
       });
-      patches.push({ id: point._id, peakHours: decayed });
+      // Skip patch if values unchanged
+      if (!arraysEqual(point.peakHours, decayed)) {
+        patches.push({ id: point._id, peakHours: decayed });
+      }
     }
 
     // Batch apply all patches in parallel
@@ -587,11 +576,7 @@ export const backfillCheckinDenormFields = internalMutation({
       needsBackfill.map((c) => {
         const user = userMap.get(c.userId);
         if (!user) return;
-        return ctx.db.patch(c._id, {
-          displayNickname: user.displayNickname ?? user.nickname ?? user.name,
-          avatarSeed: user.nickname ?? user._id,
-          duplicates: user.duplicates ?? [],
-        });
+        return ctx.db.patch(c._id, buildCheckinDenormFields(user));
       })
     );
 

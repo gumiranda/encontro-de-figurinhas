@@ -5,8 +5,11 @@ import { Role, isValidRole, isValidSector } from "./lib/types";
 import { getAuthenticatedUser, isAdmin, requireAuth } from "./lib/auth";
 import { haversine, isInBrazil } from "./lib/geo";
 import { verifyIpLocationToken } from "./lib/ipLocationToken";
-import { GEO_VALIDATION, LOCATION_RATE_LIMIT } from "./lib/locationConstants";
-import { getLocationUpdateTimestampsForWindow } from "./lib/locationRateLimit";
+import {
+  GEO_VALIDATION,
+  LOCATION_RATE_LIMIT,
+  getLocationUpdateTimestampsForWindow,
+} from "./lib/locationRateLimit";
 import { checkRateLimit } from "./lib/rateLimit";
 import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
