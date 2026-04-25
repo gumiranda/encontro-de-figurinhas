@@ -24,6 +24,16 @@ import { MatchDicebearAvatar } from "./match-dicebear-avatar";
 
 type Fairness = "ok" | "warn" | "none";
 
+const TRADE_ERROR_MESSAGES = {
+  TOO_MANY_PENDING: "Você já tem muitas trocas pendentes",
+  ALREADY_PENDING: "Já existe uma proposta pendente com este usuário",
+  NO_MATCH: "Não foi possível validar o match. Confira se ainda estão no mesmo ponto.",
+  INVALID_STICKER: "Figurinha inválida para esta troca",
+  STICKERS_CHANGED: "Algumas figurinhas já foram trocadas",
+  MESSAGE_TOO_LONG: "Mensagem muito longa",
+  RATE_LIMITED: "Muitas propostas enviadas. Aguarde um pouco.",
+} as const;
+
 function calcFairness(give: number, receive: number): Fairness {
   if (give === 0 || receive === 0) return "none";
   const diff = Math.abs(give - receive);
@@ -558,20 +568,12 @@ function MatchTradeModalContent({
       onOpenChange(false);
       onSuccess?.();
     } catch (err) {
-      const errorMessage =
-        err instanceof Error && err.message.includes("TOO_MANY_PENDING")
-          ? "Você já tem muitas trocas pendentes"
-          : err instanceof Error && err.message.includes("ALREADY_PENDING")
-            ? "Já existe uma proposta pendente com este usuário"
-            : err instanceof Error && err.message.includes("NO_MATCH")
-              ? "Não foi possível validar o match. Confira se ainda estão no mesmo ponto."
-              : err instanceof Error && err.message.includes("INVALID_STICKER")
-                ? "Figurinha inválida para esta troca"
-                : err instanceof Error && err.message.includes("STICKERS_CHANGED")
-                  ? "Algumas figurinhas já foram trocadas"
-                  : err instanceof Error && err.message.includes("MESSAGE_TOO_LONG")
-                    ? "Mensagem muito longa"
-                    : "Erro ao enviar proposta";
+      const matchedError = err instanceof Error
+        ? Object.entries(TRADE_ERROR_MESSAGES).find(([code]) =>
+            err.message.includes(code),
+          )
+        : undefined;
+      const errorMessage = matchedError?.[1] ?? "Erro ao enviar proposta";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);

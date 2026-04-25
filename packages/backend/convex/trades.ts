@@ -96,6 +96,16 @@ export const initiate = mutation({
       throw new ConvexError("TOO_MANY_PENDING");
     }
 
+    const oneHourAgo = Date.now() - 3600_000;
+    const recentTrades = await ctx.db
+      .query("trades")
+      .withIndex("by_initiator_status", (q) => q.eq("initiatorId", user._id))
+      .filter((q) => q.gt(q.field("_creationTime"), oneHourAgo))
+      .collect();
+    if (recentTrades.length >= 10) {
+      throw new ConvexError("RATE_LIMITED");
+    }
+
     const counterparty = await ctx.db.get(args.matchedUserId);
     if (
       !counterparty ||
