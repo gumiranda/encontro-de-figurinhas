@@ -88,6 +88,41 @@ const EXT_VARIANT_CONFIG: Record<
 // Order for display: ouro first (most rare), then prata, bronze, base
 const EXT_VARIANT_ORDER: ExtVariant[] = ["ouro", "prata", "bronze", "base"];
 
+/** Coca-Cola América Latina — mesmo “card” das raras (EXT), tema vermelho + preto */
+const CC_LAM_CARD = {
+  label: "COCA-COLA",
+  subtitle: "AMÉRICA LATINA",
+  icon: "🎫",
+  gradient:
+    "bg-gradient-to-br from-red-600/25 via-zinc-950/95 to-red-950/35",
+  border: "border-red-500/50",
+  textColor: "text-red-100",
+  subtext: "text-zinc-400",
+};
+
+/** Sincronizar com `packages/backend/data/album-2026.json` (CC-LAM, rel 1–14) */
+const CC_LAM_STICKERS: { full: string; short: string }[] = [
+  { full: "Lamine Yamal", short: "Yamal" },
+  { full: "Joshua Kimmich", short: "Kimmich" },
+  { full: "Harry Kane", short: "Kane" },
+  { full: "Santiago Giménez", short: "Giménez" },
+  { full: "Joško Gvardiol", short: "Gvardiol" },
+  { full: "Federico Valverde", short: "Valverde" },
+  { full: "Jefferson Lerma", short: "Lerma" },
+  { full: "Enner Valencia", short: "Valencia" },
+  { full: "Gabriel Magalhães", short: "Gabriel" },
+  { full: "Virgil van Dijk", short: "Van Dijk" },
+  { full: "Alphonso Davies", short: "Davies" },
+  { full: "Emiliano Martínez", short: "E. Martínez" },
+  { full: "Raúl Jiménez", short: "Jiménez" },
+  { full: "Lautaro Martínez", short: "L. Martínez" },
+];
+
+function getCcLamInfo(rel: number): { full: string; short: string } | null {
+  if (!Number.isInteger(rel) || rel < 1 || rel > 14) return null;
+  return CC_LAM_STICKERS[rel - 1] ?? null;
+}
+
 function getExtStickerInfo(relativeNum: number): {
   displayLabel: string;
   playerName: string;
@@ -183,6 +218,7 @@ function StickerSectionGroupBase({
   }, [section.startNumber, section.endNumber]);
 
   const isExt = section.code === "EXT";
+  const isCcLam = section.code === "CC-LAM";
   const extGroups = useMemo(() => {
     if (!isExt) return null;
     return groupExtByVariant(section.startNumber, section.endNumber);
@@ -404,6 +440,125 @@ function StickerSectionGroupBase({
               </div>
             );
           })}
+        </div>
+      ) : isCcLam ? (
+        <div
+          className={cn(
+            "rounded-xl border border-red-500/25 bg-gradient-to-b from-red-950/30 via-black/40 to-zinc-950/60 p-3 shadow-sm",
+            "ring-1 ring-red-500/10"
+          )}
+        >
+          <div className="mb-3 flex items-center gap-2">
+            <span className={cn("text-md font-bold tracking-wide", CC_LAM_CARD.textColor)}>
+              {CC_LAM_CARD.icon} {CC_LAM_CARD.label} · {CC_LAM_CARD.subtitle}
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-r from-red-500/30 to-transparent" />
+            <span className={cn("text-xs", CC_LAM_CARD.subtext)}>
+              {activeInSection}/{totalCount} figurinhas
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-7">
+            {numbers.map((num) => {
+              const relativeNum = (num - section.startNumber) + relStart;
+              const isInDup = duplicatesSet.has(num);
+              const isInMiss = missingSet.has(num);
+
+              let state: TileState = "none";
+              if (mode === "duplicates" && isInMiss) state = "blocked";
+              else if (mode === "missing" && isInDup) state = "blocked";
+              else if (isInDup) state = "have";
+              else if (isInMiss) state = "need";
+
+              const isActive = state === "have" || state === "need";
+              const relLabel =
+                relativeNum === 0 ? "00" : String(relativeNum);
+              const cc = getCcLamInfo(relativeNum);
+              const labelTitle = cc
+                ? `${cc.full} — ${section.code}-${relLabel}`
+                : `${section.code}-${relLabel}`;
+
+              return (
+                <button
+                  key={num}
+                  type="button"
+                  data-sticker-num={num}
+                  onClick={handleTileClick}
+                  disabled={state === "blocked"}
+                  title={labelTitle}
+                  aria-label={
+                    cc
+                      ? `Figurinha ${section.code}-${relLabel} ${cc.full}`
+                      : `Figurinha ${section.code}-${relLabel}`
+                  }
+                  className={cn(
+                    "relative aspect-[3/4] rounded-lg border-2 p-1.5 transition-all duration-200",
+                    "flex flex-col items-stretch justify-between overflow-hidden",
+                    CC_LAM_CARD.gradient,
+                    state === "blocked"
+                      ? "cursor-not-allowed border-zinc-700/50 opacity-40"
+                      : isActive
+                        ? cn(
+                            CC_LAM_CARD.border,
+                            "ring-2 ring-offset-1 ring-offset-background",
+                            state === "have" ? "ring-emerald-500" : "ring-rose-500"
+                          )
+                        : cn(
+                            CC_LAM_CARD.border,
+                            "cursor-pointer hover:scale-105 hover:shadow-lg"
+                          )
+                  )}
+                >
+                  <span
+                    className="pointer-events-none absolute right-1.5 top-1 text-[5px] text-red-500/50"
+                    aria-hidden
+                  >
+                    ✦
+                  </span>
+                  <span
+                    className={cn(
+                      "w-full text-left font-mono text-[7px] font-bold tabular-nums sm:text-[8px]",
+                      CC_LAM_CARD.subtext
+                    )}
+                  >
+                    #{relLabel}
+                  </span>
+                  <div className="flex min-h-0 flex-1 flex-col justify-center">
+                    {cc ? (
+                      <span
+                        className={cn(
+                          "w-full break-words text-left text-[10px] font-bold leading-snug",
+                          "line-clamp-3 text-white drop-shadow sm:text-xs",
+                          CC_LAM_CARD.textColor
+                        )}
+                      >
+                        {cc.short}
+                      </span>
+                    ) : (
+                      <span
+                        className={cn(
+                          "w-full text-center font-mono text-base font-black tabular-nums text-white"
+                        )}
+                      >
+                        {relLabel}
+                      </span>
+                    )}
+                  </div>
+                  {isActive && (
+                    <span
+                      className={cn(
+                        "self-end rounded px-1 text-[10px] font-bold",
+                        state === "have"
+                          ? "bg-emerald-500/90 text-white"
+                          : "bg-rose-500/90 text-white"
+                      )}
+                    >
+                      {state === "have" ? "✓" : "+"}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : (
         /* Regular section grid */
