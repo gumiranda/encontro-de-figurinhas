@@ -1,5 +1,17 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { relativeFromAbsolute } from "./lib/stickerNumbering";
+
+/** `totalStickers` = quantidade; números absolutos válidos: 0 .. totalStickers - 1. */
+export const getPublicAlbumCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const config = await ctx.db.query("albumConfig").first();
+    if (!config) return { totalStickers: 0, maxAbsolute: -1 };
+    const t = config.totalStickers;
+    return { totalStickers: t, maxAbsolute: t - 1 };
+  },
+});
 
 export const getSections = query({
   args: {},
@@ -99,7 +111,7 @@ export const getStickerByNumber = query({
       flagEmoji: section.flagEmoji,
       teamStartNumber: section.startNumber,
       teamEndNumber: section.endNumber,
-      relativeNum: number - section.startNumber + 1,
+      relativeNum: relativeFromAbsolute(number, section),
       isGolden,
       isLegend: !!legend,
       legendName: legend?.name,
@@ -115,7 +127,7 @@ export const getAllStickerNumbers = query({
     if (!config) return [];
 
     const numbers: number[] = [];
-    for (let i = 1; i <= config.totalStickers; i++) {
+    for (let i = 0; i < config.totalStickers; i++) {
       numbers.push(i);
     }
     return numbers;
@@ -193,7 +205,7 @@ export const getRelatedStickers = query({
       flagEmoji: section.flagEmoji,
       stickers: selectedNumbers.map((n) => ({
         number: n,
-        relativeNum: n - section.startNumber + 1,
+        relativeNum: relativeFromAbsolute(n, section),
         isGolden: goldenSet.has(n),
         isLegend: legendMap.has(n),
         legendName: legendMap.get(n),
@@ -235,7 +247,7 @@ export const searchStickersByName = query({
       .replace(/[̀-ͯ]/g, "");
 
     // Full scan - Convex has no LIKE/contains. For production scale, use Meilisearch.
-    // 1109 docs is small enough for full scan + JS filter.
+    // ~1k docs is small enough for full scan + JS filter.
     const all = await ctx.db.query("stickerDetail").collect();
 
     return all
@@ -379,7 +391,7 @@ export const getStickerWithDetail = query({
       flagEmoji: section.flagEmoji,
       teamStartNumber: section.startNumber,
       teamEndNumber: section.endNumber,
-      relativeNum: number - section.startNumber + 1,
+      relativeNum: relativeFromAbsolute(number, section),
       isGolden,
       isLegend: !!legend,
       legendName: legend?.name,

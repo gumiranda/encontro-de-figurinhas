@@ -53,9 +53,7 @@ async function loadAlbumConfig() {
   "use cache";
   cacheTag("album-config");
   cacheLife("days");
-  const config = await convexServer.query(api.album.getSections, {});
-  const totalStickers = config.reduce((acc, s) => Math.max(acc, s.endNumber), 0);
-  return { totalStickers };
+  return convexServer.query(api.album.getPublicAlbumCount, {});
 }
 
 export async function generateMetadata({
@@ -74,7 +72,9 @@ export async function generateMetadata({
     return { title: "Figurinha não encontrada" };
   }
 
-  const displayLabel = `${sticker.sectionCode}-${sticker.relativeNum}`;
+  const relDisplay =
+    sticker.relativeNum === 0 ? "00" : String(sticker.relativeNum);
+  const displayLabel = `${sticker.sectionCode}-${relDisplay}`;
 
   return generateStickerMetadata({
     number: sticker.absoluteNum,
@@ -109,7 +109,9 @@ export default async function StickerPage({ params }: StickerPageProps) {
 
   const relatedStickers = await loadRelatedStickers(sticker.absoluteNum);
 
-  const displayLabel = `${sticker.sectionCode}-${sticker.relativeNum}`;
+  const relDisplay =
+    sticker.relativeNum === 0 ? "00" : String(sticker.relativeNum);
+  const displayLabel = `${sticker.sectionCode}-${relDisplay}`;
   const teamSlug = sticker.sectionCode.toLowerCase();
 
   const breadcrumbItems = [
@@ -143,8 +145,11 @@ export default async function StickerPage({ params }: StickerPageProps) {
   );
 
   // Prev/next use number URLs (middleware redirects to slug)
-  const prevNumber = sticker.absoluteNum > 1 ? sticker.absoluteNum - 1 : null;
-  const nextNumber = sticker.absoluteNum < albumConfig.totalStickers ? sticker.absoluteNum + 1 : null;
+  const prevNumber = sticker.absoluteNum > 0 ? sticker.absoluteNum - 1 : null;
+  const nextNumber =
+    sticker.absoluteNum < albumConfig.totalStickers - 1
+      ? sticker.absoluteNum + 1
+      : null;
 
   return (
     <>
@@ -232,7 +237,9 @@ export default async function StickerPage({ params }: StickerPageProps) {
                 <div />
               )}
               <span className="text-sm text-muted-foreground">
-                {displayLabel} ({sticker.absoluteNum} de {albumConfig.totalStickers})
+                {displayLabel} (
+                {sticker.absoluteNum === 0 ? "00" : sticker.absoluteNum} de{" "}
+                {albumConfig.totalStickers})
               </span>
               {nextNumber ? (
                 <Link

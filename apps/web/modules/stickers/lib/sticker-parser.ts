@@ -117,7 +117,7 @@ function parseSingle(
       return {
         kind: "ok",
         valid: [absoluteNum],
-        formatted: `${code}-${num}`,
+        formatted: num === 0 ? `${code}-00` : `${code}-${num}`,
       };
     }
   }
@@ -169,14 +169,14 @@ function parseGlobalSingle(
   num: number,
   totalStickers: number
 ): ParseEntryResult {
-  if (!Number.isInteger(num) || num < 1 || num > totalStickers) {
+  if (!Number.isInteger(num) || num < 0 || num >= totalStickers) {
     return { kind: "invalid", label: String(num) };
   }
 
   return {
     kind: "ok",
     valid: [num],
-    formatted: String(num),
+    formatted: num === 0 ? "0" : String(num),
   };
 }
 
@@ -189,8 +189,8 @@ function parseGlobalRange(
     !Number.isInteger(start) ||
     !Number.isInteger(end) ||
     start > end ||
-    start < 1 ||
-    end > totalStickers
+    start < 0 ||
+    end >= totalStickers
   ) {
     return { kind: "invalid", label: `${start}-${end}` };
   }
@@ -341,11 +341,12 @@ export function formatStickerNumber(
 
   if (section) {
     const relativeNum = getRelativeNum(num, section);
+    const relDisplay = relativeNum === 0 ? "00" : String(relativeNum);
     return {
       code: section.code,
       relativeNum,
       fullName: section.name,
-      display: `${section.code}-${relativeNum}`,
+      display: `${section.code}-${relDisplay}`,
     };
   }
 
@@ -366,11 +367,12 @@ export function formatStickerNumberStrict(
     throw new Error(`No section found for sticker number ${num}`);
   }
   const relativeNum = getRelativeNum(num, section);
+  const relDisplay = relativeNum === 0 ? "00" : String(relativeNum);
   return {
     code: section.code,
     relativeNum,
     fullName: section.name,
-    display: `${section.code}-${relativeNum}`,
+    display: `${section.code}-${relDisplay}`,
   };
 }
 

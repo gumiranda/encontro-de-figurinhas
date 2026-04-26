@@ -1,8 +1,24 @@
 {
-  "version": 4,
+  "version": 6,
   "year": 2026,
-  "totalStickers": 1109,
+  "totalStickers": 1074,
   "sections": [
+    {
+      "code": "ALB",
+      "name": "Figurinha 00",
+      "startNumber": 0,
+      "endNumber": 0,
+      "flagEmoji": "🎫",
+      "isExtra": false,
+      "relStart": 0,
+      "stickers": [
+        {
+          "rel": 0,
+          "name": "Capa do álbum",
+          "type": "special"
+        }
+      ]
+    },
     {
       "code": "FWC",
       "name": "Copa do Mundo",
@@ -5400,81 +5416,11 @@
       ]
     },
     {
-      "code": "CC-US",
-      "name": "Coca-Cola USA/Canadá",
-      "startNumber": 980,
-      "endNumber": 991,
-      "flagEmoji": "🥤",
-      "isExtra": true,
-      "stickers": [
-        {
-          "rel": 1,
-          "name": "Lamine Yamal",
-          "type": "special"
-        },
-        {
-          "rel": 2,
-          "name": "Joshua Kimmich",
-          "type": "special"
-        },
-        {
-          "rel": 3,
-          "name": "Harry Kane",
-          "type": "special"
-        },
-        {
-          "rel": 4,
-          "name": "Santiago Giménez",
-          "type": "special"
-        },
-        {
-          "rel": 5,
-          "name": "Antonee Robinson",
-          "type": "special"
-        },
-        {
-          "rel": 6,
-          "name": "Jefferson Lerma",
-          "type": "special"
-        },
-        {
-          "rel": 7,
-          "name": "Edson Álvarez",
-          "type": "special"
-        },
-        {
-          "rel": 8,
-          "name": "Virgil van Dijk",
-          "type": "special"
-        },
-        {
-          "rel": 9,
-          "name": "Alphonso Davies",
-          "type": "special"
-        },
-        {
-          "rel": 10,
-          "name": "Weston McKennie",
-          "type": "special"
-        },
-        {
-          "rel": 11,
-          "name": "Lautaro Martínez",
-          "type": "special"
-        },
-        {
-          "rel": 12,
-          "name": "Gabriel Magalhães",
-          "type": "special"
-        }
-      ]
-    },
-    {
       "code": "CC-LAM",
       "name": "Coca-Cola América Latina",
-      "startNumber": 992,
-      "endNumber": 1005,
-      "flagEmoji": "🥤",
+      "startNumber": 980,
+      "endNumber": 993,
+      "flagEmoji": "🎫",
       "isExtra": true,
       "stickers": [
         {
@@ -5550,150 +5496,10 @@
       ]
     },
     {
-      "code": "CC-SRB",
-      "name": "Coca-Cola Sérvia",
-      "startNumber": 1006,
-      "endNumber": 1017,
-      "flagEmoji": "🥤",
-      "isExtra": true,
-      "stickers": [
-        {
-          "rel": 1,
-          "name": "Lautaro Martínez",
-          "type": "special"
-        },
-        {
-          "rel": 2,
-          "name": "Alphonso Davies",
-          "type": "special"
-        },
-        {
-          "rel": 3,
-          "name": "Joško Gvardiol",
-          "type": "special"
-        },
-        {
-          "rel": 4,
-          "name": "Harry Kane",
-          "type": "special"
-        },
-        {
-          "rel": 5,
-          "name": "Eduardo Camavinga",
-          "type": "special"
-        },
-        {
-          "rel": 6,
-          "name": "William Saliba",
-          "type": "special"
-        },
-        {
-          "rel": 7,
-          "name": "Joshua Kimmich",
-          "type": "special"
-        },
-        {
-          "rel": 8,
-          "name": "Raúl Jiménez",
-          "type": "special"
-        },
-        {
-          "rel": 9,
-          "name": "Virgil van Dijk",
-          "type": "special"
-        },
-        {
-          "rel": 10,
-          "name": "Lamine Yamal",
-          "type": "special"
-        },
-        {
-          "rel": 11,
-          "name": "Antonee Robinson",
-          "type": "special"
-        },
-        {
-          "rel": 12,
-          "name": "Federico Valverde",
-          "type": "special"
-        }
-      ]
-    },
-    {
-      "code": "CC-ESP",
-      "name": "Coca-Cola Espanha",
-      "startNumber": 1018,
-      "endNumber": 1029,
-      "flagEmoji": "🥤",
-      "isExtra": true,
-      "stickers": [
-        {
-          "rel": 1,
-          "name": "Lamine Yamal",
-          "type": "special"
-        },
-        {
-          "rel": 2,
-          "name": "Joshua Kimmich",
-          "type": "special"
-        },
-        {
-          "rel": 3,
-          "name": "Eduardo Camavinga",
-          "type": "special"
-        },
-        {
-          "rel": 4,
-          "name": "Joško Gvardiol",
-          "type": "special"
-        },
-        {
-          "rel": 5,
-          "name": "Federico Valverde",
-          "type": "special"
-        },
-        {
-          "rel": 6,
-          "name": "Virgil van Dijk",
-          "type": "special"
-        },
-        {
-          "rel": 7,
-          "name": "Alphonso Davies",
-          "type": "special"
-        },
-        {
-          "rel": 8,
-          "name": "Raúl Jiménez",
-          "type": "special"
-        },
-        {
-          "rel": 9,
-          "name": "William Saliba",
-          "type": "special"
-        },
-        {
-          "rel": 10,
-          "name": "Lautaro Martínez",
-          "type": "special"
-        },
-        {
-          "rel": 11,
-          "name": "Harry Kane",
-          "type": "special"
-        },
-        {
-          "rel": 12,
-          "name": "Antonee Robinson",
-          "type": "special"
-        }
-      ]
-    },
-    {
       "code": "EXT",
       "name": "Extras",
-      "startNumber": 1030,
-      "endNumber": 1109,
+      "startNumber": 994,
+      "endNumber": 1073,
       "flagEmoji": "✨",
       "isExtra": true,
       "stickers": [

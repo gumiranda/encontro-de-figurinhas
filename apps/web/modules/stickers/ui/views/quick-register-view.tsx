@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  AppNavDrawer,
+  AppSidebarContent,
+  useAppNavGroups,
+} from "@/modules/shared/ui/components/app-nav-drawer";
+import { MobileBottomNav } from "@/modules/shared/ui/components/mobile-bottom-nav";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
@@ -9,12 +15,6 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  AppNavDrawer,
-  AppSidebarContent,
-  useAppNavGroups,
-} from "@/modules/shared/ui/components/app-nav-drawer";
-import { MobileBottomNav } from "@/modules/shared/ui/components/mobile-bottom-nav";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { DesktopTopBar } from "../components/desktop-top-bar";
 import { MobileFabBar } from "../components/mobile-fab-bar";
@@ -27,10 +27,11 @@ import {
 import { StickerTabs } from "../components/sticker-tabs";
 
 const SECTION_EMOJI: Record<string, string> = {
+  // Já existentes
   BRA: "🇧🇷",
   ARG: "🇦🇷",
   FRA: "🇫🇷",
-  ENG: "🏴",
+  ENG: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
   ESP: "🇪🇸",
   GER: "🇩🇪",
   POR: "🇵🇹",
@@ -43,6 +44,64 @@ const SECTION_EMOJI: Record<string, string> = {
   BEL: "🇧🇪",
   SUI: "🇨🇭",
   CRO: "🇭🇷",
+
+  // Grupo A
+  RSA: "🇿🇦",
+  CZE: "🇨🇿",
+
+  // Grupo B
+  QAT: "🇶🇦",
+  BIH: "🇧🇦",
+
+  // Grupo C
+  MAR: "🇲🇦",
+  HAI: "🇭🇹",
+  SCO: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+
+  // Grupo D
+  PAR: "🇵🇾",
+  AUS: "🇦🇺",
+  TUR: "🇹🇷",
+
+  // Grupo E
+  CUW: "🇨🇼",
+  CIV: "🇨🇮",
+  ECU: "🇪🇨",
+
+  // Grupo F
+  SWE: "🇸🇪",
+  TUN: "🇹🇳",
+
+  // Grupo G
+  EGY: "🇪🇬",
+  IRN: "🇮🇷",
+  NZL: "🇳🇿",
+
+  // Grupo H
+  CPV: "🇨🇻",
+  KSA: "🇸🇦",
+  URU: "🇺🇾",
+
+  // Grupo I
+  SEN: "🇸🇳",
+  NOR: "🇳🇴",
+  IRQ: "🇮🇶",
+
+  // Grupo J
+  ALG: "🇩🇿",
+  AUT: "🇦🇹",
+  JOR: "🇯🇴",
+
+  // Grupo K
+  UZB: "🇺🇿",
+  COL: "🇨🇴",
+  COD: "🇨🇩",
+
+  // Grupo L
+  GHA: "🇬🇭",
+  PAN: "🇵🇦",
+
+  // Coringa / extra
   EXT: "⭐️",
 };
 
@@ -57,10 +116,7 @@ export function QuickRegisterView({
   const pathname = usePathname();
   const { isAuthenticated } = useConvexAuth();
 
-  const navContext = useQuery(
-    api.users.getNavContext,
-    isAuthenticated ? {} : "skip"
-  );
+  const navContext = useQuery(api.users.getNavContext, isAuthenticated ? {} : "skip");
   const navReady = navContext !== undefined;
   const hasCompletedSetup = navContext?.hasCompletedStickerSetup === true;
 
@@ -109,12 +165,8 @@ export function QuickRegisterView({
     setSnapshot({ haveBase: haveCount, dupsBase: duplicates.length });
   }, [isLoading, snapshot, haveCount, duplicates.length]);
 
-  const addedHaveDiff = snapshot
-    ? Math.max(0, haveCount - snapshot.haveBase)
-    : 0;
-  const addedDupsDiff = snapshot
-    ? Math.max(0, duplicates.length - snapshot.dupsBase)
-    : 0;
+  const addedHaveDiff = snapshot ? Math.max(0, haveCount - snapshot.haveBase) : 0;
+  const addedDupsDiff = snapshot ? Math.max(0, duplicates.length - snapshot.dupsBase) : 0;
 
   const handleToggle = useCallback(
     (num: number) => {
@@ -215,13 +267,8 @@ export function QuickRegisterView({
               </h1>
               <p className="text-[11px] text-on-surface-variant">
                 {totalStickers} figurinhas ·{" "}
-                <span className="font-bold text-secondary">
-                  {haveCount} tenho
-                </span>{" "}
-                ·{" "}
-                <span className="font-bold text-tertiary">
-                  {needCount} preciso
-                </span>
+                <span className="font-bold text-secondary">{haveCount} tenho</span> ·{" "}
+                <span className="font-bold text-tertiary">{needCount} preciso</span>
               </p>
               {modeSwitchLink ? (
                 <p className="mt-1 text-[11px]">{modeSwitchLink}</p>
@@ -328,9 +375,7 @@ export function QuickRegisterView({
                     missingSet={missingSet}
                     variant="mobile"
                     onToggle={handleToggle}
-                    onBulkAction={(action) =>
-                      handleBulkAction(section.code, action)
-                    }
+                    onBulkAction={(action) => handleBulkAction(section.code, action)}
                   />
                 ))}
               </div>

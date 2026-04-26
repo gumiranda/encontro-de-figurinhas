@@ -32,6 +32,7 @@ import type * as lib_reportCategories from "../lib/reportCategories.js";
 import type * as lib_report_severity from "../lib/report_severity.js";
 import type * as lib_setLocationErrors from "../lib/setLocationErrors.js";
 import type * as lib_slug from "../lib/slug.js";
+import type * as lib_stickerNumbering from "../lib/stickerNumbering.js";
 import type * as lib_tradeHelpers from "../lib/tradeHelpers.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_userCoords from "../lib/userCoords.js";
@@ -95,6 +96,7 @@ declare const fullApi: ApiFromModules<{
   "lib/report_severity": typeof lib_report_severity;
   "lib/setLocationErrors": typeof lib_setLocationErrors;
   "lib/slug": typeof lib_slug;
+  "lib/stickerNumbering": typeof lib_stickerNumbering;
   "lib/tradeHelpers": typeof lib_tradeHelpers;
   "lib/types": typeof lib_types;
   "lib/userCoords": typeof lib_userCoords;

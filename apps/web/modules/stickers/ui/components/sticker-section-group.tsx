@@ -164,6 +164,8 @@ function StickerSectionGroupBase({
   const totalCount = section.endNumber - section.startNumber + 1;
   const relStart = section.relStart ?? 1;
   const relEnd = relStart + totalCount - 1;
+  const relRangeLabel =
+    relStart === 0 && relEnd === 0 ? "00" : `${relStart}–${relEnd}`;
   const activeSet = mode === "duplicates" ? duplicatesSet : missingSet;
 
   const activeInSection = useMemo(() => {
@@ -215,7 +217,7 @@ function StickerSectionGroupBase({
               className={cn("h-5 w-7 shrink-0 rounded", getFlagGradient(section.code))}
             />
             <span className="font-headline text-md font-bold uppercase tracking-wider">
-              {section.name} · {relStart}–{relEnd}
+              {section.name} · {relRangeLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -267,7 +269,7 @@ function StickerSectionGroupBase({
           <div className="flex items-center justify-between">
             <span className="font-headline text-md font-bold uppercase tracking-widest text-on-surface-variant">
               {section.emoji ? `${section.emoji} ` : ""}
-              {section.name} ({section.code}) · {relStart}–{relEnd}
+              {section.name} ({section.code}) · {relRangeLabel}
             </span>
             <span className="font-mono text-md text-outline">
               {activeInSection}/{totalCount}

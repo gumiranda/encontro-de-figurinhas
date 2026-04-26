@@ -46,8 +46,10 @@ function validateDisjoint(dups: number[], miss: number[]): string | null {
     : null;
 }
 
-function filterValidStickerNumbers(numbers: number[], maxSticker: number): number[] {
-  return numbers.filter((n) => Number.isInteger(n) && n >= 1 && n <= maxSticker);
+function filterValidStickerNumbers(numbers: number[], totalCount: number): number[] {
+  return numbers.filter(
+    (n) => Number.isInteger(n) && n >= 0 && n < totalCount
+  );
 }
 
 /** Dedupe + ascending sort (canonical order for sticker ids). */
@@ -106,7 +108,7 @@ const initialStickersUi: StickersUiState = {
 export function useStickers(debounceMs = 300) {
   const data = useQuery(api.stickers.getUserStickers);
   const sections: Section[] = data?.sections ?? EMPTY_SECTIONS;
-  const totalStickers = data?.totalStickers ?? 1109;
+  const totalStickers = data?.totalStickers ?? 1074;
   const serverDuplicates = data?.duplicates ?? EMPTY_NUMBERS;
   const serverMissing = data?.missing ?? EMPTY_NUMBERS;
   const isLoading = data === undefined;
@@ -167,7 +169,7 @@ export function useStickers(debounceMs = 300) {
     const dups = dupsRef.current;
     const miss = missRef.current;
 
-    const lengthExceeded = dups.length > 1109 || miss.length > 1109;
+    const lengthExceeded = dups.length > 1074 || miss.length > 1074;
 
     if (lengthExceeded) {
       dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
@@ -179,7 +181,7 @@ export function useStickers(debounceMs = 300) {
       const dupsAtSave = dupsRef.current;
       const missAtSave = missRef.current;
 
-      if (dupsAtSave.length > 1109 || missAtSave.length > 1109) {
+      if (dupsAtSave.length > 1074 || missAtSave.length > 1074) {
         dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
         return;
       }
@@ -258,7 +260,7 @@ export function useStickers(debounceMs = 300) {
 
   const removeNumber = useCallback(
     (kind: ListKind, num: number) => {
-      if (!Number.isInteger(num) || num < 1 || num > totalStickers) return;
+      if (!Number.isInteger(num) || num < 0 || num >= totalStickers) return;
       applyListUpdate(kind, (prev) => prev.filter((n) => n !== num));
     },
     [applyListUpdate, totalStickers]
@@ -434,7 +436,7 @@ export function useStickers(debounceMs = 300) {
 
   const markAll = useCallback(
     (mode: ListKind) => {
-      const allNumbers = Array.from({ length: totalStickers }, (_, i) => i + 1);
+      const allNumbers = Array.from({ length: totalStickers }, (_, i) => i);
       applyListUpdate(mode, () => allNumbers);
     },
     [totalStickers, applyListUpdate]

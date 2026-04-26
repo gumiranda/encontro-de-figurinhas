@@ -52,7 +52,8 @@ function StickerTileBase({
   onClick,
 }: StickerTileProps) {
   const isBlocked = state === "blocked";
-  const label = displayLabel ?? String(relativeNum);
+  const relLabel = relativeNum === 0 ? "00" : String(relativeNum);
+  const label = displayLabel ?? relLabel;
 
   const stateLabel = STATE_LABELS[state];
   const button = (
@@ -64,7 +65,7 @@ function StickerTileBase({
       disabled={isBlocked}
       aria-disabled={isBlocked || undefined}
       aria-pressed={state === "have" || state === "need" || undefined}
-      aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relativeNum}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
+      aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relLabel}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       title={playerName}
       className={cn(
         "sticker-spring relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold",

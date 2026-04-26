@@ -136,7 +136,7 @@ export function SeedAdminView() {
                 <div>
                   <CardTitle>Seed Album</CardTitle>
                   <CardDescription>
-                    Album config + 1109 sticker details (Copa 2026)
+                    Album config + 1074 sticker details (Copa 2026)
                   </CardDescription>
                 </div>
               </div>
@@ -204,7 +204,7 @@ export function SeedAdminView() {
               <strong>Trade Points:</strong> 80 pontos de troca exemplo
             </p>
             <p>
-              <strong>Album:</strong> 1109 figurinhas com nomes de jogadores
+              <strong>Album:</strong> 1074 figurinhas com nomes de jogadores
             </p>
             <p>
               <strong>Boring Game:</strong> Rodadas do jogo mais chato

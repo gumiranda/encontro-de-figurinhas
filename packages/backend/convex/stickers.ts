@@ -11,6 +11,7 @@ import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { rateLimiter } from "./lib/rateLimiter";
 import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
+import { isValidAbsolute } from "./lib/stickerNumbering";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 3000;
@@ -78,7 +79,7 @@ function withResolvedRelStart(section: AlbumSection): AlbumSection {
   const details = section.stickerDetails;
   if (!details?.length) return section;
   const minRel = Math.min(...details.map((d) => d.rel));
-  if (minRel <= 1) return section;
+  if (minRel === 1) return section;
   return { ...section, relStart: minRel };
 }
 
@@ -118,7 +119,7 @@ export const updateStickerList = mutation({
     }
 
     const config = await ctx.db.query("albumConfig").first();
-    const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const totalCount = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const newDup = new Set<number>(args.duplicates);
     const newMiss = new Set<number>(args.missing);
@@ -131,13 +132,12 @@ export const updateStickerList = mutation({
       );
     }
 
-    // 2. Range 1..maxSticker
+    // 2. Números absolutos: 0 .. totalCount - 1
     const allNumbers = [...args.duplicates, ...args.missing];
-    const invalid = allNumbers.filter(
-      (n) => !Number.isInteger(n) || !Number.isFinite(n) || n < 1 || n > maxSticker
-    );
+    const invalid = allNumbers.filter((n) => !isValidAbsolute(n, totalCount));
     if (invalid.length > 0) {
-      throw new Error(`Numeros invalidos (1-${maxSticker}): ${invalid.join(", ")}`);
+      const maxAbs = totalCount - 1;
+      throw new Error(`Numeros invalidos (0-${maxAbs}): ${invalid.join(", ")}`);
     }
 
     // 3. Skip se iguais
@@ -163,8 +163,8 @@ export const updateStickerList = mutation({
     }
 
     // 5. Contadores
-    const totalStickersOwned = maxSticker - args.missing.length;
-    const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
+    const totalStickersOwned = totalCount - args.missing.length;
+    const albumProgress = Math.round((totalStickersOwned / totalCount) * 100);
 
     // 6. Patch
     const patch: UserPatch = {
@@ -202,11 +202,12 @@ export const toggleSticker = mutation({
     await rateLimiter.limit(ctx, "toggleSticker", { key: user._id, throws: true });
 
     const config = await ctx.db.query("albumConfig").first();
-    const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const totalCount = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const n = args.number;
-    if (!Number.isInteger(n) || n < 1 || n > maxSticker) {
-      throw new Error(`Número inválido (1-${maxSticker})`);
+    if (!isValidAbsolute(n, totalCount)) {
+      const maxAbs = totalCount - 1;
+      throw new Error(`Número inválido (0-${maxAbs})`);
     }
 
     const currentDup = new Set<number>(user.duplicates ?? []);
@@ -226,8 +227,8 @@ export const toggleSticker = mutation({
     const nextDup = [...currentDup].sort((a, b) => a - b);
     const nextMiss = [...currentMiss].sort((a, b) => a - b);
 
-    const totalStickersOwned = maxSticker - nextMiss.length;
-    const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
+    const totalStickersOwned = totalCount - nextMiss.length;
+    const albumProgress = Math.round((totalStickersOwned / totalCount) * 100);
 
     const userPatch: UserPatch = {
       duplicates: nextDup,

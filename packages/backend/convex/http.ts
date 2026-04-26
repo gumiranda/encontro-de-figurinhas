@@ -21,7 +21,7 @@ const getStickerSlugHttp = httpAction(async (ctx, request) => {
   const numStr = url.searchParams.get("num");
   const num = numStr ? parseInt(numStr, 10) : NaN;
 
-  if (isNaN(num) || num < 1) {
+  if (isNaN(num) || !Number.isInteger(num) || num < 0) {
     return new Response(null, { status: 400 });
   }
 
