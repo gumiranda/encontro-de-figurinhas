@@ -67,11 +67,6 @@ export async function generateMetadata({
   );
 }
 
-export async function generateStaticParams() {
-  const slugs = await convexServer.query(api.states.getAllStateSlugs, {});
-  return slugs.map((slug) => ({ slug }));
-}
-
 export default async function StatePage({ params }: StatePageProps) {
   const { slug } = await params;
   const [state, stats, allStates] = await Promise.all([

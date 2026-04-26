@@ -70,11 +70,6 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   return base;
 }
 
-export async function generateStaticParams() {
-  const slugs = await convexServer.query(api.cities.listTopActiveForSSG, {});
-  return slugs.map((slug) => ({ slug }));
-}
-
 export default async function CityPage({ params }: CityPageProps) {
   const { slug } = await params;
   const [city, stats, topPoints] = await Promise.all([

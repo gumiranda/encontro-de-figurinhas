@@ -76,11 +76,6 @@ async function loadRelatedPoints(citySlug: string) {
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
-export async function generateStaticParams() {
-  const slugs = await fetchQuery(api.tradePoints.listTopForSSG, {});
-  return slugs.map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: PontoPageProps): Promise<Metadata> {

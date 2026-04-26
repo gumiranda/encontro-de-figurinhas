@@ -25,12 +25,6 @@ import { JsonLd } from "@/components/json-ld";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { RelatedStickers } from "@/components/related-stickers";
 
-// ISR: revalidate every 24 hours
-export const revalidate = 86400;
-
-// Only pre-generated slugs, unknown slugs → 404 immediately
-export const dynamicParams = false;
-
 interface StickerPageProps {
   params: Promise<{ slug: string }>;
 }
