@@ -52,36 +52,15 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { rodada } = await params;
-  const round = await loadRound(rodada);
-  if (!round) return { title: "Rodada não encontrada" };
-
-  const matches = await loadResult(round._id, round.slug);
-  const winner = matches[0];
-  const total = matches.reduce((acc, m) => acc + m.totalVotes, 0);
-  const winnerPct =
-    winner && total > 0 ? Math.round((winner.totalVotes / total) * 100) : 0;
-
   const url = `${BASE_URL}/jogo-mais-chato/${rodada}/resultado`;
-  const title = winner
-    ? `Vencedor — Jogo Mais Chato ${round.name}`
-    : `Resultado — ${round.name}`;
-  const description = winner
-    ? `${winner.homeTeamName} x ${winner.awayTeamName} foi eleito o jogo mais chato da ${round.name} com ${winnerPct}%.`
-    : `Resultado da votação de jogo mais chato da ${round.name}.`;
-
-  // Gating noindex: rodada precisa estar ENCERRADA (admin flipped + endDate
-  // passou). isFinished é computado server-side dentro da Convex query —
-  // contorna proibição de Date.now() em Server Component metadata.
-  const shouldIndex = round.isActive === false && round.isFinished === true;
+  const title = "Resultado — Jogo Mais Chato";
+  const description = "Veja o resultado da votação de jogo mais chato da Copa 2026.";
 
   return {
     title,
     description,
     openGraph: { title, description, url, type: "website" },
     alternates: { canonical: url },
-    robots: shouldIndex
-      ? { index: true, follow: true }
-      : { index: false, follow: true },
   };
 }
 

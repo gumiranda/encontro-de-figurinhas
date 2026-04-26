@@ -56,12 +56,9 @@ export async function generateMetadata({
   params,
 }: Omit<Props, "searchParams">): Promise<Metadata> {
   const { rodada, matchSlug } = await params;
-  const data = await loadMatchBySlug(matchSlug);
-  if (!data) return { title: "Jogo não encontrado" };
-  const { match, round } = data;
   const url = `${BASE_URL}/jogo-mais-chato/${rodada}/${matchSlug}`;
-  const title = `${match.homeTeamName} x ${match.awayTeamName} — Foi o jogo mais chato?`;
-  const description = `Diga por que ${match.homeTeamName} x ${match.awayTeamName} pela ${round.name} foi (ou não foi) chato. ${match.totalVotes.toLocaleString("pt-BR")} já votaram.`;
+  const title = "Foi o jogo mais chato?";
+  const description = "Diga por que esta partida da Copa 2026 foi (ou não foi) chato. Vote agora!";
   return {
     title,
     description,

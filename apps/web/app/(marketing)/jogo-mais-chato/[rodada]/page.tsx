@@ -50,19 +50,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { rodada } = await params;
-  const round = await loadRoundBySlug(rodada);
-  if (!round) return { title: "Rodada não encontrada" };
-
   const url = `${BASE_URL}/jogo-mais-chato/${rodada}`;
-  const matches = await loadMatches(round._id, round.slug);
-  const description = `Vote no jogo mais chato da ${round.name}: ${matches.length} partidas em disputa.`;
-
   return {
-    title: `${round.name} — Jogo Mais Chato`,
-    description,
+    title: "Jogo Mais Chato — Copa 2026",
+    description: "Vote no jogo mais chato da Copa 2026.",
     openGraph: {
-      title: `${round.name} — Jogo Mais Chato da Copa 2026`,
-      description,
+      title: "Jogo Mais Chato — Copa 2026",
+      description: "Vote no jogo mais chato da Copa 2026.",
       url,
       type: "website",
     },
