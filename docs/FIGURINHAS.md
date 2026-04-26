@@ -2,1107 +2,1143 @@ Agora eu tenho detalhes do album oficial da copa e gostaria de atualizar seed e 
 
 seed de figurinhas
 
-EXTRA STICKERS DO TIPO REGULAR (ROXO),BRONZE,PRATA E OURO
-1 LIONEL MESSI (Argentina)
-2 JÉRÉMY DOKU (Bélgica)
-3 VINÍCIUS JÚNIOR (Brasil)
-4 ALPHONSO DAVIES (Canadá)
-5 LUIS DÍAZ (Colômbia)
-6 LUKA MODRIĆ (Croácia)
-7 MOISÉS CAICEDO (Equador)
-8 MOHAMED SALAH (Egito)
-9 JUDE BELLINGHAM (Inglaterra)
-10 KYLIAN MBAPPÉ (França)
-11 FLORIAN WIRTZ (Alemanha)
-12 RAÚL JIMÉNEZ (México)
-13 ACHRAF HAKIMI (Marrocos)
-14 CODY GAKPO (Países Baixos)
-15 ERLING HAALAND (Noruega)
-16 CRISTIANO RONALDO (Portugal)
-17 HEUNG-MIN SON (Coreia do Sul)
-18 LAMINE YAMAL (Espanha)
-19 CHRISTIAN PULISIC (Estados Unidos)
-20 FEDERICO VALVERDE (Uruguai)
-
 00
-FWC-1 EMBLEMA OFICIAL PARTE SUPERIOR
-FWC-2 EMBLEMA OFICIAL PARTE INFERIOR
+FWC-1 EscudoA OFICIAL PARTE SUPERIOR
+FWC-2 EscudoA OFICIAL PARTE INFERIOR
 FWC-3 MASCOTE OFICIAL
 FWC-4 SLOGAN OFICIAL
 FWC-5 BOLA OFICIAL
-FWC-6 EMBLEMA DO PAÍS-SEDE CANADÁ
-FWC-7 EMBLEMA DO PAÍS SEDE MÉXICO
-FWC-8 EMBLEMA DO PAÍS SEDE ESTADOS UNIDOS
+FWC-6 EscudoA DO PAÍS-SEDE CANADÁ
+FWC-7 EscudoA DO PAÍS SEDE MÉXICO
+FWC-8 EscudoA DO PAÍS SEDE ESTADOS UNIDOS
 
 ## GRUPO A
 
-MEX-1 ESCUDO
-MEX-2 LUIS MALAGON
-MEX-3 JOHAN VASQUEZ
-MEX-4 JORGE SANCHEZ
-MEX-5 CESAR MONTES
-MEX-6 JESUS GALLARDO
-MEX-7 ISRAEL REVES
-MEX-8 DIEGO LAINEZ
-MEX-9 CARLOS RODRIGUEZ
-MEX-10 EDSON ÁLVAREZ
-MEX-11 ORBELIN PINEDA
-MEX-12 MARCEL RUIZ
-MEX-13 FOTO DA EQUIPE
-MEX-14 ERICK SANCHEZ
-MEX-15 HRVING LOZANO
-MEX-16 SANTIAGO GIMENEZ
-MEX-17 RAUL JIMENEZ
-MEX-18 ALEXIS VEGA
-MEX-19 ROBERTO ALVARADO
-MEX-20 CESAR HUERTA
+# === MÉXICO ===
 
-RSA-1 ESCUDO
-RSA-2 RONWEN WILLIAMS
-RSA-3 SIPHO CHAINE
-RSA-4 AUBREY MODIBA
-RSA-5 SAMUKELE KABINI
-RSA-6 MBEKEZELI MBOKAZI
-RSA-7 KHULUMANI NDAMANE
-RSA-8 SIYABONGA NGEZANA
-RSA-9 KHULISO MUDAU
-RSA-10 NIKOSINATHI SIBISI
-RSA-11 TEBOHO MOKOENA
-RSA-12 THALENTE MBATHA
-RSA-13 FOTO DA EQUIPE
-RSA-14 BATHUSI AUBAAS
-RSA-15 YAYA SITHOLE
-RSA-16 SIPHO MBULE
-RSA-17 LYLE FOSTER
-RSA-18 IORAAM RAYNERS
-RSA-19 MOHAU NIKOTA
-RSA-20 OSWIN APPOLIS
+MEX-1 Escudo
+MEX-2 Luis Malagón
+MEX-3 Johan Vásquez
+MEX-4 Jorge Sánchez
+MEX-5 César Montes
+MEX-6 Jesús Gallardo
+MEX-7 Israel Reyes
+MEX-8 Diego Lainez
+MEX-9 Carlos Rodríguez
+MEX-10 Edson Álvarez
+MEX-11 Orbelín Pineda
+MEX-12 Marcel Ruiz
+MEX-13 Foto do time
+MEX-14 Érick Sánchez
+MEX-15 Hirving Lozano
+MEX-16 Santiago Giménez
+MEX-17 Raúl Jiménez
+MEX-18 Alexis Vega
+MEX-19 Roberto Alvarado
+MEX-20 César Huerta
 
-KOR-1 ESCUDO
-KOR-2 HYEONWOO JO
-KOR-3 SEUNGGYU KIM
-KOR-4 MINJAE KIM
-KOR-5 YUMIN CHO
-KOR-6 YOUNGWOO SEOL
-KOR-7 HANBEOM LEE
-KOR-8 TAESEOK LEE
-KOR-9 MYUNGJAE LEE
-KOR-10 JAESUNG LEE
-KOR-11 INBEOM HWANG
-KOR-12 KANGIN LEE
-KOR-13 FOTO DA EQUIPE
-KOR-14 SEUNGHO PARK
-KOR-15 JENS CASTROP
-KOR-16 DONGGYEONG LEE
-KOR-17 GUESUNG CHO
-KOR-18 HEUGMIN SON
-KOR-19 HEECHAN HWANG
-KOR-20 HYEONGYU OH
+# === ÁFRICA DO SUL ===
 
-CZE-1 ESCUDO
-CZE-2 MATEJ KOVAR
-CZE-3 JINDRICH STANEK
-CZE-4 LADISLAV KREJCI
-CZE-5 VLADIMIR COUFAL
-CZE-6 JORSLAV ZELENY
-CZE-7 TOMAS HOLES
-CZE-8 DAVID ZIMA
-CZE-9 MICHAL SADILEK
-CZE-10 LUKAS PROVOD
-CZE-11 LUKAS CERV
-CZE-12 TOMAS SOUCEK
-CZE-13 FOTO DA EQUIPE
-CZE-14 PAVEL SULC
-CZE-15 MATEJ VYDRA
-CZE-16 VASIL KUSEJ
-CZE-17 TOMAS CHORY
-CZE-18 VACLAV CERNY
-CZE-19 ADAM HLOZEK
-CZE-20 PATRIK SCHICK
+RSA-1 Escudo
+RSA-2 Ronwen Williams
+RSA-3 Sipho Chaine
+RSA-4 Aubrey Modiba
+RSA-5 Samukele Kabini
+RSA-6 Mbekezeli Mbokazi
+RSA-7 Khulumani Ndamane
+RSA-8 Siyabonga Ngezana
+RSA-9 Khuliso Mudau
+RSA-10 Nkosinathi Sibisi
+RSA-11 Teboho Mokoena
+RSA-12 Thalente Mbatha
+RSA-13 Foto do time
+RSA-14 Bathasi Aubaas
+RSA-15 Yaya Sithole
+RSA-16 Sipho Mbule
+RSA-17 Lyle Foster
+RSA-18 Iqraam Rayners
+RSA-19 Mohau Nkota
+RSA-20 Oswin Appollis
+
+# === COREIA DO SUL ===
+
+KOR-1 Escudo
+KOR-2 Hyeon-woo Jo
+KOR-3 Seung-Gyu Kim
+KOR-4 Min-jae Kim
+KOR-5 Yu-min Cho
+KOR-6 Young-woo Seol
+KOR-7 Han-beom Lee
+KOR-8 Tae-seok Lee
+KOR-9 Myung-jae Lee
+KOR-10 Jae-sung Lee
+KOR-11 In-beom Hwang
+KOR-12 Kang-in Lee
+KOR-13 Foto do time
+KOR-14 Seung-ho Paik
+KOR-15 Jens Castrop
+KOR-16 Dong-yeong Lee
+KOR-17 Gue-sung Cho
+KOR-18 Heung-min Son
+KOR-19 Hee-chan Hwang
+KOR-20 Hyeon-Gyu Oh
+
+# === REPÚBLICA TCHECA ===
+
+CZE-1 Escudo
+CZE-2 Matej Kovar
+CZE-3 Jindrich Stanek
+CZE-4 Ladislav Krejci
+CZE-5 Vladimir Coufal
+CZE-6 Jaroslav Zeleny
+CZE-7 Tomas Holes
+CZE-8 David Zima
+CZE-9 Michal Sadilek
+CZE-10 Lukas Provod
+CZE-11 Lukas Cerv
+CZE-12 Tomas Soucek
+CZE-13 Foto do time
+CZE-14 Pavel Sulc
+CZE-15 Matej Vydra
+CZE-16 Vasil Kusej
+CZE-17 Tomas Chory
+CZE-18 Vaclav Cerny
+CZE-19 Adam Hlozek
+CZE-20 Patrik Schick
 
 ## GRUPO B
-CAN-1 ESCUDO
-CAN-2 DAYNE ST. CLAIR
-CAN-3 ALPHONSO DAVIES
-CAN-4 ALISTAIR JOHNSTON
-CAN-5 SAMUEL ADEKUGBE
-CAN-6 RICHIE LARYEA
-CAN-7 DEREK CORNELIUS
-CAN-8 MOISE BOMBITO
-CAN-9 KAMAL MILLER
-CAN-10 STEPHEN EUSTÁQUIO
-CAN-11 ISMAEL KONÉ
-CAN-12 JONATHAN OSORIO
-CAN-13 FOTO DA EQUIPE
-CAN-14 JACOB SHAFFELBURG
-CAN-15 MATHIEU CHOINIERE
-CAN-16 NIKO SIGUR
-CAN-17 TAJON BUCHANAN
-CAN-18 LIAM MILLAR
-CAN-19 CYLE LARIN
-CAN-20 JONATHAN DAVID
 
-BIH-1 ESCUDO
-BIH-2 NIKOLA VASILJ
-BIH-3 AMAR DEDIC
-BIH-4 SEAD KOLASINAC
-BIH-5 TARIK MUHAREMOVIC
-BIH-6 NIHAD MUJAKIC
-BIH-7 NIKOLA KATIC
-BIH-8 AMIR HADZIAHMETOVIC
-BIH-9 BENJAMIN TAHIROVIC
-BIH-10 ARMIN GIGOVIC
-BIH-11 IVAN SUNJIC
-BIH-12 IVAN BASIC
-BIH-13 FOTO DA EQUIPE
-BIH-14 DZENIS BURNIC
-BIH-15 ESMIR BAJRAKTAREVIC
-BIH-16 AMAR MEMIC
-BIH-17 ERMEDIN DEMIROVIC
-BIH-18 EDIN DZEKO
-BIH-19 SAMED BAZDAR
-BIH-20 HARIS TABAKOVIC
+# === CANADÁ ===
 
-QAT-1 ESCUDO
-QAT-2 MESHAAL BARSHAM
-QAT-3 SULTAN ALBRAKE
-QAT-4 LUCAS MENDES
-QAT-5 HOMAM AHMED
-QAT-6 BOUALEM KHOUKHI
-QAT-7 PEDRO MIGUEL
-QAT-8 TAREK SALMAN
-QAT-9 MOHAMMED MANNAI
-QAT-10 KARIM BOUDIAF
-QAT-11 ASSIM MADIBO
-QAT-12 HAMED FATEHI
-QAT-13 FOTO DA EQUIPE
-QAT-14 MOHAMMED WAAD
-QAT-15 ABDULAZIZ HATEM
-QAT-16 HASSAN AL-HAYDOS
-QAT-17 EDMÍLSON JUNIOR
-QAT-18 AKRAM HASSAN AFIF
-QAT-19 AHMED AL-GANEHI
-QAT-20 ALMOEZ ALI
+CAN-1 Escudo
+CAN-2 Dayne St.Clair
+CAN-3 Alphonso Davies
+CAN-4 Alistair Johnston
+CAN-5 Samuel Adekugbe
+CAN-6 Richie Laryea
+CAN-7 Derek Cornelius
+CAN-8 Moïse Bombito
+CAN-9 Kamal Miller
+CAN-10 Stephen Eustáquio
+CAN-11 Ismaël Koné
+CAN-12 Jonathan Osorio
+CAN-13 Foto do time
+CAN-14 Jacob Shaffelburg
+CAN-15 Mathieu Choinière
+CAN-16 Niko Sigur
+CAN-17 Tajon Buchanan
+CAN-18 Liam Millar
+CAN-19 Cyle Larin
+CAN-20 Jonathan David
 
-SUI-1 ESCUDO
-SUI-2 GREGOR KOBEL
-SUI-3 YVON MVOGO
-SUI-4 MANUEL AKANJI
-SUI-5 RICARDO RODRIGUEZ
-SUI-6 NICO ELVEDI
-SUI-7 AURELE AMENDA
-SUI-8 SILVAN WIDMER
-SUI-9 GRANIT XHAKA
-SUI-10 DENIS ZAKARIA
-SUI-11 REMO FREULER
-SUI-12 FABIAN RIEDER
-SUI-13 FOTO DA EQUIPE
-SUI-14 ARDON JASHARI
-SUI-15 JOHAN MANZAMBI
-SUI-16 MICHEL AEBISCHER
-SUI-17 BREEL EMBOLO
-SUI-18 RUBEN VARGAS
-SUI-19 DAN NDOYE
-SUI-20 ZEKI AMDOUNI
+# === BÓSNIA E HERZEGOVINA ===
+
+BIH-1 Escudo
+BIH-2 Nikola Vasilj
+BIH-3 Amer Dedic
+BIH-4 Sead Kolasinac
+BIH-5 Tarik Muharemovic
+BIH-6 Nihad Mujakic
+BIH-7 Nikola Katic
+BIH-8 Amir Hadziahmetovic
+BIH-9 Benjamin Tahirovic
+BIH-10 Armin Gigovic
+BIH-11 Ivan Sunjic
+BIH-12 Ivan Basic
+BIH-13 Foto do time
+BIH-14 Dzenis Burnic
+BIH-15 Esmir Bajraktarevic
+BIH-16 Amar Memic
+BIH-17 Ermedin Demirovic
+BIH-18 Edin Dzeko
+BIH-19 Samed Bazdar
+BIH-20 Haris Tabakovic
+
+# === CATAR ===
+
+QAT-1 Escudo
+QAT-2 Meshaal Barsham
+QAT-3 Sultan Albrake
+QAT-4 Lucas Mendes
+QAT-5 Homam Ahmed
+QAT-6 Boualem Khoukhi
+QAT-7 Pedro Miguel
+QAT-8 Tarek Salman
+QAT-9 Mohamed Al-Mannai
+QAT-10 Karim Boudiaf
+QAT-11 Assim Madibo
+QAT-12 Ahmed Fatehi
+QAT-13 Foto do time
+QAT-14 Mohammed Waad
+QAT-15 Abdulaziz Hatem
+QAT-16 Hassan Al-Haydos
+QAT-17 Edmilson Junior
+QAT-18 Akram Hassan Afif
+QAT-19 Ahmed Al Ganehi
+QAT-20 Almoez Ali
+
+# === SUÍÇA ===
+
+SUI-1 Escudo
+SUI-2 Gregor Kobel
+SUI-3 Yvon Mvogo
+SUI-4 Manuel Akanji
+SUI-5 Ricardo Rodriguez
+SUI-6 Nico Elvedi
+SUI-7 Aurèle Amenda
+SUI-8 Silvan Widmer
+SUI-9 Granit Xhaka
+SUI-10 Denis Zakaria
+SUI-11 Remo Freuler
+SUI-12 Fabian Rieder
+SUI-13 Foto do time
+SUI-14 Ardon Jashari
+SUI-15 Johan Manzambi
+SUI-16 Michel Aebischer
+SUI-17 Breel Embolo
+SUI-18 Ruben Vargas
+SUI-19 Dan Ndoye
+SUI-20 Zeki Amdouni
 
 ## GRUPO C
-BRA-1 ESCUDO
-BRA-2 ALISSON
-BRA-3 BENTO
-BRA-4 MARQUINHOS
-BRA-5 ÉDER MILITÃO
-BRA-6 GABRIEL MAGALHÃES
-BRA-7 DANILO
-BRA-8 WESLEY
-BRA-9 LUCAS PAQUETÁ 
-BRA-10 CASEMIRO
-BRA-11 BRUNO GUIMARÃES
-BRA-12 LUIZ HENRIQUE 
-BRA-13 FOTO DA EQUIPE
-BRA-14 VINICIUS JUNIOR
-BRA-15 RODRYGO
-BRA-16 JOÃO PEDRO
-BRA-17 MATHEUS CUNHA
-BRA-18 GABRIEL MARTINELLI
-BRA-19 RAPHINHA
-BRA-20 ESTÊVÃO
 
-MAR-1 ESCUDO
-MAR-2 YASSINE BOUNOU
-MAR-3 MUNIR EL KAJOUI
-MAR-4 ACHRAF HAKIMI
-MAR-5 NOUSSAIR MAZRAQUI
-MAR-6 NAYEF AGUERD
-MAR-7 ROMAIN SAISS
-MAR-8 JAWAD EL YAMIQ
-MAR-9 ADAM MASINA
-MAR-10 SOFYAN AMRABAT
-MAR-11 AZZEDINE OUNAHI
-MAR-12 ELIESSE BEN SEGHIR
-MAR-13 FOTO DA EQUIPE
-MAR-14 BILAL EL KHANNOUSS
-MAR-15 ISMAEL SAIBARI
-MAR-16 YOUSSEF EN-NESVRI
-MAR-17 ABDE EZZALZOULI
-MAR-18 SOUFIANE RAHIMI
-MAR-19 BRAHIM DIAZ
-MAR-20 AYOUB EL KAABI
+# === BRASIL ===
 
-HAI-1 ESCUDO
-HAI-2 JOHNY PLACIDE
-HAI-3 CARLENS ARCUS
-HAI-4 MARTIN EXPERIENCE
-HAI-5 JEAN-KEVIN DUVERNE
-HAI-6 RICARDO ADÉ
-HAI-7 DUKE LACROIX
-HAI-8 GARVEN METUSALA
-HAI-9 HANNES DELCROIX
-HAI-10 LEVERTON PIERRE
-HAI-11 DANLEY JEAN JACQUES
-HAI-12 JEAN-RICNER BELLEGARD
-HAI-13 FOTO DA EQUIPE
-HAI-14 CHRISTOPHER ATTYS
-HAI-15 DERRICK ETIENNE JR.
-HAI-16 JOSUÉ CASIMIR
-HAI-17 RUBEN PROVIDENCE
-HAI-18 DUCKENS NAZON
-HAI-19 LOUICIUS DEEDSON
-HAI-20 FRANTZDY PIERROT
+BRA-1 Escudo
+BRA-2 Alisson
+BRA-3 Bento
+BRA-4 Marquinhos
+BRA-5 Éder Militão
+BRA-6 Gabriel Magalhães
+BRA-7 Danilo
+BRA-8 Wesley
+BRA-9 Lucas Paquetá
+BRA-10 Casemiro
+BRA-11 Bruno Guimarães
+BRA-12 Luiz Henrique
+BRA-13 Foto do time
+BRA-14 Vinicius Júnior
+BRA-15 Rodrygo
+BRA-16 João Pedro
+BRA-17 Matheus Cunha
+BRA-18 Gabriel Martinelli
+BRA-19 Raphinha
+BRA-20 Estêvão
 
-SCO-1 ESCUDO
-SCO-2 ANGUS GUNNI
-SCO-3 JACK HENDRY
-SCO-4 KIERAN TIERNEY
-SCO-5 AARON HICKEY
-SCO-6 ANDREW ROBERTSON
-SCO-7 SCOTT McKENNA
-SCO-8 JOHN SOUTTAR
-SCO-9 ANTHONY RALSTON
-SCO-10 GRANT HANLEY
-SCO-11 SCOTT McTOMINAV
-SCO-12 BILLY GILMOUR
-SCO-13 FOTO DA EQUIPE
-SCO-14 LEWIS FERGUSON
-SCO-15 RYAN CHRISTIE
-SCO-16 KENNY McLEAN
-SCO-17 JOHN McGINN
-SCO-18 LYNDON DYKES
-SCO-19 CHÉ ADAMS
-SCO-20 BEN GANNON-DOAK
+# === MARROCOS ===
+
+MAR-1 Escudo
+MAR-2 Yassine Bounou
+MAR-3 Munir El Kajoui
+MAR-4 Achraf Hakimi
+MAR-5 Noussair Mazraoui
+MAR-6 Nayef Aguerd
+MAR-7 Romain Saiss
+MAR-8 Jawad El Yamiq
+MAR-9 Adam Masina
+MAR-10 Sofyan Amrabat
+MAR-11 Azzedine Ounahi
+MAR-12 Eliesse Ben Seghir
+MAR-13 Foto do time
+MAR-14 Bilal El Khannouss
+MAR-15 Ismael Saibari
+MAR-16 Youssef En-Nesyri
+MAR-17 Abde Ezzalzouli
+MAR-18 Soufiane Rahimi
+MAR-19 Brahim Diaz
+MAR-20 Ayoub El Kaabi
+
+# === HAITI ===
+
+HAI-1 Escudo
+HAI-2 Johny Placide
+HAI-3 Carlens Arcus
+HAI-4 Martin Expérience
+HAI-5 Jean-Kevin Duverne
+HAI-6 Ricardo Adé
+HAI-7 Duke Lacroix
+HAI-8 Garven Metusala
+HAI-9 Hannes Delcroix
+HAI-10 Leverton Pierre
+HAI-11 Danley Jean Jacques
+HAI-12 Jean-Ricner Bellegarde
+HAI-13 Foto do time
+HAI-14 Christopher Attys
+HAI-15 Derrick Etienne Jr
+HAI-16 Josue Casimir
+HAI-17 Ruben Providence
+HAI-18 Duckens Nazon
+HAI-19 Louicius Deedson
+HAI-20 Frantzdy Pierrot
+
+# === ESCÓCIA ===
+
+SCO-1 Escudo
+SCO-2 Angus Gunn
+SCO-3 Jack Hendry
+SCO-4 Kieran Tierney
+SCO-5 Aaron Hickey
+SCO-6 Andrew Robertson
+SCO-7 Scott McKenna
+SCO-8 John Souttar
+SCO-9 Anthony Ralston
+SCO-10 Grant Hanley
+SCO-11 Scott McTominay
+SCO-12 Billy Gilmour
+SCO-13 Foto do time
+SCO-14 Lewis Ferguson
+SCO-15 Ryan Christie
+SCO-16 Kenny McLean
+SCO-17 John McGinn
+SCO-18 Lyndon Dykes
+SCO-19 Che Adams
+SCO-20 Ben Gannon-Doak
 
 ## GRUPO D
-USA-1 ESCUDO
-USA-2 MATT FREESE
-USA-3 CHRIS RICHARDS
-USA-4 TIM REAM
-USA-5 MARK McKENZIE
-USA-6 ALEX FREEMAN
-USA-7 ANTONEE ROBINSON
-USA-8 TYLER ADAMS
-USA-9 TANNER TESSMANN
-USA-10 WESTON McKENNIE
-USA-11 CHRSTIAN ROLDAN
-USA-12 TIMOTHY WEAH
-USA-13 FOTO DA EQUIPE
-USA-14 DIEGO LUNA
-USA-15 MALIK TILLMAN
-USA-16 CHRISTIAN PULISIC
-USA-17 BRENDEN AARONSON
-USA-18 RICARDO PEPI
-USA-19 HAJI WRIGHT
-USA-20 FOLARIN BALOGUN
 
-PAR-1 ESCUDO
-PAR-2 ROBERTO FERNANDEZ
-PAR-3 ORLANDO GILL
-PAR-4 GUSTAVO GOMEZ
-PAR-5 FABIAN BALBUENA
-PAR-6 JUAN JOSÉ CÁCERES
-PAR-7 OMAR ALDERETE
-PAR-8 JUNIOR ALONSO
-PAR-9 MATHÍAS VILLASANTI
-PAR-10 DIEGO GOMEZ
-PAR-11 DAMIAN BOBADILLA
-PAR-12 ANDRÉS CUBAS
-PAR-13 FOTO DA EQUIPE
-PAR-14 MATÍAS GALARZA FONDA
-PAR-15 JULIO ENCISO
-PAR-16 ALEJANDRO ROMERO GAMARRA
-PAR-17 MIGUEL ALMIRÓN
-PAR-18 RAMÓN SOSA
-PAR-19 ÁNGEL ROMERO
-PAR-20 ANTONIO SANABRIA
+# === ESTADOS UNIDOS ===
 
-AUS-1 ESCUDO
-AUS-2 MATHEW RYAN
-AUS-3 JOE GAUCI
-AUS-4 HARRY SOUTTAR
-AUS-5 ALESSANDRO CIRCATI
-AUS-6 JORDAN BOS
-AUS-7 AZIZ BEHICH
-AUS-8 CAMERON BURGESS
-AUS-9 LEWIS MILLER
-AUS-10 MILOS DENEGEX
-AUS-11 JACKSON IRVINE
-AUS-12 RILEY McGREE
-AUS-13 FOTO DA EQUIPE
-AUS-14 AIDEN O'NEILL
-AUS-15 CONNOR METCALIFE
-AUS-16 PATRICK VAZBEK
-AUS-17 CRAIG GOODWIN
-AUS-18 KUSINI VENGI
-AUS-19 NESTORY IRANKUNDA
-AUS-20 MOHAMED TOURÉ
+USA-1 Escudo
+USA-2 Matt Freese
+USA-3 Chris Richards
+USA-4 Tim Ream
+USA-5 Mark McKenzie
+USA-6 Alex Freeman
+USA-7 Antonee Robinson
+USA-8 Tyler Adams
+USA-9 Tanner Tessmann
+USA-10 Weston McKennie
+USA-11 Christian Roldan
+USA-12 Timothy Weah
+USA-13 Foto do time
+USA-14 Diego Luna
+USA-15 Malik Tillman
+USA-16 Christian Pulisic
+USA-17 Brenden Aaronson
+USA-18 Ricardo Pepi
+USA-19 Haji Wright
+USA-20 Folarin Balogun
 
-TUR-1 ESCUDO
+# === PARAGUAI ===
+
+PAR-1 Escudo
+PAR-2 Roberto Fernández
+PAR-3 Orlando Gill
+PAR-4 Gustavo Gómez
+PAR-5 Fabián Balbuena
+PAR-6 Juan José Cáceres
+PAR-7 Omar Alderete
+PAR-8 Junior Alonso
+PAR-9 Mathías Villasanti
+PAR-10 Diego Gómez
+PAR-11 Damián Bobadilla
+PAR-12 Andrés Cubas
+PAR-13 Foto do time
+PAR-14 Matías Galarza Fonda
+PAR-15 Julio Enciso
+PAR-16 Alejandro Romero Gamarra
+PAR-17 Miguel Almirón
+PAR-18 Ramón Sosa
+PAR-19 Ángel Romero
+PAR-20 Antonio Sanabria
+
+# === AUSTRÁLIA ===
+
+AUS-1 Escudo
+AUS-2 Mathew Ryan
+AUS-3 Joe Gauci
+AUS-4 Harry Souttar
+AUS-5 Alessandro Circati
+AUS-6 Jordan Bos
+AUS-7 Aziz Behich
+AUS-8 Cameron Burgess
+AUS-9 Lewis Miller
+AUS-10 Milos Degenek
+AUS-11 Jackson Irvine
+AUS-12 Riley McGree
+AUS-13 Foto do time
+AUS-14 Aiden O'Neill
+AUS-15 Connor Metcalfe
+AUS-16 Patrick Yazbek
+AUS-17 Craig Goodwin
+AUS-18 Kusini Yengi
+AUS-19 Nestory Irankunda
+AUS-20 Mohamed Touré
+
+# === TURQUIA ===
+
+TUR-1 Escudo
 TUR-2 Ugurcan Cakir
-TUR-3 MERT MULDUR
-TUR-4 ZEKI CELIK
-TUR-5 ABDULKERIM BARDAKCI
-TUR-6 Caglar Soyunku
+TUR-3 Mert Muldur
+TUR-4 Zeki Celik
+TUR-5 Abdulkerim Bardakci
+TUR-6 Caglar Soyuncu
 TUR-7 Merih Demiral
 TUR-8 Ferdi Kadioglu
 TUR-9 Kaan Ayhan
-TUR-10
-TUR-11
-TUR-12
-TUR-13 FOTO DA EQUIPE
-TUR-14
-TUR-15
-TUR-16
-TUR-17
-TUR-18
-TUR-19
-TUR-20
+TUR-10 Ismail Yuksek
+TUR-11 Hakan Calhanoglu
+TUR-12 Orkun Kokcu
+TUR-13 Foto do time
+TUR-14 Arda Guler
+TUR-15 Irfan Can Kahveci
+TUR-16 Yunus Akgun
+TUR-17 Can Uzun
+TUR-18 Baris Alper Yilmaz
+TUR-19 Kerem Akturkoglu
+TUR-20 Kenan Yildiz
+
 ## GRUPO E
+
+# === ALEMANHA ===
+
+GER-1 Escudo
+GER-2 Marc-André ter Stegen
+GER-3 Jonathan Tah
+GER-4 David Raum
+GER-5 Nico Schlotterbeck
+GER-6 Antonio Rüdiger
+GER-7 Waldemar Anton
+GER-8 Ridle Baku
+GER-9 Maximilian Mittelstadt
+GER-10 Joshua Kimmich
+GER-11 Florian Wirtz
+GER-12 Felix Nmecha
+GER-13 Foto do time
+GER-14 Leon Goretzka
+GER-15 Jamal Musiala
+GER-16 Serge Gnabry
+GER-17 Kai Havertz
+GER-18 Leroy Sané
+GER-19 Karim Adeyemi
+GER-20 Nick Woltemade
+
+# === CURAÇAO ===
+
+CUW-1 Escudo
+CUW-2 Eloy Room
+CUW-3 Armando Obispo
+CUW-4 Sherel Floranus
+CUW-5 Jurien Gaari
+CUW-6 Joshua Brenet
+CUW-7 Roshon Van Eijma
+CUW-8 Shurandy Sambo
+CUW-9 Livano Comenencia
+CUW-10 Godfried Roemeratoe
+CUW-11 Juninho Bacuna
+CUW-12 Leandro Bacuna
+CUW-13 Foto do time
+CUW-14 Tahith Chong
+CUW-15 Kenji Gorre
+CUW-16 Jearl Margaritha
+CUW-17 Jurgen Locadia
+CUW-18 Jeremy Antonisse
+CUW-19 Gervane Kastaneer
+CUW-20 Sontje Hansen
+
+# === COSTA DO MARFIM ===
+
+CIV-1 Escudo
+CIV-2 Yahia Fofana
+CIV-3 Ghislain Konan
+CIV-4 Wilfried Singo
+CIV-5 Odilon Kossounou
+CIV-6 Evan Ndicka
+CIV-7 Willy Boly
+CIV-8 Emmanuel Agbadou
+CIV-9 Ousmane Diomande
+CIV-10 Franck Kessie
+CIV-11 Seko Fofana
+CIV-12 Ibrahim Sangare
+CIV-13 Foto do time
+CIV-14 Jean-Philippe Gbamin
+CIV-15 Amad Diallo
+CIV-16 Sébastien Haller
+CIV-17 Simon Adingra
+CIV-18 Yan Diomande
+CIV-19 Evann Guessand
+CIV-20 Oumar Diakite
+
+# === EQUADOR ===
+
+ECU-1 Escudo
+ECU-2 Hernán Galíndez
+ECU-3 Gonzalo Valle
+ECU-4 Piero Hincapié
+ECU-5 Pervis Estupiñán
+ECU-6 Willian Pacho
+ECU-7 Ángelo Preciado
+ECU-8 Joel Ordóñez
+ECU-9 Moisés Caicedo
+ECU-10 Alan Franco
+ECU-11 Kendry Páez
+ECU-12 Pedro Vite
+ECU-13 Foto do time
+ECU-14 John Yeboah
+ECU-15 Leonardo Campana
+ECU-16 Gonzalo Plata
+ECU-17 Nilson Angulo
+ECU-18 Alan Minda
+ECU-19 Kevin Rodríguez
+ECU-20 Enner Valencia
 
 ## GRUPO F
 
+# === HOLANDA ===
+
+NED-1 Escudo
+NED-2 Bart Verbruggen
+NED-3 Virgil van Dijk
+NED-4 Micky van de Ven
+NED-5 Jurriën Timber
+NED-6 Denzel Dumfries
+NED-7 Nathan Aké
+NED-8 Jeremie Frimpong
+NED-9 Jan Paul van Hecke
+NED-10 Tijjani Reijnders
+NED-11 Ryan Gravenberch
+NED-12 Teun Koopmeiners
+NED-13 Foto do time
+NED-14 Frenkie de Jong
+NED-15 Xavi Simons
+NED-16 Justin Kluivert
+NED-17 Memphis Depay
+NED-18 Donyell Malen
+NED-19 Wout Weghorst
+NED-20 Cody Gakpo
+
+# === JAPÃO ===
+
+JPN-1 Escudo
+JPN-2 Zion Suzuki
+JPN-3 Henry Heroki Mochizuki
+JPN-4 Ayumu Seko
+JPN-5 Junnosuke Suzuki
+JPN-6 Shogo Taniguchi
+JPN-7 Tsuyoshi Watanabe
+JPN-8 Kaishu Sano
+JPN-9 Yuki Soma
+JPN-10 Ao Tanaka
+JPN-11 Daichi Kamada
+JPN-12 Takefusa Kubo
+JPN-13 Foto do time
+JPN-14 Ritsu Doan
+JPN-15 Keito Nakamura
+JPN-16 Takumi Minamino
+JPN-17 Shuto Machino
+JPN-18 Junya Ito
+JPN-19 Koki Ogawa
+JPN-20 Ayase Ueda
+
+# === SUÉCIA ===
+
+SWE-1 Escudo
+SWE-2 Victor Johansson
+SWE-3 Isak Hien
+SWE-4 Gabriel Gudmundsson
+SWE-5 Emil Holm
+SWE-6 Victor Nilsson Lindelöf
+SWE-7 Gustaf Lagerbielke
+SWE-8 Lucas Bergvall
+SWE-9 Hugo Larsson
+SWE-10 Jesper Karlström
+SWE-11 Yasin Ayari
+SWE-12 Mattias Svanberg
+SWE-13 Foto do time
+SWE-14 Daniel Svensson
+SWE-15 Ken Sema
+SWE-16 Roony Bardghji
+SWE-17 Dejan Kulusevski
+SWE-18 Anthony Elanga
+SWE-19 Alexander Isak
+SWE-20 Viktor Gyökeres
+
+# === TUNÍSIA ===
+
+TUN-1 Escudo
+TUN-2 Bechir Ben Said
+TUN-3 Aymen Dahmen
+TUN-4 Yan Valery
+TUN-5 Montassar Talbi
+TUN-6 Yassine Meriah
+TUN-7 Ali Abdi
+TUN-8 Dylan Bronn
+TUN-9 Ellyes Skhiri
+TUN-10 Aissa Laidouni
+TUN-11 Ferjani Sassi
+TUN-12 Mohamed Ali Ben Romdhane
+TUN-13 Foto do time
+TUN-14 Hannibal Mejbri
+TUN-15 Elias Achouri
+TUN-16 Elias Saad
+TUN-17 Hazem Mastouri
+TUN-18 Ismael Gharbi
+TUN-19 Sayfallah Ltaief
+TUN-20 Naim Sliti
+
 ## GRUPO G
+
+# === BÉLGICA ===
+
+BEL-1 Escudo
+BEL-2 Thibaut Courtois
+BEL-3 Arthur Theate
+BEL-4 Timothy Castagne
+BEL-5 Zeno Debast
+BEL-6 Brandon Mechele
+BEL-7 Maxim De Cuyper
+BEL-8 Thomas Meunier
+BEL-9 Youri Tielemans
+BEL-10 Amadou Onana
+BEL-11 Nicolas Raskin
+BEL-12 Alexis Saelemaekers
+BEL-13 Foto do time
+BEL-14 Hans Vanaken
+BEL-15 Kevin De Bruyne
+BEL-16 Jérémy Doku
+BEL-17 Charles De Ketelaere
+BEL-18 Leandro Trossard
+BEL-19 Loïs Openda
+BEL-20 Romelu Lukaku
+
+# === EGITO ===
+
+EGY-1 Escudo
+EGY-2 Mohamed El Shenawy
+EGY-3 Mohamed Hany
+EGY-4 Mohamed Hamdy
+EGY-5 Yasser Ibrahim
+EGY-6 Khaled Sobhi
+EGY-7 Ramy Rabia
+EGY-8 Hossam Abdelmaguid
+EGY-9 Ahmed Fatouh
+EGY-10 Marwan Attia
+EGY-11 Zizo
+EGY-12 Hamdy Fathy
+EGY-13 Foto do time
+EGY-14 Mohamed Lasheen
+EGY-15 Emam Ashour
+EGY-16 Osama Faisal
+EGY-17 Mohamed Salah
+EGY-18 Mostafa Mohamed
+EGY-19 Trezeguet
+EGY-20 Omar Marmoush
+
+# === IRÃ ===
+
+IRN-1 Escudo
+IRN-2 Alireza Beiranvand
+IRN-3 Morteza Pouraliganji
+IRN-4 Ehsan Hajsafi
+IRN-5 Milad Mohammadi
+IRN-6 Shojae Khalilzadeh
+IRN-7 Ramin Rezaeian
+IRN-8 Hossein Kanaani
+IRN-9 Sadegh Moharrami
+IRN-10 Saleh Hardani
+IRN-11 Saeed Ezatolahi
+IRN-12 Saman Ghoddos
+IRN-13 Foto do time
+IRN-14 Omid Noorafkan
+IRN-15 Roozbeh Cheshmi
+IRN-16 Mohammad Mohebi
+IRN-17 Sardar Azmoun
+IRN-18 Mehdi Taremi
+IRN-19 Alireza Jahanbakhsh
+IRN-20 Ali Gholizadeh
+
+# === NOVA ZELÂNDIA ===
+
+NZL-1 Escudo
+NZL-2 Max Crocombe Payne
+NZL-3 Alex Paulsen
+NZL-4 Michael Boxall
+NZL-5 Liberato Cacace
+NZL-6 Tim Payne
+NZL-7 Tyler Bindon
+NZL-8 Francis de Vries
+NZL-9 Finn Surman
+NZL-10 Joe Bell
+NZL-11 Sarpreet Singh
+NZL-12 Ryan Thomas
+NZL-13 Foto do time
+NZL-14 Matthew Garbett
+NZL-15 Marko Stamenić
+NZL-16 Ben Old
+NZL-17 Chris Wood
+NZL-18 Elijah Just
+NZL-19 Callum McCowatt
+NZL-20 Kosta Barbarouses
 
 ## GRUPO H
 
+# === ESPANHA ===
+
+ESP-1 Escudo
+ESP-2 Unai Simón
+ESP-3 Robin Le Normand
+ESP-4 Aymeric Laporte
+ESP-5 Dean Huijsen
+ESP-6 Pedro Porro
+ESP-7 Dani Carvajal
+ESP-8 Marc Cucurella
+ESP-9 Martín Zubimendi
+ESP-10 Rodri
+ESP-11 Pedri
+ESP-12 Fabián Ruiz
+ESP-13 Foto do time
+ESP-14 Mikel Merino
+ESP-15 Lamine Yamal
+ESP-16 Dani Olmo
+ESP-17 Nico Williams
+ESP-18 Ferran Torres
+ESP-19 Álvaro Morata
+ESP-20 Mikel Oyarzabal
+
+# === CABO VERDE ===
+
+CPV-1 Escudo
+CPV-2 Vozinha
+CPV-3 Logan Costa
+CPV-4 Pico
+CPV-5 Diney
+CPV-6 Steven Moreira
+CPV-7 Wagner Pina
+CPV-8 João Paulo
+CPV-9 Yannick Semedo
+CPV-10 Kevin Pina
+CPV-11 Patrick Andrade
+CPV-12 Jamiro Monteiro
+CPV-13 Foto do time
+CPV-14 Deroy Duarte
+CPV-15 Garry Rodrigues
+CPV-16 Jovane Cabral
+CPV-17 Ryan Mendes
+CPV-18 Dailon Livramento
+CPV-19 Willy Semedo
+CPV-20 Bebe
+
+# === ARÁBIA SAUDITA ===
+
+KSA-1 Escudo
+KSA-2 Nawaf Alaqidi
+KSA-3 Abdulrahman Al-Sanbi
+KSA-4 Saud Abdulhamid
+KSA-5 Nawaf Bouwashl
+KSA-6 Jihad Thakri
+KSA-7 Moteb Al-Harbi
+KSA-8 Hassan Altambakti
+KSA-9 Musab Aljuwayr
+KSA-10 Ziyad Aljohani
+KSA-11 Abdullah Alkhaibari
+KSA-12 Nasser Aldawsari
+KSA-13 Foto do time
+KSA-14 Saleh Abu Alshamat
+KSA-15 Marwan Alsahafi
+KSA-16 Salem Aldawsari
+KSA-17 Abdulrahman Al-Aboud
+KSA-18 Feras Akbrikan
+KSA-19 Saleh Alshehri
+KSA-20 Abdullah Al-Hamdan
+
+# === URUGUAI ===
+
+URU-1 Escudo
+URU-2 Sergio Rochet
+URU-3 Santiago Mele
+URU-4 Ronald Araújo
+URU-5 José María Giménez
+URU-6 Sebastián Cáceres
+URU-7 Mathías Olivera
+URU-8 Guillermo Varela
+URU-9 Nahitan Nández
+URU-10 Federico Valverde
+URU-11 Giorgian De Arrascaeta
+URU-12 Rodrigo Bentancur
+URU-13 Foto do time
+URU-14 Manuel Ugarte
+URU-15 Nicolás de la Cruz
+URU-16 Maxi Araújo
+URU-17 Darwin Núñez
+URU-18 Federico Viñas
+URU-19 Rodrigo Aguirre
+URU-20 Facundo Pellistri
+
 ## GRUPO I
+
+# === FRANÇA ===
+
+FRA-1 Escudo
+FRA-2 Mike Maignan
+FRA-3 Theo Hernandez
+FRA-4 William Saliba
+FRA-5 Jules Koundé
+FRA-6 Ibrahima Konaté
+FRA-7 Dayot Upamecano
+FRA-8 Lucas Digne
+FRA-9 Aurélien Tchouaméni
+FRA-10 Eduardo Camavinga
+FRA-11 Manu Koné
+FRA-12 Adrien Rabiot
+FRA-13 Foto do time
+FRA-14 Michael Olise
+FRA-15 Ousmane Dembélé
+FRA-16 Bradley Barcola
+FRA-17 Désiré Doué
+FRA-18 Kingsley Coman
+FRA-19 Hugo Ekitike
+FRA-20 Kylian Mbappé
+
+# === SENEGAL ===
+
+SEN-1 Escudo
+SEN-2 Édouard Mendy
+SEN-3 Yehvann Diouf
+SEN-4 Moussa Niakhaté
+SEN-5 Abdoulaye Seck
+SEN-6 Ismail Jakobs
+SEN-7 El Hadji Malick Diouf
+SEN-8 Kalidou Koulibaly
+SEN-9 Idrissa Gana Gueye
+SEN-10 Pape Matar Sarr
+SEN-11 Pape Gueye
+SEN-12 Habib Diarra
+SEN-13 Foto do time
+SEN-14 Lamine Camara
+SEN-15 Sadio Mané
+SEN-16 Ismaïla Sarr
+SEN-17 Boulaye Dia
+SEN-18 Iliman Ndiaye
+SEN-19 Nicolas Jackson
+SEN-20 Krepin Diatta
+
+# === IRAQUE ===
+
+IRQ-1 Escudo
+IRQ-2 Jalal Hassan
+IRQ-3 Rebin Sulaka
+IRQ-4 Hussein Ali
+IRQ-5 Akam Hashem
+IRQ-6 Merchas Doski
+IRQ-7 Zaid Tahseen
+IRQ-8 Manaf Younis
+IRQ-9 Zidane Iqbal
+IRQ-10 Amir Al-Ammari
+IRQ-11 Ibrahim Bayesh
+IRQ-12 Ali Jasim
+IRQ-13 Foto do time
+IRQ-14 Youssef Amyn
+IRQ-15 Aimar Sher
+IRQ-16 Marko Farji
+IRQ-17 Osama Rashid
+IRQ-18 Ali Al-Hamadi
+IRQ-19 Aymen Hussein
+IRQ-20 Mohanad Ali
+
+# === NORUEGA ===
+
+NOR-1 Escudo
+NOR-2 Orjan Nyland
+NOR-3 Julian Ryerson
+NOR-4 Leo Østigård
+NOR-5 Kristoffer Vassbakk Ajer
+NOR-6 Marcus Holmgren Pedersen
+NOR-7 David Møller Wolfe
+NOR-8 Torbjørn Heggem
+NOR-9 Morten Thorsby
+NOR-10 Martin Ødegaard
+NOR-11 Sander Berge
+NOR-12 Andreas Schjelderup
+NOR-13 Foto do time
+NOR-14 Patrick Berg
+NOR-15 Erling Haaland
+NOR-16 Alexander Sørloth
+NOR-17 Aron Dønnum
+NOR-18 Jørgen Strand Larsen
+NOR-19 Antonio Nusa
+NOR-20 Oscar Bobb
 
 ## GRUPO J
 
+# === ARGENTINA ===
+
+ARG-1 Escudo
+ARG-2 Emiliano Martínez
+ARG-3 Nahuel Molina
+ARG-4 Cristian Romero
+ARG-5 Nicolás Otamendi
+ARG-6 Nicolás Tagliafico
+ARG-7 Leonardo Balerdi
+ARG-8 Enzo Fernández
+ARG-9 Alexis Mac Allister
+ARG-10 Rodrigo De Paul
+ARG-11 Exequiel Palacios
+ARG-12 Leandro Paredes
+ARG-13 Foto do time
+ARG-14 Nico Paz
+ARG-15 Franco Mastantuono
+ARG-16 Nico González
+ARG-17 Lionel Messi
+ARG-18 Lautaro Martínez
+ARG-19 Julián Álvarez
+ARG-20 Giuliano Simeone
+
+# === ARGÉLIA ===
+
+ALG-1 Escudo
+ALG-2 Alexis Guendouz
+ALG-3 Ramy Bensebaini
+ALG-4 Youcef Atal
+ALG-5 Rayan Aït-Nouri
+ALG-6 Mohamed Amine Tougai
+ALG-7 Aïssa Mandi
+ALG-8 Ismael Bennacer
+ALG-9 Houssem Aouar
+ALG-10 Hicham Boudaoui
+ALG-11 Ramiz Zerrouki
+ALG-12 Nabil Bentaleb
+ALG-13 Foto do time
+ALG-14 Farès Chaibi
+ALG-15 Riyad Mahrez
+ALG-16 Saïd Benrahma
+ALG-17 Anis Hadj Moussa
+ALG-18 Amine Gouiri
+ALG-19 Baghdad Bounedjah
+ALG-20 Mohammed Amoura
+
+# === ÁUSTRIA ===
+
+AUT-1 Escudo
+AUT-2 Alexander Schlager
+AUT-3 Patrick Pentz
+AUT-4 David Alaba
+AUT-5 Kevin Danso
+AUT-6 Philipp Lienhart
+AUT-7 Stefan Posch
+AUT-8 Phillipp Mwene
+AUT-9 Alexander Prass
+AUT-10 Xaver Schlager
+AUT-11 Marcel Sabitzer
+AUT-12 Konrad Laimer
+AUT-13 Foto do time
+AUT-14 Florian Grillitsch
+AUT-15 Nicolas Seiwald
+AUT-16 Romano Schmid
+AUT-17 Patrick Wimmer
+AUT-18 Christoph Baumgartner
+AUT-19 Michael Gregoritsch
+AUT-20 Marko Arnautović
+
+# === JORDÂNIA ===
+
+JOR-1 Escudo
+JOR-2 Yazeed Abulaila
+JOR-3 Ihsan Haddad
+JOR-4 Mohammad Abu Hashish
+JOR-5 Yazan Al-Arab
+JOR-6 Abdallah Nasib
+JOR-7 Saleem Obaid
+JOR-8 Mohammad Abualnadi
+JOR-9 Ibrahim Saadeh
+JOR-10 Nizar Al-Rashdan
+JOR-11 Noor Al-Rawabdeh
+JOR-12 Mohannad Abu Taha
+JOR-13 Foto do time
+JOR-14 Amer Jamous
+JOR-15 Musa Al-Taamari
+JOR-16 Yazan Al-Naimat
+JOR-17 Mahmoud Al-Mardi
+JOR-18 Ali Olwan
+JOR-19 Mohammad Abu Zrayq
+JOR-20 Ibrahim Sabra
+
 ## GRUPO K
+
+# === PORTUGAL ===
+
+POR-1 Escudo
+POR-2 Diogo Costa
+POR-3 José Sá
+POR-4 Rúben Dias
+POR-5 João Cancelo
+POR-6 Diogo Dalot
+POR-7 Nuno Mendes
+POR-8 Gonçalo Inácio
+POR-9 Bernardo Silva
+POR-10 Bruno Fernandes
+POR-11 Rúben Neves
+POR-12 Vitinha
+POR-13 Foto do time
+POR-14 João Neves
+POR-15 Cristiano Ronaldo
+POR-16 Francisco Trincão
+POR-17 João Félix
+POR-18 Gonçalo Ramos
+POR-19 Pedro Neto
+POR-20 Rafael Leão
+
+# === REPÚBLICA DEMOCRÁTICA DO CONGO ===
+
+COD-1 Escudo
+COD-2 Lionel Mpasi
+COD-3 Aaron Wan-Bissaka
+COD-4 Axel Tuanzebe
+COD-5 Arthur Masuaku
+COD-6 Chancel Mbemba
+COD-7 Joris Kayembe
+COD-8 Charles Pickel
+COD-9 Ngal'ayel Mukau
+COD-10 Edo Kayembe
+COD-11 Samuel Moutoussamy
+COD-12 Noah Sadiki
+COD-13 Foto do time
+COD-14 Théo Bongonda
+COD-15 Meschak Elia
+COD-16 Yoane Wissa
+COD-17 Brian Cipenga
+COD-18 Fiston Mayele
+COD-19 Cédric Bakambu
+COD-20 Nathanaël Mbuku
+
+# === UZBEQUISTÃO ===
+
+UZB-1 Escudo
+UZB-2 Utkir Yusupov
+UZB-3 Farrukh Sayfiev
+UZB-4 Sherzod Nasrullaev
+UZB-5 Umar Eshmurodov
+UZB-6 Husniddin Aliqulov
+UZB-7 Rustamjon Ashurmatov
+UZB-8 Khojiakbar Alijonov
+UZB-9 Abdukodir Khusanov
+UZB-10 Odiljon Hamrobekov
+UZB-11 Otabek Shukurov
+UZB-12 Jamshid Iskanderov
+UZB-13 Foto do time
+UZB-14 Azizbek Turgunboev
+UZB-15 Khojimat Erkinov
+UZB-16 Eldor Shomurodov
+UZB-17 Oston Urunov
+UZB-18 Jaloliddin Masharipov
+UZB-19 Igor Sergeev
+UZB-20 Abbosbek Fayzullaev
+
+# === COLÔMBIA ===
+
+COL-1 Escudo
+COL-2 Camilo Vargas
+COL-3 David Ospina
+COL-4 Dávinson Sánchez
+COL-5 Yerry Mina
+COL-6 Daniel Muñoz
+COL-7 Johan Mojica
+COL-8 Jhon Lucumí
+COL-9 Santiago Arias
+COL-10 Jefferson Lerma
+COL-11 Kevin Castaño
+COL-12 Richard Ríos
+COL-13 Foto do time
+COL-14 James Rodríguez
+COL-15 Juan Fernando Quintero
+COL-16 Jorge Carrascal
+COL-17 Jhon Arias
+COL-18 Jhon Córdoba
+COL-19 Luis Suárez
+COL-20 Luis Díaz
 
 ## GRUPO L
 
-## GRUPO M
-
-## GRUPO N
-
-
-
-
-
-# === CONMEBOL ===
-
-ARG-1 ESCUDO
-ARG-2
-ARG-3
-ARG-4
-ARG-5
-ARG-6
-ARG-7
-ARG-8
-ARG-9
-ARG-10
-ARG-11
-ARG-12
-ARG-13 FOTO DA EQUIPE
-ARG-14
-ARG-15
-ARG-16
-ARG-17
-ARG-18
-ARG-19
-ARG-20
-
-
-
-COL-1 ESCUDO
-COL-2
-COL-3
-COL-4
-COL-5
-COL-6
-COL-7
-COL-8
-COL-9
-COL-10
-COL-11
-COL-12
-COL-13 FOTO DA EQUIPE
-COL-14
-COL-15
-COL-16
-COL-17
-COL-18
-COL-19
-COL-20
-
-ECU-1 ESCUDO
-ECU-2
-ECU-3
-ECU-4
-ECU-5
-ECU-6
-ECU-7
-ECU-8
-ECU-9
-ECU-10
-ECU-11
-ECU-12
-ECU-13 FOTO DA EQUIPE
-ECU-14
-ECU-15
-ECU-16
-ECU-17
-ECU-18
-ECU-19
-ECU-20
-
-
-
-URU-1 ESCUDO
-URU-2
-URU-3
-URU-4
-URU-5
-URU-6
-URU-7
-URU-8
-URU-9
-URU-10
-URU-11
-URU-12
-URU-13 FOTO DA EQUIPE
-URU-14
-URU-15
-URU-16
-URU-17
-URU-18
-URU-19
-URU-20
-
-# === CONCACAF (não-anfitriões) ===
-
-CUW-1 ESCUDO
-CUW-2
-CUW-3
-CUW-4
-CUW-5
-CUW-6
-CUW-7
-CUW-8
-CUW-9
-CUW-10
-CUW-11
-CUW-12
-CUW-13 FOTO DA EQUIPE
-CUW-14
-CUW-15
-CUW-16
-CUW-17
-CUW-18
-CUW-19
-CUW-20
-
-
-
-PAN-1 ESCUDO
-PAN-2
-PAN-3
-PAN-4
-PAN-5
-PAN-6
-PAN-7
-PAN-8
-PAN-9
-PAN-10
-PAN-11
-PAN-12
-PAN-13 FOTO DA EQUIPE
-PAN-14
-PAN-15
-PAN-16
-PAN-17
-PAN-18
-PAN-19
-PAN-20
-
-# === UEFA ===
-
-AUT-1 ESCUDO
-AUT-2
-AUT-3
-AUT-4
-AUT-5
-AUT-6
-AUT-7
-AUT-8
-AUT-9
-AUT-10
-AUT-11
-AUT-12
-AUT-13 FOTO DA EQUIPE
-AUT-14
-AUT-15
-AUT-16
-AUT-17
-AUT-18
-AUT-19
-AUT-20
-
-BEL-1 ESCUDO
-BEL-2
-BEL-3
-BEL-4
-BEL-5
-BEL-6
-BEL-7
-BEL-8
-BEL-9
-BEL-10
-BEL-11
-BEL-12
-BEL-13 FOTO DA EQUIPE
-BEL-14
-BEL-15
-BEL-16
-BEL-17
-BEL-18
-BEL-19
-BEL-20
-
-
-
-CRO-1 ESCUDO
-CRO-2
-CRO-3
-CRO-4
-CRO-5
-CRO-6
-CRO-7
-CRO-8
-CRO-9
-CRO-10
-CRO-11
-CRO-12
-CRO-13 FOTO DA EQUIPE
-CRO-14
-CRO-15
-CRO-16
-CRO-17
-CRO-18
-CRO-19
-CRO-20
-
-ENG-1 ESCUDO
-ENG-2
-ENG-3
-ENG-4
-ENG-5
-ENG-6
-ENG-7
-ENG-8
-ENG-9
-ENG-10
-ENG-11
-ENG-12
-ENG-13 FOTO DA EQUIPE
-ENG-14
-ENG-15
-ENG-16
-ENG-17
-ENG-18
-ENG-19
-ENG-20
-
-ESP-1 ESCUDO
-ESP-2
-ESP-3
-ESP-4
-ESP-5
-ESP-6
-ESP-7
-ESP-8
-ESP-9
-ESP-10
-ESP-11
-ESP-12
-ESP-13 FOTO DA EQUIPE
-ESP-14
-ESP-15
-ESP-16
-ESP-17
-ESP-18
-ESP-19
-ESP-20
-
-FRA-1 ESCUDO
-FRA-2
-FRA-3
-FRA-4
-FRA-5
-FRA-6
-FRA-7
-FRA-8
-FRA-9
-FRA-10
-FRA-11
-FRA-12
-FRA-13 FOTO DA EQUIPE
-FRA-14
-FRA-15
-FRA-16
-FRA-17
-FRA-18
-FRA-19
-FRA-20
-
-GER-1 ESCUDO
-GER-2
-GER-3
-GER-4
-GER-5
-GER-6
-GER-7
-GER-8
-GER-9
-GER-10
-GER-11
-GER-12
-GER-13 FOTO DA EQUIPE
-GER-14
-GER-15
-GER-16
-GER-17
-GER-18
-GER-19
-GER-20
-
-NED-1 ESCUDO
-NED-2
-NED-3
-NED-4
-NED-5
-NED-6
-NED-7
-NED-8
-NED-9
-NED-10
-NED-11
-NED-12
-NED-13 FOTO DA EQUIPE
-NED-14
-NED-15
-NED-16
-NED-17
-NED-18
-NED-19
-NED-20
-
-NOR-1 ESCUDO
-NOR-2
-NOR-3
-NOR-4
-NOR-5
-NOR-6
-NOR-7
-NOR-8
-NOR-9
-NOR-10
-NOR-11
-NOR-12
-NOR-13 FOTO DA EQUIPE
-NOR-14
-NOR-15
-NOR-16
-NOR-17
-NOR-18
-NOR-19
-NOR-20
-
-POR-1 ESCUDO
-POR-2
-POR-3
-POR-4
-POR-5
-POR-6
-POR-7
-POR-8
-POR-9
-POR-10
-POR-11
-POR-12
-POR-13 FOTO DA EQUIPE
-POR-14
-POR-15
-POR-16
-POR-17
-POR-18
-POR-19
-POR-20
-
-
-
-
-
-SWE-1 ESCUDO
-SWE-2
-SWE-3
-SWE-4
-SWE-5
-SWE-6
-SWE-7
-SWE-8
-SWE-9
-SWE-10
-SWE-11
-SWE-12
-SWE-13 FOTO DA EQUIPE
-SWE-14
-SWE-15
-SWE-16
-SWE-17
-SWE-18
-SWE-19
-SWE-20
-
-
-
-# === AFC ===
-
-
-
-IRN-1 ESCUDO
-IRN-2
-IRN-3
-IRN-4
-IRN-5
-IRN-6
-IRN-7
-IRN-8
-IRN-9
-IRN-10
-IRN-11
-IRN-12
-IRN-13 FOTO DA EQUIPE
-IRN-14
-IRN-15
-IRN-16
-IRN-17
-IRN-18
-IRN-19
-IRN-20
-
-JOR-1 ESCUDO
-JOR-2
-JOR-3
-JOR-4
-JOR-5
-JOR-6
-JOR-7
-JOR-8
-JOR-9
-JOR-10
-JOR-11
-JOR-12
-JOR-13 FOTO DA EQUIPE
-JOR-14
-JOR-15
-JOR-16
-JOR-17
-JOR-18
-JOR-19
-JOR-20
-
-JPN-1 ESCUDO
-JPN-2
-JPN-3
-JPN-4
-JPN-5
-JPN-6
-JPN-7
-JPN-8
-JPN-9
-JPN-10
-JPN-11
-JPN-12
-JPN-13 FOTO DA EQUIPE
-JPN-14
-JPN-15
-JPN-16
-JPN-17
-JPN-18
-JPN-19
-JPN-20
-
-KSA-1 ESCUDO
-KSA-2
-KSA-3
-KSA-4
-KSA-5
-KSA-6
-KSA-7
-KSA-8
-KSA-9
-KSA-10
-KSA-11
-KSA-12
-KSA-13 FOTO DA EQUIPE
-KSA-14
-KSA-15
-KSA-16
-KSA-17
-KSA-18
-KSA-19
-KSA-20
-
-
-
-UZB-1 ESCUDO
-UZB-2
-UZB-3
-UZB-4
-UZB-5
-UZB-6
-UZB-7
-UZB-8
-UZB-9
-UZB-10
-UZB-11
-UZB-12
-UZB-13 FOTO DA EQUIPE
-UZB-14
-UZB-15
-UZB-16
-UZB-17
-UZB-18
-UZB-19
-UZB-20
-
-# === CAF ===
-
-ALG-1 ESCUDO
-ALG-2
-ALG-3
-ALG-4
-ALG-5
-ALG-6
-ALG-7
-ALG-8
-ALG-9
-ALG-10
-ALG-11
-ALG-12
-ALG-13 FOTO DA EQUIPE
-ALG-14
-ALG-15
-ALG-16
-ALG-17
-ALG-18
-ALG-19
-ALG-20
-
-CIV-1 ESCUDO
-CIV-2
-CIV-3
-CIV-4
-CIV-5
-CIV-6
-CIV-7
-CIV-8
-CIV-9
-CIV-10
-CIV-11
-CIV-12
-CIV-13 FOTO DA EQUIPE
-CIV-14
-CIV-15
-CIV-16
-CIV-17
-CIV-18
-CIV-19
-CIV-20
-
-CPV-1 ESCUDO
-CPV-2
-CPV-3
-CPV-4
-CPV-5
-CPV-6
-CPV-7
-CPV-8
-CPV-9
-CPV-10
-CPV-11
-CPV-12
-CPV-13 FOTO DA EQUIPE
-CPV-14
-CPV-15
-CPV-16
-CPV-17
-CPV-18
-CPV-19
-CPV-20
-
-EGY-1 ESCUDO
-EGY-2
-EGY-3
-EGY-4
-EGY-5
-EGY-6
-EGY-7
-EGY-8
-EGY-9
-EGY-10
-EGY-11
-EGY-12
-EGY-13 FOTO DA EQUIPE
-EGY-14
-EGY-15
-EGY-16
-EGY-17
-EGY-18
-EGY-19
-EGY-20
-
-GHA-1 ESCUDO
-GHA-2
-GHA-3
-GHA-4
-GHA-5
-GHA-6
-GHA-7
-GHA-8
-GHA-9
-GHA-10
-GHA-11
-GHA-12
-GHA-13 FOTO DA EQUIPE
-GHA-14
-GHA-15
-GHA-16
-GHA-17
-GHA-18
-GHA-19
-GHA-20
-
-
-
-SEN-1 ESCUDO
-SEN-2
-SEN-3
-SEN-4
-SEN-5
-SEN-6
-SEN-7
-SEN-8
-SEN-9
-SEN-10
-SEN-11
-SEN-12
-SEN-13 FOTO DA EQUIPE
-SEN-14
-SEN-15
-SEN-16
-SEN-17
-SEN-18
-SEN-19
-SEN-20
-
-TUN-1 ESCUDO
-TUN-2
-TUN-3
-TUN-4
-TUN-5
-TUN-6
-TUN-7
-TUN-8
-TUN-9
-TUN-10
-TUN-11
-TUN-12
-TUN-13 FOTO DA EQUIPE
-TUN-14
-TUN-15
-TUN-16
-TUN-17
-TUN-18
-TUN-19
-TUN-20
-
-# === OFC ===
-
-NZL-1 ESCUDO
-NZL-2
-NZL-3
-NZL-4
-NZL-5
-NZL-6
-NZL-7
-NZL-8
-NZL-9
-NZL-10
-NZL-11
-NZL-12
-NZL-13 FOTO DA EQUIPE
-NZL-14
-NZL-15
-NZL-16
-NZL-17
-NZL-18
-NZL-19
-NZL-20
-
-# === REPESCAGEM INTERCONTINENTAL ===
-
-COD-1 ESCUDO
-COD-2
-COD-3
-COD-4
-COD-5
-COD-6
-COD-7
-COD-8
-COD-9
-COD-10
-COD-11
-COD-12
-COD-13 FOTO DA EQUIPE
-COD-14
-COD-15
-COD-16
-COD-17
-COD-18
-COD-19
-COD-20
-
-NCL-1 ESCUDO
-NCL-2
-NCL-3
-NCL-4
-NCL-5
-NCL-6
-NCL-7
-NCL-8
-NCL-9
-NCL-10
-NCL-11
-NCL-12
-NCL-13 FOTO DA EQUIPE
-NCL-14
-NCL-15
-NCL-16
-NCL-17
-NCL-18
-NCL-19
-NCL-20
+# === INGLATERRA ===
+
+ENG-1 Escudo
+ENG-2 Jordan Pickford
+ENG-3 John Stones
+ENG-4 Marc Guéhi
+ENG-5 Ezri Konsa
+ENG-6 Trent Alexander-Arnold
+ENG-7 Reece James
+ENG-8 Dan Burn
+ENG-9 Jordan Henderson
+ENG-10 Declan Rice
+ENG-11 Jude Bellingham
+ENG-12 Cole Palmer
+ENG-13 Foto do time
+ENG-14 Morgan Rogers
+ENG-15 Anthony Gordon
+ENG-16 Phil Foden
+ENG-17 Bukayo Saka
+ENG-18 Harry Kane
+ENG-19 Marcus Rashford
+ENG-20 Ollie Watkins
+
+# === CROÁCIA ===
+
+CRO-1 Escudo
+CRO-2 Dominik Livaković
+CRO-3 Duje Ćaleta-Car
+CRO-4 Joško Gvardiol
+CRO-5 Josip Stanišić
+CRO-6 Luka Vušković
+CRO-7 Josip Šutalo
+CRO-8 Kristijan Jakić
+CRO-9 Luka Modrić
+CRO-10 Mateo Kovačić
+CRO-11 Martin Baturina
+CRO-12 Lovro Majer
+CRO-13 Foto do time
+CRO-14 Mario Pašalić
+CRO-15 Petar Sučić
+CRO-16 Ivan Perišić
+CRO-17 Marco Pašalić
+CRO-18 Ante Budimir
+CRO-19 Andrej Kramarić
+CRO-20 Franjo Ivanović
+
+# === GANA ===
+
+GHA-1 Escudo
+GHA-2 Lawrence Ati Zigi
+GHA-3 Tariq Lamptey
+GHA-4 Mohammed Salisu
+GHA-5 Alidu Seidu
+GHA-6 Alexander Djiku
+GHA-7 Gideon Mensah
+GHA-8 Caleb Yirenkyi
+GHA-9 Abdul Issahaku Fatawu
+GHA-10 Thomas Partey
+GHA-11 Salis Abdul Samed
+GHA-12 Kamaldeen Sulemana
+GHA-13 Foto do time
+GHA-14 Mohammed Kudus
+GHA-15 Inaki Williams
+GHA-16 Jordan Ayew
+GHA-17 André Ayew
+GHA-18 Joseph Paintsil
+GHA-19 Osman Bukari
+GHA-20 Antoine Semenyo
+
+# === PANAMÁ ===
+
+PAN-1 Escudo
+PAN-2 Orlando Mosquera
+PAN-3 Luis Mejía
+PAN-4 Fidel Escobar
+PAN-5 Andrés Andrade
+PAN-6 Michael Amir Murillo
+PAN-7 Eric Davis
+PAN-8 José Córdoba
+PAN-9 César Blackman
+PAN-10 Cristian Martínez
+PAN-11 Aníbal Godoy
+PAN-12 Adalberto Carrasquilla
+PAN-13 Foto do time
+PAN-14 Édgar Bárcenas
+PAN-15 Carlos Harvey
+PAN-16 Ismael Díaz
+PAN-17 José Fajardo
+PAN-18 Cecilio Waterman
+PAN-19 José Luis Rodríguez
+PAN-20 Alberto Quintero
 
 FWC-9 ITÁLIA 1934 ( campeã)
 FWC-10 URUGUAI 1950
@@ -1115,13 +1151,88 @@ FWC-16 BRASIL 2002
 FWC-17 ITÁLIA 2006
 FWC-18 ALEMANHA 2014
 FWC-19 ARGENTINA 2022
-00 PANINI
 
-FWC-1 EMBLEMA OFICIAL PARTE SUPERIOR
-FWC-2 EMBLEMA OFICIAL PARTE INFERIOR
-FWC-3 MASCOTE OFICIAL
-FWC-4 SLOGAN OFICIAL
-FWC-5 BOLA OFICIAL
-FWC-6 EMBLEMA DO PAÍS-SEDE CANADÁ
-FWC-7 EMBLEMA DO PAÍS SEDE MÉXICO
-FWC-8 EMBLEMA DO PAÍS SEDE ESTADOS UNIDOS
+# === COCA-COLA / USA CANADA ===
+
+CC-US1 Lamine Yamal (Spain)
+CC-US2 Joshua Kimmich (Germany)
+CC-US3 Harry Kane (England)
+CC-US4 Santiago Giménez (Mexico)
+CC-US5 Antonee Robinson (USA)
+CC-US6 Jefferson Lerma (Colombia)
+CC-US7 Edson Álvarez (Mexico)
+CC-US8 Virgil van Dijk (Netherlands)
+CC-US9 Alphonso Davies (Canada)
+CC-US10 Weston McKennie (USA)
+CC-US11 Lautaro Martínez (Argentina)
+CC-US12 Gabriel Magalhães (Brazil)
+
+# === COCA-COLA / LATIN AMERICA ===
+
+CC-LAM1 Lamine Yamal (Spain)
+CC-LAM2 Joshua Kimmich (Germany)
+CC-LAM3 Harry Kane (England)
+CC-LAM4 Santiago Giménez (Mexico)
+CC-LAM5 Joško Gvardiol (Croatia)
+CC-LAM6 Federico Valverde (Uruguay)
+CC-LAM7 Jefferson Lerma (Colombia)
+CC-LAM8 Enner Valencia (Ecuador)
+CC-LAM9 Gabriel Magalhães (Brazil)
+CC-LAM10 Virgil van Dijk (Netherlands)
+CC-LAM11 Alphonso Davies (Canada)
+CC-LAM12 Emiliano Martínez (Argentina)
+CC-LAM13 Raúl Jiménez (Mexico)
+CC-LAM14 Lautaro Martínez (Argentina)
+
+# === COCA-COLA / SERBIA ===
+
+CC-SRB1 Lautaro Martínez (Argentina)
+CC-SRB2 Alphonso Davies (Canada)
+CC-SRB3 Joško Gvardiol (Croatia)
+CC-SRB4 Harry Kane (England)
+CC-SRB5 Eduardo Camavinga (France)
+CC-SRB6 William Saliba (France)
+CC-SRB7 Joshua Kimmich (Germany)
+CC-SRB8 Raúl Jiménez (Mexico)
+CC-SRB9 Virgil van Dijk (Netherlands)
+CC-SRB10 Lamine Yamal (Spain)
+CC-SRB11 Antonee Robinson (USA)
+CC-SRB12 Federico Valverde (Uruguay)
+
+# === COCA-COLA / SPAIN ===
+
+CC-ESP1 Lamine Yamal (Spain)
+CC-ESP2 Joshua Kimmich (Germany)
+CC-ESP3 Eduardo Camavinga (France)
+CC-ESP4 Joško Gvardiol (Croatia)
+CC-ESP5 Federico Valverde (Uruguay)
+CC-ESP6 Virgil van Dijk (Netherlands)
+CC-ESP7 Alphonso Davies (Canada)
+CC-ESP8 Raúl Jiménez (Mexico)
+CC-ESP9 William Saliba (France)
+CC-ESP10 Lautaro Martínez (Argentina)
+CC-ESP11 Harry Kane (England)
+CC-ESP12 Antonee Robinson (USA)
+
+# === EXTRA STICKERS (BASE / ROXO + BRONZE + PRATA + OURO) ===
+
+LM Lionel Messi (Argentina)
+JD Jérémy Doku (Belgium)
+VJ Vinícius Júnior (Brazil)
+AD Alphonso Davies (Canada)
+LD Luis Díaz (Colombia)
+LMO Luka Modrić (Croatia)
+MC Moisés Caicedo (Ecuador)
+MS Mohamed Salah (Egypt)
+JB Jude Bellingham (England)
+KM Kylian Mbappé (France)
+FW Florian Wirtz (Germany)
+RJ Raúl Jiménez (Mexico)
+AH Achraf Hakimi (Morocco)
+EH Erling Haaland (Norway)
+RL Robert Lewandowski (Poland)
+CR Cristiano Ronaldo (Portugal)
+HS Heung-min Son (South Korea)
+LY Lamine Yamal (Spain)
+CP Christian Pulisic (USA)
+FV Federico Valverde (Uruguay)
