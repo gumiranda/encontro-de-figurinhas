@@ -10,15 +10,13 @@ import {
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
+import { rateLimiter } from "./lib/rateLimiter";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 1000;
 
 /** Mínimo entre salvamentos batch (recompute já é debounced em matches). */
 const RATE_LIMIT_MS = 400;
-
-/** Mínimo entre toggles — só evita double-click; recompute é debounced em matches. */
-const TOGGLE_RATE_LIMIT_MS = 100;
 
 type UserPatch = Partial<
   Pick<
@@ -206,10 +204,7 @@ export const toggleSticker = mutation({
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
 
-    const timeSinceLastUpdate = Date.now() - (user.lastActiveAt ?? 0);
-    if (timeSinceLastUpdate < TOGGLE_RATE_LIMIT_MS) {
-      throw new Error("Aguarde um momento antes de continuar");
-    }
+    await rateLimiter.limit(ctx, "toggleSticker", { key: user._id, throws: true });
 
     const config = await ctx.db.query("albumConfig").first();
     const maxSticker = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;

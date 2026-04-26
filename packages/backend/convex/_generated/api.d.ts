@@ -19,6 +19,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_checkinHelpers from "../lib/checkinHelpers.js";
 import type * as lib_confidence_status from "../lib/confidence_status.js";
 import type * as lib_constants from "../lib/constants.js";
+import type * as lib_coverImageUrl from "../lib/coverImageUrl.js";
 import type * as lib_geo from "../lib/geo.js";
 import type * as lib_ipLocationToken from "../lib/ipLocationToken.js";
 import type * as lib_limits from "../lib/limits.js";
@@ -78,6 +79,7 @@ declare const fullApi: ApiFromModules<{
   "lib/checkinHelpers": typeof lib_checkinHelpers;
   "lib/confidence_status": typeof lib_confidence_status;
   "lib/constants": typeof lib_constants;
+  "lib/coverImageUrl": typeof lib_coverImageUrl;
   "lib/geo": typeof lib_geo;
   "lib/ipLocationToken": typeof lib_ipLocationToken;
   "lib/limits": typeof lib_limits;

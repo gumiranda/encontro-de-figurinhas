@@ -16,6 +16,7 @@ import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { convexServer, api } from "@/lib/convex-server";
 import { BASE_URL } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { LoadMorePosts } from "@/modules/blog/ui/load-more-posts";
 import "@/modules/blog/ui/blog-home.css";
 
 interface CategoryPageProps {
@@ -153,8 +154,10 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
     ],
   };
 
+  // SSR renders 12 posts (1 featured + 11 grid) so LoadMorePosts skips them
+  // cleanly. Total visible matches LoadMorePosts SSR_INITIAL_COUNT=12.
   const featured = posts[0]!;
-  const rest = posts.slice(1);
+  const rest = posts.slice(1, 12);
 
   return (
     <>
@@ -290,6 +293,7 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
               </Link>
             ))}
           </div>
+          <LoadMorePosts mode={{ kind: "category", category: label }} />
         </section>
 
         <section className="container mx-auto mt-16 px-4 pb-16">

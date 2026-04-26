@@ -323,6 +323,31 @@ export const setAvatar = mutation({
       await ctx.storage.delete(previousStorageId);
     }
 
+    // Refresh denorm avatar on pending trades
+    const [pendingAsCounterparty, pendingAsInitiator] = await Promise.all([
+      ctx.db
+        .query("trades")
+        .withIndex("by_counterparty_status", (q) =>
+          q.eq("counterpartyId", user._id).eq("status", "pending_confirmation")
+        )
+        .take(50),
+      ctx.db
+        .query("trades")
+        .withIndex("by_initiator_status", (q) =>
+          q.eq("initiatorId", user._id).eq("status", "pending_confirmation")
+        )
+        .take(50),
+    ]);
+
+    await Promise.all([
+      ...pendingAsCounterparty.map((t) =>
+        ctx.db.patch(t._id, { counterpartyAvatarUrl: url })
+      ),
+      ...pendingAsInitiator.map((t) =>
+        ctx.db.patch(t._id, { initiatorAvatarUrl: url })
+      ),
+    ]);
+
     return { avatarUrl: url };
   },
 });

@@ -1,9 +1,42 @@
 import { paginationOptsValidator } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
-import { internalMutation, mutation, query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import {
+  internalMutation,
+  mutation,
+  type MutationCtx,
+  query,
+} from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { requireAdmin } from "./lib/auth";
+import { validateCoverImageUrl } from "./lib/coverImageUrl";
+
+function projectListPost<T extends {
+  _id: Id<"blogPosts">;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage?: string;
+  category: string;
+  tags: string[];
+  readingTime: number;
+  publishedAt?: number;
+  author: { name: string; avatar?: string; role?: string };
+}>(p: T) {
+  return {
+    _id: p._id,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    coverImage: p.coverImage,
+    category: p.category,
+    tags: p.tags,
+    readingTime: p.readingTime,
+    publishedAt: p.publishedAt,
+    author: p.author,
+  };
+}
 
 export const getPublished = query({
   args: {
@@ -15,19 +48,44 @@ export const getPublished = query({
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
       .order("desc")
       .take(limit ?? 50);
+    return posts.map(projectListPost);
+  },
+});
 
-    return posts.map((p) => ({
-      _id: p._id,
-      title: p.title,
-      slug: p.slug,
-      excerpt: p.excerpt,
-      coverImage: p.coverImage,
-      category: p.category,
-      tags: p.tags,
-      readingTime: p.readingTime,
-      publishedAt: p.publishedAt,
-      author: p.author,
-    }));
+export const getPublishedPaginated = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, { paginationOpts }) => {
+    const result = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
+      .order("desc")
+      .paginate(paginationOpts);
+    return {
+      page: result.page.map(projectListPost),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
+  },
+});
+
+export const getByCategoryPaginated = query({
+  args: {
+    category: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, { category, paginationOpts }) => {
+    const result = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_category_status", (q) =>
+        q.eq("category", category).eq("status", "published")
+      )
+      .order("desc")
+      .paginate(paginationOpts);
+    return {
+      page: result.page.map(projectListPost),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
   },
 });
 
@@ -468,6 +526,48 @@ export const listForSitemap = query({
   },
 });
 
+async function assertCoverImage(coverImage: string | undefined): Promise<void> {
+  if (!coverImage) return;
+  const v = validateCoverImageUrl(coverImage);
+  if (!v.ok) {
+    throw new ConvexError(`INVALID_COVER_URL:${v.reason}`);
+  }
+}
+
+async function assertSeriesAssignment(
+  ctx: MutationCtx,
+  seriesId: Id<"blogSeries"> | undefined,
+  seriesEpisodeNumber: number | undefined,
+  excludePostId?: Id<"blogPosts">
+): Promise<void> {
+  if (seriesId === undefined && seriesEpisodeNumber === undefined) return;
+  if (seriesId === undefined) {
+    throw new ConvexError("MISSING_SERIES_ID");
+  }
+  if (seriesEpisodeNumber === undefined) {
+    throw new ConvexError("MISSING_EPISODE_NUMBER");
+  }
+  if (
+    !Number.isInteger(seriesEpisodeNumber) ||
+    seriesEpisodeNumber < 1
+  ) {
+    throw new ConvexError("INVALID_EPISODE_NUMBER");
+  }
+  const series = await ctx.db.get(seriesId);
+  if (!series) {
+    throw new ConvexError("SERIES_NOT_FOUND");
+  }
+  const conflict = await ctx.db
+    .query("blogPosts")
+    .withIndex("by_series_episode", (q) =>
+      q.eq("seriesId", seriesId).eq("seriesEpisodeNumber", seriesEpisodeNumber)
+    )
+    .first();
+  if (conflict && conflict._id !== excludePostId) {
+    throw new ConvexError("DUPLICATE_EPISODE");
+  }
+}
+
 // Admin mutations
 export const create = mutation({
   args: {
@@ -484,6 +584,8 @@ export const create = mutation({
     titleHighlight: v.optional(v.string()),
     isTrending: v.optional(v.boolean()),
     authorRole: v.optional(v.string()),
+    seriesId: v.optional(v.id("blogSeries")),
+    seriesEpisodeNumber: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const user = await requireAdmin(ctx);
@@ -497,6 +599,13 @@ export const create = mutation({
     if (args.authorRole !== undefined && args.authorRole.length > AUTHOR_ROLE_MAX) {
       throw new Error(`author.role max ${AUTHOR_ROLE_MAX} chars`);
     }
+
+    await assertCoverImage(args.coverImage);
+    await assertSeriesAssignment(
+      ctx,
+      args.seriesId,
+      args.seriesEpisodeNumber
+    );
 
     const existing = await ctx.db
       .query("blogPosts")
@@ -546,6 +655,8 @@ export const update = mutation({
     titleHighlight: v.optional(v.string()),
     isTrending: v.optional(v.boolean()),
     authorRole: v.optional(v.string()),
+    seriesId: v.optional(v.id("blogSeries")),
+    seriesEpisodeNumber: v.optional(v.number()),
   },
   handler: async (ctx, { id, authorRole, ...updates }) => {
     await requireAdmin(ctx);
@@ -562,6 +673,24 @@ export const update = mutation({
 
     const post = await ctx.db.get(id);
     if (!post) throw new Error("Post not found");
+
+    if (updates.coverImage !== undefined) {
+      await assertCoverImage(updates.coverImage);
+    }
+
+    // Series assignment uses post's existing values when one side is omitted.
+    const nextSeriesId =
+      updates.seriesId !== undefined ? updates.seriesId : post.seriesId;
+    const nextEpisode =
+      updates.seriesEpisodeNumber !== undefined
+        ? updates.seriesEpisodeNumber
+        : post.seriesEpisodeNumber;
+    if (
+      updates.seriesId !== undefined ||
+      updates.seriesEpisodeNumber !== undefined
+    ) {
+      await assertSeriesAssignment(ctx, nextSeriesId, nextEpisode, id);
+    }
 
     const patch: Record<string, unknown> = { ...updates, updatedAt: Date.now() };
 
@@ -670,5 +799,83 @@ export const toggleMetric = mutation({
     }
 
     return { active: !wasActive };
+  },
+});
+
+const PRUNE_BATCH = 100;
+const PRUNE_MAX_CHUNKS = 50;
+
+export const pruneOrphanPostInteractions = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const page = await ctx.db
+      .query("postUserInteractions")
+      .paginate({ numItems: PRUNE_BATCH, cursor: cursor ?? null });
+
+    // Batch fetch all postIds at once to avoid N+1
+    const postIds = [...new Set(page.page.map((i) => i.postId))];
+    const posts = await Promise.all(postIds.map((id) => ctx.db.get(id)));
+    const existingPostIds = new Set(
+      posts.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => p._id)
+    );
+
+    let deleted = 0;
+    for (const interaction of page.page) {
+      if (!existingPostIds.has(interaction.postId)) {
+        await ctx.db.delete(interaction._id);
+        deleted++;
+      }
+    }
+
+    await rescheduleIfMore(ctx, {
+      self: internal.blog.pruneOrphanPostInteractions,
+      args: { cursor: page.continueCursor },
+      hasMore: !page.isDone,
+      chunk,
+      maxChunks: PRUNE_MAX_CHUNKS,
+      label: "pruneOrphanPostInteractions",
+    });
+
+    return { deleted };
+  },
+});
+
+export const pruneOrphanPostMetrics = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const page = await ctx.db
+      .query("postMetrics")
+      .paginate({ numItems: PRUNE_BATCH, cursor: cursor ?? null });
+
+    const postIds = [...new Set(page.page.map((m) => m.postId))];
+    const posts = await Promise.all(postIds.map((id) => ctx.db.get(id)));
+    const existingPostIds = new Set(
+      posts.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => p._id)
+    );
+
+    let deleted = 0;
+    for (const metric of page.page) {
+      if (!existingPostIds.has(metric.postId)) {
+        await ctx.db.delete(metric._id);
+        deleted++;
+      }
+    }
+
+    await rescheduleIfMore(ctx, {
+      self: internal.blog.pruneOrphanPostMetrics,
+      args: { cursor: page.continueCursor },
+      hasMore: !page.isDone,
+      chunk,
+      maxChunks: PRUNE_MAX_CHUNKS,
+      label: "pruneOrphanPostMetrics",
+    });
+
+    return { deleted };
   },
 });

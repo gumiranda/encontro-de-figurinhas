@@ -59,4 +59,32 @@ crons.cron(
   {}
 );
 
+crons.cron(
+  "prune old reports",
+  "0 3 * * 0", // Sunday 03:00 UTC
+  internal.reports.pruneOldReports,
+  {}
+);
+
+crons.cron(
+  "prune unsubscribed newsletters",
+  "0 4 1 * *", // 1st of month 04:00 UTC
+  internal.newsletter.pruneUnsubscribed,
+  {}
+);
+
+crons.cron(
+  "prune orphan post interactions",
+  "0 2 * * 0", // Sunday 02:00 UTC
+  internal.blog.pruneOrphanPostInteractions,
+  {}
+);
+
+crons.cron(
+  "prune orphan post metrics",
+  "30 2 * * 0", // Sunday 02:30 UTC
+  internal.blog.pruneOrphanPostMetrics,
+  {}
+);
+
 export default crons;

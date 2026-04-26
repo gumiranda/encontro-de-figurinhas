@@ -20,6 +20,7 @@ import {
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { validateCoverImageUrl } from "@/lib/cover-image-validation";
 
 type PostStatus = "draft" | "published";
 
@@ -103,6 +104,25 @@ export function AdminPostEditor({ mode, postId, initial }: AdminPostEditorProps)
     if (!excerpt.trim()) return toast.error("Resumo obrigatório");
     if (!content.trim()) return toast.error("Conteúdo obrigatório");
     if (!category.trim()) return toast.error("Categoria obrigatória");
+
+    const trimmedCover = coverImage.trim();
+    if (trimmedCover) {
+      const v = validateCoverImageUrl(trimmedCover);
+      if (!v.ok) {
+        switch (v.reason) {
+          case "PARSE":
+            return toast.error("URL de capa inválida");
+          case "SCHEME":
+            return toast.error("Capa precisa usar http(s)://");
+          case "HOSTNAME":
+            return toast.error("Hostname da capa inválido");
+          case "HOST_NOT_ALLOWED":
+            return toast.error(
+              `Host "${v.hostname}" não está em next.config.mjs:COVER_REMOTE_PATTERNS`
+            );
+        }
+      }
+    }
 
     const tags = tagsInput
       .split(",")

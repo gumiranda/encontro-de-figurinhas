@@ -73,4 +73,55 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 120,
     shards: 4,
   },
+
+  // Newsletter unsubscribe — per-IP key (extracted by the route handler from
+  // x-forwarded-for). Avoids global-key DoS where one attacker locks out all
+  // users; unauthenticated, so the route handler is the trust boundary.
+  newsletterUnsubscribe: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 60,
+  },
+
+  // Per-token brute-force guard. UUIDv4 isn't bruteforceable in cosmic time,
+  // but cheap cap stops a misbehaving email client from re-firing the link.
+  newsletterUnsubscribeToken: {
+    kind: "token bucket",
+    rate: 5,
+    period: 10 * MINUTE,
+    capacity: 5,
+  },
+
+  // checkins.create — per-user throttle against spam checkins
+  checkinCreate: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 60,
+  },
+
+  // trades.initiate — per-user 10/hour (matches existing manual logic)
+  tradeInitiate: {
+    kind: "token bucket",
+    rate: 10,
+    period: HOUR,
+    capacity: 10,
+  },
+
+  // userMatchInteractions.toggleHidden — moderate throttle
+  toggleHidden: {
+    kind: "token bucket",
+    rate: 60,
+    period: MINUTE,
+    capacity: 120,
+  },
+
+  // stickers.toggleSticker — per-user throttle (50+ stickers abuse vector)
+  toggleSticker: {
+    kind: "token bucket",
+    rate: 120,
+    period: MINUTE,
+    capacity: 240,
+  },
 });
