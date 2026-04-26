@@ -1,5 +1,4 @@
 import { fetchQuery } from "convex/nextjs";
-import { cacheLife, cacheTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { api } from "@workspace/backend/_generated/api";
@@ -20,9 +19,7 @@ export const viewport: Viewport = {
 };
 
 async function getCities() {
-  "use cache";
-  cacheTag("cities");
-  cacheLife("hours");
+  // Sem "use cache": evita lista vazia stale; o cliente ainda hidrata via useQuery(api.cities.getAll).
   return fetchQuery(api.cities.getAll);
 }
 

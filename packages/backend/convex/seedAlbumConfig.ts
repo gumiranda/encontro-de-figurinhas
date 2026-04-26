@@ -143,13 +143,19 @@ export const seedStickerDetails = internalMutation({
     }> = [];
 
     for (const section of albumConfig.sections) {
-      for (const st of section.stickerDetails ?? []) {
+      const stickerDetails = section.stickerDetails ?? [];
+      // Find minimum rel to handle sections where rel doesn't start at 1 (e.g., champions FWC-9 to FWC-19)
+      const minRel = stickerDetails.length > 0
+        ? Math.min(...stickerDetails.map(s => s.rel))
+        : 1;
+
+      for (const st of stickerDetails) {
         allStickers.push({
           sectionCode: section.code,
           sectionName: section.name,
           flagEmoji: section.flagEmoji ?? "",
           relativeNum: st.rel,
-          absoluteNum: section.startNumber + st.rel - 1,
+          absoluteNum: section.startNumber + (st.rel - minRel),
           name: st.name,
           nameNormalized: normalize(st.name),
           slug: `${slugify(st.name)}-${section.code.toLowerCase()}-${st.rel}`,
