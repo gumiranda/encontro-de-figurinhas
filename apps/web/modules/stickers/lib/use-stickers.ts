@@ -17,6 +17,7 @@ function getUserFacingStickerError(
   error: unknown,
   fallback = GENERIC_SAVE_ERROR
 ): string {
+  console.log("getUserFacingStickerError", error);
   const rawMessage = error instanceof Error ? error.message : String(error ?? "");
   const message = rawMessage.trim();
 

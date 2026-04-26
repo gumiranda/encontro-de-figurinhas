@@ -1,6 +1,6 @@
+import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type MutationCtx } from "./_generated/server";
-import { v } from "convex/values";
 import { requireAuth } from "./lib/auth";
 import {
   arraysEqual,
@@ -8,12 +8,12 @@ import {
   getActiveCheckin,
 } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import { rateLimiter } from "./lib/rateLimiter";
 import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
-import { rateLimiter } from "./lib/rateLimiter";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
-const MAX_STICKER_ARRAY_SIZE = 1000;
+const MAX_STICKER_ARRAY_SIZE = 3000;
 
 /** Mínimo entre salvamentos batch (recompute já é debounced em matches). */
 const RATE_LIMIT_MS = 400;
@@ -64,9 +64,7 @@ async function syncActiveCheckinsStickerSnapshot(
 
   if (needsPatch.length === 0) return;
 
-  await Promise.all(
-    needsPatch.map((c) => ctx.db.patch(c._id, denorm))
-  );
+  await Promise.all(needsPatch.map((c) => ctx.db.patch(c._id, denorm)));
 }
 
 export const getUserStickers = query({
@@ -120,11 +118,7 @@ export const updateStickerList = mutation({
     // 2. Range 1..maxSticker
     const allNumbers = [...args.duplicates, ...args.missing];
     const invalid = allNumbers.filter(
-      (n) =>
-        !Number.isInteger(n) ||
-        !Number.isFinite(n) ||
-        n < 1 ||
-        n > maxSticker
+      (n) => !Number.isInteger(n) || !Number.isFinite(n) || n < 1 || n > maxSticker
     );
     if (invalid.length > 0) {
       throw new Error(`Numeros invalidos (1-${maxSticker}): ${invalid.join(", ")}`);
@@ -148,14 +142,8 @@ export const updateStickerList = mutation({
     }
 
     // 4. Finalize: pelo menos uma lista não vazia
-    if (
-      args.finalize &&
-      args.duplicates.length === 0 &&
-      args.missing.length === 0
-    ) {
-      throw new Error(
-        "Preencha figurinhas repetidas ou faltantes antes de continuar"
-      );
+    if (args.finalize && args.duplicates.length === 0 && args.missing.length === 0) {
+      throw new Error("Preencha figurinhas repetidas ou faltantes antes de continuar");
     }
 
     // 5. Contadores
@@ -179,12 +167,7 @@ export const updateStickerList = mutation({
     await ctx.db.patch(user._id, patch);
 
     const mergedUser = { ...user, ...patch };
-    await syncActiveCheckinsStickerSnapshot(
-      ctx,
-      user._id,
-      mergedUser,
-      args.duplicates
-    );
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, mergedUser, args.duplicates);
 
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 
@@ -195,11 +178,7 @@ export const updateStickerList = mutation({
 export const toggleSticker = mutation({
   args: {
     number: v.number(),
-    target: v.union(
-      v.literal("missing"),
-      v.literal("duplicate"),
-      v.literal("clear")
-    ),
+    target: v.union(v.literal("missing"), v.literal("duplicate"), v.literal("clear")),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
