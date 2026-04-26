@@ -371,6 +371,9 @@ export default defineSchema({
     views: v.optional(v.number()),
     isTrending: v.optional(v.boolean()),
     titleHighlight: v.optional(v.string()),
+    // Series membership (optional). Episode number determines order within a series.
+    seriesId: v.optional(v.id("blogSeries")),
+    seriesEpisodeNumber: v.optional(v.number()),
     // SEO/AEO structured data fields
     products: v.optional(
       v.array(
@@ -397,7 +400,30 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .index("by_status_publishedAt", ["status", "publishedAt"])
-    .index("by_category_status", ["category", "status"]),
+    .index("by_category_status", ["category", "status"])
+    .index("by_series_episode", ["seriesId", "seriesEpisodeNumber"]),
+
+  blogSeries: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    /** Number of episodes planned. Used to render "X / N" progress and upcoming slots. */
+    totalPlanned: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_isActive_createdAt", ["isActive", "createdAt"]),
+
+  newsletterSubscriptions: defineTable({
+    email: v.string(),
+    status: v.union(v.literal("active"), v.literal("unsubscribed")),
+    source: v.optional(v.string()),
+    createdAt: v.number(),
+    unsubscribedAt: v.optional(v.number()),
+  })
+    .index("by_email", ["email"])
+    .index("by_status_createdAt", ["status", "createdAt"]),
 
   reports: defineTable({
     reporterId: v.id("users"),
@@ -440,7 +466,9 @@ export default defineSchema({
     // Public view counter. Lives here (not on blogPosts) to avoid write contention
     // on the post doc when many viewers hit the page concurrently.
     views: v.optional(v.number()),
-  }).index("by_post", ["postId"]),
+  })
+    .index("by_post", ["postId"])
+    .index("by_views", ["views"]),
 
 
   postViewIdempotency: defineTable({

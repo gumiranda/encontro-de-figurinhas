@@ -64,4 +64,13 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: MINUTE,
     capacity: 120,
   },
+
+  // Newsletter subscribe — public, single global bucket against email-spam abuse.
+  newsletterSubscribe: {
+    kind: "token bucket",
+    rate: 60,
+    period: MINUTE,
+    capacity: 120,
+    shards: 4,
+  },
 });

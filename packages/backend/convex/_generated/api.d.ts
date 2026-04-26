@@ -35,6 +35,7 @@ import type * as lib_userCoords from "../lib/userCoords.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_whatsapp from "../lib/whatsapp.js";
 import type * as matches from "../matches.js";
+import type * as newsletter from "../newsletter.js";
 import type * as permissions from "../permissions.js";
 import type * as reports from "../reports.js";
 import type * as revalidate from "../revalidate.js";
@@ -93,6 +94,7 @@ declare const fullApi: ApiFromModules<{
   "lib/utils": typeof lib_utils;
   "lib/whatsapp": typeof lib_whatsapp;
   matches: typeof matches;
+  newsletter: typeof newsletter;
   permissions: typeof permissions;
   reports: typeof reports;
   revalidate: typeof revalidate;

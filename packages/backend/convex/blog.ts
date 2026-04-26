@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
-import { getAuthenticatedUser } from "./lib/auth";
+import { requireAdmin } from "./lib/auth";
 
 export const getPublished = query({
   args: {
@@ -199,6 +199,192 @@ export const getByCategory = query({
   },
 });
 
+export const listForAdmin = query({
+  args: {
+    status: v.optional(
+      v.union(v.literal("all"), v.literal("draft"), v.literal("published"))
+    ),
+    search: v.optional(v.string()),
+  },
+  handler: async (ctx, { status, search }) => {
+    await requireAdmin(ctx);
+    const filter = status ?? "all";
+
+    const allPosts =
+      filter === "all"
+        ? await ctx.db.query("blogPosts").order("desc").take(500)
+        : await ctx.db
+            .query("blogPosts")
+            .withIndex("by_status_publishedAt", (q) => q.eq("status", filter))
+            .order("desc")
+            .take(500);
+
+    const term = search?.trim().toLowerCase();
+    const filtered = term
+      ? allPosts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(term) ||
+            p.slug.toLowerCase().includes(term) ||
+            p.category.toLowerCase().includes(term)
+        )
+      : allPosts;
+
+    const metrics = await Promise.all(
+      filtered.map((p) =>
+        ctx.db
+          .query("postMetrics")
+          .withIndex("by_post", (q) => q.eq("postId", p._id))
+          .first()
+      )
+    );
+
+    return filtered.map((p, i) => ({
+      _id: p._id,
+      title: p.title,
+      slug: p.slug,
+      category: p.category,
+      status: p.status,
+      author: p.author.name,
+      coverImage: p.coverImage,
+      publishedAt: p.publishedAt,
+      updatedAt: p.updatedAt,
+      createdAt: p.createdAt,
+      readingTime: p.readingTime,
+      views: metrics[i]?.views ?? p.views ?? 0,
+      likes: metrics[i]?.likes ?? 0,
+    }));
+  },
+});
+
+export const getByIdForAdmin = query({
+  args: { id: v.id("blogPosts") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    const post = await ctx.db.get(id);
+    return post;
+  },
+});
+
+export const adminStats = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const posts = await ctx.db.query("blogPosts").take(1000);
+    const published = posts.filter((p) => p.status === "published").length;
+    const drafts = posts.filter((p) => p.status === "draft").length;
+
+    const metrics = await Promise.all(
+      posts.map((p) =>
+        ctx.db
+          .query("postMetrics")
+          .withIndex("by_post", (q) => q.eq("postId", p._id))
+          .first()
+      )
+    );
+    let totalViews = 0;
+    let totalLikes = 0;
+    for (const m of metrics) {
+      totalViews += m?.views ?? 0;
+      totalLikes += m?.likes ?? 0;
+    }
+    return {
+      total: posts.length,
+      published,
+      drafts,
+      totalViews,
+      totalLikes,
+    };
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("blogPosts") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    const post = await ctx.db.get(id);
+    if (!post) throw new Error("Post not found");
+    await ctx.db.delete(id);
+  },
+});
+
+export const getActiveSeries = query({
+  args: {},
+  handler: async (ctx) => {
+    const series = await ctx.db
+      .query("blogSeries")
+      .withIndex("by_isActive_createdAt", (q) => q.eq("isActive", true))
+      .order("desc")
+      .first();
+    if (!series) return null;
+
+    const episodes = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_series_episode", (q) => q.eq("seriesId", series._id))
+      .take(series.totalPlanned);
+
+    episodes.sort(
+      (a, b) => (a.seriesEpisodeNumber ?? 0) - (b.seriesEpisodeNumber ?? 0)
+    );
+
+    return {
+      _id: series._id,
+      title: series.title,
+      slug: series.slug,
+      description: series.description,
+      totalPlanned: series.totalPlanned,
+      episodes: episodes.map((p) => ({
+        _id: p._id,
+        title: p.title,
+        slug: p.slug,
+        episodeNumber: p.seriesEpisodeNumber ?? 0,
+        readingTime: p.readingTime,
+        author: p.author.name,
+        status: p.status,
+        publishedAt: p.publishedAt,
+      })),
+    };
+  },
+});
+
+export const getTrending = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const max = Math.min(Math.max(limit ?? 5, 1), 20);
+    const topMetrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_views")
+      .order("desc")
+      .take(max * 2);
+
+    const posts = await Promise.all(
+      topMetrics.map((m) => ctx.db.get(m.postId))
+    );
+    const viewsByPost = new Map(
+      topMetrics.map((m) => [m.postId, m.views ?? 0])
+    );
+
+    const rows: Array<{
+      _id: typeof topMetrics[number]["postId"];
+      title: string;
+      slug: string;
+      category: string;
+      views: number;
+    }> = [];
+    for (const p of posts) {
+      if (!p || p.status !== "published") continue;
+      rows.push({
+        _id: p._id,
+        title: p.title,
+        slug: p.slug,
+        category: p.category,
+        views: viewsByPost.get(p._id) ?? 0,
+      });
+      if (rows.length >= max) break;
+    }
+    return rows;
+  },
+});
+
 export const getRelated = query({
   args: { slug: v.string(), limit: v.optional(v.number()) },
   returns: v.array(
@@ -300,10 +486,7 @@ export const create = mutation({
     authorRole: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user || user.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
+    const user = await requireAdmin(ctx);
 
     if (
       args.titleHighlight !== undefined &&
@@ -365,10 +548,7 @@ export const update = mutation({
     authorRole: v.optional(v.string()),
   },
   handler: async (ctx, { id, authorRole, ...updates }) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user || user.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
+    await requireAdmin(ctx);
 
     if (
       updates.titleHighlight !== undefined &&

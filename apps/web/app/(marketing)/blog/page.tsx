@@ -4,11 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
+  BookmarkPlus,
   BookOpen,
+  CheckCircle2,
   Clock,
   Diamond,
   Flame,
   History,
+  Library,
   Rss,
   TrendingUp,
   Trophy,
@@ -24,6 +27,7 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { NewsletterForm } from "@/modules/blog/ui/newsletter-form";
 import "@/modules/blog/ui/blog-home.css";
 
 export const metadata: Metadata = generateBlogListMetadata();
@@ -33,6 +37,20 @@ async function loadPosts() {
   cacheTag("blog");
   cacheLife("hours");
   return convexServer.query(api.blog.getPublished, { limit: 20 });
+}
+
+async function loadTrending() {
+  "use cache";
+  cacheTag("blog");
+  cacheLife("hours");
+  return convexServer.query(api.blog.getTrending, { limit: 5 });
+}
+
+async function loadActiveSeries() {
+  "use cache";
+  cacheTag("blog");
+  cacheLife("hours");
+  return convexServer.query(api.blog.getActiveSeries, {});
 }
 
 function formatDate(timestamp: number) {
@@ -87,7 +105,11 @@ const CATEGORY_CARDS = [
 ] as const;
 
 export default async function BlogPage() {
-  const posts = await loadPosts();
+  const [posts, trending, series] = await Promise.all([
+    loadPosts(),
+    loadTrending(),
+    loadActiveSeries(),
+  ]);
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
@@ -238,105 +260,261 @@ export default async function BlogPage() {
           </div>
         </section>
 
-        {/* Big-pair */}
-        {bigPair.length > 0 && (
-          <section className="container mx-auto mt-8 px-4">
-            <div className="bh-section-head">
-              <div>
-                <span className="bh-eyebrow">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Em destaque
-                </span>
-                <h2 className="bh-section-title mt-2">Lidos nesta semana</h2>
-              </div>
-            </div>
-            <div className="bh-big-pair">
-              {bigPair.map((post) => (
-                <Link
-                  key={post._id}
-                  href={`/blog/${post.slug}`}
-                  className="bh-big-card"
-                >
-                  <div
-                    className="bh-thumb"
-                    style={
-                      post.coverImage
-                        ? { backgroundImage: `url(${post.coverImage})` }
-                        : undefined
-                    }
-                  />
-                  <div className="bh-body">
-                    <div className="flex gap-1.5">
-                      <span className="bh-chip bh-chip-primary">
-                        {post.category}
+        {/* Main grid: content + trending sidebar */}
+        <section className="container mx-auto mt-8 px-4">
+          <div className="bh-main-grid">
+            <div>
+              {/* Big-pair */}
+              {bigPair.length > 0 && (
+                <div>
+                  <div className="bh-section-head">
+                    <div>
+                      <span className="bh-eyebrow">
+                        <TrendingUp className="h-3.5 w-3.5" />
+                        Em destaque
                       </span>
-                    </div>
-                    <h3>{post.title}</h3>
-                    <p className="bh-excerpt">{post.excerpt}</p>
-                    <div className="mt-auto flex items-center gap-2.5 text-xs text-muted-foreground">
-                      <div className="bh-avatar">
-                        {initials(post.author.name)}
-                      </div>
-                      <span>{post.author.name}</span>
-                      <span className="opacity-40">·</span>
-                      <span>{post.readingTime} min</span>
+                      <h2 className="bh-section-title mt-2">
+                        Lidos nesta semana
+                      </h2>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+                  <div className="bh-big-pair">
+                    {bigPair.map((post) => (
+                      <Link
+                        key={post._id}
+                        href={`/blog/${post.slug}`}
+                        className="bh-big-card"
+                      >
+                        <div
+                          className="bh-thumb"
+                          style={
+                            post.coverImage
+                              ? { backgroundImage: `url(${post.coverImage})` }
+                              : undefined
+                          }
+                        />
+                        <div className="bh-body">
+                          <div className="flex gap-1.5">
+                            <span className="bh-chip bh-chip-primary">
+                              {post.category}
+                            </span>
+                          </div>
+                          <h3>{post.title}</h3>
+                          <p className="bh-excerpt">{post.excerpt}</p>
+                          <div className="mt-auto flex items-center gap-2.5 text-xs text-muted-foreground">
+                            <div className="bh-avatar">
+                              {initials(post.author.name)}
+                            </div>
+                            <span>{post.author.name}</span>
+                            <span className="opacity-40">·</span>
+                            <span>{post.readingTime} min</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-        {/* Post grid */}
-        {gridPosts.length > 0 && (
-          <section
-            id="mais-recentes"
-            className="container mx-auto mt-4 px-4"
-          >
-            <div className="bh-section-head">
-              <h2 className="bh-section-title">Mais recentes</h2>
-              <Link href="/blog" className="bh-section-link">
-                Todos os artigos
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="bh-post-grid">
-              {gridPosts.map((post) => (
-                <Link
-                  key={post._id}
-                  href={`/blog/${post.slug}`}
-                  className="bh-post-card"
-                >
-                  <div className="bh-thumb">
-                    {post.coverImage && (
-                      <Image
-                        src={post.coverImage}
-                        alt={post.title}
-                        fill
-                        sizes="(min-width: 1080px) 33vw, (min-width: 720px) 50vw, 100vw"
-                        className="object-cover"
-                      />
-                    )}
-                    <span className="bh-cat">{post.category}</span>
+              {/* Post grid */}
+              {gridPosts.length > 0 && (
+                <div id="mais-recentes">
+                  <div className="bh-section-head">
+                    <h2 className="bh-section-title">Mais recentes</h2>
+                    <Link href="/blog" className="bh-section-link">
+                      Todos os artigos
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
-                  <div className="bh-body">
-                    <h3>{post.title}</h3>
-                    <p className="bh-excerpt">{post.excerpt}</p>
-                    <div className="bh-meta">
-                      <div className="bh-avatar">
-                        {initials(post.author.name)}
-                      </div>
-                      <span>{post.author.name}</span>
-                      <span className="bh-read-time">
-                        <Clock className="h-3.5 w-3.5" />
-                        {post.readingTime} min
+                  <div className="bh-post-grid">
+                    {gridPosts.map((post) => (
+                      <Link
+                        key={post._id}
+                        href={`/blog/${post.slug}`}
+                        className="bh-post-card"
+                      >
+                        <div className="bh-thumb">
+                          {post.coverImage && (
+                            <Image
+                              src={post.coverImage}
+                              alt={post.title}
+                              fill
+                              sizes="(min-width: 1080px) 33vw, (min-width: 720px) 50vw, 100vw"
+                              className="object-cover"
+                            />
+                          )}
+                          <span className="bh-cat">{post.category}</span>
+                        </div>
+                        <div className="bh-body">
+                          <h3>{post.title}</h3>
+                          <p className="bh-excerpt">{post.excerpt}</p>
+                          <div className="bh-meta">
+                            <div className="bh-avatar">
+                              {initials(post.author.name)}
+                            </div>
+                            <span>{post.author.name}</span>
+                            <span className="bh-read-time">
+                              <Clock className="h-3.5 w-3.5" />
+                              {post.readingTime} min
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Trending sidebar */}
+            {trending.length > 0 && (
+              <aside className="bh-trending">
+                <h4>
+                  <Flame className="h-4 w-4" />
+                  Em alta agora
+                </h4>
+                <ol>
+                  {trending.map((t, i) => (
+                    <li key={t._id}>
+                      <span className="bh-rank">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
-                    </div>
+                      <Link href={`/blog/${t.slug}`} className="block">
+                        <p className="bh-t-title">{t.title}</p>
+                        <div className="bh-t-meta">
+                          <span>{t.category}</span>
+                          <span className="opacity-40">·</span>
+                          <span>{t.views.toLocaleString("pt-BR")} leituras</span>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+                <div className="bh-stat-grid">
+                  <div className="bh-stat">
+                    <div className="bh-stat-num">{posts.length}</div>
+                    <div className="bh-stat-lbl">artigos</div>
                   </div>
-                </Link>
-              ))}
+                  <div className="bh-stat">
+                    <div
+                      className="bh-stat-num"
+                      style={{ color: "var(--primary)" }}
+                    >
+                      {categoryCounts.size}
+                    </div>
+                    <div className="bh-stat-lbl">categorias</div>
+                  </div>
+                  <div className="bh-stat">
+                    <div
+                      className="bh-stat-num"
+                      style={{ color: "#ffc965" }}
+                    >
+                      {new Set(posts.map((p) => p.author.name)).size}
+                    </div>
+                    <div className="bh-stat-lbl">autores</div>
+                  </div>
+                </div>
+              </aside>
+            )}
+          </div>
+        </section>
+
+        {/* Series */}
+        {series && (
+          <section className="container mx-auto mt-12 px-4">
+            <div className="bh-section-head">
+              <h2 className="bh-section-title">Série em andamento</h2>
             </div>
+            <article className="bh-series-card">
+              <div className="bh-series-head">
+                <div>
+                  <span className="bh-chip bh-chip-tertiary mb-2.5 inline-flex">
+                    <Library className="h-3.5 w-3.5" />
+                    Série · {series.episodes.filter((e) => e.status === "published").length}/{series.totalPlanned}
+                  </span>
+                  <h3 className="bh-series-title mt-2">{series.title}</h3>
+                  {series.description && (
+                    <p className="mt-1.5 max-w-prose text-sm text-muted-foreground">
+                      {series.description}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-white/[0.08]"
+                >
+                  <BookmarkPlus className="h-4 w-4" />
+                  Seguir série
+                </button>
+              </div>
+              <div className="bh-series-episodes">
+                {Array.from({ length: series.totalPlanned }).map((_, idx) => {
+                  const number = idx + 1;
+                  const ep = series.episodes.find(
+                    (e) => e.episodeNumber === number
+                  );
+                  const isPublished = ep && ep.status === "published";
+                  const isCurrent =
+                    isPublished &&
+                    number ===
+                      Math.max(
+                        ...series.episodes
+                          .filter((e) => e.status === "published")
+                          .map((e) => e.episodeNumber)
+                      );
+                  const numClass = !ep
+                    ? "bh-episode-num upcoming"
+                    : isCurrent
+                      ? "bh-episode-num current"
+                      : "bh-episode-num";
+                  const wrapClass = ep
+                    ? "bh-episode"
+                    : "bh-episode upcoming";
+                  const inner = (
+                    <>
+                      <div className={numClass}>
+                        {String(number).padStart(2, "0")}
+                      </div>
+                      <div className="bh-episode-info">
+                        <h4>{ep ? ep.title : "Em breve"}</h4>
+                        <p>
+                          {ep
+                            ? `${ep.readingTime} min · ${ep.author}`
+                            : `Próximo episódio · #${number}`}
+                        </p>
+                      </div>
+                      {isCurrent ? (
+                        <span className="bh-chip bh-chip-tertiary text-[0.6rem]">
+                          Novo
+                        </span>
+                      ) : isPublished ? (
+                        <CheckCircle2
+                          className="h-5 w-5 shrink-0"
+                          style={{ color: "#ffc965" }}
+                        />
+                      ) : (
+                        <Clock
+                          className="h-5 w-5 shrink-0 text-muted-foreground"
+                        />
+                      )}
+                    </>
+                  );
+                  return ep ? (
+                    <Link
+                      key={number}
+                      href={`/blog/${ep.slug}`}
+                      className={wrapClass}
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div key={number} className={wrapClass}>
+                      {inner}
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
           </section>
         )}
 
@@ -393,8 +571,28 @@ export default async function BlogPage() {
           </section>
         )}
 
+        {/* Newsletter */}
+        <section id="newsletter" className="container mx-auto mt-20 px-4">
+          <div className="bh-newsletter">
+            <span className="bh-eyebrow">
+              <Rss className="h-3.5 w-3.5" />
+              Newsletter semanal
+            </span>
+            <h3>Receba o melhor do álbum na sua caixa, toda sexta.</h3>
+            <p>
+              Guias exclusivos, alertas de figurinha rara perto de você e
+              entrevistas com colecionadores. Sem spam, sem enrolação.
+            </p>
+            <NewsletterForm source="blog-home" />
+            <p className="bh-newsletter-meta">
+              <span className="bh-live-dot" />
+              Junto com colecionadores. Cancele quando quiser.
+            </p>
+          </div>
+        </section>
+
         {/* CTA */}
-        <section id="newsletter" className="py-16 md:py-24">
+        <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-headline mb-6 text-2xl font-bold md:text-3xl">
               Quer completar seu álbum?

@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeftRight,
+  BookOpen,
   Inbox,
   LayoutDashboard,
   ListPlus,
@@ -103,6 +104,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
               items: [
                 { label: "Aprovar pontos", href: "/admin/points", icon: ShieldCheck },
                 { label: "Usuários", href: "/admin/users", icon: UserCog },
+                { label: "Blog", href: "/admin/blog", icon: BookOpen },
               ],
             },
           ]
