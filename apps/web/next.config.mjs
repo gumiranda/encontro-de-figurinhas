@@ -4,6 +4,29 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+/**
+ * Single source of truth for cover-image / next-image allowed hosts.
+ * Imported by `apps/web/lib/cover-image-validation.ts` so the admin form
+ * validator never drifts from what next/image will actually render.
+ */
+export const COVER_REMOTE_PATTERNS = [
+  {
+    protocol: "https",
+    hostname: "lh3.googleusercontent.com",
+    pathname: "/aida-public/**",
+  },
+  {
+    protocol: "https",
+    hostname: "*.convex.cloud",
+    pathname: "/api/storage/**",
+  },
+  {
+    protocol: "https",
+    hostname: "images.unsplash.com",
+    pathname: "/**",
+  },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   cacheComponents: true,
@@ -12,18 +35,7 @@ const nextConfig = {
   trailingSlash: false,
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        pathname: "/aida-public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "*.convex.cloud",
-        pathname: "/api/storage/**",
-      },
-    ],
+    remotePatterns: COVER_REMOTE_PATTERNS,
   },
   async headers() {
     return [
