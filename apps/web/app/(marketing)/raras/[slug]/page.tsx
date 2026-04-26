@@ -23,8 +23,6 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
-export const dynamicParams = false;
-
 interface RarePageProps {
   params: Promise<{ slug: string }>;
 }
