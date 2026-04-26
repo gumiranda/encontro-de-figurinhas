@@ -31,9 +31,18 @@ const isPublicRoute = createRouteMatcher([
   "/album-copa-do-mundo-2026(.*)",
   "/blog(.*)",
   "/cidade(.*)",
+  "/estado(.*)",
+  "/cidades",
+  "/estados",
+  "/selecoes",
+  "/selecao(.*)",
   "/figurinha(.*)",
+  "/figurinhas",
+  "/raras(.*)",
   "/jogo-mais-chato(.*)",
+  "/onde-comprar-figurinhas-copa-2026",
   "/ponto/id(.*)",
+  "/pontos",
   // /ponto/[slug] público (SEO) exceto /ponto/solicitar (autenticado)
   /^\/ponto\/(?!solicitar(?:\/|$))[^/]+(?:\/.*)?$/,
 ]);
