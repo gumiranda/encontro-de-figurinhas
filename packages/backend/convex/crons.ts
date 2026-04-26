@@ -45,4 +45,18 @@ crons.cron(
   {}
 );
 
+crons.cron(
+  "cleanup orphan cover storage",
+  "0 2 * * *",
+  internal.tradePoints.cleanupOrphanCoverStorage,
+  {}
+);
+
+crons.cron(
+  "prune blog view idempotency",
+  "0 1 * * *",
+  internal.blog.pruneViewIdempotency,
+  {}
+);
+
 export default crons;

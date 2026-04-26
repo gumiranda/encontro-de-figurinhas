@@ -301,19 +301,25 @@ export function parseStickers(
   return { valid, invalid, rejectedMultiCount, formatted };
 }
 
-export function formatStickerNumber(
-  num: number,
-  lookup: SectionLookup
-): {
+export type StickerDisplay = {
   code: string;
   relativeNum: number;
   fullName: string;
   display: string;
-} {
+};
+
+export function getRelativeNum(num: number, section: Section): number {
+  return num - section.startNumber + 1;
+}
+
+export function formatStickerNumber(
+  num: number,
+  lookup: SectionLookup
+): StickerDisplay {
   const section = findSectionForNumber(num, lookup);
 
   if (section) {
-    const relativeNum = num - section.startNumber + 1;
+    const relativeNum = getRelativeNum(num, section);
     return {
       code: section.code,
       relativeNum,
@@ -327,6 +333,23 @@ export function formatStickerNumber(
     relativeNum: num,
     fullName: "Desconhecido",
     display: String(num),
+  };
+}
+
+export function formatStickerNumberStrict(
+  num: number,
+  lookup: SectionLookup
+): StickerDisplay {
+  const section = findSectionForNumber(num, lookup);
+  if (!section) {
+    throw new Error(`No section found for sticker number ${num}`);
+  }
+  const relativeNum = getRelativeNum(num, section);
+  return {
+    code: section.code,
+    relativeNum,
+    fullName: section.name,
+    display: `${section.code}-${relativeNum}`,
   };
 }
 

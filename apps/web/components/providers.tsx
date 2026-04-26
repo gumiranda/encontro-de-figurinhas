@@ -3,7 +3,6 @@
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import { ConvexReactClient } from "convex/react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -36,15 +35,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       }}
     >
-      <NextThemesProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-        enableColorScheme
-      >
-        <ConvexClerkBridge>{children}</ConvexClerkBridge>
-      </NextThemesProvider>
+      <ConvexClerkBridge>{children}</ConvexClerkBridge>
     </ClerkProvider>
   );
 }

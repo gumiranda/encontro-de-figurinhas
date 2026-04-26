@@ -1,8 +1,17 @@
 import type { MetadataRoute } from "next";
+import type { FunctionReturnType } from "convex/server";
 import { cacheLife, cacheTag } from "next/cache";
 import { convexServer, api } from "@/lib/convex-server";
 
 const BASE_URL = "https://figurinhafacil.com.br";
+
+type BlogSitemapResult = FunctionReturnType<typeof api.blog.listForSitemap>;
+
+function getSsgSecret(): string {
+  const secret = process.env.SSG_SECRET;
+  if (!secret) throw new Error("SSG_SECRET not configured");
+  return secret;
+}
 
 async function loadCitiesForSitemap() {
   "use cache";
@@ -23,6 +32,7 @@ async function loadTradePointsForSitemap() {
       continueCursor: string | null;
       isDone: boolean;
     } = await convexServer.query(api.tradePoints.listApprovedForSitemapPage, {
+      secret: getSsgSecret(),
       cursor,
       pageSize: 5000,
     });
@@ -58,7 +68,20 @@ async function loadBlogForSitemap() {
   "use cache";
   cacheTag("sitemap");
   cacheLife("days");
-  return convexServer.query(api.blog.listForSitemap, {});
+  const all: Array<{ slug: string; updatedAt: number | undefined }> = [];
+  let cursor: string | null = null;
+  for (let i = 0; i < 20; i++) {
+    const result: BlogSitemapResult = await convexServer.query(
+      api.blog.listForSitemap,
+      {
+        paginationOpts: { numItems: 1000, cursor },
+      }
+    );
+    all.push(...result.page);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return all;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -133,6 +156,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${BASE_URL}/raras`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/onde-comprar-figurinhas-copa-2026`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${BASE_URL}/pontos`,
       lastModified: now,
       changeFrequency: "daily",
@@ -191,6 +226,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const rarePages: MetadataRoute.Sitemap = teams.map((slug) => ({
+    url: `${BASE_URL}/raras/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: post.updatedAt ? new Date(post.updatedAt) : now,
@@ -203,6 +245,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...cityPages,
     ...statePages,
     ...teamPages,
+    ...rarePages,
     ...stickerPages,
     ...tradePointPages,
     ...blogPages,

@@ -28,11 +28,11 @@ import {
   LayoutDashboard,
   Loader2,
   MapPin,
+  Pencil,
   Settings,
   Shield,
   Star,
-  Landmark,
-  Pencil,
+  Trophy,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -672,7 +672,7 @@ function PendingCompactCard({
       <div>
         <div className="mb-6 flex items-start justify-between">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--ap-primary)]/20 bg-[#181f33]">
-            <Landmark className="h-8 w-8 text-[var(--ap-primary)]" />
+            <Trophy className="h-8 w-8 text-[var(--ap-primary)]" />
           </div>
           <div className="text-right">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#feb700]">

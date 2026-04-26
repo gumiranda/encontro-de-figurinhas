@@ -19,6 +19,9 @@ import {
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { useSectionLookup } from "@/modules/stickers/lib/section-lookup-context";
+import { formatStickerNumber } from "@/modules/stickers/lib/sticker-parser";
+
 export type MatchTradeDrawerProps = {
   matchedUserId: Id<"users">;
   matchedUserNickname: string;
@@ -41,6 +44,7 @@ function StickerGrid({
   onToggle: (n: number) => void;
   label: string;
 }) {
+  const lookup = useSectionLookup();
   const allSelected = numbers.length > 0 && numbers.every((n) => selected.has(n));
 
   const handleSelectAll = () => {
@@ -71,22 +75,24 @@ function StickerGrid({
       {numbers.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhuma figurinha disponível</p>
       ) : (
-        <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8">
+        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
           {numbers.map((n) => {
             const isSelected = selected.has(n);
+            const { display, fullName } = formatStickerNumber(n, lookup);
             return (
               <button
                 key={n}
                 type="button"
                 onClick={() => onToggle(n)}
+                aria-label={`Figurinha ${display} (${fullName})${isSelected ? ", selecionada" : ""}`}
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-md border text-sm font-mono transition-colors",
+                  "flex h-10 items-center justify-center rounded-md border px-2 text-xs font-mono font-semibold transition-colors",
                   isSelected
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-card hover:border-primary/50"
                 )}
               >
-                {isSelected ? <Check className="size-4" /> : n}
+                {isSelected ? <Check className="size-4" /> : display}
               </button>
             );
           })}

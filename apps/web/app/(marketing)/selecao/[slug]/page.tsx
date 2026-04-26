@@ -195,7 +195,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     <p className="text-lg font-semibold mb-2">
                       {section.goldenNumbers.map((n) => (
                         <Badge key={n} variant="outline" className="mr-2 mb-2 border-yellow-500 text-yellow-600">
-                          #{n}
+                          {section.code}-{n - section.startNumber + 1}
                         </Badge>
                       ))}
                     </p>
@@ -218,7 +218,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     {section.legendNumbers.map((legend) => (
                       <div key={legend.number} className="mb-2">
                         <Badge variant="outline" className="mr-2 border-purple-500 text-purple-600">
-                          #{legend.number}
+                          {section.code}-{legend.number - section.startNumber + 1}
                         </Badge>
                         <span className="font-semibold">{legend.name}</span>
                       </div>
@@ -252,13 +252,25 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     Entre as figurinhas mais procuradas da {section.name} estão:{" "}
                     {section.legendNumbers.map((l, i) => (
                       <span key={l.number}>
-                        <strong>{l.name}</strong> (#{l.number})
+                        <strong>{l.name}</strong> ({section.code}-{l.number - section.startNumber + 1})
                         {i < section.legendNumbers.length - 1 ? ", " : "."}
                       </span>
                     ))}{" "}
-                    Essas figurinhas são especialmente valorizadas pelos colecionadores.
+                    Essas figurinhas são especialmente valorizadas pelos colecionadores.{" "}
+                    <Link href={`/raras/${section.slug}`} className="text-primary hover:underline">
+                      Ver todas as figurinhas raras da {section.name}
+                    </Link>
+                    .
                   </p>
                 </>
+              )}
+              {!hasLegends && hasGolden && (
+                <p>
+                  <Link href={`/raras/${section.slug}`} className="text-primary hover:underline">
+                    Ver as figurinhas douradas da {section.name}
+                  </Link>
+                  .
+                </p>
               )}
 
               <h3>Como trocar figurinhas da {section.name}</h3>

@@ -25,7 +25,7 @@ export function CitySearch() {
           <Input
             type="text"
             className="h-auto min-w-0 flex-1 border-0 bg-transparent py-3 pl-3 pr-2 text-base text-[var(--on-surface)] shadow-none placeholder:text-[var(--outline)] focus-visible:ring-0 md:text-sm font-[var(--font-body)]"
-            placeholder="Digite sua cidade (ex: Sao Paulo, Rio...)"
+            placeholder="Digite sua cidade (ex: São Paulo, Rio...)"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             onFocus={() => setIsFocused(true)}

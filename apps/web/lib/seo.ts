@@ -208,7 +208,7 @@ export function generateCityMetadata(
   const description = `Encontre colecionadores e pontos de troca de figurinhas em ${cityName}, ${state}. Troque suas figurinhas repetidas e complete seu álbum.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       `figurinhas ${cityName}`,
@@ -243,7 +243,7 @@ export function generateTradePointMetadata(
   const description = `Ponto de troca de figurinhas "${pointName}" em ${city}, ${state}. Veja horários, localização e como participar das trocas.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: {
       title,
@@ -271,7 +271,7 @@ export function generateTeamMetadata(
   const description = `Encontre e troque figurinhas da seleção ${teamName} para a Copa do Mundo 2026. São ${stickerCount} figurinhas da ${teamName}. Veja quais você precisa e encontre quem tem.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       `figurinhas ${teamName}`,
@@ -327,6 +327,7 @@ export function generateSportsTeamSchema(
 
 export function generateStickerMetadata(
   number: number,
+  displayLabel: string,
   teamName: string,
   flagEmoji: string,
   isGolden: boolean,
@@ -338,22 +339,22 @@ export function generateStickerMetadata(
     : isGolden
       ? " (Dourada)"
       : "";
-  const title = `Figurinha ${number} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
+  const title = `Figurinha ${displayLabel} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
   const description = isLegend
-    ? `Figurinha ${number} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
+    ? `Figurinha ${displayLabel} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
     : isGolden
-      ? `Figurinha dourada ${number} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
-      : `Figurinha ${number} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
+      ? `Figurinha dourada ${displayLabel} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
+      : `Figurinha ${displayLabel} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
-      `figurinha ${number}`,
-      `figurinha ${number} copa 2026`,
-      `figurinha ${teamName} ${number}`,
+      `figurinha ${displayLabel}`,
+      `figurinha ${displayLabel} copa 2026`,
+      `figurinha ${teamName} ${displayLabel}`,
       ...(isLegend && legendName ? [`figurinha ${legendName}`] : []),
-      ...(isGolden ? [`figurinha dourada ${number}`] : []),
+      ...(isGolden ? [`figurinha dourada ${displayLabel}`] : []),
     ],
     openGraph: {
       title,
@@ -373,6 +374,7 @@ export function generateStickerMetadata(
 
 export function generateProductSchema(
   number: number,
+  displayLabel: string,
   teamName: string,
   isGolden: boolean,
   isLegend: boolean,
@@ -387,8 +389,8 @@ export function generateProductSchema(
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: `Figurinha ${number} - ${teamName}${specialLabel}`,
-    description: `Figurinha número ${number} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
+    name: `Figurinha ${displayLabel} - ${teamName}${specialLabel}`,
+    description: `Figurinha ${displayLabel} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
     category: "Figurinhas Colecionáveis",
     brand: {
       "@type": "Brand",
@@ -421,7 +423,7 @@ export function generateStateMetadata(
       : `Troque figurinhas da Copa 2026 em ${stateName}. ${citiesCount} cidades disponíveis para encontrar colecionadores.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       `figurinhas ${stateName}`,
@@ -475,7 +477,7 @@ export function generateBlogPostMetadata(
   const finalDescription = seoDescription || excerpt;
 
   return {
-    title: finalTitle,
+    title: { absolute: finalTitle },
     description: finalDescription,
     openGraph: {
       title: finalTitle,
@@ -547,7 +549,9 @@ export function generateBlogListMetadata(
     : `${BASE_URL}/blog`;
 
   return {
-    title: page && page > 1 ? `${title} - Página ${page}` : title,
+    title: {
+      absolute: page && page > 1 ? `${title} - Página ${page}` : title,
+    },
     description,
     openGraph: {
       title,
@@ -759,7 +763,7 @@ export function generateCitiesHubMetadata(): Metadata {
     "Encontre colecionadores de figurinhas da Copa 2026 em mais de 500 cidades brasileiras. Veja onde trocar figurinhas perto de você.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "cidades figurinhas",
@@ -778,7 +782,7 @@ export function generateStatesHubMetadata(): Metadata {
     "Troque figurinhas da Copa 2026 em todos os 27 estados brasileiros. Encontre colecionadores e pontos de troca no seu estado.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "estados figurinhas",
@@ -796,7 +800,7 @@ export function generateTeamsHubMetadata(): Metadata {
     "Veja todas as 48 seleções do álbum da Copa do Mundo 2026. Encontre figurinhas douradas, lendas e complete sua coleção.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "seleções copa 2026",
@@ -815,7 +819,7 @@ export function generateStickersHubMetadata(): Metadata {
     "Lista completa das 980 figurinhas do álbum Copa do Mundo 2026. Encontre figurinhas douradas, lendas e raras. Troque com colecionadores.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "figurinhas copa 2026",
@@ -835,7 +839,7 @@ export function generateTradePointsHubMetadata(): Metadata {
     "Encontre pontos de troca de figurinhas da Copa 2026 perto de você. Shoppings, praças, escolas e eventos em todo o Brasil.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "pontos de troca figurinhas",
@@ -1030,6 +1034,77 @@ export function generateSoftwareApplicationSchema() {
       ratingValue: "4.8",
       ratingCount: "1200",
       bestRating: "5",
+    },
+  };
+}
+
+export function generateRareMetadata(
+  teamName: string,
+  teamSlug: string,
+  flagEmoji: string,
+  legendCount: number,
+  goldenCount: number
+): Metadata {
+  const total = legendCount + goldenCount;
+  const title = `Figurinhas Raras ${teamName} ${flagEmoji} Copa 2026 | ${SITE_NAME}`;
+  const description = `As ${total} figurinhas raras da ${teamName} no álbum da Copa 2026: ${legendCount} lendas e ${goldenCount} douradas. Veja quais são, raridade e como trocar.`;
+  return {
+    title: { absolute: title },
+    description,
+    keywords: [
+      `figurinhas raras ${teamName}`,
+      `figurinhas raras ${teamName} copa 2026`,
+      `figurinhas douradas ${teamName}`,
+      `lendas ${teamName} copa 2026`,
+      `troca figurinhas raras ${teamName}`,
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/raras/${teamSlug}`,
+      type: "website",
+    },
+    twitter: { title, description },
+    alternates: { canonical: `${BASE_URL}/raras/${teamSlug}` },
+  };
+}
+
+export function generateRareCollectionSchema(
+  teamName: string,
+  teamSlug: string,
+  legendNames: string[],
+  goldenCount: number
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Figurinhas Raras ${teamName} - Copa 2026`,
+    description: `Coleção das figurinhas raras (lendas e douradas) da seleção ${teamName} no álbum da Copa do Mundo 2026.`,
+    url: `${BASE_URL}/raras/${teamSlug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    about: {
+      "@type": "SportsTeam",
+      name: `Seleção ${teamName}`,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: legendNames.length + goldenCount,
+      itemListElement: [
+        ...legendNames.map((name, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: `Lenda: ${name}`,
+        })),
+        ...Array.from({ length: goldenCount }).map((_, i) => ({
+          "@type": "ListItem",
+          position: legendNames.length + i + 1,
+          name: `Figurinha Dourada ${i + 1}`,
+        })),
+      ],
     },
   };
 }

@@ -37,7 +37,7 @@ export const create = mutation({
       .withIndex("by_reporter_created", (q) =>
         q.eq("reporterId", user._id).gte("createdAt", todayStart.getTime())
       )
-      .collect();
+      .take(DAILY_REPORT_LIMIT + 1);
 
     if (todayReports.length >= DAILY_REPORT_LIMIT) {
       throw new ConvexError("DAILY_LIMIT");

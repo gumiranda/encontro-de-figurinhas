@@ -28,6 +28,7 @@ import {
   generateBreadcrumbSchema,
   generateCombinedSchema,
   generateFAQSchema,
+  generateSportsEventSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -163,6 +164,7 @@ const combinedSchema = generateCombinedSchema([
   articleSchema,
   breadcrumbSchema,
   faqSchema,
+  generateSportsEventSchema(),
 ]);
 
 const costComparison = [

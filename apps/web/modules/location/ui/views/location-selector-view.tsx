@@ -15,8 +15,8 @@ import { useMutation } from "convex/react";
 import {
   AlertCircle,
   Info,
-  Landmark,
   RefreshCw,
+  Trophy,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -219,7 +219,7 @@ export function LocationSelectorView({
               className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-[var(--on-primary)] shadow-sm"
               aria-hidden="true"
             >
-              <Landmark className="h-4 w-4" strokeWidth={2} />
+              <Trophy className="h-4 w-4" strokeWidth={2} />
             </span>
             <span className="font-[var(--font-headline)] text-base font-semibold tracking-tight text-[var(--on-surface)]">
               Figurinha Fácil

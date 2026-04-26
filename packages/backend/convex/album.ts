@@ -97,6 +97,9 @@ export const getStickerByNumber = query({
       teamCode: section.code,
       teamSlug: section.code.toLowerCase(),
       flagEmoji: section.flagEmoji,
+      teamStartNumber: section.startNumber,
+      teamEndNumber: section.endNumber,
+      relativeNum: number - section.startNumber + 1,
       isGolden,
       isLegend: !!legend,
       legendName: legend?.name,
@@ -185,10 +188,12 @@ export const getRelatedStickers = query({
 
     return {
       teamName: section.name,
+      teamCode: section.code,
       teamSlug: section.code.toLowerCase(),
       flagEmoji: section.flagEmoji,
       stickers: selectedNumbers.map((n) => ({
         number: n,
+        relativeNum: n - section.startNumber + 1,
         isGolden: goldenSet.has(n),
         isLegend: legendMap.has(n),
         legendName: legendMap.get(n),

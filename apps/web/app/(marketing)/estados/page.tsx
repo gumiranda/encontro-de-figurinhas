@@ -17,6 +17,7 @@ import {
   generateBreadcrumbSchema,
   generateItemListSchema,
   generateCombinedSchema,
+  generateSportsEventSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -48,7 +49,7 @@ export default async function StatesHubPage() {
     }))
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
 
   return (
     <>

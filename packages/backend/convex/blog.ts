@@ -1,6 +1,9 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
-import { getAuthenticatedUser } from "./lib/auth";
+import { internal } from "./_generated/api";
+import { internalMutation, mutation, query } from "./_generated/server";
+import { rescheduleIfMore } from "./_helpers/pagination";
+import { requireAdmin } from "./lib/auth";
 
 export const getPublished = query({
   args: {
@@ -38,6 +41,11 @@ export const getBySlug = query({
 
     if (!post || post.status !== "published") return null;
 
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", post._id))
+      .first();
+
     return {
       _id: post._id,
       title: post.title,
@@ -53,19 +61,115 @@ export const getBySlug = query({
       author: post.author,
       seoTitle: post.seoTitle,
       seoDescription: post.seoDescription,
+      views: metrics?.views ?? post.views,
+      isTrending: post.isTrending,
+      titleHighlight: post.titleHighlight,
     };
   },
 });
 
+const VIEW_IDEMPOTENCY_WINDOW_MS = 60 * 60 * 1000;
+const VIEW_IDEMPOTENCY_TTL_MS = 2 * 60 * 60 * 1000;
+const PRUNE_IDEMPOTENCY_BATCH = 200;
+const PRUNE_IDEMPOTENCY_MAX_CHUNKS = 100;
+const TITLE_HIGHLIGHT_MAX = 50;
+const AUTHOR_ROLE_MAX = 200;
+
+// Public (unauthenticated) view counter. Rate-bounded by per-(postId,key) idempotency window.
+// View counter lives on postMetrics (not blogPosts) to avoid write contention on the
+// blogPosts row when many viewers hit the page concurrently.
+export const incrementView = mutation({
+  args: {
+    slug: v.string(),
+    idempotencyKey: v.string(),
+  },
+  handler: async (ctx, { slug, idempotencyKey }) => {
+    if (idempotencyKey.length < 8 || idempotencyKey.length > 64) return;
+
+    const post = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+
+    if (!post || post.status !== "published") return;
+
+    const existing = await ctx.db
+      .query("postViewIdempotency")
+      .withIndex("by_post_key", (q) =>
+        q.eq("postId", post._id).eq("key", idempotencyKey)
+      )
+      .first();
+
+    const now = Date.now();
+    if (existing && now - existing.at < VIEW_IDEMPOTENCY_WINDOW_MS) return;
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { at: now });
+    } else {
+      await ctx.db.insert("postViewIdempotency", {
+        postId: post._id,
+        key: idempotencyKey,
+        at: now,
+      });
+    }
+
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", post._id))
+      .first();
+    if (metrics) {
+      await ctx.db.patch(metrics._id, {
+        views: (metrics.views ?? 0) + 1,
+      });
+    } else {
+      await ctx.db.insert("postMetrics", {
+        postId: post._id,
+        likes: 0,
+        saves: 0,
+        comments: 0,
+        views: 1,
+      });
+    }
+  },
+});
+
+export const pruneViewIdempotency = internalMutation({
+  args: { chunk: v.optional(v.number()) },
+  handler: async (ctx, { chunk = 0 }) => {
+    const cutoff = Date.now() - VIEW_IDEMPOTENCY_TTL_MS;
+    const stale = await ctx.db
+      .query("postViewIdempotency")
+      .withIndex("by_at", (q) => q.lt("at", cutoff))
+      .take(PRUNE_IDEMPOTENCY_BATCH);
+
+    await Promise.all(stale.map((row) => ctx.db.delete(row._id)));
+
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.blog.pruneViewIdempotency,
+      args: {},
+      hasMore: stale.length === PRUNE_IDEMPOTENCY_BATCH,
+      chunk,
+      maxChunks: PRUNE_IDEMPOTENCY_MAX_CHUNKS,
+      label: "pruneViewIdempotency",
+    });
+
+    return { deleted: stale.length, aborted: tail.aborted ?? false };
+  },
+});
+
 export const getAllSlugs = query({
-  args: {},
-  handler: async (ctx) => {
-    const posts = await ctx.db
+  args: { paginationOpts: v.optional(paginationOptsValidator) },
+  handler: async (ctx, { paginationOpts }) => {
+    const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .take(10000);
+      .paginate(paginationOpts ?? { numItems: 1000, cursor: null });
 
-    return posts.map((p) => p.slug);
+    return {
+      slugs: result.page.map((p) => p.slug),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
   },
 });
 
@@ -92,6 +196,192 @@ export const getByCategory = query({
       publishedAt: p.publishedAt,
       author: p.author,
     }));
+  },
+});
+
+export const listForAdmin = query({
+  args: {
+    status: v.optional(
+      v.union(v.literal("all"), v.literal("draft"), v.literal("published"))
+    ),
+    search: v.optional(v.string()),
+  },
+  handler: async (ctx, { status, search }) => {
+    await requireAdmin(ctx);
+    const filter = status ?? "all";
+
+    const allPosts =
+      filter === "all"
+        ? await ctx.db.query("blogPosts").order("desc").take(500)
+        : await ctx.db
+            .query("blogPosts")
+            .withIndex("by_status_publishedAt", (q) => q.eq("status", filter))
+            .order("desc")
+            .take(500);
+
+    const term = search?.trim().toLowerCase();
+    const filtered = term
+      ? allPosts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(term) ||
+            p.slug.toLowerCase().includes(term) ||
+            p.category.toLowerCase().includes(term)
+        )
+      : allPosts;
+
+    const metrics = await Promise.all(
+      filtered.map((p) =>
+        ctx.db
+          .query("postMetrics")
+          .withIndex("by_post", (q) => q.eq("postId", p._id))
+          .first()
+      )
+    );
+
+    return filtered.map((p, i) => ({
+      _id: p._id,
+      title: p.title,
+      slug: p.slug,
+      category: p.category,
+      status: p.status,
+      author: p.author.name,
+      coverImage: p.coverImage,
+      publishedAt: p.publishedAt,
+      updatedAt: p.updatedAt,
+      createdAt: p.createdAt,
+      readingTime: p.readingTime,
+      views: metrics[i]?.views ?? p.views ?? 0,
+      likes: metrics[i]?.likes ?? 0,
+    }));
+  },
+});
+
+export const getByIdForAdmin = query({
+  args: { id: v.id("blogPosts") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    const post = await ctx.db.get(id);
+    return post;
+  },
+});
+
+export const adminStats = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const posts = await ctx.db.query("blogPosts").take(1000);
+    const published = posts.filter((p) => p.status === "published").length;
+    const drafts = posts.filter((p) => p.status === "draft").length;
+
+    const metrics = await Promise.all(
+      posts.map((p) =>
+        ctx.db
+          .query("postMetrics")
+          .withIndex("by_post", (q) => q.eq("postId", p._id))
+          .first()
+      )
+    );
+    let totalViews = 0;
+    let totalLikes = 0;
+    for (const m of metrics) {
+      totalViews += m?.views ?? 0;
+      totalLikes += m?.likes ?? 0;
+    }
+    return {
+      total: posts.length,
+      published,
+      drafts,
+      totalViews,
+      totalLikes,
+    };
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("blogPosts") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    const post = await ctx.db.get(id);
+    if (!post) throw new Error("Post not found");
+    await ctx.db.delete(id);
+  },
+});
+
+export const getActiveSeries = query({
+  args: {},
+  handler: async (ctx) => {
+    const series = await ctx.db
+      .query("blogSeries")
+      .withIndex("by_isActive_createdAt", (q) => q.eq("isActive", true))
+      .order("desc")
+      .first();
+    if (!series) return null;
+
+    const episodes = await ctx.db
+      .query("blogPosts")
+      .withIndex("by_series_episode", (q) => q.eq("seriesId", series._id))
+      .take(series.totalPlanned);
+
+    episodes.sort(
+      (a, b) => (a.seriesEpisodeNumber ?? 0) - (b.seriesEpisodeNumber ?? 0)
+    );
+
+    return {
+      _id: series._id,
+      title: series.title,
+      slug: series.slug,
+      description: series.description,
+      totalPlanned: series.totalPlanned,
+      episodes: episodes.map((p) => ({
+        _id: p._id,
+        title: p.title,
+        slug: p.slug,
+        episodeNumber: p.seriesEpisodeNumber ?? 0,
+        readingTime: p.readingTime,
+        author: p.author.name,
+        status: p.status,
+        publishedAt: p.publishedAt,
+      })),
+    };
+  },
+});
+
+export const getTrending = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const max = Math.min(Math.max(limit ?? 5, 1), 20);
+    const topMetrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_views")
+      .order("desc")
+      .take(max * 2);
+
+    const posts = await Promise.all(
+      topMetrics.map((m) => ctx.db.get(m.postId))
+    );
+    const viewsByPost = new Map(
+      topMetrics.map((m) => [m.postId, m.views ?? 0])
+    );
+
+    const rows: Array<{
+      _id: typeof topMetrics[number]["postId"];
+      title: string;
+      slug: string;
+      category: string;
+      views: number;
+    }> = [];
+    for (const p of posts) {
+      if (!p || p.status !== "published") continue;
+      rows.push({
+        _id: p._id,
+        title: p.title,
+        slug: p.slug,
+        category: p.category,
+        views: viewsByPost.get(p._id) ?? 0,
+      });
+      if (rows.length >= max) break;
+    }
+    return rows;
   },
 });
 
@@ -150,17 +440,31 @@ export const getRelated = query({
 });
 
 export const listForSitemap = query({
-  args: {},
-  handler: async (ctx) => {
-    const posts = await ctx.db
+  args: { paginationOpts: v.optional(paginationOptsValidator) },
+  returns: v.object({
+    page: v.array(
+      v.object({
+        slug: v.string(),
+        updatedAt: v.optional(v.number()),
+      })
+    ),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+  }),
+  handler: async (ctx, { paginationOpts }) => {
+    const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .take(10000);
+      .paginate(paginationOpts ?? { numItems: 1000, cursor: null });
 
-    return posts.map((p) => ({
-      slug: p.slug,
-      updatedAt: p.updatedAt ?? p.publishedAt,
-    }));
+    return {
+      page: result.page.map((p) => ({
+        slug: p.slug,
+        updatedAt: p.updatedAt ?? p.publishedAt,
+      })),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
   },
 });
 
@@ -177,11 +481,21 @@ export const create = mutation({
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     status: v.union(v.literal("draft"), v.literal("published")),
+    titleHighlight: v.optional(v.string()),
+    isTrending: v.optional(v.boolean()),
+    authorRole: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user || user.role !== "admin") {
-      throw new Error("Unauthorized");
+    const user = await requireAdmin(ctx);
+
+    if (
+      args.titleHighlight !== undefined &&
+      args.titleHighlight.length > TITLE_HIGHLIGHT_MAX
+    ) {
+      throw new Error(`titleHighlight max ${TITLE_HIGHLIGHT_MAX} chars`);
+    }
+    if (args.authorRole !== undefined && args.authorRole.length > AUTHOR_ROLE_MAX) {
+      throw new Error(`author.role max ${AUTHOR_ROLE_MAX} chars`);
     }
 
     const existing = await ctx.db
@@ -197,14 +511,16 @@ export const create = mutation({
     const readingTime = Math.ceil(wordCount / 200);
     const normalizedTags = args.tags.map((t) => t.trim().toLowerCase());
 
+    const { authorRole, ...rest } = args;
     const now = Date.now();
     const id = await ctx.db.insert("blogPosts", {
-      ...args,
+      ...rest,
       tags: normalizedTags,
       readingTime,
       author: {
         name: user.name,
         avatar: user.avatarUrl,
+        role: authorRole,
       },
       publishedAt: args.status === "published" ? now : undefined,
       createdAt: now,
@@ -227,11 +543,21 @@ export const update = mutation({
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     status: v.optional(v.union(v.literal("draft"), v.literal("published"))),
+    titleHighlight: v.optional(v.string()),
+    isTrending: v.optional(v.boolean()),
+    authorRole: v.optional(v.string()),
   },
-  handler: async (ctx, { id, ...updates }) => {
-    const user = await getAuthenticatedUser(ctx);
-    if (!user || user.role !== "admin") {
-      throw new Error("Unauthorized");
+  handler: async (ctx, { id, authorRole, ...updates }) => {
+    await requireAdmin(ctx);
+
+    if (
+      updates.titleHighlight !== undefined &&
+      updates.titleHighlight.length > TITLE_HIGHLIGHT_MAX
+    ) {
+      throw new Error(`titleHighlight max ${TITLE_HIGHLIGHT_MAX} chars`);
+    }
+    if (authorRole !== undefined && authorRole.length > AUTHOR_ROLE_MAX) {
+      throw new Error(`author.role max ${AUTHOR_ROLE_MAX} chars`);
     }
 
     const post = await ctx.db.get(id);
@@ -252,6 +578,97 @@ export const update = mutation({
       patch.publishedAt = Date.now();
     }
 
+    if (authorRole !== undefined) {
+      patch.author = { ...post.author, role: authorRole };
+    }
+
     await ctx.db.patch(id, patch);
+  },
+});
+
+// Post metrics for share rail
+export const getMetrics = query({
+  args: { postId: v.id("blogPosts"), visitorId: v.optional(v.string()) },
+  handler: async (ctx, { postId, visitorId }) => {
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .first();
+
+    let userInteraction = null;
+    if (visitorId) {
+      userInteraction = await ctx.db
+        .query("postUserInteractions")
+        .withIndex("by_post_visitor", (q) =>
+          q.eq("postId", postId).eq("visitorId", visitorId)
+        )
+        .first();
+    }
+
+    return {
+      likes: metrics?.likes ?? 0,
+      saves: metrics?.saves ?? 0,
+      comments: metrics?.comments ?? 0,
+      views: metrics?.views ?? 0,
+      userLiked: userInteraction?.liked ?? false,
+      userSaved: userInteraction?.saved ?? false,
+    };
+  },
+});
+
+export const toggleMetric = mutation({
+  args: {
+    postId: v.id("blogPosts"),
+    visitorId: v.string(),
+    metric: v.union(v.literal("likes"), v.literal("saves")),
+  },
+  handler: async (ctx, { postId, visitorId, metric }) => {
+    const interactionField = metric === "likes" ? "liked" : "saved";
+
+    // Check existing interaction
+    const interaction = await ctx.db
+      .query("postUserInteractions")
+      .withIndex("by_post_visitor", (q) =>
+        q.eq("postId", postId).eq("visitorId", visitorId)
+      )
+      .first();
+
+    const wasActive = interaction?.[interactionField] ?? false;
+    const delta = wasActive ? -1 : 1;
+
+    // Update or create interaction record
+    if (interaction) {
+      await ctx.db.patch(interaction._id, {
+        [interactionField]: !wasActive,
+      });
+    } else {
+      await ctx.db.insert("postUserInteractions", {
+        postId,
+        visitorId,
+        liked: metric === "likes",
+        saved: metric === "saves",
+      });
+    }
+
+    // Update metrics count
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", postId))
+      .first();
+
+    if (metrics) {
+      await ctx.db.patch(metrics._id, {
+        [metric]: Math.max(0, metrics[metric] + delta),
+      });
+    } else {
+      await ctx.db.insert("postMetrics", {
+        postId,
+        likes: metric === "likes" && delta > 0 ? 1 : 0,
+        saves: metric === "saves" && delta > 0 ? 1 : 0,
+        comments: 0,
+      });
+    }
+
+    return { active: !wasActive };
   },
 });

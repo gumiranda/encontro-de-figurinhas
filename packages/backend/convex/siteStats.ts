@@ -6,10 +6,15 @@ import {
   type MutationCtx,
   type QueryCtx,
 } from "./_generated/server";
+import { rateLimiter } from "./lib/rateLimiter";
 
 export const get = query({
   args: {},
   handler: async (ctx) => {
+    const status = await rateLimiter.check(ctx, "publicSiteStats", {
+      key: "global",
+    });
+    if (!status.ok) throw new ConvexError("rate-limited");
     return await ctx.db.query("siteStats").unique();
   },
 });

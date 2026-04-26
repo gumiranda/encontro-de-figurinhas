@@ -2,7 +2,9 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, query, type MutationCtx } from "./_generated/server";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
+import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
 
 const PAGE_SIZE = 500;
@@ -229,6 +231,10 @@ const MATCH_RECOMPUTE_RUN_AFTER_MS = 5000;
 /**
  * Idempotent debounce: repeated sticker updates within 5s schedule at most one
  * {@link recomputeForUser} run (5s after the first qualifying patch).
+ *
+ * Note: Scheduled jobs aren't cancelled on logout/unmount. This is acceptable because
+ * {@link recomputeMatchCache} has a freshness check (lines 107-122) that short-circuits
+ * stale/orphan jobs with early returns, preventing unnecessary work.
  */
 export async function scheduleDebouncedMatchRecompute(
   ctx: MutationCtx,
@@ -264,8 +270,9 @@ const BATCH_RECOMPUTE_ACTIVE_WINDOW_MS = 6 * 60 * 60 * 1000;
  * When active users (last 6h) exceed this count, we only fan out per-city jobs — never one
  * mutation that schedules everyone — so we stay within mutation time/write limits.
  */
-const BATCH_RECOMPUTE_PARTITION_THRESHOLD = 1000;
 const BATCH_RECOMPUTE_PAGE_SIZE = 200;
+const CITIES_SCAN_PAGE_SIZE = 100;
+const CITIES_SCAN_MAX_CHUNKS = 50;
 
 function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolean {
   return (
@@ -300,15 +307,17 @@ async function countActiveUsersInCity(
 
 /**
  * Cron: refresh match caches for users active in the last 6h.
- * If active user count exceeds {@link BATCH_RECOMPUTE_PARTITION_THRESHOLD}, fans out one
- * continuation per city (partition by `cityId`) to stay within mutation time/write limits.
+ * Scan mode paginates cities in chunks of CITIES_SCAN_PAGE_SIZE, scheduling per-city
+ * continuations and rescheduling itself until isDone (capped by CITIES_SCAN_MAX_CHUNKS).
  */
 export const batchRecomputeMatches = internalMutation({
   args: {
     cityId: v.optional(v.id("cities")),
     cursor: v.optional(v.union(v.string(), v.null())),
+    citiesCursor: v.optional(v.union(v.string(), v.null())),
+    citiesChunk: v.optional(v.number()),
   },
-  handler: async (ctx, { cityId, cursor }) => {
+  handler: async (ctx, { cityId, cursor, citiesCursor, citiesChunk = 0 }) => {
     const cutoff = Date.now() - BATCH_RECOMPUTE_ACTIVE_WINDOW_MS;
 
     if (cityId !== undefined) {
@@ -340,35 +349,39 @@ export const batchRecomputeMatches = internalMutation({
       };
     }
 
-    const cities = await ctx.db.query("cities").collect();
+    const citiesPage = await ctx.db.query("cities").paginate({
+      numItems: CITIES_SCAN_PAGE_SIZE,
+      cursor: citiesCursor ?? null,
+    });
 
     let totalActive = 0;
-    const cityCounts = new Map<Id<"cities">, number>();
-    for (const city of cities) {
+    let scheduled = 0;
+    for (const city of citiesPage.page) {
       const n = await countActiveUsersInCity(ctx, city._id, cutoff);
-      cityCounts.set(city._id, n);
       totalActive += n;
-    }
-
-    if (totalActive === 0) {
-      return {
-        mode: "scan" as const,
-        totalActive,
-        partitionedByCity: false,
-      };
-    }
-
-    const partitionedByCity = totalActive > BATCH_RECOMPUTE_PARTITION_THRESHOLD;
-
-    for (const city of cities) {
-      const n = cityCounts.get(city._id) ?? 0;
       if (n === 0) continue;
       await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
         cityId: city._id,
       });
+      scheduled += 1;
     }
 
-    return { mode: "scan" as const, totalActive, partitionedByCity };
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.matches.batchRecomputeMatches,
+      args: { citiesCursor: citiesPage.continueCursor },
+      hasMore: !citiesPage.isDone,
+      chunk: citiesChunk,
+      maxChunks: CITIES_SCAN_MAX_CHUNKS,
+      label: "batchRecomputeMatches.scan",
+    });
+
+    return {
+      mode: "scan" as const,
+      totalActive,
+      scheduled,
+      done: citiesPage.isDone,
+      aborted: tail.aborted ?? false,
+    };
   },
 });
 
@@ -386,7 +399,22 @@ export type ListMyMatchRow = {
   layer: 1 | 2;
   tradePointId: Id<"tradePoints">;
   tradePointSlug: string;
+  /** User has reliabilityScore >= 4.0 OR totalTrades >= 5 */
+  isVerified: boolean;
+  /** Any sticker in overlap is golden/legend */
+  hasRareStickers: boolean;
 };
+
+export type ListMyMatchesResult = {
+  matches: ListMyMatchRow[];
+  meta: {
+    /** Total stickers current user needs (for match % calc) */
+    userMissingCount: number;
+  };
+};
+
+const VERIFIED_RELIABILITY_THRESHOLD = 4.0;
+const VERIFIED_TRADES_THRESHOLD = 5;
 
 const MATCH_STICKER_SAMPLE = 5;
 
@@ -398,15 +426,23 @@ export const listMyMatches = query({
   args: {
     layer: v.union(v.literal(1), v.literal(2), v.null()),
     bidirectionalOnly: v.boolean(),
+    verifiedOnly: v.optional(v.boolean()),
   },
-  handler: async (ctx, args): Promise<{ matches: ListMyMatchRow[] }> => {
+  handler: async (ctx, args): Promise<ListMyMatchesResult> => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
-      return { matches: [] };
+      return { matches: [], meta: { userMissingCount: 0 } };
     }
 
-    const userId = auth.user._id;
+    const me = auth.user;
+    const userId = me._id;
+    const userMissingCount = me.missing?.length ?? 0;
     const layers: (1 | 2)[] = args.layer === null ? [1, 2] : [args.layer];
+
+    const albumConfig = await ctx.db.query("albumConfig").first();
+    const specialSet = albumConfig
+      ? buildSpecialSet(albumConfig.sections)
+      : new Set<number>();
 
     const rows: Doc<"precomputedMatches">[] = [];
     for (const layer of layers) {
@@ -447,6 +483,7 @@ export const listMyMatches = query({
       return b.computedAt - a.computedAt;
     });
 
+    // Bounded: matchedIds ≤ 50 (from matches.length check in loop below)
     const matchedIds = [...new Set(filteredRows.map((r) => r.matchedUserId))];
     const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
     const otherById = new Map(
@@ -459,6 +496,16 @@ export const listMyMatches = query({
       const other = otherById.get(r.matchedUserId);
       if (!other) continue;
       if (other.isBanned === true || other.isShadowBanned === true) continue;
+
+      const isVerified =
+        other.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
+        (other.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+
+      if (args.verifiedOnly && !isVerified) continue;
+
+      const hasRareStickers =
+        r.theyHaveINeed.some((n) => specialSet.has(n)) ||
+        r.iHaveTheyNeed.some((n) => specialSet.has(n));
 
       matches.push({
         matchedUserId: r.matchedUserId,
@@ -473,10 +520,12 @@ export const listMyMatches = query({
         layer: r.layer,
         tradePointId: r.tradePointId,
         tradePointSlug: r.tradePointSlug,
+        isVerified,
+        hasRareStickers,
       });
     }
 
-    return { matches };
+    return { matches, meta: { userMissingCount } };
   },
 });
 
@@ -491,35 +540,39 @@ const PRESENT_FALLBACK_CHECKIN_CAP = 50;
 export const listPresentMatchRowsAtActivePoint = query({
   args: {
     bidirectionalOnly: v.boolean(),
+    verifiedOnly: v.optional(v.boolean()),
   },
-  handler: async (ctx, args): Promise<{ matches: ListMyMatchRow[] }> => {
+  handler: async (ctx, args): Promise<ListMyMatchesResult> => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") {
-      return { matches: [] };
+      return { matches: [], meta: { userMissingCount: 0 } };
     }
     const me = auth.user;
+    const userMissingCount = me.missing?.length ?? 0;
     if (!me.hasCompletedStickerSetup) {
-      return { matches: [] };
+      return { matches: [], meta: { userMissingCount } };
     }
 
-    const now = Date.now();
-    const active = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) => q.eq("userId", me._id).gt("expiresAt", now))
-      .first();
+    const active = await getActiveCheckin(ctx, me._id);
 
     if (!active) {
-      return { matches: [] };
+      return { matches: [], meta: { userMissingCount } };
     }
 
     const point = await ctx.db.get(active.tradePointId);
     if (!point || point.status !== "approved") {
-      return { matches: [] };
+      return { matches: [], meta: { userMissingCount } };
     }
+
+    const albumConfig = await ctx.db.query("albumConfig").first();
+    const specialSet = albumConfig
+      ? buildSpecialSet(albumConfig.sections)
+      : new Set<number>();
 
     const myDupSorted = [...(me.duplicates ?? [])].sort((a, b) => a - b);
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
 
+    const now = Date.now();
     const checkins = await ctx.db
       .query("checkins")
       .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
@@ -530,6 +583,7 @@ export const listPresentMatchRowsAtActivePoint = query({
       )
       .take(PRESENT_FALLBACK_CHECKIN_CAP);
 
+    // Bounded: otherIds ≤ PRESENT_FALLBACK_CHECKIN_CAP (50)
     const otherIds = [
       ...new Set(
         checkins.filter((c) => c.userId !== me._id).map((c) => c.userId)
@@ -565,6 +619,16 @@ export const listPresentMatchRowsAtActivePoint = query({
       const okOneWay = theyHaveINeed.length >= 1 || iHaveTheyNeed.length >= 1;
       if (args.bidirectionalOnly ? !okBoth : !okOneWay) continue;
 
+      const isVerified =
+        other.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
+        (other.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+
+      if (args.verifiedOnly && !isVerified) continue;
+
+      const hasRareStickers =
+        theyHaveINeed.some((n) => specialSet.has(n)) ||
+        iHaveTheyNeed.some((n) => specialSet.has(n));
+
       matches.push({
         matchedUserId: other._id,
         displayNickname: other.displayNickname ?? other.nickname ?? other.name,
@@ -578,6 +642,8 @@ export const listPresentMatchRowsAtActivePoint = query({
         layer: 1,
         tradePointId: active.tradePointId,
         tradePointSlug: point.slug ?? "",
+        isVerified,
+        hasRareStickers,
       });
     }
 
@@ -593,7 +659,7 @@ export const listPresentMatchRowsAtActivePoint = query({
       return a.displayNickname.localeCompare(b.displayNickname);
     });
 
-    return { matches };
+    return { matches, meta: { userMissingCount } };
   },
 });
 
@@ -666,7 +732,7 @@ export const findUserMatches = query({
     const myDupSet = new Set<number>(me.duplicates ?? []);
     const myMissSet = new Set<number>(me.missing ?? []);
 
-    // Batch fetch all users upfront to avoid N+1 queries
+    // Batch fetch all users upfront to avoid N+1 queries (bounded: ≤ RETURN_LIMIT = 30)
     const userIds = top.map((m) => m.otherUserId);
     const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
     const userMap = new Map(
@@ -817,6 +883,7 @@ export type FullStickerOverlapResult = {
     confirmedTradesCount: number;
     distanceKm: number;
   };
+  tradePointName: string;
 };
 
 export const getFullStickerOverlap = query({
@@ -846,6 +913,7 @@ export const getFullStickerOverlap = query({
         confirmedTradesCount: v.number(),
         distanceKm: v.number(),
       }),
+      tradePointName: v.string(),
     })
   ),
   handler: async (
@@ -868,11 +936,13 @@ export const getFullStickerOverlap = query({
 
     const precomputed = await ctx.db
       .query("precomputedMatches")
-      .withIndex("by_user_point", (q) =>
-        q.eq("userId", me._id).eq("tradePointId", tradePointId)
+      .withIndex("by_user_matched_point", (q) =>
+        q
+          .eq("userId", me._id)
+          .eq("matchedUserId", matchedUserId)
+          .eq("tradePointId", tradePointId)
       )
-      .filter((q) => q.eq(q.field("matchedUserId"), matchedUserId))
-      .first();
+      .unique();
 
     let theyHaveINeedNums: number[];
     let iHaveTheyNeedNums: number[];
@@ -947,6 +1017,7 @@ export const getFullStickerOverlap = query({
         confirmedTradesCount: matchedUser.totalTrades ?? 0,
         distanceKm,
       },
+      tradePointName: tradePoint.name,
     };
   },
 });

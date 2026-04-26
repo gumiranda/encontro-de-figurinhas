@@ -13,6 +13,7 @@ export type TileState = "none" | "have" | "need" | "blocked";
 interface StickerTileProps {
   num: number;
   relativeNum: number;
+  sectionCode: string;
   state: TileState;
   dupCount?: number;
   blockedReason?: string;
@@ -40,6 +41,7 @@ const STATE_LABELS: Record<TileState, string> = {
 function StickerTileBase({
   num,
   relativeNum,
+  sectionCode,
   state,
   dupCount,
   blockedReason = "Já está na outra lista. Remova de lá primeiro.",
@@ -57,7 +59,7 @@ function StickerTileBase({
       disabled={isBlocked}
       aria-disabled={isBlocked || undefined}
       aria-pressed={state === "have" || state === "need" || undefined}
-      aria-label={`Figurinha ${num}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
+      aria-label={`Figurinha ${sectionCode}-${relativeNum}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       className={cn(
         "sticker-spring relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
         STATE_CLASSES[state]

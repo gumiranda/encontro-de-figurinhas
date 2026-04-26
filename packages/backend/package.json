@@ -5,11 +5,13 @@
     "dev": "convex dev --env-file .env.local",
     "dev:env-dev": "convex dev --env-file .env.dev",
     "dev:env-prod": "convex dev --env-file .env.prod",
-    "setup": "convex dev --until-success --env-file .env.local"
+    "setup": "convex dev --until-success --env-file .env.local",
+    "seed:convex": "convex run seeds/seedCities:seedCities --component _root && convex run seeds/seedTradePoints:seedTradePoints --component _root && convex run seedAlbumConfig:seedAlbumConfig && convex run seedBlog:seedBlogPosts --component _root"
   },
   "exports": {
     "./convex": "./convex/*.ts",
     "./convex/matches": "./convex/matches.ts",
+    "./convex/trades": "./convex/trades.ts",
     "./_generated/api": "./convex/_generated/api.js",
     "./_generated/dataModel": "./convex/_generated/dataModel.d.ts",
     "./lib/types": "./convex/lib/types.ts",

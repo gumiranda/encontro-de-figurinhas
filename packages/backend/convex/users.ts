@@ -5,11 +5,15 @@ import { Role, isValidRole, isValidSector } from "./lib/types";
 import { getAuthenticatedUser, isAdmin, requireAuth } from "./lib/auth";
 import { haversine, isInBrazil } from "./lib/geo";
 import { verifyIpLocationToken } from "./lib/ipLocationToken";
-import { GEO_VALIDATION, LOCATION_RATE_LIMIT } from "./lib/locationConstants";
-import { getLocationUpdateTimestampsForWindow } from "./lib/locationRateLimit";
+import {
+  GEO_VALIDATION,
+  LOCATION_RATE_LIMIT,
+  getLocationUpdateTimestampsForWindow,
+} from "./lib/locationRateLimit";
 import { checkRateLimit } from "./lib/rateLimit";
 import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
+import { getPendingProposalsForUserCount } from "./lib/tradeHelpers";
 
 export const getCurrentUser = query({
   args: {},
@@ -23,10 +27,15 @@ export const getNavContext = query({
   handler: async (ctx) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) return null;
+    const pendingProposalsCount = await getPendingProposalsForUserCount(
+      ctx,
+      user._id
+    );
     return {
       role: user.role,
       hasCompletedOnboarding: user.hasCompletedOnboarding ?? false,
       hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
+      pendingProposalsCount,
     };
   },
 });

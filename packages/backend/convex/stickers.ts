@@ -2,6 +2,11 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "./lib/auth";
+import {
+  arraysEqual,
+  buildCheckinDenormFields,
+  getActiveCheckin,
+} from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
@@ -30,6 +35,7 @@ type UserPatch = Partial<
 
 /**
  * Present-matches reads denormalized `duplicates` on check-ins; keep in sync when the user edits stickers.
+ * Uses Promise.all for parallel patches, skips unchanged checkins to reduce writes.
  */
 async function syncActiveCheckinsStickerSnapshot(
   ctx: MutationCtx,
@@ -37,27 +43,32 @@ async function syncActiveCheckinsStickerSnapshot(
   user: Doc<"users">,
   duplicates: number[]
 ) {
-  const now = Date.now();
+  const activeCheckin = await getActiveCheckin(ctx, userId);
+  if (!activeCheckin) return;
+
+  // Take up to 20 active checkins (edge case: user has multiple)
   const activeCheckins = await ctx.db
     .query("checkins")
     .withIndex("by_user_active", (q) =>
-      q.eq("userId", userId).gt("expiresAt", now)
+      q.eq("userId", userId).gt("expiresAt", Date.now())
     )
     .take(20);
 
-  if (activeCheckins.length === 0) return;
+  const denorm = buildCheckinDenormFields({ ...user, duplicates });
 
-  const displayNickname =
-    user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador";
-  const avatarSeed = user.nickname ?? userId;
+  // Skip patches for checkins where values haven't changed (reduces Convex writes)
+  const needsPatch = activeCheckins.filter(
+    (c) =>
+      !arraysEqual(c.duplicates ?? [], duplicates) ||
+      c.displayNickname !== denorm.displayNickname ||
+      c.avatarSeed !== denorm.avatarSeed
+  );
 
-  for (const c of activeCheckins) {
-    await ctx.db.patch(c._id, {
-      duplicates,
-      displayNickname,
-      avatarSeed,
-    });
-  }
+  if (needsPatch.length === 0) return;
+
+  await Promise.all(
+    needsPatch.map((c) => ctx.db.patch(c._id, denorm))
+  );
 }
 
 export const getUserStickers = query({
@@ -228,16 +239,19 @@ export const toggleSticker = mutation({
     const totalStickersOwned = maxSticker - nextMiss.length;
     const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
 
-    await ctx.db.patch(user._id, {
+    const userPatch: UserPatch = {
       duplicates: nextDup,
       missing: nextMiss,
       albumProgress,
       albumCompletionPct: albumProgress,
       totalStickersOwned,
       lastActiveAt: Date.now(),
-    });
+    };
 
-    await syncActiveCheckinsStickerSnapshot(ctx, user._id, user, nextDup);
+    await ctx.db.patch(user._id, userPatch);
+
+    const mergedUser = { ...user, ...userPatch };
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, mergedUser, nextDup);
 
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 

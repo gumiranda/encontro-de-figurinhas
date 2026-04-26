@@ -52,14 +52,22 @@ export async function generateMetadata({
     return { title: "Figurinha não encontrada" };
   }
 
-  const sticker = await loadSticker(number);
+  let sticker: Awaited<ReturnType<typeof loadSticker>>;
+  try {
+    sticker = await loadSticker(number);
+  } catch {
+    return { title: "Figurinha" };
+  }
 
   if (!sticker) {
     return { title: "Figurinha não encontrada" };
   }
 
+  const displayLabel = `${sticker.teamCode}-${sticker.relativeNum}`;
+
   return generateStickerMetadata(
     sticker.number,
+    displayLabel,
     sticker.teamName,
     sticker.flagEmoji ?? "",
     sticker.isGolden,
@@ -90,21 +98,24 @@ export default async function StickerPage({ params }: StickerPageProps) {
     notFound();
   }
 
+  const displayLabel = `${sticker.teamCode}-${sticker.relativeNum}`;
+
   const breadcrumbItems = [
     { label: "Figurinhas", href: "/figurinhas" },
     { label: sticker.teamName, href: `/selecao/${sticker.teamSlug}` },
-    { label: `#${number}` },
+    { label: displayLabel },
   ];
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
     { name: "Álbum Copa 2026", url: `${BASE_URL}/album-copa-do-mundo-2026` },
     { name: sticker.teamName, url: `${BASE_URL}/selecao/${sticker.teamSlug}` },
-    { name: `Figurinha ${number}` },
+    { name: `Figurinha ${displayLabel}` },
   ]);
 
   const productSchema = generateProductSchema(
     number,
+    displayLabel,
     sticker.teamName,
     sticker.isGolden,
     sticker.isLegend,
@@ -129,7 +140,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <span className="text-5xl">{sticker.flagEmoji}</span>
                 <Badge variant="outline" className="text-lg px-3 py-1">
-                  #{number}
+                  {displayLabel}
                 </Badge>
                 {sticker.isGolden && (
                   <Badge className="bg-yellow-500 text-yellow-950">
@@ -146,7 +157,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-4">
-                Figurinha {number}
+                Figurinha {displayLabel}
                 {sticker.isLegend && sticker.legendName && (
                   <span className="block text-primary">{sticker.legendName}</span>
                 )}
@@ -197,20 +208,20 @@ export default async function StickerPage({ params }: StickerPageProps) {
                   className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Figurinha {prevNumber}</span>
+                  <span>Anterior</span>
                 </Link>
               ) : (
                 <div />
               )}
               <span className="text-sm text-muted-foreground">
-                {number} de {sticker.totalStickers}
+                {displayLabel} ({number} de {sticker.totalStickers})
               </span>
               {nextNumber ? (
                 <Link
                   href={`/figurinha/${nextNumber}`}
                   className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <span>Figurinha {nextNumber}</span>
+                  <span>Próxima</span>
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
               ) : (
@@ -291,9 +302,9 @@ export default async function StickerPage({ params }: StickerPageProps) {
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
-              <h2>Sobre a figurinha {number}</h2>
+              <h2>Sobre a figurinha {displayLabel}</h2>
               <p>
-                A figurinha número {number} faz parte da coleção da{" "}
+                A figurinha {displayLabel} faz parte da coleção da{" "}
                 <Link href={`/selecao/${sticker.teamSlug}`}>{sticker.teamName}</Link>{" "}
                 {sticker.flagEmoji} no álbum oficial da Copa do Mundo 2026.
                 {sticker.isLegend && sticker.legendName && (
@@ -312,14 +323,14 @@ export default async function StickerPage({ params }: StickerPageProps) {
                 )}
               </p>
 
-              <h3>Como conseguir a figurinha {number}</h3>
+              <h3>Como conseguir a figurinha {displayLabel}</h3>
               <p>
-                A melhor forma de conseguir a figurinha {number} é através de
+                A melhor forma de conseguir a figurinha {displayLabel} é através de
                 trocas com outros colecionadores. No Figurinha Fácil, você pode:
               </p>
               <ul>
                 <li>
-                  Marcar que precisa da figurinha {number} no seu perfil
+                  Marcar que precisa da figurinha {displayLabel} no seu perfil
                 </li>
                 <li>
                   Encontrar colecionadores que têm ela repetida
@@ -346,6 +357,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
         {relatedStickers && relatedStickers.stickers.length > 0 && (
           <RelatedStickers
             teamName={relatedStickers.teamName}
+            teamCode={relatedStickers.teamCode}
             teamSlug={relatedStickers.teamSlug}
             flagEmoji={relatedStickers.flagEmoji}
             stickers={relatedStickers.stickers}
@@ -357,7 +369,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-headline font-bold mb-6">
-              Precisa da figurinha {number}?
+              Precisa da figurinha {displayLabel}?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               Cadastre-se gratuitamente e encontre colecionadores que têm essa

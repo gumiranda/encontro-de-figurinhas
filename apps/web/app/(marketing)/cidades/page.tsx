@@ -11,6 +11,7 @@ import {
   generateBreadcrumbSchema,
   generateItemListSchema,
   generateCombinedSchema,
+  generateSportsEventSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -48,7 +49,7 @@ export default async function CitiesHubPage() {
     allCities.slice(0, 100)
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
 
   const totalCities = citiesByState.reduce(
     (acc, s) => acc + s.cities.length,

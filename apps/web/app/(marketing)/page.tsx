@@ -25,11 +25,26 @@ import {
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Figurinha Fácil - Troque Figurinhas da Copa 2026 Perto de Você",
+  title: {
+    absolute: "Figurinha Fácil — Troque Figurinhas da Copa 2026 Perto de Você",
+  },
   description:
-    "O álbum da Copa 2026 tem 980 figurinhas. Economize até R$ 5.000 trocando com colecionadores em mais de 100 cidades. Cadastre suas repetidas e encontre quem tem as que você precisa.",
+    "Troque figurinhas da Copa 2026 com colecionadores perto de você. 980 figurinhas no álbum, mais de 100 cidades. Cadastre repetidas e faltantes — grátis.",
   alternates: {
     canonical: BASE_URL,
+  },
+  openGraph: {
+    type: "website",
+    url: BASE_URL,
+    title: "Figurinha Fácil — Troque Figurinhas da Copa 2026 Perto de Você",
+    description:
+      "Troque figurinhas da Copa 2026 com colecionadores perto de você. Cadastre repetidas e faltantes em mais de 100 cidades — grátis.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Figurinha Fácil — Troque Figurinhas da Copa 2026 Perto de Você",
+    description:
+      "Troque figurinhas da Copa 2026 com colecionadores perto de você — grátis.",
   },
   other: {
     "article:published_time": "2025-01-01T00:00:00Z",

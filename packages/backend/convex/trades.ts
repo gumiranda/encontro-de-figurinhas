@@ -1,17 +1,21 @@
 import { v, ConvexError } from "convex/values";
 import {
   mutation,
+  query,
   internalMutation,
   type MutationCtx,
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { getAuthenticatedUser } from "./lib/auth";
-import { getPendingTradesCount } from "./lib/tradeHelpers";
+import { getActiveCheckin } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import { getPendingTradesCount } from "./lib/tradeHelpers";
 
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
+const HISTORY_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const LIST_MY_TRADES_CAP = 300;
 
 function computeLiveOverlap(
   user: Doc<"users">,
@@ -41,19 +45,12 @@ async function assertBothPublicCheckinAtPoint(
   counterpartyId: Id<"users">,
   tradePointId: Id<"tradePoints">
 ): Promise<void> {
-  const now = Date.now();
-  const a = await ctx.db
-    .query("checkins")
-    .withIndex("by_user_active", (q) =>
-      q.eq("userId", userId).gt("expiresAt", now)
-    )
-    .first();
-  const b = await ctx.db
-    .query("checkins")
-    .withIndex("by_user_active", (q) =>
-      q.eq("userId", counterpartyId).gt("expiresAt", now)
-    )
-    .first();
+  // Parallel queries for both users' active checkins
+  const [a, b] = await Promise.all([
+    getActiveCheckin(ctx, userId),
+    getActiveCheckin(ctx, counterpartyId),
+  ]);
+
   if (
     !a ||
     a.tradePointId !== tradePointId ||
@@ -75,8 +72,9 @@ export const initiate = mutation({
     matchedUserId: v.id("users"),
     stickersIGive: v.array(v.number()),
     stickersIReceive: v.array(v.number()),
-    /** Required when no `precomputedMatches` row exists (e.g. live “present at point” cards). */
+    /** Required when no `precomputedMatches` row exists (e.g. live "present at point" cards). */
     tradePointId: v.optional(v.id("tradePoints")),
+    message: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
@@ -95,6 +93,17 @@ export const initiate = mutation({
       throw new ConvexError("TOO_MANY_PENDING");
     }
 
+    const oneHourAgo = Date.now() - 3600_000;
+    const recentTrades = await ctx.db
+      .query("trades")
+      .withIndex("by_initiator_created", (q) =>
+        q.eq("initiatorId", user._id).gt("createdAt", oneHourAgo)
+      )
+      .take(11);
+    if (recentTrades.length >= 10) {
+      throw new ConvexError("RATE_LIMITED");
+    }
+
     const counterparty = await ctx.db.get(args.matchedUserId);
     if (
       !counterparty ||
@@ -110,8 +119,9 @@ export const initiate = mutation({
 
     const precomputed = await ctx.db
       .query("precomputedMatches")
-      .withIndex("by_user_point", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("matchedUserId"), args.matchedUserId))
+      .withIndex("by_user_matched_point", (q) =>
+        q.eq("userId", user._id).eq("matchedUserId", args.matchedUserId)
+      )
       .first();
 
     let resolvedTradePointId: Id<"tradePoints">;
@@ -158,6 +168,11 @@ export const initiate = mutation({
 
     const pairKey = [user._id, args.matchedUserId].sort().join("_");
 
+    const sanitizedMessage = args.message?.trim();
+    if (sanitizedMessage && sanitizedMessage.length > 200) {
+      throw new ConvexError("MESSAGE_TOO_LONG");
+    }
+
     const existing = await ctx.db
       .query("trades")
       .withIndex("by_pairKey_status_created", (q) =>
@@ -165,6 +180,8 @@ export const initiate = mutation({
       )
       .first();
     if (existing) throw new ConvexError("ALREADY_PENDING");
+
+    const tradePoint = await ctx.db.get(resolvedTradePointId);
 
     const tradeId = await ctx.db.insert("trades", {
       pairKey,
@@ -175,6 +192,19 @@ export const initiate = mutation({
       stickersInitiatorReceived: args.stickersIReceive,
       status: "pending_confirmation",
       createdAt: Date.now(),
+      initiatorMessage: sanitizedMessage || undefined,
+      initiatorDisplayNickname:
+        user.displayNickname ?? user.nickname ?? user.name,
+      initiatorAvatarUrl: user.avatarUrl,
+      initiatorTotalTrades: user.totalTrades ?? 0,
+      initiatorReliabilityScore: user.reliabilityScore,
+      counterpartyDisplayNickname:
+        counterparty.displayNickname ?? counterparty.nickname ?? counterparty.name,
+      counterpartyAvatarUrl: counterparty.avatarUrl,
+      counterpartyTotalTrades: counterparty.totalTrades ?? 0,
+      counterpartyReliabilityScore: counterparty.reliabilityScore,
+      tradePointName: tradePoint?.name,
+      tradePointAddress: tradePoint?.address,
     });
 
     await ctx.scheduler.runAfter(TRADE_EXPIRATION_MS, internal.trades.expireTrade, {
@@ -280,6 +310,8 @@ export const confirm = mutation({
     await ctx.db.patch(args.tradeId, {
       status: "confirmed",
       confirmedAt: Date.now(),
+      initiatorTotalTrades: (initiator.totalTrades ?? 0) + 1,
+      counterpartyTotalTrades: (user.totalTrades ?? 0) + 1,
     });
 
     return { status: "confirmed" as const };
@@ -333,6 +365,36 @@ export const dispute = mutation({
   },
 });
 
+export const decline = mutation({
+  args: {
+    tradeId: v.id("trades"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) throw new ConvexError("AUTH_REQUIRED");
+
+    const trade = await ctx.db.get(args.tradeId);
+    if (!trade) throw new ConvexError("NOT_FOUND");
+
+    if (trade.counterpartyId !== user._id) throw new ConvexError("FORBIDDEN");
+    if (trade.status !== "pending_confirmation") throw new ConvexError("STATE_CHANGED");
+
+    const sanitizedReason = args.reason?.trim();
+    if (sanitizedReason && sanitizedReason.length > 200) {
+      throw new ConvexError("REASON_TOO_LONG");
+    }
+
+    await ctx.db.patch(args.tradeId, {
+      status: "declined",
+      declinedAt: Date.now(),
+      declineReason: sanitizedReason || undefined,
+    });
+
+    return { status: "declined" as const };
+  },
+});
+
 export const expireTrade = internalMutation({
   args: {
     tradeId: v.id("trades"),
@@ -346,5 +408,174 @@ export const expireTrade = internalMutation({
       status: "expired",
       expiredAt: Date.now(),
     });
+  },
+});
+
+export type ListMyTradeRow = {
+  _id: Id<"trades">;
+  status: Doc<"trades">["status"];
+  role: "incoming" | "outgoing";
+  createdAt: number;
+  expiresAt: number;
+  confirmedAt: number | null;
+  initiatorMessage: string | null;
+  stickersIGive: number[];
+  stickersIReceive: number[];
+  matchPct: number | null;
+  counterparty: {
+    _id: Id<"users">;
+    name: string;
+    nickname: string | null;
+    avatarUrl: string | null;
+    totalTrades: number;
+    reliabilityScore: number;
+  };
+  tradePoint: {
+    _id: Id<"tradePoints">;
+    name: string;
+    address: string;
+  } | null;
+};
+
+export const listMyTrades = query({
+  args: {},
+  handler: async (ctx): Promise<ListMyTradeRow[]> => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return [];
+
+    const now = Date.now();
+    const cutoff = now - HISTORY_WINDOW_MS;
+
+    const [asInitiator, asCounterparty] = await Promise.all([
+      ctx.db
+        .query("trades")
+        .withIndex("by_initiator_status", (q) => q.eq("initiatorId", user._id))
+        .order("desc")
+        .take(LIST_MY_TRADES_CAP),
+      ctx.db
+        .query("trades")
+        .withIndex("by_counterparty_status", (q) =>
+          q.eq("counterpartyId", user._id)
+        )
+        .order("desc")
+        .take(LIST_MY_TRADES_CAP),
+    ]);
+
+    const trades: { trade: Doc<"trades">; role: "incoming" | "outgoing" }[] = [];
+    for (const t of asInitiator) trades.push({ trade: t, role: "outgoing" });
+    for (const t of asCounterparty) trades.push({ trade: t, role: "incoming" });
+
+    const filtered = trades.filter(({ trade }) => {
+      if (
+        trade.status === "pending_confirmation" ||
+        trade.status === "confirmed"
+      ) {
+        return true;
+      }
+      return trade.createdAt >= cutoff;
+    });
+
+    const userMissingCount = (user.missing ?? []).length;
+
+    const rows: ListMyTradeRow[] = filtered.map(({ trade, role }) =>
+      buildTradeRow(trade, role, userMissingCount)
+    );
+
+    rows.sort((a, b) => b.createdAt - a.createdAt);
+    return rows;
+  },
+});
+
+function buildTradeRow(
+  trade: Doc<"trades">,
+  role: "incoming" | "outgoing",
+  userMissingCount: number
+): ListMyTradeRow {
+  const otherId = role === "incoming" ? trade.initiatorId : trade.counterpartyId;
+
+  const stickersIGive =
+    role === "outgoing"
+      ? trade.stickersInitiatorGave
+      : trade.stickersInitiatorReceived;
+  const stickersIReceive =
+    role === "outgoing"
+      ? trade.stickersInitiatorReceived
+      : trade.stickersInitiatorGave;
+
+  const matchPct =
+    userMissingCount > 0
+      ? Math.min(
+          100,
+          Math.round((stickersIReceive.length / userMissingCount) * 100)
+        )
+      : null;
+
+  const otherNickname =
+    role === "incoming"
+      ? trade.initiatorDisplayNickname
+      : trade.counterpartyDisplayNickname;
+  const otherAvatar =
+    role === "incoming"
+      ? trade.initiatorAvatarUrl
+      : trade.counterpartyAvatarUrl;
+  const otherTotalTrades =
+    role === "incoming"
+      ? trade.initiatorTotalTrades
+      : trade.counterpartyTotalTrades;
+  const otherReliability =
+    role === "incoming"
+      ? trade.initiatorReliabilityScore
+      : trade.counterpartyReliabilityScore;
+
+  return {
+    _id: trade._id,
+    status: trade.status,
+    role,
+    createdAt: trade.createdAt,
+    expiresAt: trade.createdAt + TRADE_EXPIRATION_MS,
+    confirmedAt: trade.confirmedAt ?? null,
+    initiatorMessage: trade.initiatorMessage ?? null,
+    stickersIGive,
+    stickersIReceive,
+    matchPct,
+    counterparty: {
+      _id: otherId,
+      name: otherNickname ?? "Colecionador",
+      nickname: otherNickname ?? null,
+      avatarUrl: otherAvatar ?? null,
+      totalTrades: otherTotalTrades ?? 0,
+      reliabilityScore: otherReliability ?? 0,
+    },
+    tradePoint: trade.tradePointName
+      ? {
+          _id: trade.tradePointId,
+          name: trade.tradePointName,
+          address: trade.tradePointAddress ?? "",
+        }
+      : null,
+  };
+}
+
+export const getTradeById = query({
+  args: { tradeId: v.id("trades") },
+  handler: async (ctx, { tradeId }): Promise<ListMyTradeRow | null> => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+
+    const trade = await ctx.db.get(tradeId);
+    if (!trade) return null;
+
+    if (trade.initiatorId !== user._id && trade.counterpartyId !== user._id) {
+      return null;
+    }
+
+    const role: "incoming" | "outgoing" =
+      trade.initiatorId === user._id ? "outgoing" : "incoming";
+
+    const row = buildTradeRow(trade, role, (user.missing ?? []).length);
+    if (role === "outgoing") {
+      row.initiatorMessage = null;
+    }
+    return row;
   },
 });

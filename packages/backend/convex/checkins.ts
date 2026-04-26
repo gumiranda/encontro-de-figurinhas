@@ -4,6 +4,12 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth } from "./lib/auth";
+import {
+  arraysEqual,
+  buildCheckinDenormFields,
+  getActiveCheckin,
+  normalizeCheckinDenorm,
+} from "./lib/checkinHelpers";
 import { getBrazilHour, haversine, isInBrazil } from "./lib/geo";
 import {
   CHECKIN_DURATION_MS,
@@ -61,12 +67,7 @@ export const create = mutation({
     const now = Date.now();
     const expiresAt = now + CHECKIN_DURATION_MS;
 
-    const previous = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).gt("expiresAt", now)
-      )
-      .first();
+    const previous = await getActiveCheckin(ctx, user._id);
 
     // Renewal no MESMO ponto: só estende expiresAt. Sem flicker UI, sem bump.
     if (previous && previous.tradePointId === tradePointId) {
@@ -114,9 +115,7 @@ export const create = mutation({
       createdAt: now,
       countedInPublic,
       // Denormalized fields for listPresentMatchesAtPoint (avoids N+1 reads)
-      displayNickname: user.displayNickname ?? user.nickname ?? user.name,
-      avatarSeed: user.nickname ?? user._id,
-      duplicates: user.duplicates ?? [],
+      ...buildCheckinDenormFields(user),
     });
 
     if (countedInPublic) {
@@ -176,13 +175,7 @@ export const cancelMine = mutation({
     }
     const user = auth.user;
 
-    const now = Date.now();
-    const active = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", user._id).gt("expiresAt", now)
-      )
-      .first();
+    const active = await getActiveCheckin(ctx, user._id);
 
     if (!active) return { ok: true as const, cancelled: false };
 
@@ -216,19 +209,22 @@ export const listPresentAtMyPoints = query({
       .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
       .take(100);
 
+    const checkinsByPoint = await Promise.all(
+      myMemberships.map((m) =>
+        ctx.db
+          .query("checkins")
+          .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+            q
+              .eq("tradePointId", m.tradePointId)
+              .eq("countedInPublic", true)
+              .gt("expiresAt", now)
+          )
+          .take(20)
+      )
+    );
+
     const presentUserIds: Id<"users">[] = [];
-
-    for (const m of myMemberships) {
-      const checkins = await ctx.db
-        .query("checkins")
-        .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
-          q
-            .eq("tradePointId", m.tradePointId)
-            .eq("countedInPublic", true)
-            .gt("expiresAt", now)
-        )
-        .take(20);
-
+    for (const checkins of checkinsByPoint) {
       for (const c of checkins) {
         if (c.userId !== auth.user._id) {
           presentUserIds.push(c.userId);
@@ -240,7 +236,7 @@ export const listPresentAtMyPoints = query({
   },
 });
 
-/** Active check-in for share CTA + “estou no ponto” empty states. */
+/** Active check-in for share CTA + "estou no ponto" empty states. */
 export const getMyActiveCheckinSummary = query({
   args: {},
   handler: async (ctx) => {
@@ -253,13 +249,7 @@ export const getMyActiveCheckinSummary = query({
       };
     }
 
-    const now = Date.now();
-    const active = await ctx.db
-      .query("checkins")
-      .withIndex("by_user_active", (q) =>
-        q.eq("userId", auth.user._id).gt("expiresAt", now)
-      )
-      .first();
+    const active = await getActiveCheckin(ctx, auth.user._id);
 
     if (!active) {
       return {
@@ -279,10 +269,13 @@ export const getMyActiveCheckinSummary = query({
 });
 
 const EXPIRE_BATCH_SIZE = 50;
+const EXPIRE_MAX_CHUNKS = 200;
 
 export const expireCheckins = internalMutation({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { chunk = 0 }) => {
     const now = Date.now();
     const expired = await ctx.db
       .query("checkins")
@@ -318,11 +311,16 @@ export const expireCheckins = internalMutation({
       })
     );
 
-    if (expired.length === EXPIRE_BATCH_SIZE) {
-      await ctx.scheduler.runAfter(0, internal.checkins.expireCheckins, {});
-    }
+    const result = await rescheduleIfMore(ctx, {
+      self: internal.checkins.expireCheckins,
+      args: {},
+      hasMore: expired.length === EXPIRE_BATCH_SIZE,
+      chunk,
+      maxChunks: EXPIRE_MAX_CHUNKS,
+      label: "expireCheckins",
+    });
 
-    return { expired: expired.length };
+    return { expired: expired.length, aborted: result.aborted ?? false };
   },
 });
 
@@ -484,7 +482,7 @@ export const decayPeakHours = internalMutation({
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .paginate({ numItems: DECAY_BATCH, cursor: cursor ?? null });
 
-    // Collect patches to apply
+    // Collect patches to apply (skip if values unchanged to reduce writes)
     const patches: { id: Id<"tradePoints">; peakHours: number[] }[] = [];
     for (const point of page.page) {
       if (!point.peakHours || point.peakHours.length === 0) continue;
@@ -494,7 +492,10 @@ export const decayPeakHours = internalMutation({
         const next = Math.floor(original * PEAK_HOURS_DECAY_FACTOR);
         return Math.max(next, PEAK_HOURS_FLOOR_AFTER_ACTIVITY);
       });
-      patches.push({ id: point._id, peakHours: decayed });
+      // Skip patch if values unchanged
+      if (!arraysEqual(point.peakHours, decayed)) {
+        patches.push({ id: point._id, peakHours: decayed });
+      }
     }
 
     // Batch apply all patches in parallel
@@ -587,11 +588,7 @@ export const backfillCheckinDenormFields = internalMutation({
       needsBackfill.map((c) => {
         const user = userMap.get(c.userId);
         if (!user) return;
-        return ctx.db.patch(c._id, {
-          displayNickname: user.displayNickname ?? user.nickname ?? user.name,
-          avatarSeed: user.nickname ?? user._id,
-          duplicates: user.duplicates ?? [],
-        });
+        return ctx.db.patch(c._id, buildCheckinDenormFields(user));
       })
     );
 
@@ -609,6 +606,24 @@ export const backfillCheckinDenormFields = internalMutation({
 const PRESENT_MATCHES_CAP = 50;
 const STICKER_SAMPLE_LIMIT = 20;
 
+const matchRowValidator = v.object({
+  checkinId: v.id("checkins"),
+  userId: v.id("users"),
+  displayNickname: v.string(),
+  avatarSeed: v.string(),
+  checkinAt: v.number(),
+  distanceMeters: v.number(),
+  matchingStickers: v.array(v.number()),
+  totalMatches: v.number(),
+  myMatchingStickers: v.array(v.number()),
+  myMatchingTotal: v.number(),
+  albumCompletionPct: v.number(),
+  totalTrades: v.number(),
+  isPremium: v.boolean(),
+  isVerified: v.boolean(),
+  hasProfileData: v.boolean(),
+});
+
 const listPresentMatchesReturn = v.union(
   v.object({ state: v.literal("needs-auth") }),
   v.object({ state: v.literal("banned") }),
@@ -617,17 +632,9 @@ const listPresentMatchesReturn = v.union(
   v.object({ state: v.literal("not-found") }),
   v.object({
     state: v.literal("ready"),
-    matches: v.array(
-      v.object({
-        checkinId: v.id("checkins"),
-        displayNickname: v.string(),
-        avatarSeed: v.string(),
-        checkinAt: v.number(),
-        matchingStickers: v.array(v.number()),
-        totalMatches: v.number(),
-      })
-    ),
+    matches: v.array(matchRowValidator),
     truncated: v.boolean(),
+    myMissingCount: v.number(),
   })
 );
 
@@ -666,6 +673,7 @@ export const listPresentMatchesAtPoint = query({
     }
 
     const myMissingSet = new Set(myMissing);
+    const myDupSet = new Set(user.duplicates ?? []);
     const now = Date.now();
 
     const checkins = await ctx.db
@@ -680,30 +688,58 @@ export const listPresentMatchesAtPoint = query({
 
     const truncated = checkins.length === PRESENT_MATCHES_CAP;
 
-    const matchRows: {
+    type MatchRow = {
       checkinId: Id<"checkins">;
+      userId: Id<"users">;
       displayNickname: string;
       avatarSeed: string;
       checkinAt: number;
+      distanceMeters: number;
       matchingStickers: number[];
       totalMatches: number;
-    }[] = [];
+      myMatchingStickers: number[];
+      myMatchingTotal: number;
+      albumCompletionPct: number;
+      totalTrades: number;
+      isPremium: boolean;
+      isVerified: boolean;
+      hasProfileData: boolean;
+    };
+
+    const matchRows: MatchRow[] = [];
 
     for (const c of checkins) {
       if (c.userId === user._id) continue;
 
-      const theirDuplicates = c.duplicates ?? [];
-      const matching = theirDuplicates.filter((n) => myMissingSet.has(n));
-
+      const norm = normalizeCheckinDenorm(c);
+      const matching = norm.duplicates.filter((n) => myMissingSet.has(n));
       if (matching.length === 0) continue;
+
+      // Reverse direction: my dups ∩ their missing.
+      // Set on the smaller-iteration side (myDupSet via for-of).
+      // userMissing stays server-internal — never emitted in matchRowValidator.
+      const theirMissingSet = new Set(norm.userMissing);
+      const myMatching: number[] = [];
+      for (const n of myDupSet) {
+        if (theirMissingSet.has(n)) myMatching.push(n);
+      }
 
       matchRows.push({
         checkinId: c._id,
-        displayNickname: c.displayNickname ?? "Colecionador",
-        avatarSeed: c.avatarSeed ?? c.userId,
+        userId: c.userId,
+        displayNickname: norm.displayNickname,
+        avatarSeed: norm.avatarSeed,
         checkinAt: c.createdAt,
+        distanceMeters: c.distanceMeters,
         matchingStickers: matching.slice(0, STICKER_SAMPLE_LIMIT),
         totalMatches: matching.length,
+        myMatchingStickers: myMatching.slice(0, STICKER_SAMPLE_LIMIT),
+        myMatchingTotal: myMatching.length,
+        albumCompletionPct: norm.albumCompletionPct,
+        totalTrades: norm.totalTrades,
+        isPremium: norm.isPremium,
+        isVerified: norm.isVerified,
+        hasProfileData: norm.hasProfileData,
       });
     }
 
@@ -718,6 +754,7 @@ export const listPresentMatchesAtPoint = query({
       state: "ready" as const,
       matches: matchRows,
       truncated,
+      myMissingCount: myMissing.length,
     };
   },
 });

@@ -12,6 +12,8 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeftRight,
+  BookOpen,
+  Inbox,
   LayoutDashboard,
   ListPlus,
   Map as MapIcon,
@@ -31,6 +33,7 @@ export interface NavItem {
   label: string;
   href: string;
   icon: LucideIcon;
+  badgeCount?: number;
 }
 
 export interface NavGroup {
@@ -64,6 +67,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
     // desabilitar tudo exceto /cadastrar-figurinhas. Evita flash clicável que dispararia
     // o redirect loop do DashboardShell antes do setup completar.
     const setupCompleted = navContext?.hasCompletedStickerSetup === true;
+    const pendingProposalsCount = navContext?.pendingProposalsCount ?? 0;
 
     const baseGroups: NavGroup[] = [
       {
@@ -77,6 +81,12 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             icon: ListPlus,
           },
           { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
+          {
+            label: "Propostas",
+            href: "/propostas",
+            icon: Inbox,
+            badgeCount: pendingProposalsCount,
+          },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
         ],
       },
@@ -94,6 +104,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
               items: [
                 { label: "Aprovar pontos", href: "/admin/points", icon: ShieldCheck },
                 { label: "Usuários", href: "/admin/users", icon: UserCog },
+                { label: "Blog", href: "/admin/blog", icon: BookOpen },
               ],
             },
           ]
@@ -107,7 +118,11 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         ariaDisabled: !setupCompleted && !ONBOARDING_ALLOWED_HREFS.has(item.href),
       })),
     }));
-  }, [navContext?.role, navContext?.hasCompletedStickerSetup]);
+  }, [
+    navContext?.role,
+    navContext?.hasCompletedStickerSetup,
+    navContext?.pendingProposalsCount,
+  ]);
 }
 
 interface SidebarContentProps {
@@ -119,17 +134,22 @@ interface SidebarContentProps {
 export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarContentProps) {
   return (
     <>
-      <div className="p-6">
-        <h1 className="font-[var(--font-headline)] text-xl font-bold tracking-tight">
-          Figurinha Fácil
-        </h1>
+      <div className="flex items-center gap-2 px-6 py-5">
+        <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground font-headline text-sm font-black">
+          FF
+        </div>
+        <span className="font-headline text-base font-bold tracking-tight">
+          figurinhafácil
+        </span>
       </div>
       <nav className="space-y-6 px-4">
-        {groups.map((group) => (
-          <div key={group.title} className="space-y-1">
-            <p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-muted-foreground">
-              {group.title}
-            </p>
+        {groups.map((group, groupIndex) => (
+          <div key={group.title || `group-${groupIndex}`} className="space-y-1">
+            {group.title && (
+              <p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-muted-foreground">
+                {group.title}
+              </p>
+            )}
             {group.items.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -141,6 +161,21 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
                 isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
               );
 
+              const badge =
+                item.badgeCount && item.badgeCount > 0 ? (
+                  <span
+                    aria-label={`${item.badgeCount} pendentes`}
+                    className={cn(
+                      "ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-bold tabular-nums",
+                      isActive
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-tertiary text-tertiary-foreground"
+                    )}
+                  >
+                    {item.badgeCount > 99 ? "99+" : item.badgeCount}
+                  </span>
+                ) : null;
+
               if (item.ariaDisabled) {
                 return (
                   <span
@@ -151,6 +186,7 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
                   >
                     <Icon className="h-4 w-4" />
                     {item.label}
+                    {badge}
                   </span>
                 );
               }
@@ -165,6 +201,7 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}
+                  {badge}
                 </Link>
               );
             })}

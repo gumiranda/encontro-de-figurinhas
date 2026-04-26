@@ -1,41 +1,19 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useReadingProgress } from "./reading-progress-provider";
 
 export function ReadingProgress() {
-  const [progress, setProgress] = useState(0);
-  const ticking = useRef(false);
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      setProgress(Math.min(100, Math.max(0, scrollPercent)));
-      ticking.current = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking.current) {
-        ticking.current = true;
-        requestAnimationFrame(updateProgress);
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    updateProgress();
-
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const progress = useReadingProgress();
 
   return (
     <div
-      className="reading-progress fixed top-0 left-0 right-0 h-1 z-50 bg-muted/30"
+      className="fixed top-0 left-0 right-0 h-1 z-50 bg-muted/30"
       role="progressbar"
-      aria-valuenow={Math.round(progress)}
+      aria-valuenow={progress}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Progresso de leitura"
+      aria-valuetext={`${progress}% lido`}
     >
       <div
         className="h-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-150 ease-out"

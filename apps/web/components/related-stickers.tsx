@@ -4,6 +4,7 @@ import { Badge } from "@workspace/ui/components/badge";
 
 interface RelatedSticker {
   number: number;
+  relativeNum: number;
   isGolden: boolean;
   isLegend: boolean;
   legendName?: string | null;
@@ -11,6 +12,7 @@ interface RelatedSticker {
 
 interface RelatedStickersProps {
   teamName: string;
+  teamCode: string;
   teamSlug: string;
   flagEmoji?: string;
   stickers: RelatedSticker[];
@@ -19,6 +21,7 @@ interface RelatedStickersProps {
 
 export function RelatedStickers({
   teamName,
+  teamCode,
   teamSlug,
   flagEmoji,
   stickers,
@@ -62,7 +65,7 @@ export function RelatedStickers({
                   `}
                   title={sticker.legendName ?? undefined}
                 >
-                  #{sticker.number}
+                  {teamCode}-{sticker.relativeNum}
                   {sticker.isGolden && <Star className="h-3 w-3 ml-1 fill-current" />}
                   {sticker.isLegend && <Sparkles className="h-3 w-3 ml-1" />}
                 </Badge>

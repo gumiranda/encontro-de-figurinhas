@@ -172,6 +172,7 @@ function StickerSectionGroupBase({
               key={num}
               num={num}
               relativeNum={relativeNum}
+              sectionCode={section.code}
               state={state}
               onClick={handleTileClick}
             />

@@ -1,27 +1,39 @@
 "use client";
 
 import { useQuery, useMutation } from "convex/react";
-import { ArrowRight, ArrowUpRight, ArrowDownLeft, Check, Search, X, Repeat } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ArrowDownLeft, Check, MessageCircle, Search, X, Repeat } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import type { StickerWithQty } from "@workspace/backend/convex/matches";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { cn } from "@workspace/ui/lib/utils";
 
+import { getRelativeNum } from "@/modules/stickers/lib/sticker-parser";
+
 import { MatchDicebearAvatar } from "./match-dicebear-avatar";
 
 type Fairness = "ok" | "warn" | "none";
+
+const TRADE_ERROR_MESSAGES = {
+  TOO_MANY_PENDING: "Você já tem muitas trocas pendentes",
+  ALREADY_PENDING: "Já existe uma proposta pendente com este usuário",
+  NO_MATCH: "Não foi possível validar o match. Confira se ainda estão no mesmo ponto.",
+  INVALID_STICKER: "Figurinha inválida para esta troca",
+  STICKERS_CHANGED: "Algumas figurinhas já foram trocadas",
+  MESSAGE_TOO_LONG: "Mensagem muito longa",
+  RATE_LIMITED: "Muitas propostas enviadas. Aguarde um pouco.",
+} as const;
 
 function calcFairness(give: number, receive: number): Fairness {
   if (give === 0 || receive === 0) return "none";
@@ -89,11 +101,14 @@ function StickerCard({ sticker, section, selected, onToggle, variant }: StickerC
   const isRare =
     section?.goldenNumbers.includes(sticker.num) ||
     section?.legendNumbers.includes(sticker.num);
+  const relativeNum = section ? getRelativeNum(sticker.num, section) : sticker.num;
+  const displayLabel = section ? `${section.code}-${relativeNum}` : String(sticker.num);
 
   return (
     <button
       type="button"
       onClick={onToggle}
+      aria-label={`Figurinha ${displayLabel}${sticker.qty > 1 ? `, ${sticker.qty} repetidas` : ""}${selected ? ", selecionada" : ""}`}
       className={cn(
         "group relative flex aspect-[3/4] flex-col items-center justify-center rounded-xl border-[1.5px] font-mono text-sm font-semibold transition-all duration-150",
         "hover:-translate-y-0.5 hover:shadow-md",
@@ -122,7 +137,7 @@ function StickerCard({ sticker, section, selected, onToggle, variant }: StickerC
       )}
 
       {/* Number */}
-      <span className="relative mt-2 text-base font-bold text-foreground">{sticker.num}</span>
+      <span className="relative mt-2 text-base font-bold text-foreground">{relativeNum}</span>
 
       {/* Quantity */}
       {sticker.qty > 1 && (
@@ -154,7 +169,6 @@ type StickerColumnProps = {
   stickers: StickerWithQty[];
   selected: Set<number>;
   onToggle: (num: number) => void;
-  sections: Section[];
   sectionMap: Map<number, Section>;
   variant: "give" | "receive";
 };
@@ -174,7 +188,6 @@ function StickerColumn({
   const filteredStickers = useMemo(() => {
     let result = stickers;
 
-    // Apply search
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((s) => {
@@ -186,7 +199,6 @@ function StickerColumn({
       });
     }
 
-    // Apply filter
     if (filter === "rare") {
       result = result.filter((s) => {
         const sec = sectionMap.get(s.num);
@@ -374,12 +386,105 @@ function ExchangeWidget({ giveCount, receiveCount }: ExchangeWidgetProps) {
   );
 }
 
+const MAX_MESSAGE_LENGTH = 200;
+
+type Preset = { value: string; label: string };
+
+type MessageInputRowProps = {
+  firstName: string;
+  tradePointName: string;
+  message: string;
+  onMessageChange: (msg: string) => void;
+};
+
+function MessageInputRow({ firstName, tradePointName, message, onMessageChange }: MessageInputRowProps) {
+  const presets: Preset[] = useMemo(() => [
+    { value: "Posso hoje", label: "Posso hoje" },
+    {
+      value: tradePointName,
+      label: tradePointName.length > 20 ? `${tradePointName.slice(0, 20)}…` : tradePointName
+    },
+  ], [tradePointName]);
+
+  const isAtLimit = message.length >= MAX_MESSAGE_LENGTH;
+
+  const handlePresetClick = (value: string) => {
+    const newMsg = message ? `${message} ${value}` : value;
+    if (newMsg.length <= MAX_MESSAGE_LENGTH) {
+      onMessageChange(newMsg.trim());
+    }
+  };
+
+  const isPresetIncluded = (value: string) => message.includes(value);
+  const wouldExceedLimit = (value: string) => (message.length + value.length + 1) > MAX_MESSAGE_LENGTH;
+
+  return (
+    <div
+      className="col-span-full mt-4 space-y-2"
+      role="group"
+      aria-labelledby="message-label"
+    >
+      <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-ring">
+        <MessageCircle className="size-4 text-muted-foreground" aria-hidden="true" />
+        <label id="message-label" className="sr-only">
+          Mensagem opcional para {firstName}
+        </label>
+        <Input
+          value={message}
+          onChange={(e) => onMessageChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+          placeholder={`Mensagem opcional para ${firstName}...`}
+          className="flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+          aria-describedby="message-counter"
+        />
+        <span
+          id="message-counter"
+          className={cn(
+            "text-xs tabular-nums transition-colors",
+            isAtLimit ? "text-destructive" : "text-muted-foreground"
+          )}
+          aria-live="polite"
+        >
+          {message.length}/{MAX_MESSAGE_LENGTH}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Mensagens rápidas">
+        {presets.map(({ value, label }) => {
+          const included = isPresetIncluded(value);
+          const exceeds = wouldExceedLimit(value);
+          const disabled = included || exceeds;
+          const ariaLabel = included
+            ? `${label} (já adicionado)`
+            : exceeds
+              ? `${label} (excede limite)`
+              : `Adicionar: ${label}`;
+
+          return (
+            <Button
+              key={value}
+              variant="outline"
+              size="sm"
+              disabled={disabled}
+              onClick={() => handlePresetClick(value)}
+              aria-label={ariaLabel}
+              className={cn(
+                "h-7 max-w-[140px] truncate text-xs",
+                disabled && "opacity-50"
+              )}
+            >
+              {label}
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export type MatchTradeModalProps = {
   matchedUserId: Id<"users">;
   matchedUserNickname: string;
   tradePointId: Id<"tradePoints">;
   distanceKm: number;
-  albumPct: number;
   tradesCount: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -391,7 +496,6 @@ function MatchTradeModalContent({
   matchedUserNickname,
   tradePointId,
   distanceKm,
-  albumPct,
   tradesCount,
   onOpenChange,
   onSuccess,
@@ -399,6 +503,13 @@ function MatchTradeModalContent({
   const [stickersIGive, setStickersIGive] = useState<Set<number>>(new Set());
   const [stickersIReceive, setStickersIReceive] = useState<Set<number>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setStickersIGive(new Set());
+    setStickersIReceive(new Set());
+    setMessage("");
+  }, [matchedUserId]);
 
   const data = useQuery(api.matches.getFullStickerOverlap, {
     matchedUserId,
@@ -450,24 +561,19 @@ function MatchTradeModalContent({
         tradePointId,
         stickersIGive: [...stickersIGive],
         stickersIReceive: [...stickersIReceive],
+        message: message.trim() || undefined,
       });
       toast.success("Proposta de troca enviada!");
       onOpenChange(false);
       onSuccess?.();
     } catch (err) {
-      const message =
-        err instanceof Error && err.message.includes("TOO_MANY_PENDING")
-          ? "Você já tem muitas trocas pendentes"
-          : err instanceof Error && err.message.includes("ALREADY_PENDING")
-            ? "Já existe uma proposta pendente com este usuário"
-            : err instanceof Error && err.message.includes("NO_MATCH")
-              ? "Não foi possível validar o match. Confira se ainda estão no mesmo ponto."
-              : err instanceof Error && err.message.includes("INVALID_STICKER")
-                ? "Figurinha inválida para esta troca"
-                : err instanceof Error && err.message.includes("STICKERS_CHANGED")
-                  ? "Algumas figurinhas já foram trocadas"
-                  : "Erro ao enviar proposta";
-      toast.error(message);
+      const matchedError = err instanceof Error
+        ? Object.entries(TRADE_ERROR_MESSAGES).find(([code]) =>
+            err.message.includes(code),
+          )
+        : undefined;
+      const errorMessage = matchedError?.[1] ?? "Erro ao enviar proposta";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -485,20 +591,18 @@ function MatchTradeModalContent({
   const receiveCount = stickersIReceive.size;
   const canSubmit = giveCount > 0 && receiveCount > 0 && !isSubmitting;
 
-  // Count rare stickers being received
   const rareReceiveCount = [...stickersIReceive].filter((num) => {
     const sec = sectionMap.get(num);
     return sec?.goldenNumbers.includes(num) || sec?.legendNumbers.includes(num);
   }).length;
 
-  // Match percentage calculation
   const matchPct = Math.round(
     (Math.min(data.theyHaveINeed.length, data.iHaveTheyNeed.length) /
       Math.max(data.theyHaveINeed.length, data.iHaveTheyNeed.length, 1)) *
       100
   );
 
-  const firstName = matchedUserNickname.split(" ")[0];
+  const firstName = matchedUserNickname.split(" ")[0] ?? "";
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -529,7 +633,7 @@ function MatchTradeModalContent({
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-5 md:overflow-visible md:p-6">
+      <div className="min-h-0 flex-1 overflow-y-auto p-5 md:p-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr]">
           <StickerColumn
             title="Você oferece"
@@ -537,7 +641,6 @@ function MatchTradeModalContent({
             stickers={data.iHaveTheyNeed}
             selected={stickersIGive}
             onToggle={toggleGive}
-            sections={data.sections}
             sectionMap={sectionMap}
             variant="give"
           />
@@ -550,9 +653,15 @@ function MatchTradeModalContent({
             stickers={data.theyHaveINeed}
             selected={stickersIReceive}
             onToggle={toggleReceive}
-            sections={data.sections}
             sectionMap={sectionMap}
             variant="receive"
+          />
+
+          <MessageInputRow
+            firstName={firstName}
+            tradePointName={data.tradePointName ?? ""}
+            message={message}
+            onMessageChange={setMessage}
           />
         </div>
       </div>
@@ -602,6 +711,7 @@ export function MatchTradeModal({
         className="flex h-full max-h-dvh w-full max-w-[1280px] flex-col overflow-hidden rounded-none border-0 p-0 md:h-auto md:max-h-[min(92vh,880px)] md:rounded-3xl md:border lg:max-w-[1400px]"
         showCloseButton={false}
       >
+        <DialogTitle className="sr-only">Propor troca</DialogTitle>
         {open && (
           <MatchTradeModalContent {...props} onOpenChange={onOpenChange} />
         )}

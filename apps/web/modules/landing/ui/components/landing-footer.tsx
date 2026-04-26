@@ -1,4 +1,4 @@
-import { Globe, Landmark, Share2 } from "lucide-react";
+import { Globe, Share2, Trophy } from "lucide-react";
 import Link from "next/link";
 
 const PRODUCT_LINKS = [
@@ -40,7 +40,7 @@ export function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <Landmark className="text-primary w-6 h-6" aria-hidden="true" />
+              <Trophy className="text-primary w-6 h-6" aria-hidden="true" />
               <span className="text-primary-dim font-bold text-xl">Figurinha Fácil</span>
             </Link>
             <p className="text-sm text-slate-500 mb-4">

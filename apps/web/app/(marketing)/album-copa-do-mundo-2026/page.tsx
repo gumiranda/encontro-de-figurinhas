@@ -29,6 +29,7 @@ import {
   generateCombinedSchema,
   generateFAQSchema,
   generateCollectionPageSchema,
+  generateSportsEventSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -175,6 +176,7 @@ const combinedSchema = generateCombinedSchema([
   breadcrumbSchema,
   faqSchema,
   collectionPageSchema,
+  generateSportsEventSchema(),
 ]);
 
 const quickFacts = [

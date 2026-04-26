@@ -44,6 +44,9 @@ export default defineSchema({
     pendingSubmissionsCount: v.number(),
     lastSubmissionAt: v.optional(v.number()),
     totalTrades: v.optional(v.number()),
+    isVerified: v.optional(v.boolean()),
+    ratingAvg: v.optional(v.number()),
+    ratingCount: v.optional(v.number()),
     isShadowBanned: v.optional(v.boolean()),
     isBanned: v.optional(v.boolean()),
 
@@ -72,6 +75,9 @@ export default defineSchema({
     guardianEmail: v.optional(v.string()),
 
     // Sticker fields (PRD §4.3)
+    // Note: Convex has 8192 element array limit. Currently safe (album ~700 stickers).
+    // stickers.ts enforces MAX_STICKER_ARRAY_SIZE = 1000. If future albums exceed this,
+    // consider splitting into userStickers table with userId + stickerNumber index.
     duplicates: v.optional(v.array(v.number())),
     missing: v.optional(v.array(v.number())),
     albumProgress: v.optional(v.number()),
@@ -91,6 +97,8 @@ export default defineSchema({
     warningCount: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
 
+    coverUploadTimestamps: v.optional(v.array(v.number())),
+
     locationSource: v.optional(
       v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"))
     ),
@@ -106,7 +114,8 @@ export default defineSchema({
     .index("by_nickname", ["nickname"])
     .index("by_city", ["cityId"])
     .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"])
-    .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"]),
+    .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"])
+    .index("by_avatar_storage", ["avatarStorageId"]),
 
   cities: defineTable({
     name: v.string(),
@@ -169,12 +178,17 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_status_createdAt", ["status", "createdAt"])
     .index("by_requestedBy_status", ["requestedBy", "status"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .index("by_cover_storage", ["coverImageStorageId"]),
 
   userTradePoints: defineTable({
     userId: v.id("users"),
     tradePointId: v.id("tradePoints"),
     joinedAt: v.number(),
+    // Snapshot at join: lets getMyPoints render city without N+1 city fetch.
+    // Optional because pre-existing rows (pre-denorm) may lack it; reads fall back.
+    cityId: v.optional(v.id("cities")),
+    cityName: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
     .index("by_tradePoint", ["tradePointId"])
@@ -200,6 +214,11 @@ export default defineSchema({
     displayNickname: v.optional(v.string()),
     avatarSeed: v.optional(v.string()),
     duplicates: v.optional(v.array(v.number())),
+    userMissing: v.optional(v.array(v.number())),
+    albumCompletionPct: v.optional(v.number()),
+    totalTrades: v.optional(v.number()),
+    isPremium: v.optional(v.boolean()),
+    isVerified: v.optional(v.boolean()),
   })
     .index("by_tradePoint_active", ["tradePointId", "expiresAt"])
     .index("by_user", ["userId"])
@@ -272,6 +291,7 @@ export default defineSchema({
     .index("by_user_layer", ["userId", "layer"])
     .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])
     .index("by_user_point", ["userId", "tradePointId"])
+    .index("by_user_matched_point", ["userId", "matchedUserId", "tradePointId"])
     .index("by_matchedUser", ["matchedUserId"]),
 
   trades: defineTable({
@@ -285,16 +305,33 @@ export default defineSchema({
       v.literal("pending_confirmation"),
       v.literal("confirmed"),
       v.literal("cancelled"),
+      v.literal("declined"),
       v.literal("disputed"),
       v.literal("expired")
     ),
     createdAt: v.number(),
     confirmedAt: v.optional(v.number()),
+    declinedAt: v.optional(v.number()),
+    declineReason: v.optional(v.string()),
     disputedAt: v.optional(v.number()),
     disputeReason: v.optional(v.string()),
     expiredAt: v.optional(v.number()),
+    initiatorMessage: v.optional(v.string()),
+    // Snapshot at insert (refreshed at confirm). listMyTrades reads these to skip
+    // per-trade user/tradePoint fetches. Optional because pre-existing rows lack them.
+    initiatorDisplayNickname: v.optional(v.string()),
+    initiatorAvatarUrl: v.optional(v.string()),
+    initiatorTotalTrades: v.optional(v.number()),
+    initiatorReliabilityScore: v.optional(v.number()),
+    counterpartyDisplayNickname: v.optional(v.string()),
+    counterpartyAvatarUrl: v.optional(v.string()),
+    counterpartyTotalTrades: v.optional(v.number()),
+    counterpartyReliabilityScore: v.optional(v.number()),
+    tradePointName: v.optional(v.string()),
+    tradePointAddress: v.optional(v.string()),
   })
     .index("by_initiator_status", ["initiatorId", "status", "createdAt"])
+    .index("by_initiator_created", ["initiatorId", "createdAt"])
     .index("by_counterparty_status", ["counterpartyId", "status", "createdAt"])
     .index("by_tradePoint", ["tradePointId", "createdAt"])
     .index("by_pairKey_created", ["pairKey", "createdAt"])
@@ -324,16 +361,69 @@ export default defineSchema({
     author: v.object({
       name: v.string(),
       avatar: v.optional(v.string()),
+      role: v.optional(v.string()),
     }),
     seoTitle: v.optional(v.string()),
     seoDescription: v.optional(v.string()),
     publishedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    views: v.optional(v.number()),
+    isTrending: v.optional(v.boolean()),
+    titleHighlight: v.optional(v.string()),
+    // Series membership (optional). Episode number determines order within a series.
+    seriesId: v.optional(v.id("blogSeries")),
+    seriesEpisodeNumber: v.optional(v.number()),
+    // SEO/AEO structured data fields
+    products: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          sku: v.optional(v.string()),
+          price: v.number(),
+          priceCurrency: v.string(),
+          image: v.optional(v.string()),
+          description: v.optional(v.string()),
+          url: v.optional(v.string()),
+          availability: v.optional(v.string()),
+        })
+      )
+    ),
+    faqs: v.optional(
+      v.array(
+        v.object({
+          question: v.string(),
+          answer: v.string(),
+        })
+      )
+    ),
   })
     .index("by_slug", ["slug"])
     .index("by_status_publishedAt", ["status", "publishedAt"])
-    .index("by_category_status", ["category", "status"]),
+    .index("by_category_status", ["category", "status"])
+    .index("by_series_episode", ["seriesId", "seriesEpisodeNumber"]),
+
+  blogSeries: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    /** Number of episodes planned. Used to render "X / N" progress and upcoming slots. */
+    totalPlanned: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_isActive_createdAt", ["isActive", "createdAt"]),
+
+  newsletterSubscriptions: defineTable({
+    email: v.string(),
+    status: v.union(v.literal("active"), v.literal("unsubscribed")),
+    source: v.optional(v.string()),
+    createdAt: v.number(),
+    unsubscribedAt: v.optional(v.number()),
+  })
+    .index("by_email", ["email"])
+    .index("by_status_createdAt", ["status", "createdAt"]),
 
   reports: defineTable({
     reporterId: v.id("users"),
@@ -367,4 +457,35 @@ export default defineSchema({
     hardDeleteOversizedCount: v.optional(v.number()),
     lastReconcileAt: v.optional(v.number()),
   }),
+
+  postMetrics: defineTable({
+    postId: v.id("blogPosts"),
+    likes: v.number(),
+    saves: v.number(),
+    comments: v.number(),
+    // Public view counter. Lives here (not on blogPosts) to avoid write contention
+    // on the post doc when many viewers hit the page concurrently.
+    views: v.optional(v.number()),
+  })
+    .index("by_post", ["postId"])
+    .index("by_views", ["views"]),
+
+
+  postViewIdempotency: defineTable({
+    postId: v.id("blogPosts"),
+    key: v.string(),
+    at: v.number(),
+  })
+    .index("by_post_key", ["postId", "key"])
+    .index("by_post_at", ["postId", "at"])
+    .index("by_at", ["at"]),
+
+  postUserInteractions: defineTable({
+    postId: v.id("blogPosts"),
+    visitorId: v.string(),
+    liked: v.boolean(),
+    saved: v.boolean(),
+  })
+    .index("by_post_visitor", ["postId", "visitorId"])
+    .index("by_visitor", ["visitorId"]),
 });

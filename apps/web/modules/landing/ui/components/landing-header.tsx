@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Landmark, Menu } from "lucide-react";
+import { Menu, Trophy } from "lucide-react";
 import {
   Sheet,
   SheetTrigger,
@@ -27,7 +27,7 @@ export function LandingHeader() {
             className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dim shadow-logo-glow"
             aria-hidden="true"
           >
-            <Landmark
+            <Trophy
               className="size-5 text-[var(--on-primary)]"
               strokeWidth={2.5}
             />
@@ -92,7 +92,7 @@ export function LandingHeader() {
               <SheetTitle className="sr-only">Menu de navegacao</SheetTitle>
               <div className="p-6 border-b border-[var(--outline-variant)]">
                 <Link href="/" className="flex items-center gap-2">
-                  <Landmark className="text-[var(--primary)] w-6 h-6" />
+                  <Trophy className="text-[var(--primary)] w-6 h-6" />
                   <span className="font-[var(--font-headline)] font-bold text-lg text-[var(--primary)]">
                     Figurinha Fácil
                   </span>

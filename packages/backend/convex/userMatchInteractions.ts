@@ -63,7 +63,7 @@ export const getHiddenMatches = query({
       .withIndex("by_user_hidden", (q) =>
         q.eq("userId", user._id).eq("isHidden", true)
       )
-      .collect();
+      .take(500);
 
     return {
       hiddenPairs: hidden.map((h) => ({

@@ -7,12 +7,14 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import {
   checkAuth,
   getAuthenticatedUser,
   requireAdmin,
 } from "./lib/auth";
 import { isInBrazil } from "./lib/geo";
+import { rateLimiter } from "./lib/rateLimiter";
 import {
   EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
   REPORT_DEDUP_MS,
@@ -28,6 +30,15 @@ const NON_PUBLIC_TRADE_POINT_STATUSES = new Set<string>([
   "suspended",
   "inactive",
 ]);
+
+const ALLOWED_COVER_CONTENT_TYPES = new Set<string>([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+const MAX_COVER_SIZE_BYTES = 5 * 1024 * 1024;
+const COVER_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
+const COVER_UPLOAD_MAX_PER_WINDOW = 10;
 
 const getByIdWhatsappValidator = v.union(
   v.object({ state: v.literal("ok"), link: v.string() }),
@@ -200,22 +211,26 @@ export const getById = query({
       return { state: "not-found" as const };
     }
 
-    const city = await ctx.db.get(point.cityId);
     const now = Date.now();
 
-    const isParticipant = !!(await ctx.db
-      .query("userTradePoints")
-      .withIndex("by_user_point", (q) =>
-        q.eq("userId", user._id).eq("tradePointId", id)
-      )
-      .unique());
+    const [city, participantDoc, activeCheckin] = await Promise.all([
+      ctx.db.get(point.cityId),
+      ctx.db
+        .query("userTradePoints")
+        .withIndex("by_user_point", (q) =>
+          q.eq("userId", user._id).eq("tradePointId", id)
+        )
+        .unique(),
+      ctx.db
+        .query("checkins")
+        .withIndex("by_user_tradePoint_active", (q) =>
+          q.eq("userId", user._id).eq("tradePointId", id).gt("expiresAt", now)
+        )
+        .first(),
+    ]);
 
-    const hasActiveCheckin = !!(await ctx.db
-      .query("checkins")
-      .withIndex("by_user_tradePoint_active", (q) =>
-        q.eq("userId", user._id).eq("tradePointId", id).gt("expiresAt", now)
-      )
-      .first());
+    const isParticipant = !!participantDoc;
+    const hasActiveCheckin = !!activeCheckin;
 
     const whatsapp = isParticipant
       ? evaluateWhatsappAccess(user, point)
@@ -258,6 +273,17 @@ export const generateCoverUploadUrl = mutation({
     if (auth.state !== "ok") {
       throw new ConvexError(auth.state);
     }
+    const now = Date.now();
+    const cutoff = now - COVER_UPLOAD_WINDOW_MS;
+    const recent = (auth.user.coverUploadTimestamps ?? []).filter(
+      (t) => t >= cutoff
+    );
+    if (recent.length >= COVER_UPLOAD_MAX_PER_WINDOW) {
+      throw new ConvexError("rate-limited");
+    }
+    await ctx.db.patch(auth.user._id, {
+      coverUploadTimestamps: [...recent, now],
+    });
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -281,9 +307,14 @@ export const cancelPendingPoint = mutation({
     }
 
     const now = Date.now();
+    if (point.coverImageStorageId) {
+      await ctx.storage.delete(point.coverImageStorageId);
+    }
     await ctx.db.patch(tradePointId, {
       status: "cancelled",
       cancelledAt: now,
+      coverImageStorageId: undefined,
+      coverImageUrl: undefined,
     });
     await decrementPendingCount(ctx, user._id);
 
@@ -372,6 +403,17 @@ export const submitRequest = mutation({
     let coverImageStorageId: Id<"_storage"> | undefined;
     let coverImageUrl: string | undefined;
     if (args.coverStorageId) {
+      const metadata = await ctx.db.system.get(args.coverStorageId);
+      if (!metadata) {
+        return { ok: false as const, error: "invalid-cover" as const };
+      }
+      if (
+        !ALLOWED_COVER_CONTENT_TYPES.has(metadata.contentType ?? "") ||
+        metadata.size > MAX_COVER_SIZE_BYTES
+      ) {
+        await ctx.storage.delete(args.coverStorageId);
+        return { ok: false as const, error: "invalid-cover" as const };
+      }
       const url = await ctx.storage.getUrl(args.coverStorageId);
       if (!url) {
         return { ok: false as const, error: "invalid-cover" as const };
@@ -540,13 +582,23 @@ export const getBySlug = query({
   },
 });
 
+const SSG_MAX_SLUGS = 5000;
+const SSG_MAX_GROUPED = 2000;
+
+function assertSsgSecret(secret: string | undefined) {
+  const expected = process.env.SSG_SECRET;
+  if (!expected) throw new ConvexError("SSG_SECRET_NOT_CONFIGURED");
+  if (secret !== expected) throw new ConvexError("FORBIDDEN");
+}
+
 export const getAllApprovedSlugs = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { secret: v.string() },
+  handler: async (ctx, { secret }) => {
+    assertSsgSecret(secret);
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(15000);
+      .take(SSG_MAX_SLUGS);
 
     return points.map((p) => p.slug);
   },
@@ -555,6 +607,10 @@ export const getAllApprovedSlugs = query({
 export const listTopForSSG = query({
   args: {},
   handler: async (ctx) => {
+    const status = await rateLimiter.check(ctx, "publicTradePointsList", {
+      key: "global",
+    });
+    if (!status.ok) throw new ConvexError("rate-limited");
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
@@ -567,6 +623,10 @@ export const listTopForSSG = query({
 export const listTopByCity = query({
   args: { citySlug: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, { citySlug, limit }) => {
+    const status = await rateLimiter.check(ctx, "publicTradePointsList", {
+      key: "global",
+    });
+    if (!status.ok) throw new ConvexError("rate-limited");
     const city = await ctx.db
       .query("cities")
       .withIndex("by_slug", (q) => q.eq("slug", citySlug))
@@ -590,12 +650,13 @@ export const listTopByCity = query({
 });
 
 export const listApprovedGroupedByCity = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { secret: v.string() },
+  handler: async (ctx, { secret }) => {
+    assertSsgSecret(secret);
     const points = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(5000);
+      .take(SSG_MAX_GROUPED);
 
     const cityIds = [...new Set(points.map((p) => p.cityId))];
     const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));
@@ -643,10 +704,12 @@ export const listApprovedGroupedByCity = query({
 
 export const listApprovedForSitemapPage = query({
   args: {
+    secret: v.string(),
     cursor: v.optional(v.union(v.string(), v.null())),
     pageSize: v.optional(v.number()),
   },
-  handler: async (ctx, { cursor, pageSize }) => {
+  handler: async (ctx, { secret, cursor, pageSize }) => {
+    assertSsgSecret(secret);
     const size = Math.min(Math.max(pageSize ?? 5000, 1), 5000);
     const result = await ctx.db
       .query("tradePoints")
@@ -767,6 +830,61 @@ export const reconcileActiveCheckinsCount = internalMutation({
     }
 
     return { processed: page.page.length, drifts, rescheduled: false };
+  },
+});
+
+const ORPHAN_STORAGE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const ORPHAN_STORAGE_BATCH = 100;
+const ORPHAN_STORAGE_MAX_CHUNKS = 200;
+
+export const cleanupOrphanCoverStorage = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const cutoff = Date.now() - ORPHAN_STORAGE_TTL_MS;
+
+    const page = await ctx.db.system
+      .query("_storage")
+      .paginate({ numItems: ORPHAN_STORAGE_BATCH, cursor: cursor ?? null });
+
+    let deleted = 0;
+    for (const entry of page.page) {
+      if (entry._creationTime > cutoff) continue;
+      const [tpRef, userRef] = await Promise.all([
+        ctx.db
+          .query("tradePoints")
+          .withIndex("by_cover_storage", (q) =>
+            q.eq("coverImageStorageId", entry._id)
+          )
+          .first(),
+        ctx.db
+          .query("users")
+          .withIndex("by_avatar_storage", (q) =>
+            q.eq("avatarStorageId", entry._id)
+          )
+          .first(),
+      ]);
+      if (tpRef || userRef) continue;
+      await ctx.storage.delete(entry._id);
+      deleted += 1;
+    }
+
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.tradePoints.cleanupOrphanCoverStorage,
+      args: { cursor: page.continueCursor },
+      hasMore: !page.isDone,
+      chunk,
+      maxChunks: ORPHAN_STORAGE_MAX_CHUNKS,
+      label: "cleanupOrphanCoverStorage",
+    });
+
+    return {
+      deleted,
+      done: page.isDone,
+      aborted: tail.aborted ?? false,
+    };
   },
 });
 
