@@ -1,8 +1,11 @@
 import type { MetadataRoute } from "next";
+import type { FunctionReturnType } from "convex/server";
 import { cacheLife, cacheTag } from "next/cache";
 import { convexServer, api } from "@/lib/convex-server";
 
 const BASE_URL = "https://figurinhafacil.com.br";
+
+type BlogSitemapResult = FunctionReturnType<typeof api.blog.listForSitemap>;
 
 function getSsgSecret(): string {
   const secret = process.env.SSG_SECRET;
@@ -68,13 +71,12 @@ async function loadBlogForSitemap() {
   const all: Array<{ slug: string; updatedAt: number | undefined }> = [];
   let cursor: string | null = null;
   for (let i = 0; i < 20; i++) {
-    const result: {
-      page: Array<{ slug: string; updatedAt: number | undefined }>;
-      continueCursor: string;
-      isDone: boolean;
-    } = await convexServer.query(api.blog.listForSitemap, {
-      paginationOpts: { numItems: 1000, cursor },
-    });
+    const result: BlogSitemapResult = await convexServer.query(
+      api.blog.listForSitemap,
+      {
+        paginationOpts: { numItems: 1000, cursor },
+      }
+    );
     all.push(...result.page);
     if (result.isDone) break;
     cursor = result.continueCursor;
