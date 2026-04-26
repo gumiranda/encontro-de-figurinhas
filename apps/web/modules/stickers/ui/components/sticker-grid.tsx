@@ -127,6 +127,7 @@ type Props = {
   sectionCode: string;
   sectionStart: number;
   sectionEnd: number;
+  relStart?: number;
   duplicates: Set<number>;
   missing: Set<number>;
   onToggle: (num: number, action: "add" | "remove") => void;
@@ -137,6 +138,7 @@ function StickerGridBase({
   sectionCode,
   sectionStart,
   sectionEnd,
+  relStart = 1,
   duplicates,
   missing,
   onToggle,
@@ -279,7 +281,7 @@ function StickerGridBase({
   return (
     <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
       {sectionNumbers.map((num) => {
-        const relativeNum = num - sectionStart + 1;
+        const relativeNum = (num - sectionStart) + relStart;
         const state = getState(num);
         const label = `${sectionCode}-${relativeNum}`;
 

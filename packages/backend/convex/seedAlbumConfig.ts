@@ -47,6 +47,7 @@ interface RawSection {
   endNumber: number;
   flagEmoji?: string;
   isExtra?: boolean;
+  relStart?: number;
   stickers?: RawSticker[];
 }
 
@@ -88,6 +89,7 @@ export const seedAlbumConfig = mutation({
       endNumber: s.endNumber,
       isExtra: s.isExtra ?? false,
       flagEmoji: s.flagEmoji ?? "",
+      relStart: s.relStart,
       goldenNumbers: s.isExtra ? [] : defaultGolden(s.startNumber, s.endNumber),
       legendNumbers: [] as { number: number; name: string }[],
       stickerDetails: (s.stickers ?? []).map((st) => ({

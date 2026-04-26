@@ -139,6 +139,7 @@ export type SectionInfo = {
   endNumber: number;
   isExtra?: boolean;
   emoji?: string;
+  relStart?: number;
 };
 
 interface StickerSectionGroupProps {
@@ -161,6 +162,8 @@ function StickerSectionGroupBase({
   onBulkAction,
 }: StickerSectionGroupProps) {
   const totalCount = section.endNumber - section.startNumber + 1;
+  const relStart = section.relStart ?? 1;
+  const relEnd = relStart + totalCount - 1;
   const activeSet = mode === "duplicates" ? duplicatesSet : missingSet;
 
   const activeInSection = useMemo(() => {
@@ -212,7 +215,7 @@ function StickerSectionGroupBase({
               className={cn("h-5 w-7 shrink-0 rounded", getFlagGradient(section.code))}
             />
             <span className="font-headline text-md font-bold uppercase tracking-wider">
-              {section.name} · {section.startNumber} – {section.endNumber}
+              {section.name} · {relStart}–{relEnd}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -264,7 +267,7 @@ function StickerSectionGroupBase({
           <div className="flex items-center justify-between">
             <span className="font-headline text-md font-bold uppercase tracking-widest text-on-surface-variant">
               {section.emoji ? `${section.emoji} ` : ""}
-              {section.name} ({section.code}) · {section.startNumber}–{section.endNumber}
+              {section.name} ({section.code}) · {relStart}–{relEnd}
             </span>
             <span className="font-mono text-md text-outline">
               {activeInSection}/{totalCount}
@@ -406,7 +409,7 @@ function StickerSectionGroupBase({
           className={cn("grid gap-1.5", "grid-cols-5 md:grid-cols-10 xl:grid-cols-14")}
         >
           {numbers.map((num) => {
-            const relativeNum = num - section.startNumber + 1;
+            const relativeNum = (num - section.startNumber) + relStart;
             const isInDup = duplicatesSet.has(num);
             const isInMiss = missingSet.has(num);
 

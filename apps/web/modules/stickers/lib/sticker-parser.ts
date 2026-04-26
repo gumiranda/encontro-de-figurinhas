@@ -5,10 +5,11 @@ export type Section = {
   endNumber: number;
   isExtra?: boolean;
   flagEmoji?: string;
+  relStart?: number; // First relative number (default 1). FWC champions uses 9.
 };
 
 export type SectionLookup = {
-  byCode: Map<string, Section>;
+  byCode: Map<string, Section[]>;
   byIndex: Section[];
 };
 
@@ -24,14 +25,16 @@ export function buildSectionLookup(sections: Section[]): SectionLookup {
     ...s,
     code: s.code.toUpperCase(),
   }));
-  const byCode = new Map<string, Section>();
+  const byCode = new Map<string, Section[]>();
   const byIndex = [...normalized].sort((a, b) => a.startNumber - b.startNumber);
 
   for (const section of normalized) {
-    if (byCode.has(section.code)) {
-      console.warn(`Duplicate section code: ${section.code}`);
+    const existing = byCode.get(section.code);
+    if (existing) {
+      existing.push(section);
+    } else {
+      byCode.set(section.code, [section]);
     }
-    byCode.set(section.code, section);
   }
 
   for (let i = 1; i < byIndex.length; i++) {
@@ -93,42 +96,47 @@ type ParseEntryResult =
 function parseSingle(
   code: string,
   num: number,
-  codeMap: Map<string, Section>
+  codeMap: Map<string, Section[]>
 ): ParseEntryResult {
   if (!Number.isInteger(num)) {
     return { kind: "invalid", label: `${code}-${num}` };
   }
 
-  const section = codeMap.get(code);
-  if (!section) {
+  const sections = codeMap.get(code);
+  if (!sections || sections.length === 0) {
     return { kind: "invalid", label: `${code}-${num}` };
   }
 
-  const sectionSize = section.endNumber - section.startNumber + 1;
-  if (num < 1 || num > sectionSize) {
-    return { kind: "invalid", label: `${code}-${num}` };
+  // Find section where num fits within its relative range
+  for (const section of sections) {
+    const relStart = section.relStart ?? 1;
+    const sectionSize = section.endNumber - section.startNumber + 1;
+    const relEnd = relStart + sectionSize - 1;
+    if (num >= relStart && num <= relEnd) {
+      const absoluteNum = section.startNumber + (num - relStart);
+      return {
+        kind: "ok",
+        valid: [absoluteNum],
+        formatted: `${code}-${num}`,
+      };
+    }
   }
 
-  const absoluteNum = section.startNumber + num - 1;
-  return {
-    kind: "ok",
-    valid: [absoluteNum],
-    formatted: `${code}-${num}`,
-  };
+  return { kind: "invalid", label: `${code}-${num}` };
 }
 
 function parseRange(
   code: string,
   start: number,
   end: number,
-  codeMap: Map<string, Section>
+  codeMap: Map<string, Section[]>
 ): ParseEntryResult {
   if (!Number.isInteger(start) || !Number.isInteger(end)) {
     return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
-  const section = codeMap.get(code);
-  if (!section) {
+  const sections = codeMap.get(code);
+  if (!sections || sections.length === 0) {
     return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
@@ -136,20 +144,25 @@ function parseRange(
     return { kind: "invalid", label: `${code}-${start}-${end}` };
   }
 
-  const sectionSize = section.endNumber - section.startNumber + 1;
-  if (start < 1 || end > sectionSize) {
-    return { kind: "invalid", label: `${code}-${start}-${end}` };
+  // Find section where range fits
+  for (const section of sections) {
+    const relStart = section.relStart ?? 1;
+    const sectionSize = section.endNumber - section.startNumber + 1;
+    const relEnd = relStart + sectionSize - 1;
+    if (start >= relStart && end <= relEnd) {
+      const numbers: number[] = [];
+      for (let i = start; i <= end; i++) {
+        numbers.push(section.startNumber + (i - relStart));
+      }
+
+      const formatted =
+        start === end ? `${code}-${start}` : `${code}-${start} a ${code}-${end}`;
+
+      return { kind: "ok", valid: numbers, formatted };
+    }
   }
 
-  const numbers: number[] = [];
-  for (let i = start; i <= end; i++) {
-    numbers.push(section.startNumber + i - 1);
-  }
-
-  const formatted =
-    start === end ? `${code}-${start}` : `${code}-${start} a ${code}-${end}`;
-
-  return { kind: "ok", valid: numbers, formatted };
+  return { kind: "invalid", label: `${code}-${start}-${end}` };
 }
 
 function parseGlobalSingle(
@@ -196,7 +209,7 @@ function parseGlobalRange(
 
 function parseEntry(
   entry: string,
-  codeMap: Map<string, Section>,
+  codeMap: Map<string, Section[]>,
   totalStickers: number
 ): ParseEntryResult {
   const originalEntry = entry.trim();
@@ -316,7 +329,8 @@ export type StickerDisplay = {
 };
 
 export function getRelativeNum(num: number, section: Section): number {
-  return num - section.startNumber + 1;
+  const relStart = section.relStart ?? 1;
+  return (num - section.startNumber) + relStart;
 }
 
 export function formatStickerNumber(

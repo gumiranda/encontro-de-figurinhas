@@ -18,6 +18,7 @@ type Section = {
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
+  relStart?: number;
 };
 
 type Props = {
@@ -135,6 +136,7 @@ export function SectionAccordion({
                   sectionCode={section.code}
                   sectionStart={section.startNumber}
                   sectionEnd={section.endNumber}
+                  relStart={section.relStart}
                   duplicates={duplicatesSet}
                   missing={missingSet}
                   onToggle={onToggle}

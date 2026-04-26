@@ -283,6 +283,7 @@ export default defineSchema({
         endNumber: v.number(),
         isExtra: v.optional(v.boolean()),
         flagEmoji: v.optional(v.string()),
+        relStart: v.optional(v.number()), // First relative number (default 1). FWC champions uses 9.
         goldenNumbers: v.optional(v.array(v.number())),
         legendNumbers: v.optional(
           v.array(

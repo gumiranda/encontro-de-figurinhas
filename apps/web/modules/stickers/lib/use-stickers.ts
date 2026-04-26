@@ -372,16 +372,18 @@ export function useStickers(debounceMs = 300) {
     };
   }, []);
 
-  function findSection(sectionCode: string): Section | undefined {
-    return sectionLookup.byCode.get(sectionCode.toUpperCase());
+  function findSections(sectionCode: string): Section[] {
+    return sectionLookup.byCode.get(sectionCode.toUpperCase()) ?? [];
   }
 
   function getSectionNumbers(sectionCode: string): number[] {
-    const section = findSection(sectionCode);
-    if (!section) return [];
+    const sections = findSections(sectionCode);
+    if (sections.length === 0) return [];
     const numbers: number[] = [];
-    for (let i = section.startNumber; i <= section.endNumber; i++) {
-      numbers.push(i);
+    for (const section of sections) {
+      for (let i = section.startNumber; i <= section.endNumber; i++) {
+        numbers.push(i);
+      }
     }
     return numbers;
   }
@@ -398,11 +400,11 @@ export function useStickers(debounceMs = 300) {
 
   const clearSection = useCallback(
     (sectionCode: string, mode: ListKind) => {
-      const section = findSection(sectionCode);
-      if (!section) return;
+      const sections = findSections(sectionCode);
+      if (sections.length === 0) return;
 
       applyListUpdate(mode, (prev) =>
-        prev.filter((n) => n < section.startNumber || n > section.endNumber)
+        prev.filter((n) => !sections.some((s) => n >= s.startNumber && n <= s.endNumber))
       );
     },
     [sectionLookup, applyListUpdate]
@@ -410,14 +412,14 @@ export function useStickers(debounceMs = 300) {
 
   const invertSection = useCallback(
     (sectionCode: string, mode: ListKind) => {
-      const section = findSection(sectionCode);
-      if (!section) return;
+      const sections = findSections(sectionCode);
+      if (sections.length === 0) return;
 
       const sectionNumbers = getSectionNumbers(sectionCode);
       applyListUpdate(mode, (currentList) => {
         const currentSet = new Set(currentList);
         const newList = currentList.filter(
-          (n) => n < section.startNumber || n > section.endNumber
+          (n) => !sections.some((s) => n >= s.startNumber && n <= s.endNumber)
         );
         for (const num of sectionNumbers) {
           if (!currentSet.has(num)) {
