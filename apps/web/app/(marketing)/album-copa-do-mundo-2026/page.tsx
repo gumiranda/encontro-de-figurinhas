@@ -29,6 +29,7 @@ import {
   generateCombinedSchema,
   generateFAQSchema,
   generateCollectionPageSchema,
+  generateSportsEventSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -170,43 +171,12 @@ const articleSchema = {
 
 const collectionPageSchema = generateCollectionPageSchema();
 
-const sportsEventSchema = {
-  "@context": "https://schema.org",
-  "@type": "SportsEvent",
-  name: "Copa do Mundo FIFA 2026",
-  description:
-    "A Copa do Mundo FIFA 2026 é o primeiro Mundial com 48 seleções, sediado nos Estados Unidos, México e Canadá.",
-  startDate: "2026-06-11",
-  endDate: "2026-07-19",
-  eventStatus: "https://schema.org/EventScheduled",
-  image: `${BASE_URL}/opengraph-image`,
-  location: [
-    {
-      "@type": "Place",
-      name: "Estados Unidos, México e Canadá",
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: ["US", "MX", "CA"],
-      },
-    },
-  ],
-  organizer: {
-    "@type": "Organization",
-    name: "FIFA",
-    url: "https://www.fifa.com",
-  },
-  performer: {
-    "@type": "SportsTeam",
-    name: "48 seleções classificadas",
-  },
-};
-
 const combinedSchema = generateCombinedSchema([
   articleSchema,
   breadcrumbSchema,
   faqSchema,
   collectionPageSchema,
-  sportsEventSchema,
+  generateSportsEventSchema(),
 ]);
 
 const quickFacts = [

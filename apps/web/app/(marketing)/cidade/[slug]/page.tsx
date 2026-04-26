@@ -8,6 +8,7 @@ import {
   generateCombinedSchema,
   generatePlaceSchema,
   generateSpeakableSchema,
+  generateSportsEventSchema,
 } from "@/lib/seo";
 import { stateCodeToName, stateCodeToSlug } from "@/lib/states";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
@@ -125,7 +126,7 @@ export default async function CityPage({ params }: CityPageProps) {
     ".prose ol",
   ]);
 
-  const schemas = [breadcrumbSchema, placeSchema, speakableSchema];
+  const schemas = [breadcrumbSchema, placeSchema, speakableSchema, generateSportsEventSchema()];
   if (itemListSchema) schemas.push(itemListSchema);
   const combinedSchema = generateCombinedSchema(schemas);
 

@@ -51,6 +51,7 @@ import {
   generateTradePointPlaceSchema,
   generateSpeakableSchema,
   generateCombinedSchema,
+  generateSportsEventSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -144,6 +145,7 @@ export default async function PontoPage({ params }: PontoPageProps) {
     breadcrumbSchema,
     placeSchema,
     speakableSchema,
+    generateSportsEventSchema(),
   ]);
 
   const shareUrl = `${BASE_URL}/ponto/${slug}`;

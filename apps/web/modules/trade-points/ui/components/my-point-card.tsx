@@ -422,7 +422,10 @@ function WhoBlock({
   );
 }
 
-const HOUR_LABELS = ["10h", "12h", "14h", "agora", "18h", "20h", "22h"];
+const HOUR_LABELS = Array.from(
+  { length: 12 },
+  (_, i) => `${(i * 2).toString().padStart(2, "0")}h`
+);
 
 function Heatmap12({ buckets }: { buckets: number[] }) {
   const max = useMemo(() => Math.max(1, ...buckets), [buckets]);
@@ -468,9 +471,11 @@ function Heatmap12({ buckets }: { buckets: number[] }) {
           );
         })}
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[0.55rem] text-outline">
+      <div className="mt-1 grid grid-cols-12 gap-0.5 font-mono text-[0.55rem] text-outline">
         {HOUR_LABELS.map((l) => (
-          <span key={l}>{l}</span>
+          <span key={l} className="text-center">
+            {l}
+          </span>
         ))}
       </div>
     </div>
