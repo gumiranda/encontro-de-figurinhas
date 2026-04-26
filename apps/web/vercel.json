@@ -1,15 +1,1 @@
-{
-  "redirects": [
-    {
-      "source": "/:path(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.figurinhafacil.com.br"
-        }
-      ],
-      "destination": "https://figurinhafacil.com.br/:path",
-      "permanent": true
-    }
-  ]
-}
+{}
