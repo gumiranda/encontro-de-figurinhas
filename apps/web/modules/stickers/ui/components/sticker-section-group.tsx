@@ -37,21 +37,96 @@ const EXT_PLAYERS = [
   { short: "Pulisic", name: "Christian Pulisic" },
   { short: "Valverde", name: "Federico Valverde" },
 ];
-const EXT_VARIANTS = ["Base", "Bronze", "Prata", "Ouro"];
-const EXT_VARIANT_SUFFIX = ["", "🥉", "🥈", "🥇"]; // base, bronze, prata, ouro
 
-function getExtStickerInfo(relativeNum: number): { displayLabel: string; playerName: string } | null {
+type ExtVariant = "base" | "bronze" | "prata" | "ouro";
+
+const EXT_VARIANT_CONFIG: Record<ExtVariant, {
+  label: string;
+  subtitle: string;
+  icon: string;
+  gradient: string;
+  border: string;
+  textColor: string;
+}> = {
+  ouro: {
+    label: "OURO",
+    subtitle: "ULTRA-RARAS",
+    icon: "★",
+    gradient: "bg-gradient-to-br from-yellow-500/30 via-amber-600/20 to-yellow-700/30",
+    border: "border-yellow-500/50",
+    textColor: "text-yellow-400",
+  },
+  prata: {
+    label: "PRATA",
+    subtitle: "RARAS",
+    icon: "◆",
+    gradient: "bg-gradient-to-br from-slate-300/20 via-gray-400/15 to-slate-500/20",
+    border: "border-slate-400/50",
+    textColor: "text-slate-300",
+  },
+  bronze: {
+    label: "BRONZE",
+    subtitle: "ESPECIAIS",
+    icon: "●",
+    gradient: "bg-gradient-to-br from-orange-700/25 via-amber-800/20 to-orange-900/25",
+    border: "border-orange-600/50",
+    textColor: "text-orange-400",
+  },
+  base: {
+    label: "ROXA",
+    subtitle: "REGULARES RARAS",
+    icon: "✦",
+    gradient: "bg-gradient-to-br from-purple-600/25 via-violet-700/20 to-purple-800/25",
+    border: "border-purple-500/50",
+    textColor: "text-purple-400",
+  },
+};
+
+// Order for display: ouro first (most rare), then prata, bronze, base
+const EXT_VARIANT_ORDER: ExtVariant[] = ["ouro", "prata", "bronze", "base"];
+
+function getExtStickerInfo(relativeNum: number): {
+  displayLabel: string;
+  playerName: string;
+  variant: ExtVariant;
+  playerShort: string;
+} | null {
   if (relativeNum < 1 || relativeNum > 80) return null;
   const playerIdx = Math.floor((relativeNum - 1) / 4);
   const variantIdx = (relativeNum - 1) % 4;
   const player = EXT_PLAYERS[playerIdx];
-  const variant = EXT_VARIANTS[variantIdx];
-  const suffix = EXT_VARIANT_SUFFIX[variantIdx] ?? "";
+  const variants: ExtVariant[] = ["base", "bronze", "prata", "ouro"];
+  const variant = variants[variantIdx];
   if (!player || !variant) return null;
   return {
-    displayLabel: suffix ? `${player.short}${suffix}` : player.short,
-    playerName: `${player.name} (${variant})`,
+    displayLabel: player.short,
+    playerName: `${player.name} (${variant.charAt(0).toUpperCase() + variant.slice(1)})`,
+    variant,
+    playerShort: player.short,
   };
+}
+
+// Group EXT stickers by variant
+function groupExtByVariant(
+  startNumber: number,
+  endNumber: number
+): Record<ExtVariant, number[]> {
+  const groups: Record<ExtVariant, number[]> = {
+    ouro: [],
+    prata: [],
+    bronze: [],
+    base: [],
+  };
+
+  for (let num = startNumber; num <= endNumber; num++) {
+    const relativeNum = num - startNumber + 1;
+    const info = getExtStickerInfo(relativeNum);
+    if (info) {
+      groups[info.variant].push(num);
+    }
+  }
+
+  return groups;
 }
 
 export type SectionInfo = {
@@ -98,6 +173,12 @@ function StickerSectionGroupBase({
     for (let n = section.startNumber; n <= section.endNumber; n++) arr.push(n);
     return arr;
   }, [section.startNumber, section.endNumber]);
+
+  const isExt = section.code === "EXT";
+  const extGroups = useMemo(() => {
+    if (!isExt) return null;
+    return groupExtByVariant(section.startNumber, section.endNumber);
+  }, [isExt, section.startNumber, section.endNumber]);
 
   const handleTileClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -190,40 +271,126 @@ function StickerSectionGroupBase({
         </header>
       )}
 
-      <div
-        className={cn(
-          "grid gap-1.5",
-          "grid-cols-5 md:grid-cols-10 xl:grid-cols-14"
-        )}
-      >
-        {numbers.map((num) => {
-          const relativeNum = num - section.startNumber + 1;
-          const isInDup = duplicatesSet.has(num);
-          const isInMiss = missingSet.has(num);
+      {/* EXT section: grouped by variant with special styling */}
+      {isExt && extGroups ? (
+        <div className="space-y-4">
+          {EXT_VARIANT_ORDER.map((variantKey) => {
+            const nums = extGroups[variantKey];
+            const config = EXT_VARIANT_CONFIG[variantKey];
+            const activeInVariant = nums.filter((n) => activeSet.has(n)).length;
 
-          let state: TileState = "none";
-          if (mode === "duplicates" && isInMiss) state = "blocked";
-          else if (mode === "missing" && isInDup) state = "blocked";
-          else if (isInDup) state = "have";
-          else if (isInMiss) state = "need";
+            return (
+              <div key={variantKey} className="space-y-2">
+                {/* Variant header */}
+                <div className="flex items-center gap-2">
+                  <span className={cn("text-sm font-bold", config.textColor)}>
+                    {config.icon} {config.label} · {config.subtitle}
+                  </span>
+                  <div className="flex-1 h-px bg-outline-variant/30" />
+                  <span className="text-xs text-muted-foreground">
+                    {activeInVariant}/{nums.length} figurinhas
+                  </span>
+                </div>
 
-          // For EXT section, show player initials instead of number
-          const extInfo = section.code === "EXT" ? getExtStickerInfo(relativeNum) : null;
+                {/* Variant grid */}
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                  {nums.map((num) => {
+                    const relativeNum = num - section.startNumber + 1;
+                    const extInfo = getExtStickerInfo(relativeNum);
+                    const isInDup = duplicatesSet.has(num);
+                    const isInMiss = missingSet.has(num);
 
-          return (
-            <StickerTile
-              key={num}
-              num={num}
-              relativeNum={relativeNum}
-              sectionCode={section.code}
-              state={state}
-              displayLabel={extInfo?.displayLabel}
-              playerName={extInfo?.playerName}
-              onClick={handleTileClick}
-            />
-          );
-        })}
-      </div>
+                    let state: TileState = "none";
+                    if (mode === "duplicates" && isInMiss) state = "blocked";
+                    else if (mode === "missing" && isInDup) state = "blocked";
+                    else if (isInDup) state = "have";
+                    else if (isInMiss) state = "need";
+
+                    const isActive = state === "have" || state === "need";
+
+                    return (
+                      <button
+                        key={num}
+                        type="button"
+                        data-sticker-num={num}
+                        onClick={handleTileClick}
+                        disabled={state === "blocked"}
+                        title={extInfo?.playerName}
+                        className={cn(
+                          "relative aspect-[3/4] rounded-lg border-2 p-1.5 transition-all duration-200",
+                          "flex flex-col items-start justify-between overflow-hidden",
+                          config.gradient,
+                          state === "blocked"
+                            ? "opacity-40 cursor-not-allowed border-muted"
+                            : isActive
+                              ? cn(config.border, "ring-2 ring-offset-1 ring-offset-background",
+                                  state === "have" ? "ring-emerald-500" : "ring-rose-500")
+                              : cn(config.border, "hover:scale-105 hover:shadow-lg cursor-pointer")
+                        )}
+                      >
+                        {/* Player name */}
+                        <span className={cn(
+                          "text-[10px] font-bold truncate w-full text-left",
+                          config.textColor
+                        )}>
+                          {extInfo?.playerShort}
+                        </span>
+
+                        {/* Sparkle decorations */}
+                        <span className="absolute top-2 right-1.5 text-[6px] opacity-60">✦</span>
+                        <span className="absolute bottom-4 right-2 text-[5px] opacity-40">✦</span>
+
+                        {/* State indicator */}
+                        {isActive && (
+                          <span className={cn(
+                            "absolute bottom-1 left-1 text-[8px] font-bold px-1 rounded",
+                            state === "have"
+                              ? "bg-emerald-500/80 text-white"
+                              : "bg-rose-500/80 text-white"
+                          )}>
+                            {state === "have" ? "✓" : "+"}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Regular section grid */
+        <div
+          className={cn(
+            "grid gap-1.5",
+            "grid-cols-5 md:grid-cols-10 xl:grid-cols-14"
+          )}
+        >
+          {numbers.map((num) => {
+            const relativeNum = num - section.startNumber + 1;
+            const isInDup = duplicatesSet.has(num);
+            const isInMiss = missingSet.has(num);
+
+            let state: TileState = "none";
+            if (mode === "duplicates" && isInMiss) state = "blocked";
+            else if (mode === "missing" && isInDup) state = "blocked";
+            else if (isInDup) state = "have";
+            else if (isInMiss) state = "need";
+
+            return (
+              <StickerTile
+                key={num}
+                num={num}
+                relativeNum={relativeNum}
+                sectionCode={section.code}
+                state={state}
+                onClick={handleTileClick}
+              />
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

@@ -32,21 +32,94 @@ const EXT_PLAYERS = [
   { short: "Pulisic", name: "Christian Pulisic" },
   { short: "Valverde", name: "Federico Valverde" },
 ];
-const EXT_VARIANTS = ["Base", "Bronze", "Prata", "Ouro"];
-const EXT_VARIANT_SUFFIX = ["", "🥉", "🥈", "🥇"];
 
-function getExtStickerInfo(relativeNum: number): { displayLabel: string; playerName: string } | null {
+type ExtVariant = "base" | "bronze" | "prata" | "ouro";
+
+const EXT_VARIANT_CONFIG: Record<ExtVariant, {
+  label: string;
+  subtitle: string;
+  icon: string;
+  gradient: string;
+  border: string;
+  textColor: string;
+}> = {
+  ouro: {
+    label: "OURO",
+    subtitle: "ULTRA-RARAS",
+    icon: "★",
+    gradient: "bg-gradient-to-br from-yellow-500/30 via-amber-600/20 to-yellow-700/30",
+    border: "border-yellow-500/50",
+    textColor: "text-yellow-400",
+  },
+  prata: {
+    label: "PRATA",
+    subtitle: "RARAS",
+    icon: "◆",
+    gradient: "bg-gradient-to-br from-slate-300/20 via-gray-400/15 to-slate-500/20",
+    border: "border-slate-400/50",
+    textColor: "text-slate-300",
+  },
+  bronze: {
+    label: "BRONZE",
+    subtitle: "ESPECIAIS",
+    icon: "●",
+    gradient: "bg-gradient-to-br from-orange-700/25 via-amber-800/20 to-orange-900/25",
+    border: "border-orange-600/50",
+    textColor: "text-orange-400",
+  },
+  base: {
+    label: "ROXA",
+    subtitle: "REGULARES RARAS",
+    icon: "✦",
+    gradient: "bg-gradient-to-br from-purple-600/25 via-violet-700/20 to-purple-800/25",
+    border: "border-purple-500/50",
+    textColor: "text-purple-400",
+  },
+};
+
+const EXT_VARIANT_ORDER: ExtVariant[] = ["ouro", "prata", "bronze", "base"];
+
+function getExtStickerInfo(relativeNum: number): {
+  displayLabel: string;
+  playerName: string;
+  variant: ExtVariant;
+  playerShort: string;
+} | null {
   if (relativeNum < 1 || relativeNum > 80) return null;
   const playerIdx = Math.floor((relativeNum - 1) / 4);
   const variantIdx = (relativeNum - 1) % 4;
   const player = EXT_PLAYERS[playerIdx];
-  const variant = EXT_VARIANTS[variantIdx];
-  const suffix = EXT_VARIANT_SUFFIX[variantIdx] ?? "";
+  const variants: ExtVariant[] = ["base", "bronze", "prata", "ouro"];
+  const variant = variants[variantIdx];
   if (!player || !variant) return null;
   return {
-    displayLabel: suffix ? `${player.short}${suffix}` : player.short,
-    playerName: `${player.name} (${variant})`,
+    displayLabel: player.short,
+    playerName: `${player.name} (${variant.charAt(0).toUpperCase() + variant.slice(1)})`,
+    variant,
+    playerShort: player.short,
   };
+}
+
+function groupExtByVariant(
+  sectionStart: number,
+  sectionEnd: number
+): Record<ExtVariant, number[]> {
+  const groups: Record<ExtVariant, number[]> = {
+    ouro: [],
+    prata: [],
+    bronze: [],
+    base: [],
+  };
+
+  for (let num = sectionStart; num <= sectionEnd; num++) {
+    const relativeNum = num - sectionStart + 1;
+    const info = getExtStickerInfo(relativeNum);
+    if (info) {
+      groups[info.variant].push(num);
+    }
+  }
+
+  return groups;
 }
 
 type Props = {
@@ -111,20 +184,107 @@ function StickerGridBase({
 
   const isExt = sectionCode === "EXT";
 
+  const extGroups = useMemo(() => {
+    if (!isExt) return null;
+    return groupExtByVariant(sectionStart, sectionEnd);
+  }, [isExt, sectionStart, sectionEnd]);
+
+  // For EXT section, render variant-grouped display
+  if (isExt && extGroups) {
+    return (
+      <div className="space-y-4">
+        {EXT_VARIANT_ORDER.map((variantKey) => {
+          const nums = extGroups[variantKey];
+          const config = EXT_VARIANT_CONFIG[variantKey];
+          const activeInVariant = nums.filter((n) =>
+            mode === "duplicates" ? duplicates.has(n) : missing.has(n)
+          ).length;
+
+          return (
+            <div key={variantKey} className="space-y-2">
+              {/* Variant header */}
+              <div className="flex items-center gap-2">
+                <span className={cn("text-sm font-bold", config.textColor)}>
+                  {config.icon} {config.label} · {config.subtitle}
+                </span>
+                <div className="flex-1 h-px bg-outline-variant/30" />
+                <span className="text-xs text-muted-foreground">
+                  {activeInVariant}/{nums.length}
+                </span>
+              </div>
+
+              {/* Variant grid */}
+              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-2">
+                {nums.map((num) => {
+                  const relativeNum = num - sectionStart + 1;
+                  const extInfo = getExtStickerInfo(relativeNum);
+                  const state = getState(num);
+                  const isActive = state === "duplicate" || state === "missing";
+
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      data-sticker-num={num}
+                      onClick={state !== "blocked" ? handleStickerButtonClick : undefined}
+                      disabled={state === "blocked"}
+                      title={extInfo?.playerName}
+                      className={cn(
+                        "relative aspect-[3/4] rounded-lg border-2 p-1.5 transition-all duration-200",
+                        "flex flex-col items-start justify-between overflow-hidden",
+                        config.gradient,
+                        state === "blocked"
+                          ? "opacity-40 cursor-not-allowed border-muted"
+                          : isActive
+                            ? cn(config.border, "ring-2 ring-offset-1 ring-offset-background",
+                                state === "duplicate" ? "ring-emerald-500" : "ring-rose-500")
+                            : cn(config.border, "hover:scale-105 hover:shadow-lg cursor-pointer")
+                      )}
+                    >
+                      {/* Player name */}
+                      <span className={cn(
+                        "text-[10px] font-bold truncate w-full text-left",
+                        config.textColor
+                      )}>
+                        {extInfo?.playerShort}
+                      </span>
+
+                      {/* Sparkle decorations */}
+                      <span className="absolute top-2 right-1.5 text-[6px] opacity-60">✦</span>
+                      <span className="absolute bottom-4 right-2 text-[5px] opacity-40">✦</span>
+
+                      {/* State indicator */}
+                      {isActive && (
+                        <span className={cn(
+                          "absolute bottom-1 left-1 text-[8px] font-bold px-1 rounded",
+                          state === "duplicate"
+                            ? "bg-emerald-500/80 text-white"
+                            : "bg-rose-500/80 text-white"
+                        )}>
+                          {state === "duplicate" ? "✓" : "+"}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Regular section: flat grid
   return (
     <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
       {sectionNumbers.map((num) => {
         const relativeNum = num - sectionStart + 1;
         const state = getState(num);
-
-        // For EXT section, show player name instead of number
-        const extInfo = isExt ? getExtStickerInfo(relativeNum) : null;
-        const displayText = extInfo?.displayLabel ?? String(relativeNum);
-        const tooltipName = extInfo?.playerName;
+        const label = `${sectionCode}-${relativeNum}`;
 
         const buttonClasses = cn(
-          "h-10 w-full rounded-lg font-bold transition-transform duration-150 active:scale-[0.96]",
-          isExt ? "text-[10px] px-0.5" : "text-sm",
+          "h-10 w-full rounded-lg font-bold text-sm transition-transform duration-150 active:scale-[0.96]",
           {
             "bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500":
               state === "duplicate",
@@ -137,8 +297,6 @@ function StickerGridBase({
           }
         );
 
-        const label = tooltipName ?? `${sectionCode}-${relativeNum}`;
-
         if (state === "blocked") {
           return (
             <Tooltip key={num}>
@@ -150,12 +308,11 @@ function StickerGridBase({
                   aria-label={`Figurinha ${label}, bloqueada`}
                   title={label}
                 >
-                  {displayText}
+                  {relativeNum}
                 </button>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">
-                  {tooltipName && <span className="font-medium">{tooltipName}<br /></span>}
                   Já está em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
                   <br />
                   Remova de lá primeiro.
@@ -176,7 +333,7 @@ function StickerGridBase({
             aria-label={`Figurinha ${label}`}
             title={label}
           >
-            {displayText}
+            {relativeNum}
           </button>
         );
       })}
