@@ -67,16 +67,32 @@ async function syncActiveCheckinsStickerSnapshot(
   await Promise.all(needsPatch.map((c) => ctx.db.patch(c._id, denorm)));
 }
 
+type AlbumSection = Doc<"albumConfig">["sections"][number];
+
+/**
+ * Seções legadas (ex.: adminSeed sem `relStart`) ainda têm `stickerDetails` com `rel` correto;
+ * espelha a lógica de seedAlbumConfig/seedStickerDetails para a UI e o parser.
+ */
+function withResolvedRelStart(section: AlbumSection): AlbumSection {
+  if (section.relStart != null) return section;
+  const details = section.stickerDetails;
+  if (!details?.length) return section;
+  const minRel = Math.min(...details.map((d) => d.rel));
+  if (minRel <= 1) return section;
+  return { ...section, relStart: minRel };
+}
+
 export const getUserStickers = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
 
     const albumConfig = await ctx.db.query("albumConfig").first();
+    const rawSections = albumConfig?.sections ?? [];
     return {
       duplicates: user.duplicates ?? [],
       missing: user.missing ?? [],
-      sections: albumConfig?.sections ?? [],
+      sections: rawSections.map(withResolvedRelStart),
       totalStickers: albumConfig?.totalStickers ?? DEFAULT_TOTAL_STICKERS,
     };
   },

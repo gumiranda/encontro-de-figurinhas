@@ -92,23 +92,35 @@ export const seedAlbum = mutation({
 
     const existing = await ctx.db.query("albumConfig").first();
 
-    // Process sections
-    const sections = albumData.sections.map((s: { code: string; name: string; startNumber: number; endNumber: number; flagEmoji?: string; isExtra?: boolean; stickers?: Array<{ rel: number; name: string; type?: string; variant?: string }> }) => ({
-      name: s.name,
-      code: s.code,
-      startNumber: s.startNumber,
-      endNumber: s.endNumber,
-      isExtra: s.isExtra ?? false,
-      flagEmoji: s.flagEmoji ?? "",
-      goldenNumbers: s.isExtra ? [] : [s.startNumber + 9, s.endNumber],
-      legendNumbers: [] as { number: number; name: string }[],
-      stickerDetails: (s.stickers ?? []).map((st) => ({
-        rel: st.rel,
-        name: st.name.slice(0, 100),
-        type: st.type as "escudo" | "player" | "team_photo" | "special" | undefined,
-        variant: st.variant as "base" | "bronze" | "prata" | "ouro" | undefined,
-      })),
-    }));
+    // Process sections (include relStart for non-contiguous rel ranges, e.g. second FWC "Campeões" 969–979 → 9–19)
+    const sections = albumData.sections.map(
+      (s: {
+        code: string;
+        name: string;
+        startNumber: number;
+        endNumber: number;
+        flagEmoji?: string;
+        isExtra?: boolean;
+        relStart?: number;
+        stickers?: Array<{ rel: number; name: string; type?: string; variant?: string }>;
+      }) => ({
+        name: s.name,
+        code: s.code,
+        startNumber: s.startNumber,
+        endNumber: s.endNumber,
+        isExtra: s.isExtra ?? false,
+        flagEmoji: s.flagEmoji ?? "",
+        relStart: s.relStart,
+        goldenNumbers: s.isExtra ? [] : [s.startNumber + 9, s.endNumber],
+        legendNumbers: [] as { number: number; name: string }[],
+        stickerDetails: (s.stickers ?? []).map((st) => ({
+          rel: st.rel,
+          name: st.name.slice(0, 100),
+          type: st.type as "escudo" | "player" | "team_photo" | "special" | undefined,
+          variant: st.variant as "base" | "bronze" | "prata" | "ouro" | undefined,
+        })),
+      })
+    );
 
     if (existing) {
       await ctx.db.patch(existing._id, {
