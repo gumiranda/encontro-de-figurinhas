@@ -52,4 +52,11 @@ crons.cron(
   {}
 );
 
+crons.cron(
+  "prune blog view idempotency",
+  "0 1 * * *",
+  internal.blog.pruneViewIdempotency,
+  {}
+);
+
 export default crons;

@@ -114,7 +114,8 @@ export default defineSchema({
     .index("by_nickname", ["nickname"])
     .index("by_city", ["cityId"])
     .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"])
-    .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"]),
+    .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"])
+    .index("by_avatar_storage", ["avatarStorageId"]),
 
   cities: defineTable({
     name: v.string(),
@@ -177,12 +178,17 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_status_createdAt", ["status", "createdAt"])
     .index("by_requestedBy_status", ["requestedBy", "status"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .index("by_cover_storage", ["coverImageStorageId"]),
 
   userTradePoints: defineTable({
     userId: v.id("users"),
     tradePointId: v.id("tradePoints"),
     joinedAt: v.number(),
+    // Snapshot at join: lets getMyPoints render city without N+1 city fetch.
+    // Optional because pre-existing rows (pre-denorm) may lack it; reads fall back.
+    cityId: v.optional(v.id("cities")),
+    cityName: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
     .index("by_tradePoint", ["tradePointId"])
@@ -285,6 +291,7 @@ export default defineSchema({
     .index("by_user_layer", ["userId", "layer"])
     .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])
     .index("by_user_point", ["userId", "tradePointId"])
+    .index("by_user_matched_point", ["userId", "matchedUserId", "tradePointId"])
     .index("by_matchedUser", ["matchedUserId"]),
 
   trades: defineTable({
@@ -310,8 +317,21 @@ export default defineSchema({
     disputeReason: v.optional(v.string()),
     expiredAt: v.optional(v.number()),
     initiatorMessage: v.optional(v.string()),
+    // Snapshot at insert (refreshed at confirm). listMyTrades reads these to skip
+    // per-trade user/tradePoint fetches. Optional because pre-existing rows lack them.
+    initiatorDisplayNickname: v.optional(v.string()),
+    initiatorAvatarUrl: v.optional(v.string()),
+    initiatorTotalTrades: v.optional(v.number()),
+    initiatorReliabilityScore: v.optional(v.number()),
+    counterpartyDisplayNickname: v.optional(v.string()),
+    counterpartyAvatarUrl: v.optional(v.string()),
+    counterpartyTotalTrades: v.optional(v.number()),
+    counterpartyReliabilityScore: v.optional(v.number()),
+    tradePointName: v.optional(v.string()),
+    tradePointAddress: v.optional(v.string()),
   })
     .index("by_initiator_status", ["initiatorId", "status", "createdAt"])
+    .index("by_initiator_created", ["initiatorId", "createdAt"])
     .index("by_counterparty_status", ["counterpartyId", "status", "createdAt"])
     .index("by_tradePoint", ["tradePointId", "createdAt"])
     .index("by_pairKey_created", ["pairKey", "createdAt"])
@@ -417,7 +437,11 @@ export default defineSchema({
     likes: v.number(),
     saves: v.number(),
     comments: v.number(),
+    // Public view counter. Lives here (not on blogPosts) to avoid write contention
+    // on the post doc when many viewers hit the page concurrently.
+    views: v.optional(v.number()),
   }).index("by_post", ["postId"]),
+
 
   postViewIdempotency: defineTable({
     postId: v.id("blogPosts"),

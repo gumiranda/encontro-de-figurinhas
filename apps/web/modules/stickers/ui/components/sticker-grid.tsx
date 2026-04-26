@@ -107,9 +107,9 @@ function StickerGridBase({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">
-                  Ja esta em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
+                  Já está em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
                   <br />
-                  Remova de la primeiro.
+                  Remova de lá primeiro.
                 </p>
               </TooltipContent>
             </Tooltip>

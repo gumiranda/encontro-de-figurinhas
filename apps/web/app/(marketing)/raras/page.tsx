@@ -26,7 +26,7 @@ const DESCRIPTION =
   "Veja as figurinhas raras (lendas e douradas) de cada seleção no álbum da Copa do Mundo 2026. Ranking por seleção, total de raras e como trocar.";
 
 export const metadata: Metadata = {
-  title: TITLE,
+  title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
     "figurinhas raras copa 2026",

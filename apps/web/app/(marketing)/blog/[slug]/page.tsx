@@ -5,12 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, Flame } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
@@ -29,6 +23,7 @@ import { BlogMetaRow } from "@/modules/blog/ui/blog-meta-row";
 import { ViewTracker } from "@/modules/blog/ui/view-tracker";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import "@/modules/blog/ui/blog-prose.css";
+import "@/modules/blog/ui/blog-home.css";
 
 async function loadMetrics(postId: Id<"blogPosts">) {
   "use cache";
@@ -60,8 +55,21 @@ async function loadRelated(slug: string) {
 }
 
 export async function generateStaticParams() {
-  const slugs = await convexServer.query(api.blog.getAllSlugs, {});
-  return slugs.map((slug) => ({ slug }));
+  const all: string[] = [];
+  let cursor: string | null = null;
+  for (let i = 0; i < 50; i++) {
+    const result: {
+      slugs: string[];
+      continueCursor: string;
+      isDone: boolean;
+    } = await convexServer.query(api.blog.getAllSlugs, {
+      paginationOpts: { numItems: 1000, cursor },
+    });
+    all.push(...result.slugs);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return all.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -539,39 +547,47 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
-          <section className="py-16 bg-muted/30">
+          <section className="py-16">
             <div className="container mx-auto px-4">
-              <h2 className="text-2xl font-headline font-bold mb-8 text-center">
-                Artigos relacionados
-              </h2>
+              <div className="mx-auto max-w-5xl">
+                <div className="bh-section-head">
+                  <div>
+                    <span className="bh-eyebrow">Continue lendo</span>
+                    <h2 className="bh-section-title mt-2">
+                      Artigos relacionados
+                    </h2>
+                  </div>
+                  <Link href="/blog" className="bh-section-link">
+                    Ver todos
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
 
-              <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                {relatedPosts.map((related) => (
-                  <Link key={related._id} href={`/blog/${related.slug}`}>
-                    <Card className="h-full hover:border-primary transition-colors hover:-translate-y-0.5">
-                      {related.coverImage && (
-                        <div className="relative aspect-video">
+                <div className="bh-post-grid">
+                  {relatedPosts.map((related) => (
+                    <Link
+                      key={related._id}
+                      href={`/blog/${related.slug}`}
+                      className="bh-post-card"
+                    >
+                      <div className="bh-thumb">
+                        {related.coverImage && (
                           <Image
                             src={related.coverImage}
                             alt={related.title}
                             fill
-                            className="object-cover rounded-t-lg"
+                            sizes="(min-width: 1080px) 33vw, 100vw"
+                            className="object-cover"
                           />
-                        </div>
-                      )}
-                      <CardHeader>
-                        <CardTitle className="line-clamp-2 text-lg">
-                          {related.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground text-sm line-clamp-2">
-                          {related.excerpt}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                        )}
+                      </div>
+                      <div className="bh-body">
+                        <h3>{related.title}</h3>
+                        <p className="bh-excerpt">{related.excerpt}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </section>

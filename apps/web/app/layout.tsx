@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     template: "%s | Figurinha Fácil",
   },
   description:
-    "A maior rede de troca de figurinhas do Brasil. O álbum da Copa 2026 tem 980 figurinhas - economize até R$ 5.000 trocando com colecionadores em São Paulo, Rio de Janeiro, BH e mais de 100 cidades.",
+    "Troque figurinhas da Copa 2026 perto de você. 980 figurinhas no álbum, mais de 100 cidades, colecionadores ativos. Cadastre repetidas e faltantes — grátis.",
   keywords: [
     "troca de figurinhas",
     "figurinhas copa 2026",
@@ -75,24 +75,15 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: BASE_URL,
     siteName: "Figurinha Fácil",
-    title: "Figurinha Fácil | Troque Figurinhas da Copa 2026",
+    title: "Figurinha Fácil — Troque Figurinhas da Copa 2026",
     description:
-      "O álbum da Copa 2026 tem 980 figurinhas. Economize até R$ 5.000 trocando com colecionadores em mais de 100 cidades brasileiras.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Figurinha Fácil - Plataforma de troca de figurinhas",
-      },
-    ],
+      "980 figurinhas no álbum da Copa 2026. Encontre colecionadores em mais de 100 cidades e troque suas repetidas — grátis.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Figurinha Fácil | Troque Figurinhas da Copa 2026",
+    title: "Figurinha Fácil — Troque Figurinhas da Copa 2026",
     description:
-      "980 figurinhas no álbum da Copa 2026. Encontre colecionadores e economize trocando suas repetidas.",
-    images: ["/og-image.png"],
+      "980 figurinhas no álbum da Copa 2026. Encontre colecionadores e troque suas repetidas — grátis.",
     creator: "@figurinhafacil",
   },
   robots: {

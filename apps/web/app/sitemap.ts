@@ -65,7 +65,21 @@ async function loadBlogForSitemap() {
   "use cache";
   cacheTag("sitemap");
   cacheLife("days");
-  return convexServer.query(api.blog.listForSitemap, {});
+  const all: Array<{ slug: string; updatedAt: number | undefined }> = [];
+  let cursor: string | null = null;
+  for (let i = 0; i < 20; i++) {
+    const result: {
+      page: Array<{ slug: string; updatedAt: number | undefined }>;
+      continueCursor: string;
+      isDone: boolean;
+    } = await convexServer.query(api.blog.listForSitemap, {
+      paginationOpts: { numItems: 1000, cursor },
+    });
+    all.push(...result.page);
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  return all;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -144,6 +158,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/onde-comprar-figurinhas-copa-2026`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
     },
     {
       url: `${BASE_URL}/pontos`,

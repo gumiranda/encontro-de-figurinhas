@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowRight } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
+  ArrowRight,
+  BookOpen,
+  Clock,
+  Diamond,
+  Flame,
+  History,
+  Rss,
+  TrendingUp,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { convexServer, api } from "@/lib/convex-server";
@@ -20,6 +24,7 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import "@/modules/blog/ui/blog-home.css";
 
 export const metadata: Metadata = generateBlogListMetadata();
 
@@ -33,10 +38,53 @@ async function loadPosts() {
 function formatDate(timestamp: number) {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   }).format(new Date(timestamp));
 }
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "??";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+}
+
+function categorySlug(category: string): string {
+  return category
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const CATEGORY_CARDS = [
+  {
+    label: "Guias",
+    desc: "Como colecionar, trocar, organizar.",
+    Icon: BookOpen,
+    accent: "var(--primary)",
+  },
+  {
+    label: "História",
+    desc: "A saga dos álbuns de Copa.",
+    Icon: History,
+    accent: "var(--secondary)",
+  },
+  {
+    label: "Raridades",
+    desc: "O que vale mais e por quê.",
+    Icon: Diamond,
+    accent: "#ffc965",
+  },
+  {
+    label: "Copa 2026",
+    desc: "Tudo sobre a nova edição.",
+    Icon: Trophy,
+    accent: "var(--primary)",
+  },
+] as const;
 
 export default async function BlogPage() {
   const posts = await loadPosts();
@@ -46,16 +94,29 @@ export default async function BlogPage() {
     { name: "Blog" },
   ]);
 
-  const featuredPost = posts[0];
-  const otherPosts = posts.slice(1);
+  const featured = posts[0];
+  const bigPair = posts.slice(1, 3);
+  const gridPosts = posts.slice(3, 9);
+
+  const categoryCounts = new Map<string, number>();
+  for (const p of posts) {
+    categoryCounts.set(p.category, (categoryCounts.get(p.category) ?? 0) + 1);
+  }
+  const filterChips: { label: string; count: number; slug: string }[] = [
+    { label: "Todos", count: posts.length, slug: "" },
+    ...Array.from(categoryCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([label, count]) => ({ label, count, slug: categorySlug(label) })),
+  ];
 
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
       <LandingHeader />
-      <main className="pt-24 min-h-screen">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">
+      <main className="min-h-screen bg-background pt-24">
+        {/* Hero */}
+        <section className="bh-hero py-16">
           <div className="container mx-auto px-4">
             <nav className="mb-8 text-sm text-muted-foreground">
               <ol className="flex items-center gap-2">
@@ -69,123 +130,256 @@ export default async function BlogPage() {
               </ol>
             </nav>
 
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
-                Blog <span className="text-primary">Figurinha Fácil</span>
-              </h1>
+            <div className="grid items-end gap-8 lg:grid-cols-[1.1fr_1fr]">
+              <div className="bh-fade-up">
+                <span className="bh-eyebrow">
+                  <span className="bh-live-dot" />
+                  Blog · Arena de conteúdo
+                </span>
+                <h1 className="font-headline mt-5 text-4xl font-extrabold leading-[1.02] tracking-tight md:text-5xl lg:text-6xl text-balance">
+                  Tudo sobre o{" "}
+                  <span className="bh-text-gradient">álbum da Copa</span> — da
+                  banca à estante.
+                </h1>
+                <p className="mt-6 max-w-prose text-base text-muted-foreground md:text-lg">
+                  Guias de trocas, histórias de colecionadores, raridades,
+                  rankings e os bastidores dos álbuns. Escrito por torcedores,
+                  pra torcedores.
+                </p>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Button size="lg" asChild>
+                    <Link href="#mais-recentes">
+                      <Zap className="h-4 w-4" />
+                      Ler os mais recentes
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" asChild>
+                    <Link href="#newsletter">
+                      <Rss className="h-4 w-4" />
+                      Assinar newsletter
+                    </Link>
+                  </Button>
+                </div>
+                <dl className="mt-9 flex flex-wrap gap-7 text-sm text-muted-foreground">
+                  <div>
+                    <dt className="sr-only">Artigos publicados</dt>
+                    <dd>
+                      <strong className="font-headline mr-1 text-xl font-bold text-foreground">
+                        {posts.length}
+                      </strong>
+                      artigos publicados
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Categorias</dt>
+                    <dd>
+                      <strong className="font-headline mr-1 text-xl font-bold text-foreground">
+                        {categoryCounts.size}
+                      </strong>
+                      categorias
+                    </dd>
+                  </div>
+                </dl>
+              </div>
 
-              <p className="text-lg md:text-xl text-muted-foreground">
-                Dicas de troca, novidades da Copa do Mundo 2026 e guias para
-                completar seu álbum mais rápido.
-              </p>
+              {featured && (
+                <Link
+                  href={`/blog/${featured.slug}`}
+                  className="bh-fade-up bh-delay-2 bh-featured-card"
+                  style={
+                    featured.coverImage
+                      ? { backgroundImage: `url(${featured.coverImage})` }
+                      : undefined
+                  }
+                >
+                  <span className="bh-spine">
+                    <Flame className="h-3.5 w-3.5" />
+                    Em alta agora
+                  </span>
+                  <div className="mb-1 flex flex-wrap gap-2">
+                    <span className="bh-chip bh-chip-primary">
+                      {featured.category}
+                    </span>
+                  </div>
+                  <h2 className="font-headline mt-2 text-2xl font-bold leading-[1.1] tracking-tight md:text-3xl text-balance">
+                    {featured.title}
+                  </h2>
+                  <div className="mt-3.5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <div className="bh-avatar">{initials(featured.author.name)}</div>
+                    <span>{featured.author.name}</span>
+                    <span aria-hidden>·</span>
+                    <span>{featured.readingTime} min de leitura</span>
+                    {featured.publishedAt && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>{formatDate(featured.publishedAt)}</span>
+                      </>
+                    )}
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Featured Post */}
-        {featuredPost && (
-          <section className="py-12">
-            <div className="container mx-auto px-4">
-              <Link href={`/blog/${featuredPost.slug}`}>
-                <Card className="overflow-hidden hover:border-primary transition-colors">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {featuredPost.coverImage && (
-                      <div className="relative aspect-video md:aspect-auto">
-                        <Image
-                          src={featuredPost.coverImage}
-                          alt={featuredPost.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <CardContent className="flex flex-col justify-center py-8">
-                      <Badge variant="secondary" className="w-fit mb-4">
-                        {featuredPost.category}
-                      </Badge>
-                      <CardTitle className="text-2xl md:text-3xl mb-4 hover:text-primary transition-colors">
-                        {featuredPost.title}
-                      </CardTitle>
-                      <p className="text-muted-foreground mb-4 line-clamp-3">
-                        {featuredPost.excerpt}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {featuredPost.readingTime} min de leitura
-                        </span>
-                        {featuredPost.publishedAt && (
-                          <span>{formatDate(featuredPost.publishedAt)}</span>
-                        )}
-                      </div>
-                    </CardContent>
-                  </div>
-                </Card>
+        {/* Filter chips */}
+        <section className="container mx-auto mt-3 px-4">
+          <div className="bh-filter-bar">
+            {filterChips.map((chip, i) => (
+              <Link
+                key={chip.label}
+                href={chip.slug ? `/blog/categoria/${chip.slug}` : "/blog"}
+                className={`bh-filter-chip ${i === 0 ? "active" : ""}`}
+              >
+                {chip.label}
+                <span className="count">{chip.count}</span>
               </Link>
-            </div>
-          </section>
-        )}
+            ))}
+          </div>
+        </section>
 
-        {/* Other Posts */}
-        {otherPosts.length > 0 && (
-          <section className="py-12 bg-muted/30">
-            <div className="container mx-auto px-4">
-              <h2 className="text-2xl font-headline font-bold mb-8">
-                Mais artigos
-              </h2>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {otherPosts.map((post) => (
-                  <Link key={post._id} href={`/blog/${post.slug}`}>
-                    <Card className="h-full hover:border-primary transition-colors">
-                      {post.coverImage && (
-                        <div className="relative aspect-video">
-                          <Image
-                            src={post.coverImage}
-                            alt={post.title}
-                            fill
-                            className="object-cover rounded-t-lg"
-                          />
-                        </div>
-                      )}
-                      <CardHeader>
-                        <Badge variant="outline" className="w-fit mb-2">
-                          {post.category}
-                        </Badge>
-                        <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
-                          {post.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground line-clamp-2 mb-4">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {post.readingTime} min
-                          </span>
-                          {post.publishedAt && (
-                            <span>{formatDate(post.publishedAt)}</span>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+        {/* Big-pair */}
+        {bigPair.length > 0 && (
+          <section className="container mx-auto mt-8 px-4">
+            <div className="bh-section-head">
+              <div>
+                <span className="bh-eyebrow">
+                  <TrendingUp className="h-3.5 w-3.5" />
+                  Em destaque
+                </span>
+                <h2 className="bh-section-title mt-2">Lidos nesta semana</h2>
               </div>
             </div>
+            <div className="bh-big-pair">
+              {bigPair.map((post) => (
+                <Link
+                  key={post._id}
+                  href={`/blog/${post.slug}`}
+                  className="bh-big-card"
+                >
+                  <div
+                    className="bh-thumb"
+                    style={
+                      post.coverImage
+                        ? { backgroundImage: `url(${post.coverImage})` }
+                        : undefined
+                    }
+                  />
+                  <div className="bh-body">
+                    <div className="flex gap-1.5">
+                      <span className="bh-chip bh-chip-primary">
+                        {post.category}
+                      </span>
+                    </div>
+                    <h3>{post.title}</h3>
+                    <p className="bh-excerpt">{post.excerpt}</p>
+                    <div className="mt-auto flex items-center gap-2.5 text-xs text-muted-foreground">
+                      <div className="bh-avatar">
+                        {initials(post.author.name)}
+                      </div>
+                      <span>{post.author.name}</span>
+                      <span className="opacity-40">·</span>
+                      <span>{post.readingTime} min</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
         )}
 
-        {/* Empty State */}
+        {/* Post grid */}
+        {gridPosts.length > 0 && (
+          <section
+            id="mais-recentes"
+            className="container mx-auto mt-4 px-4"
+          >
+            <div className="bh-section-head">
+              <h2 className="bh-section-title">Mais recentes</h2>
+              <Link href="/blog" className="bh-section-link">
+                Todos os artigos
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="bh-post-grid">
+              {gridPosts.map((post) => (
+                <Link
+                  key={post._id}
+                  href={`/blog/${post.slug}`}
+                  className="bh-post-card"
+                >
+                  <div className="bh-thumb">
+                    {post.coverImage && (
+                      <Image
+                        src={post.coverImage}
+                        alt={post.title}
+                        fill
+                        sizes="(min-width: 1080px) 33vw, (min-width: 720px) 50vw, 100vw"
+                        className="object-cover"
+                      />
+                    )}
+                    <span className="bh-cat">{post.category}</span>
+                  </div>
+                  <div className="bh-body">
+                    <h3>{post.title}</h3>
+                    <p className="bh-excerpt">{post.excerpt}</p>
+                    <div className="bh-meta">
+                      <div className="bh-avatar">
+                        {initials(post.author.name)}
+                      </div>
+                      <span>{post.author.name}</span>
+                      <span className="bh-read-time">
+                        <Clock className="h-3.5 w-3.5" />
+                        {post.readingTime} min
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Category strip */}
+        <section className="container mx-auto mt-16 px-4">
+          <div className="bh-section-head">
+            <h2 className="bh-section-title">Navegue por categoria</h2>
+          </div>
+          <div className="bh-cat-strip">
+            {CATEGORY_CARDS.map((cat) => {
+              const count = categoryCounts.get(cat.label) ?? 0;
+              return (
+                <Link
+                  key={cat.label}
+                  href={`/blog/categoria/${categorySlug(cat.label)}`}
+                  className="bh-cat-card"
+                >
+                  <span className="bh-cnt">{count}</span>
+                  <div
+                    className="bh-cat-icon"
+                    style={{
+                      background: `color-mix(in oklab, ${cat.accent} 12%, transparent)`,
+                      color: cat.accent,
+                    }}
+                  >
+                    <cat.Icon className="h-5 w-5" />
+                  </div>
+                  <h4>{cat.label}</h4>
+                  <p>{cat.desc}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Empty state */}
         {posts.length === 0 && (
           <section className="py-24">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-2xl font-headline font-bold mb-4">
+              <h2 className="font-headline mb-4 text-2xl font-bold">
                 Em breve!
               </h2>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              <p className="mx-auto mb-8 max-w-md text-muted-foreground">
                 Estamos preparando conteúdos incríveis sobre figurinhas e a Copa
                 do Mundo 2026. Volte em breve!
               </p>
@@ -199,13 +393,13 @@ export default async function BlogPage() {
           </section>
         )}
 
-        {/* CTA Section */}
-        <section className="py-16 md:py-24">
+        {/* CTA */}
+        <section id="newsletter" className="py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-3xl font-headline font-bold mb-6">
+            <h2 className="font-headline mb-6 text-2xl font-bold md:text-3xl">
               Quer completar seu álbum?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground">
               Cadastre-se gratuitamente e encontre colecionadores para trocar
               figurinhas perto de você.
             </p>

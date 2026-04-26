@@ -211,22 +211,26 @@ export const getById = query({
       return { state: "not-found" as const };
     }
 
-    const city = await ctx.db.get(point.cityId);
     const now = Date.now();
 
-    const isParticipant = !!(await ctx.db
-      .query("userTradePoints")
-      .withIndex("by_user_point", (q) =>
-        q.eq("userId", user._id).eq("tradePointId", id)
-      )
-      .unique());
+    const [city, participantDoc, activeCheckin] = await Promise.all([
+      ctx.db.get(point.cityId),
+      ctx.db
+        .query("userTradePoints")
+        .withIndex("by_user_point", (q) =>
+          q.eq("userId", user._id).eq("tradePointId", id)
+        )
+        .unique(),
+      ctx.db
+        .query("checkins")
+        .withIndex("by_user_tradePoint_active", (q) =>
+          q.eq("userId", user._id).eq("tradePointId", id).gt("expiresAt", now)
+        )
+        .first(),
+    ]);
 
-    const hasActiveCheckin = !!(await ctx.db
-      .query("checkins")
-      .withIndex("by_user_tradePoint_active", (q) =>
-        q.eq("userId", user._id).eq("tradePointId", id).gt("expiresAt", now)
-      )
-      .first());
+    const isParticipant = !!participantDoc;
+    const hasActiveCheckin = !!activeCheckin;
 
     const whatsapp = isParticipant
       ? evaluateWhatsappAccess(user, point)
@@ -837,20 +841,9 @@ export const cleanupOrphanCoverStorage = internalMutation({
   args: {
     cursor: v.optional(v.union(v.string(), v.null())),
     chunk: v.optional(v.number()),
-    refsBuilt: v.optional(v.boolean()),
   },
   handler: async (ctx, { cursor, chunk = 0 }) => {
     const cutoff = Date.now() - ORPHAN_STORAGE_TTL_MS;
-
-    const referenced = new Set<string>();
-    const tradePointsAll = await ctx.db.query("tradePoints").take(50_000);
-    for (const p of tradePointsAll) {
-      if (p.coverImageStorageId) referenced.add(p.coverImageStorageId);
-    }
-    const usersAll = await ctx.db.query("users").take(50_000);
-    for (const u of usersAll) {
-      if (u.avatarStorageId) referenced.add(u.avatarStorageId);
-    }
 
     const page = await ctx.db.system
       .query("_storage")
@@ -859,7 +852,21 @@ export const cleanupOrphanCoverStorage = internalMutation({
     let deleted = 0;
     for (const entry of page.page) {
       if (entry._creationTime > cutoff) continue;
-      if (referenced.has(entry._id)) continue;
+      const [tpRef, userRef] = await Promise.all([
+        ctx.db
+          .query("tradePoints")
+          .withIndex("by_cover_storage", (q) =>
+            q.eq("coverImageStorageId", entry._id)
+          )
+          .first(),
+        ctx.db
+          .query("users")
+          .withIndex("by_avatar_storage", (q) =>
+            q.eq("avatarStorageId", entry._id)
+          )
+          .first(),
+      ]);
+      if (tpRef || userRef) continue;
       await ctx.storage.delete(entry._id);
       deleted += 1;
     }

@@ -5,7 +5,7 @@ import type { Id } from "@workspace/backend/_generated/dataModel";
 import { ProposalDetailView } from "@/modules/propostas/ui/views/proposal-detail-view";
 
 export const metadata: Metadata = {
-  title: "Detalhe da proposta | Figurinha Fácil",
+  title: "Detalhe da proposta",
   description: "Veja, aceite ou recuse uma proposta de troca.",
   robots: { index: false, follow: false },
 };

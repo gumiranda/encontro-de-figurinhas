@@ -1,5 +1,8 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { internalMutation, mutation, query } from "./_generated/server";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import { getAuthenticatedUser } from "./lib/auth";
 
 export const getPublished = query({
@@ -38,6 +41,11 @@ export const getBySlug = query({
 
     if (!post || post.status !== "published") return null;
 
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", post._id))
+      .first();
+
     return {
       _id: post._id,
       title: post.title,
@@ -53,7 +61,7 @@ export const getBySlug = query({
       author: post.author,
       seoTitle: post.seoTitle,
       seoDescription: post.seoDescription,
-      views: post.views,
+      views: metrics?.views ?? post.views,
       isTrending: post.isTrending,
       titleHighlight: post.titleHighlight,
     };
@@ -61,12 +69,15 @@ export const getBySlug = query({
 });
 
 const VIEW_IDEMPOTENCY_WINDOW_MS = 60 * 60 * 1000;
+const VIEW_IDEMPOTENCY_TTL_MS = 2 * 60 * 60 * 1000;
+const PRUNE_IDEMPOTENCY_BATCH = 200;
+const PRUNE_IDEMPOTENCY_MAX_CHUNKS = 100;
 const TITLE_HIGHLIGHT_MAX = 50;
 const AUTHOR_ROLE_MAX = 200;
 
 // Public (unauthenticated) view counter. Rate-bounded by per-(postId,key) idempotency window.
-// TODO: orphaned postViewIdempotency rows should be pruned by a cron (>1h old) — separate task.
-// TODO: when post is hard-deleted, drop matching idempotency rows.
+// View counter lives on postMetrics (not blogPosts) to avoid write contention on the
+// blogPosts row when many viewers hit the page concurrently.
 export const incrementView = mutation({
   args: {
     slug: v.string(),
@@ -102,19 +113,63 @@ export const incrementView = mutation({
       });
     }
 
-    await ctx.db.patch(post._id, { views: (post.views ?? 0) + 1 });
+    const metrics = await ctx.db
+      .query("postMetrics")
+      .withIndex("by_post", (q) => q.eq("postId", post._id))
+      .first();
+    if (metrics) {
+      await ctx.db.patch(metrics._id, {
+        views: (metrics.views ?? 0) + 1,
+      });
+    } else {
+      await ctx.db.insert("postMetrics", {
+        postId: post._id,
+        likes: 0,
+        saves: 0,
+        comments: 0,
+        views: 1,
+      });
+    }
+  },
+});
+
+export const pruneViewIdempotency = internalMutation({
+  args: { chunk: v.optional(v.number()) },
+  handler: async (ctx, { chunk = 0 }) => {
+    const cutoff = Date.now() - VIEW_IDEMPOTENCY_TTL_MS;
+    const stale = await ctx.db
+      .query("postViewIdempotency")
+      .withIndex("by_at", (q) => q.lt("at", cutoff))
+      .take(PRUNE_IDEMPOTENCY_BATCH);
+
+    await Promise.all(stale.map((row) => ctx.db.delete(row._id)));
+
+    const tail = await rescheduleIfMore(ctx, {
+      self: internal.blog.pruneViewIdempotency,
+      args: {},
+      hasMore: stale.length === PRUNE_IDEMPOTENCY_BATCH,
+      chunk,
+      maxChunks: PRUNE_IDEMPOTENCY_MAX_CHUNKS,
+      label: "pruneViewIdempotency",
+    });
+
+    return { deleted: stale.length, aborted: tail.aborted ?? false };
   },
 });
 
 export const getAllSlugs = query({
-  args: {},
-  handler: async (ctx) => {
-    const posts = await ctx.db
+  args: { paginationOpts: v.optional(paginationOptsValidator) },
+  handler: async (ctx, { paginationOpts }) => {
+    const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .take(10000);
+      .paginate(paginationOpts ?? { numItems: 1000, cursor: null });
 
-    return posts.map((p) => p.slug);
+    return {
+      slugs: result.page.map((p) => p.slug),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
   },
 });
 
@@ -199,17 +254,31 @@ export const getRelated = query({
 });
 
 export const listForSitemap = query({
-  args: {},
-  handler: async (ctx) => {
-    const posts = await ctx.db
+  args: { paginationOpts: v.optional(paginationOptsValidator) },
+  returns: v.object({
+    page: v.array(
+      v.object({
+        slug: v.string(),
+        updatedAt: v.optional(v.number()),
+      })
+    ),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+  }),
+  handler: async (ctx, { paginationOpts }) => {
+    const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
-      .take(10000);
+      .paginate(paginationOpts ?? { numItems: 1000, cursor: null });
 
-    return posts.map((p) => ({
-      slug: p.slug,
-      updatedAt: p.updatedAt ?? p.publishedAt,
-    }));
+    return {
+      page: result.page.map((p) => ({
+        slug: p.slug,
+        updatedAt: p.updatedAt ?? p.publishedAt,
+      })),
+      continueCursor: result.continueCursor,
+      isDone: result.isDone,
+    };
   },
 });
 
@@ -360,6 +429,7 @@ export const getMetrics = query({
       likes: metrics?.likes ?? 0,
       saves: metrics?.saves ?? 0,
       comments: metrics?.comments ?? 0,
+      views: metrics?.views ?? 0,
       userLiked: userInteraction?.liked ?? false,
       userSaved: userInteraction?.saved ?? false,
     };

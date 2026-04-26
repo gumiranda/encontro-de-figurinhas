@@ -209,19 +209,22 @@ export const listPresentAtMyPoints = query({
       .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
       .take(100);
 
+    const checkinsByPoint = await Promise.all(
+      myMemberships.map((m) =>
+        ctx.db
+          .query("checkins")
+          .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
+            q
+              .eq("tradePointId", m.tradePointId)
+              .eq("countedInPublic", true)
+              .gt("expiresAt", now)
+          )
+          .take(20)
+      )
+    );
+
     const presentUserIds: Id<"users">[] = [];
-
-    for (const m of myMemberships) {
-      const checkins = await ctx.db
-        .query("checkins")
-        .withIndex("by_tradePoint_expiresAt_countedInPublic", (q) =>
-          q
-            .eq("tradePointId", m.tradePointId)
-            .eq("countedInPublic", true)
-            .gt("expiresAt", now)
-        )
-        .take(20);
-
+    for (const checkins of checkinsByPoint) {
       for (const c of checkins) {
         if (c.userId !== auth.user._id) {
           presentUserIds.push(c.userId);

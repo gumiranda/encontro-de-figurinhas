@@ -40,8 +40,8 @@ function StickerListGroupedBase({
         <p className="text-lg font-headline">Nenhuma figurinha cadastrada</p>
         <p className="text-sm mt-2 font-body">
           {variant === "duplicates"
-            ? "Digite os numeros das figurinhas repetidas acima"
-            : "Digite os numeros das figurinhas que voce precisa"}
+            ? "Digite os números das figurinhas repetidas acima"
+            : "Digite os números das figurinhas que você precisa"}
         </p>
       </div>
     );

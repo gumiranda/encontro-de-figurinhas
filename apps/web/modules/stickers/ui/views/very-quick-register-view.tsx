@@ -91,7 +91,7 @@ export function VeryQuickRegisterView({
       textClass: "text-secondary",
       title: "Suas Figurinhas",
       selectAllLabel: "Tenho TODAS as figurinhas",
-      hint: "Marque todas e depois desmarque as que voce NAO tem repetida",
+      hint: "Marque todas e depois desmarque as que você NÃO tem repetida",
       tabActiveClass: "bg-secondary/10 text-secondary",
     },
     missing: {
@@ -102,7 +102,7 @@ export function VeryQuickRegisterView({
       textClass: "text-primary",
       title: "Minha Lista de Desejos",
       selectAllLabel: "Preciso de TODAS as figurinhas",
-      hint: "Marque todas e depois desmarque as que voce JA tem",
+      hint: "Marque todas e depois desmarque as que você JÁ tem",
       tabActiveClass: "bg-primary/10 text-primary",
     },
   };

@@ -57,4 +57,11 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 600,
     shards: 4,
   },
+
+  myPointsDashboard: {
+    kind: "token bucket",
+    rate: 60,
+    period: MINUTE,
+    capacity: 120,
+  },
 });

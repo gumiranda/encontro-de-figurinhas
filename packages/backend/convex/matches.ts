@@ -936,11 +936,13 @@ export const getFullStickerOverlap = query({
 
     const precomputed = await ctx.db
       .query("precomputedMatches")
-      .withIndex("by_user_point", (q) =>
-        q.eq("userId", me._id).eq("tradePointId", tradePointId)
+      .withIndex("by_user_matched_point", (q) =>
+        q
+          .eq("userId", me._id)
+          .eq("matchedUserId", matchedUserId)
+          .eq("tradePointId", tradePointId)
       )
-      .filter((q) => q.eq(q.field("matchedUserId"), matchedUserId))
-      .first();
+      .unique();
 
     let theyHaveINeedNums: number[];
     let iHaveTheyNeedNums: number[];

@@ -239,16 +239,19 @@ export const toggleSticker = mutation({
     const totalStickersOwned = maxSticker - nextMiss.length;
     const albumProgress = Math.round((totalStickersOwned / maxSticker) * 100);
 
-    await ctx.db.patch(user._id, {
+    const userPatch: UserPatch = {
       duplicates: nextDup,
       missing: nextMiss,
       albumProgress,
       albumCompletionPct: albumProgress,
       totalStickersOwned,
       lastActiveAt: Date.now(),
-    });
+    };
 
-    await syncActiveCheckinsStickerSnapshot(ctx, user._id, user, nextDup);
+    await ctx.db.patch(user._id, userPatch);
+
+    const mergedUser = { ...user, ...userPatch };
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, mergedUser, nextDup);
 
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 

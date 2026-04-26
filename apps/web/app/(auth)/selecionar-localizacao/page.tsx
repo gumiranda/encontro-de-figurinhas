@@ -10,7 +10,10 @@ import {
 } from "@/modules/location/lib/location-constants";
 import type { Viewport } from "next";
 
-export const metadata = { title: "Selecionar localização" };
+export const metadata = {
+  title: "Selecionar localização",
+  robots: { index: false, follow: false },
+};
 
 export const viewport: Viewport = {
   viewportFit: "cover",

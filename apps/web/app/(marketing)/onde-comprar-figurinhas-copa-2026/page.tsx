@@ -68,7 +68,7 @@ const CAPITALS: Array<{ name: string; slug: string; uf: string }> = [
 ];
 
 export const metadata: Metadata = {
-  title: TITLE,
+  title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
     "onde comprar figurinhas copa 2026",

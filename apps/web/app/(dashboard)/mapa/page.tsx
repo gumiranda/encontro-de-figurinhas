@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Mapa | Figurinha Fácil",
+  title: "Mapa",
   robots: { index: false, follow: false },
 };
 
