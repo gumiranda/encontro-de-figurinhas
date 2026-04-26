@@ -1,5 +1,17 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { relativeFromAbsolute } from "./lib/stickerNumbering";
+
+/** `totalStickers` = quantidade; números absolutos válidos: 0 .. totalStickers - 1. */
+export const getPublicAlbumCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const config = await ctx.db.query("albumConfig").first();
+    if (!config) return { totalStickers: 0, maxAbsolute: -1 };
+    const t = config.totalStickers;
+    return { totalStickers: t, maxAbsolute: t - 1 };
+  },
+});
 
 export const getSections = query({
   args: {},
@@ -99,7 +111,7 @@ export const getStickerByNumber = query({
       flagEmoji: section.flagEmoji,
       teamStartNumber: section.startNumber,
       teamEndNumber: section.endNumber,
-      relativeNum: number - section.startNumber + 1,
+      relativeNum: relativeFromAbsolute(number, section),
       isGolden,
       isLegend: !!legend,
       legendName: legend?.name,
@@ -115,7 +127,7 @@ export const getAllStickerNumbers = query({
     if (!config) return [];
 
     const numbers: number[] = [];
-    for (let i = 1; i <= config.totalStickers; i++) {
+    for (let i = 0; i < config.totalStickers; i++) {
       numbers.push(i);
     }
     return numbers;
@@ -193,11 +205,201 @@ export const getRelatedStickers = query({
       flagEmoji: section.flagEmoji,
       stickers: selectedNumbers.map((n) => ({
         number: n,
-        relativeNum: n - section.startNumber + 1,
+        relativeNum: relativeFromAbsolute(n, section),
         isGolden: goldenSet.has(n),
         isLegend: legendMap.has(n),
         legendName: legendMap.get(n),
       })),
+    };
+  },
+});
+
+// --- Sticker Detail Queries (O(1) lookup from stickerDetail table) ---
+
+export const getStickerDetail = query({
+  args: { absoluteNum: v.number() },
+  handler: async (ctx, { absoluteNum }) => {
+    return await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum))
+      .first();
+  },
+});
+
+export const getStickerDetailBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    return await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .first();
+  },
+});
+
+export const searchStickersByName = query({
+  args: { searchQuery: v.string() },
+  handler: async (ctx, { searchQuery }) => {
+    if (searchQuery.length < 2) return [];
+
+    const normalized = searchQuery
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "");
+
+    // Full scan - Convex has no LIKE/contains. For production scale, use Meilisearch.
+    // ~1k docs is small enough for full scan + JS filter.
+    const all = await ctx.db.query("stickerDetail").collect();
+
+    return all
+      .filter((r) => r.nameNormalized.includes(normalized))
+      .slice(0, 20);
+  },
+});
+
+export const searchStickersByVariant = query({
+  args: { variant: v.union(v.literal("base"), v.literal("bronze"), v.literal("prata"), v.literal("ouro")) },
+  handler: async (ctx, { variant }) => {
+    return await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_variant", (q) => q.eq("variant", variant))
+      .take(100);
+  },
+});
+
+export const getAllStickerDetails = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("stickerDetail").collect();
+  },
+});
+
+export const getAllStickerDetailsForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const details = await ctx.db.query("stickerDetail").collect();
+    return details.map((d) => ({
+      slug: d.slug,
+      absoluteNum: d.absoluteNum,
+      sectionCode: d.sectionCode,
+      sectionName: d.sectionName,
+      relativeNum: d.relativeNum,
+      name: d.name,
+    }));
+  },
+});
+
+export const getSectionByCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, { code }) => {
+    const config = await ctx.db.query("albumConfig").first();
+    if (!config) return null;
+
+    const section = config.sections.find(
+      (s) => s.code.toLowerCase() === code.toLowerCase()
+    );
+    if (!section) return null;
+
+    return {
+      name: section.name,
+      code: section.code,
+      slug: section.code.toLowerCase(),
+      flagEmoji: section.flagEmoji,
+      startNumber: section.startNumber,
+      endNumber: section.endNumber,
+      stickerCount: section.endNumber - section.startNumber + 1,
+      goldenNumbers: section.goldenNumbers ?? [],
+      legendNumbers: section.legendNumbers ?? [],
+      isExtra: section.isExtra ?? false,
+    };
+  },
+});
+
+export const getTeamStickers = query({
+  args: { sectionCode: v.string() },
+  handler: async (ctx, { sectionCode }) => {
+    const stickers = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_section_rel", (q) => q.eq("sectionCode", sectionCode.toUpperCase()))
+      .collect();
+
+    return stickers
+      .sort((a, b) => a.relativeNum - b.relativeNum)
+      .map((s) => ({
+        absoluteNum: s.absoluteNum,
+        relativeNum: s.relativeNum,
+        name: s.name,
+        slug: s.slug,
+        type: s.type,
+        variant: s.variant,
+      }));
+  },
+});
+
+export const getStickerWithDetail = query({
+  args: { number: v.number() },
+  handler: async (ctx, { number }) => {
+    // Try stickerDetail first (O(1) lookup with denormalized data)
+    const detail = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_absolute", (q) => q.eq("absoluteNum", number))
+      .first();
+
+    if (detail) {
+      // Fast path: use denormalized data
+      const config = await ctx.db.query("albumConfig").first();
+      const section = config?.sections.find(
+        (s) => number >= s.startNumber && number <= s.endNumber
+      );
+
+      return {
+        number,
+        teamName: detail.sectionName,
+        teamCode: detail.sectionCode,
+        teamSlug: detail.sectionCode.toLowerCase(),
+        flagEmoji: detail.flagEmoji,
+        teamStartNumber: section?.startNumber ?? 0,
+        teamEndNumber: section?.endNumber ?? 0,
+        relativeNum: detail.relativeNum,
+        isGolden: section?.goldenNumbers?.includes(number) ?? false,
+        isLegend: section?.legendNumbers?.some((l) => l.number === number) ?? false,
+        legendName: section?.legendNumbers?.find((l) => l.number === number)?.name,
+        totalStickers: config?.totalStickers ?? 0,
+        playerName: detail.name,
+        stickerType: detail.type,
+        variant: detail.variant,
+        slug: detail.slug,
+      };
+    }
+
+    // Fallback: use albumConfig (for stickers not yet in stickerDetail table)
+    const config = await ctx.db.query("albumConfig").first();
+    if (!config) return null;
+
+    const section = config.sections.find(
+      (s) => number >= s.startNumber && number <= s.endNumber
+    );
+    if (!section) return null;
+
+    const isGolden = section.goldenNumbers?.includes(number) ?? false;
+    const legend = section.legendNumbers?.find((l) => l.number === number);
+
+    return {
+      number,
+      teamName: section.name,
+      teamCode: section.code,
+      teamSlug: section.code.toLowerCase(),
+      flagEmoji: section.flagEmoji,
+      teamStartNumber: section.startNumber,
+      teamEndNumber: section.endNumber,
+      relativeNum: relativeFromAbsolute(number, section),
+      isGolden,
+      isLegend: !!legend,
+      legendName: legend?.name,
+      totalStickers: config.totalStickers,
+      playerName: undefined,
+      stickerType: undefined,
+      variant: undefined,
+      slug: undefined,
     };
   },
 });

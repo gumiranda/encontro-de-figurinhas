@@ -1,4 +1,5 @@
 import { internalMutation } from "./_generated/server";
+import type { MutationCtx } from "./_generated/server";
 
 const BLOG_POSTS = [
   {
@@ -5972,7 +5973,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável da Tunísia na Copa 2026, técnico Sami Trabelsi, Grupo F, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas RD Congo Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-rd-congo-copa-2026",
@@ -6131,7 +6131,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável da RD Congo na Copa 2026, técnico Sébastien Desabre, Grupo K, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Irã Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-irac-copa-2026",
@@ -6288,7 +6287,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável do Irã na Copa 2026, técnico Amir Ghalenoei, Grupo G, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Iraque Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-iraque-copa-2026",
@@ -6445,7 +6443,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável do Iraque na Copa 2026, técnico Jesús Casas, Grupo I, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Catar Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-catar-copa-2026",
@@ -6602,7 +6599,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável do Catar na Copa 2026, técnico Marquez López, Grupo B, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Arábia Saudita Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-arabia-saudita-copa-2026",
@@ -6765,7 +6761,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável da Arábia Saudita na Copa 2026, técnico Hervé Renard, Grupo H, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Jordânia Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-jordania-copa-2026",
@@ -6924,7 +6919,6 @@ const BLOG_POSTS = [
     seoDescription:
       "Convocação provável da Jordânia na Copa 2026, técnico Jamal Sellami, Grupo J, álbum oficial FIFA e troca de figurinhas no Figurinha Fácil.",
   },
-  ,
   {
     title: "Figurinhas Uzbequistão Copa 2026: Convocação e Álbum FIFA",
     slug: "figurinhas-uzbequistao-copa-2026",
@@ -7256,37 +7250,39 @@ const BLOG_POSTS = [
   },
 ];
 
+export async function seedBlogPostsHandler(ctx: MutationCtx) {
+  const existing = await ctx.db.query("blogPosts").first();
+  if (existing) {
+    return { skipped: true, message: "Blog posts already exist" };
+  }
+
+  const now = Date.now();
+  const inserted: string[] = [];
+
+  for (let i = 0; i < BLOG_POSTS.length; i++) {
+    const post = BLOG_POSTS[i]!;
+    const wordCount = post.content.split(/\s+/).length;
+    const readingTime = Math.ceil(wordCount / 200);
+
+    await ctx.db.insert("blogPosts", {
+      ...post,
+      readingTime,
+      status: "published",
+      author: {
+        name: "Equipe Figurinha Fácil",
+      },
+      publishedAt: now - i * 86400000,
+      createdAt: now - i * 86400000,
+      updatedAt: now - i * 86400000,
+    });
+
+    inserted.push(post.slug);
+  }
+
+  return { inserted, count: inserted.length };
+}
+
 export const seedBlogPosts = internalMutation({
   args: {},
-  handler: async (ctx) => {
-    const existing = await ctx.db.query("blogPosts").first();
-    if (existing) {
-      return { skipped: true, message: "Blog posts already exist" };
-    }
-
-    const now = Date.now();
-    const inserted: string[] = [];
-
-    for (let i = 0; i < BLOG_POSTS.length; i++) {
-      const post = BLOG_POSTS[i]!;
-      const wordCount = post.content.split(/\s+/).length;
-      const readingTime = Math.ceil(wordCount / 200);
-
-      await ctx.db.insert("blogPosts", {
-        ...post,
-        readingTime,
-        status: "published",
-        author: {
-          name: "Equipe Figurinha Fácil",
-        },
-        publishedAt: now - i * 86400000, // Each post 1 day apart
-        createdAt: now - i * 86400000,
-        updatedAt: now - i * 86400000,
-      });
-
-      inserted.push(post.slug);
-    }
-
-    return { inserted, count: inserted.length };
-  },
+  handler: seedBlogPostsHandler,
 });

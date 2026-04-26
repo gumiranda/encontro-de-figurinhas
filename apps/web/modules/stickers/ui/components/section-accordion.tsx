@@ -18,6 +18,7 @@ type Section = {
   startNumber: number;
   endNumber: number;
   isExtra?: boolean;
+  relStart?: number;
 };
 
 type Props = {
@@ -72,11 +73,14 @@ export function SectionAccordion({
           const flagGradient = getFlagGradient(section.code);
           const activeCount = mode === "duplicates" ? counts.dupCount : counts.missCount;
           const countColor = mode === "duplicates" ? "text-emerald-600" : "text-red-500";
+          const totalCount = section.endNumber - section.startNumber + 1;
+          const relStart = section.relStart ?? 1;
+          const relEnd = relStart + totalCount - 1;
 
           return (
             <AccordionItem
-              key={section.code}
-              value={section.code}
+              key={`${section.code}-${section.startNumber}`}
+              value={`${section.code}-${section.startNumber}`}
               className="border border-outline-variant/20 rounded-xl overflow-hidden bg-surface-container-low"
             >
               <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-surface-container">
@@ -86,13 +90,13 @@ export function SectionAccordion({
                     <div className={`absolute inset-0 ${flagGradient} opacity-80`} />
                   </div>
 
-                  {/* Name + Code */}
+                  {/* Name + Code + Range */}
                   <div className="flex-1 text-left">
                     <span className="font-headline font-bold text-sm uppercase tracking-wider text-on-surface">
                       {section.name}
                     </span>
                     <span className="text-xs text-on-surface-variant font-mono ml-2">
-                      ({section.code})
+                      ({section.code}) · {relStart}–{relEnd}
                     </span>
                   </div>
 
@@ -135,6 +139,7 @@ export function SectionAccordion({
                   sectionCode={section.code}
                   sectionStart={section.startNumber}
                   sectionEnd={section.endNumber}
+                  relStart={section.relStart}
                   duplicates={duplicatesSet}
                   missing={missingSet}
                   onToggle={onToggle}

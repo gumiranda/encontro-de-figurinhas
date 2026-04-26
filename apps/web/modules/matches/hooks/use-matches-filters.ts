@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useReducer, useState } from "react";
+import { useMemo, useReducer } from "react";
 import { useDebouncedValue } from "../../../hooks/use-debounce";
 
 export type FiltersState = {
@@ -26,7 +26,8 @@ export type FiltersAction =
 
 export const initialMatchesFiltersState: FiltersState = {
   layer: null,
-  bidirectionalOnly: true,
+  /** false = "Todos" / one-way or two-way; true = mão dupla only */
+  bidirectionalOnly: false,
   verifiedOnly: false,
   nearOnly: false,
   raresOnly: false,
@@ -100,7 +101,7 @@ export function useMatchesFilters() {
   const hasActiveFilters = useMemo(
     () =>
       state.layer !== null ||
-      !state.bidirectionalOnly ||
+      state.bidirectionalOnly ||
       state.verifiedOnly ||
       state.nearOnly ||
       state.raresOnly,

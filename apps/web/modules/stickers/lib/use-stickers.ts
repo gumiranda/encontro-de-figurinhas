@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-  useMemo,
-  useReducer,
-} from "react";
-import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { useMutation, useQuery } from "convex/react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 import { buildSectionLookup, type Section } from "./sticker-parser";
 
@@ -24,6 +17,7 @@ function getUserFacingStickerError(
   error: unknown,
   fallback = GENERIC_SAVE_ERROR
 ): string {
+  console.log("getUserFacingStickerError", error);
   const rawMessage = error instanceof Error ? error.message : String(error ?? "");
   const message = rawMessage.trim();
 
@@ -52,12 +46,9 @@ function validateDisjoint(dups: number[], miss: number[]): string | null {
     : null;
 }
 
-function filterValidStickerNumbers(
-  numbers: number[],
-  maxSticker: number
-): number[] {
+function filterValidStickerNumbers(numbers: number[], totalCount: number): number[] {
   return numbers.filter(
-    (n) => Number.isInteger(n) && n >= 1 && n <= maxSticker
+    (n) => Number.isInteger(n) && n >= 0 && n < totalCount
   );
 }
 
@@ -72,19 +63,13 @@ function clampStickerListsToMax(
   maxSticker: number
 ): { duplicates: number[]; missing: number[] } {
   return {
-    duplicates: normalizeStickerList(
-      filterValidStickerNumbers(duplicates, maxSticker)
-    ),
-    missing: normalizeStickerList(
-      filterValidStickerNumbers(missing, maxSticker)
-    ),
+    duplicates: normalizeStickerList(filterValidStickerNumbers(duplicates, maxSticker)),
+    missing: normalizeStickerList(filterValidStickerNumbers(missing, maxSticker)),
   };
 }
 
 function listsEqual(a: number[], b: number[]): boolean {
-  return (
-    a.length === b.length && a.every((n, i) => n === b[i])
-  );
+  return a.length === b.length && a.every((n, i) => n === b[i]);
 }
 
 type StickersUiState = {
@@ -123,15 +108,12 @@ const initialStickersUi: StickersUiState = {
 export function useStickers(debounceMs = 300) {
   const data = useQuery(api.stickers.getUserStickers);
   const sections: Section[] = data?.sections ?? EMPTY_SECTIONS;
-  const totalStickers = data?.totalStickers ?? 980;
+  const totalStickers = data?.totalStickers ?? 1074;
   const serverDuplicates = data?.duplicates ?? EMPTY_NUMBERS;
   const serverMissing = data?.missing ?? EMPTY_NUMBERS;
   const isLoading = data === undefined;
 
-  const sectionLookup = useMemo(
-    () => buildSectionLookup(sections),
-    [sections]
-  );
+  const sectionLookup = useMemo(() => buildSectionLookup(sections), [sections]);
 
   const [localDuplicates, setLocalDuplicates] = useState<number[]>([]);
   const [localMissing, setLocalMissing] = useState<number[]>([]);
@@ -150,11 +132,7 @@ export function useStickers(debounceMs = 300) {
   const missRef = useRef<number[]>([]);
 
   const runSerializedSave = useCallback(
-    async (payload: {
-      duplicates: number[];
-      missing: number[];
-      finalize: boolean;
-    }) => {
+    async (payload: { duplicates: number[]; missing: number[]; finalize: boolean }) => {
       while (savePromiseRef.current) {
         await savePromiseRef.current;
       }
@@ -191,7 +169,7 @@ export function useStickers(debounceMs = 300) {
     const dups = dupsRef.current;
     const miss = missRef.current;
 
-    const lengthExceeded = dups.length > 980 || miss.length > 980;
+    const lengthExceeded = dups.length > 1074 || miss.length > 1074;
 
     if (lengthExceeded) {
       dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
@@ -203,7 +181,7 @@ export function useStickers(debounceMs = 300) {
       const dupsAtSave = dupsRef.current;
       const missAtSave = missRef.current;
 
-      if (dupsAtSave.length > 980 || missAtSave.length > 980) {
+      if (dupsAtSave.length > 1074 || missAtSave.length > 1074) {
         dispatch({ type: "setError", error: "Limite de figurinhas excedido" });
         return;
       }
@@ -275,16 +253,14 @@ export function useStickers(debounceMs = 300) {
     (kind: ListKind, numbers: number[]) => {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
       if (!valid.length) return;
-      applyListUpdate(kind, (prev) =>
-        normalizeStickerList([...prev, ...valid])
-      );
+      applyListUpdate(kind, (prev) => normalizeStickerList([...prev, ...valid]));
     },
     [applyListUpdate, totalStickers]
   );
 
   const removeNumber = useCallback(
     (kind: ListKind, num: number) => {
-      if (!Number.isInteger(num) || num < 1 || num > totalStickers) return;
+      if (!Number.isInteger(num) || num < 0 || num >= totalStickers) return;
       applyListUpdate(kind, (prev) => prev.filter((n) => n !== num));
     },
     [applyListUpdate, totalStickers]
@@ -398,16 +374,18 @@ export function useStickers(debounceMs = 300) {
     };
   }, []);
 
-  function findSection(sectionCode: string): Section | undefined {
-    return sectionLookup.byCode.get(sectionCode.toUpperCase());
+  function findSections(sectionCode: string): Section[] {
+    return sectionLookup.byCode.get(sectionCode.toUpperCase()) ?? [];
   }
 
   function getSectionNumbers(sectionCode: string): number[] {
-    const section = findSection(sectionCode);
-    if (!section) return [];
+    const sections = findSections(sectionCode);
+    if (sections.length === 0) return [];
     const numbers: number[] = [];
-    for (let i = section.startNumber; i <= section.endNumber; i++) {
-      numbers.push(i);
+    for (const section of sections) {
+      for (let i = section.startNumber; i <= section.endNumber; i++) {
+        numbers.push(i);
+      }
     }
     return numbers;
   }
@@ -417,20 +395,18 @@ export function useStickers(debounceMs = 300) {
       const sectionNumbers = getSectionNumbers(sectionCode);
       if (sectionNumbers.length === 0) return;
 
-      applyListUpdate(mode, (prev) =>
-        normalizeStickerList([...prev, ...sectionNumbers])
-      );
+      applyListUpdate(mode, (prev) => normalizeStickerList([...prev, ...sectionNumbers]));
     },
     [sectionLookup, applyListUpdate]
   );
 
   const clearSection = useCallback(
     (sectionCode: string, mode: ListKind) => {
-      const section = findSection(sectionCode);
-      if (!section) return;
+      const sections = findSections(sectionCode);
+      if (sections.length === 0) return;
 
       applyListUpdate(mode, (prev) =>
-        prev.filter((n) => n < section.startNumber || n > section.endNumber)
+        prev.filter((n) => !sections.some((s) => n >= s.startNumber && n <= s.endNumber))
       );
     },
     [sectionLookup, applyListUpdate]
@@ -438,14 +414,14 @@ export function useStickers(debounceMs = 300) {
 
   const invertSection = useCallback(
     (sectionCode: string, mode: ListKind) => {
-      const section = findSection(sectionCode);
-      if (!section) return;
+      const sections = findSections(sectionCode);
+      if (sections.length === 0) return;
 
       const sectionNumbers = getSectionNumbers(sectionCode);
       applyListUpdate(mode, (currentList) => {
         const currentSet = new Set(currentList);
         const newList = currentList.filter(
-          (n) => n < section.startNumber || n > section.endNumber
+          (n) => !sections.some((s) => n >= s.startNumber && n <= s.endNumber)
         );
         for (const num of sectionNumbers) {
           if (!currentSet.has(num)) {
@@ -460,7 +436,7 @@ export function useStickers(debounceMs = 300) {
 
   const markAll = useCallback(
     (mode: ListKind) => {
-      const allNumbers = Array.from({ length: totalStickers }, (_, i) => i + 1);
+      const allNumbers = Array.from({ length: totalStickers }, (_, i) => i);
       applyListUpdate(mode, () => allNumbers);
     },
     [totalStickers, applyListUpdate]

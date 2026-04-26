@@ -17,6 +17,8 @@ interface StickerTileProps {
   state: TileState;
   dupCount?: number;
   blockedReason?: string;
+  displayLabel?: string; // Override for EXT stickers: "LM", "JD", etc.
+  playerName?: string;   // For tooltip
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -45,9 +47,13 @@ function StickerTileBase({
   state,
   dupCount,
   blockedReason = "Já está na outra lista. Remova de lá primeiro.",
+  displayLabel,
+  playerName,
   onClick,
 }: StickerTileProps) {
   const isBlocked = state === "blocked";
+  const relLabel = relativeNum === 0 ? "00" : String(relativeNum);
+  const label = displayLabel ?? relLabel;
 
   const stateLabel = STATE_LABELS[state];
   const button = (
@@ -59,13 +65,14 @@ function StickerTileBase({
       disabled={isBlocked}
       aria-disabled={isBlocked || undefined}
       aria-pressed={state === "have" || state === "need" || undefined}
-      aria-label={`Figurinha ${sectionCode}-${relativeNum}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
+      aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relLabel}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
+      title={playerName}
       className={cn(
         "sticker-spring relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
         STATE_CLASSES[state]
       )}
     >
-      {relativeNum}
+      {label}
 
       {state === "have" && (
         <span

@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   AlertCircle,
   Info,
@@ -20,10 +20,13 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
-import type { CityWithCoords } from "../../lib/location-constants";
+import {
+  SUGGESTED_CITY_KEYS,
+  type CityWithCoords,
+} from "../../lib/location-constants";
 import { resolveSetLocationToastMessage } from "../../lib/resolve-set-location-toast";
 import { stateCardSpec } from "../../lib/state-card-spec";
 import { useLocationFlow } from "../../lib/use-location-flow";
@@ -49,6 +52,25 @@ export function LocationSelectorView({
 }: LocationSelectorViewProps) {
   const router = useRouter();
   const setLocationMutation = useMutation(api.users.setLocation);
+  const citiesLive = useQuery(api.cities.getAll);
+
+  const citiesForFlow = useMemo((): CityWithCoords[] => {
+    if (citiesLive === undefined) return cities;
+    if (citiesLive.length > 0) return citiesLive;
+    return cities;
+  }, [cities, citiesLive]);
+
+  const suggestedCitiesResolved = useMemo((): CityWithCoords[] => {
+    if (suggestedCities.length > 0) return suggestedCities;
+    const map = new Map(
+      citiesForFlow.map((c) => [`${c.name}|${c.state}`, c] as const)
+    );
+    return SUGGESTED_CITY_KEYS.reduce<CityWithCoords[]>((acc, key) => {
+      const found = map.get(`${key.name}|${key.state}`);
+      if (found) acc.push(found);
+      return acc;
+    }, []);
+  }, [suggestedCities, citiesForFlow]);
 
   const {
     selectedCityId,
@@ -62,13 +84,18 @@ export function LocationSelectorView({
     handleIpAccept,
     selectCityManual,
     isIpAcceptInFlight,
-  } = useLocationFlow({ cities, citiesError, currentCityId });
+  } = useLocationFlow({ cities: citiesForFlow, citiesError, currentCityId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedCity = selectedCityId
-    ? cities.find((c) => c._id === selectedCityId) ?? null
+    ? citiesForFlow.find((c) => c._id === selectedCityId) ?? null
     : null;
+
+  const showEmptyCitiesBanner =
+    !citiesError &&
+    citiesForFlow.length === 0 &&
+    citiesLive !== undefined;
 
   const spec = stateCardSpec(selectedCity, locationSource, gpsStatus);
 
@@ -134,7 +161,7 @@ export function LocationSelectorView({
         </div>
       )}
 
-      {!citiesError && cities.length === 0 && (
+      {showEmptyCitiesBanner && (
         <div
           role="status"
           className="mb-2 flex gap-2 rounded-lg border border-[var(--outline-variant)]/30 bg-[var(--surface-container-high)] p-4 text-[var(--on-surface)]"
@@ -204,7 +231,7 @@ export function LocationSelectorView({
         <CityAutocomplete value={selectedCityId} onChange={selectCityManual} />
 
         <CityList
-          cities={suggestedCities}
+          cities={suggestedCitiesResolved}
           selectedCityId={selectedCityId}
           onSelect={selectCityManual}
           max={3}
@@ -261,7 +288,7 @@ export function LocationSelectorView({
           <CityAutocomplete value={selectedCityId} onChange={selectCityManual} />
 
           <CityList
-            cities={suggestedCities}
+            cities={suggestedCitiesResolved}
             selectedCityId={selectedCityId}
             onSelect={selectCityManual}
             max={2}

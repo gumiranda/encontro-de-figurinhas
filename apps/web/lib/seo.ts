@@ -325,26 +325,57 @@ export function generateSportsTeamSchema(
   };
 }
 
-export function generateStickerMetadata(
-  number: number,
-  displayLabel: string,
-  teamName: string,
-  flagEmoji: string,
-  isGolden: boolean,
-  isLegend: boolean,
-  legendName?: string
-): Metadata {
-  const specialLabel = isLegend
+export type StickerMetadataInput = {
+  number: number;
+  slug: string;
+  displayLabel: string;
+  teamName: string;
+  flagEmoji: string;
+  isGolden: boolean;
+  isLegend: boolean;
+  legendName?: string;
+  playerName?: string;
+  stickerType?: "escudo" | "player" | "team_photo" | "special";
+};
+
+export function generateStickerMetadata(input: StickerMetadataInput): Metadata {
+  const {
+    slug,
+    displayLabel,
+    teamName,
+    flagEmoji,
+    isGolden,
+    isLegend,
+    legendName,
+    playerName,
+    stickerType,
+  } = input;
+
+  // Use player name as primary identifier when available
+  const primaryName = playerName ?? legendName;
+  const specialLabel = isLegend && legendName
     ? ` - ${legendName}`
     : isGolden
       ? " (Dourada)"
       : "";
-  const title = `Figurinha ${displayLabel} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
-  const description = isLegend
-    ? `Figurinha ${displayLabel} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
-    : isGolden
-      ? `Figurinha dourada ${displayLabel} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
-      : `Figurinha ${displayLabel} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
+
+  // Title with player name for better SEO
+  const title = primaryName
+    ? `${primaryName} - Figurinha ${displayLabel} ${teamName} ${flagEmoji} | Copa 2026`
+    : `Figurinha ${displayLabel} ${flagEmoji} ${teamName}${specialLabel} | Copa 2026`;
+
+  // Type-specific descriptions
+  const description = stickerType === "escudo"
+    ? `Escudo oficial da ${teamName} - Figurinha ${displayLabel} do álbum Copa 2026. Troque com colecionadores.`
+    : stickerType === "team_photo"
+      ? `Foto do elenco da ${teamName} - Figurinha ${displayLabel} do álbum Copa 2026. Encontre para trocar.`
+      : isLegend && legendName
+        ? `Figurinha ${displayLabel} de ${legendName} da ${teamName} - uma das mais procuradas do álbum Copa 2026. Encontre quem tem e troque agora.`
+        : isGolden
+          ? `Figurinha dourada ${displayLabel} da ${teamName} para Copa 2026. Figurinha especial rara. Veja quem tem para trocar.`
+          : playerName
+            ? `${playerName} - Figurinha ${displayLabel} da ${teamName} no álbum Copa 2026. Encontre colecionadores para trocar.`
+            : `Figurinha ${displayLabel} da ${teamName} para o álbum da Copa do Mundo 2026. Encontre colecionadores para trocar.`;
 
   return {
     title: { absolute: title },
@@ -353,13 +384,13 @@ export function generateStickerMetadata(
       `figurinha ${displayLabel}`,
       `figurinha ${displayLabel} copa 2026`,
       `figurinha ${teamName} ${displayLabel}`,
-      ...(isLegend && legendName ? [`figurinha ${legendName}`] : []),
+      ...(primaryName ? [`figurinha ${primaryName}`, primaryName] : []),
       ...(isGolden ? [`figurinha dourada ${displayLabel}`] : []),
     ],
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/figurinha/${number}`,
+      url: `${BASE_URL}/figurinha/${slug}`,
       type: "website",
     },
     twitter: {
@@ -367,30 +398,57 @@ export function generateStickerMetadata(
       description,
     },
     alternates: {
-      canonical: `${BASE_URL}/figurinha/${number}`,
+      canonical: `${BASE_URL}/figurinha/${slug}`,
     },
   };
 }
 
-export function generateProductSchema(
-  number: number,
-  displayLabel: string,
-  teamName: string,
-  isGolden: boolean,
-  isLegend: boolean,
-  legendName?: string
-) {
-  const specialLabel = isLegend
+export type ProductSchemaInput = {
+  number: number;
+  displayLabel: string;
+  teamName: string;
+  isGolden: boolean;
+  isLegend: boolean;
+  legendName?: string;
+  playerName?: string;
+  stickerType?: "escudo" | "player" | "team_photo" | "special";
+};
+
+export function generateProductSchema(input: ProductSchemaInput) {
+  const {
+    displayLabel,
+    teamName,
+    isGolden,
+    isLegend,
+    legendName,
+    playerName,
+    stickerType,
+  } = input;
+
+  const primaryName = playerName ?? legendName;
+  const specialLabel = isLegend && legendName
     ? ` - ${legendName}`
     : isGolden
       ? " (Dourada)"
       : "";
 
+  const productName = primaryName
+    ? `${primaryName} - Figurinha ${displayLabel} ${teamName}`
+    : `Figurinha ${displayLabel} - ${teamName}${specialLabel}`;
+
+  const description = stickerType === "escudo"
+    ? `Escudo oficial da seleção ${teamName} no álbum Copa do Mundo 2026.`
+    : stickerType === "team_photo"
+      ? `Foto oficial do elenco da ${teamName} no álbum Copa do Mundo 2026.`
+      : primaryName
+        ? `Figurinha ${displayLabel} de ${primaryName} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`
+        : `Figurinha ${displayLabel} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`;
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: `Figurinha ${displayLabel} - ${teamName}${specialLabel}`,
-    description: `Figurinha ${displayLabel} da seleção ${teamName} para o álbum da Copa do Mundo 2026.`,
+    name: productName,
+    description,
     category: "Figurinhas Colecionáveis",
     brand: {
       "@type": "Brand",
@@ -407,6 +465,51 @@ export function generateProductSchema(
       price: "0",
       description: "Troca gratuita entre colecionadores",
     },
+  };
+}
+
+function sanitizeForJsonLd(text: string): string {
+  return text
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, ' ')
+    .replace(/\r/g, '')
+    .trim();
+}
+
+export function generateStickerFAQSchema(
+  displayLabel: string,
+  teamName: string,
+  playerName?: string
+) {
+  const safeName = playerName ? sanitizeForJsonLd(playerName) : null;
+  const safeTeam = sanitizeForJsonLd(teamName);
+  const safeLabel = sanitizeForJsonLd(displayLabel);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: safeName
+          ? `Qual figurinha é ${safeName}?`
+          : `O que é a figurinha ${safeLabel}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: safeName
+            ? `${safeName} é a figurinha ${safeLabel} da ${safeTeam} no álbum oficial da Copa do Mundo 2026.`
+            : `A figurinha ${safeLabel} pertence à seleção ${safeTeam} no álbum da Copa do Mundo 2026.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Como conseguir a figurinha ${safeLabel}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Você pode trocar a figurinha ${safeLabel} com outros colecionadores no Figurinha Fácil. Cadastre-se gratuitamente e encontre quem tem para trocar.`,
+        },
+      },
+    ],
   };
 }
 

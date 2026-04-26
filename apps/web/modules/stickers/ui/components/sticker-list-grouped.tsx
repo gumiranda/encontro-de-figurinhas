@@ -50,7 +50,8 @@ function StickerListGroupedBase({
   return (
     <div className="space-y-8">
       {Array.from(grouped.entries()).map(([sectionCode, sectionNumbers]) => {
-        const section = lookup.byCode.get(sectionCode);
+        const sections = lookup.byCode.get(sectionCode);
+        const section = sections?.[0];
         if (!section) return null;
         const sectionName = section.name;
         const isExtra = section.isExtra ?? false;

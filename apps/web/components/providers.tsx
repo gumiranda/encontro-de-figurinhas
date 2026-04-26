@@ -6,7 +6,7 @@ import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ClerkProvider } from "@clerk/nextjs";
-import { BRAND_COLORS } from "@workspace/ui/lib/design-tokens";
+import { clerkAuthAppearance } from "@/modules/auth/lib/clerk-appearance";
 
 if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
   throw new Error("Missing NEXT_PUBLIC_CONVEX_URL in your .env file");
@@ -28,13 +28,7 @@ function ConvexClerkBridge({ children }: { children: React.ReactNode }) {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorPrimary: BRAND_COLORS.primary,
-        },
-      }}
-    >
+    <ClerkProvider appearance={clerkAuthAppearance}>
       <ConvexClerkBridge>{children}</ConvexClerkBridge>
     </ClerkProvider>
   );

@@ -2,7 +2,15 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 
-const ALLOWED_TAG_PREFIXES = ["ponto:", "cidade:", "sitemap"];
+const ALLOWED_TAG_PREFIXES = [
+  "ponto:",
+  "cidade:",
+  "sitemap",
+  "match:",
+  "round:",
+  "ranking",
+  "boring-game",
+];
 
 function isAllowedTag(tag: string): boolean {
   return ALLOWED_TAG_PREFIXES.some(

@@ -10,6 +10,38 @@ const distanceBucketValidator = v.union(
   v.literal("unknown")
 );
 
+export const boringReason = v.union(
+  v.literal("sem_chances"),
+  v.literal("jogo_truncado"),
+  v.literal("sem_estrelas"),
+  v.literal("placar_morno"),
+  v.literal("narrador_dormindo"),
+  v.literal("meme_potencial"),
+);
+
+// Sticker types for album details
+export const stickerTypeValidator = v.union(
+  v.literal("escudo"),
+  v.literal("player"),
+  v.literal("team_photo"),
+  v.literal("special")
+);
+
+export const variantValidator = v.union(
+  v.literal("base"),
+  v.literal("bronze"),
+  v.literal("prata"),
+  v.literal("ouro")
+);
+
+const stickerDetailInSectionValidator = v.object({
+  rel: v.number(),
+  name: v.string(),
+  type: v.optional(stickerTypeValidator),
+  variant: v.optional(variantValidator),
+  displayCode: v.optional(v.string()), // For EXT stickers: "LM-BASE", "LM-OURO", etc.
+});
+
 const cachedMatchValidator = v.object({
   otherUserId: v.id("users"),
   ihaveCount: v.number(),
@@ -251,17 +283,40 @@ export default defineSchema({
         endNumber: v.number(),
         isExtra: v.optional(v.boolean()),
         flagEmoji: v.optional(v.string()),
+        relStart: v.optional(v.number()), // First relative number (default 1). FWC champions uses 9.
         goldenNumbers: v.optional(v.array(v.number())),
         legendNumbers: v.optional(
           v.array(
             v.object({ number: v.number(), name: v.string() })
           )
         ),
+        stickerDetails: v.optional(v.array(stickerDetailInSectionValidator)),
       })
     ),
     version: v.number(),
     year: v.number(),
-  }),
+  })
+    .index("by_version", ["version"]),
+
+  // O(1) lookup for sticker details (denormalized for breadcrumbs/SEO)
+  stickerDetail: defineTable({
+    sectionCode: v.string(),
+    sectionName: v.string(), // denormalized for breadcrumbs
+    flagEmoji: v.string(),   // denormalized for UI
+    relativeNum: v.number(),
+    absoluteNum: v.number(),
+    name: v.string(),
+    nameNormalized: v.string(),
+    slug: v.string(),
+    type: v.optional(stickerTypeValidator),
+    variant: v.optional(variantValidator),
+    displayCode: v.optional(v.string()), // For EXT: "LM-BASE", "LM-OURO"
+  })
+    .index("by_section_rel", ["sectionCode", "relativeNum"])
+    .index("by_absolute", ["absoluteNum"])
+    .index("by_slug", ["slug"])
+    .index("by_name_normalized", ["nameNormalized"])
+    .index("by_variant", ["variant"]),
 
   userMatchCache: defineTable({
     userId: v.id("users"),
@@ -494,4 +549,51 @@ export default defineSchema({
   })
     .index("by_post_visitor", ["postId", "visitorId"])
     .index("by_visitor", ["visitorId"]),
+
+  worldCupRounds: defineTable({
+    slug: v.string(),
+    name: v.string(),
+    phase: v.string(),
+    startDate: v.number(),
+    endDate: v.number(),
+    isActive: v.boolean(),
+    order: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_isActive_order", ["isActive", "order"])
+    .index("by_order", ["order"]),
+
+  worldCupMatches: defineTable({
+    roundId: v.id("worldCupRounds"),
+    slug: v.string(),
+    homeTeamCode: v.string(),
+    homeTeamName: v.string(),
+    homeTeamFlag: v.string(),
+    awayTeamCode: v.string(),
+    awayTeamName: v.string(),
+    awayTeamFlag: v.string(),
+    kickoffAt: v.number(),
+    venue: v.optional(v.string()),
+    totalVotes: v.number(),
+    reasonCounts: v.object({
+      sem_chances: v.number(),
+      jogo_truncado: v.number(),
+      sem_estrelas: v.number(),
+      placar_morno: v.number(),
+      narrador_dormindo: v.number(),
+      meme_potencial: v.number(),
+    }),
+    lastVoteAt: v.optional(v.number()),
+  })
+    .index("by_round_kickoff", ["roundId", "kickoffAt"])
+    .index("by_slug", ["slug"])
+    .index("by_round_totalVotes", ["roundId", "totalVotes"])
+    .index("by_totalVotes", ["totalVotes"]),
+
+  boringGameVotes: defineTable({
+    matchId: v.id("worldCupMatches"),
+    userId: v.id("users"),
+    roundId: v.id("worldCupRounds"),
+    reasons: v.array(boringReason),
+  }).index("by_match_user", ["matchId", "userId"]),
 });

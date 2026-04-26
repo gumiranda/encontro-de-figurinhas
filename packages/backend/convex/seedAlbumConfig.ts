@@ -1,163 +1,212 @@
-import { mutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { v } from "convex/values";
+import albumData from "../data/album-2026.json";
+import { isAdmin } from "./lib/auth";
 
-// Seed para albumConfig - Copa 2026
-// IMPORTANTE: version 0 = draft placeholder até Panini publicar oficial
+const CHUNK_SIZE = 100;
 
-type LegendEntry = { number: number; name: string };
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
-type SeedSection = {
+function normalize(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
+function sanitizeName(name: string): string {
+  return name
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .slice(0, 100);
+}
+
+type StickerType = "escudo" | "player" | "team_photo" | "special";
+type Variant = "base" | "bronze" | "prata" | "ouro";
+
+interface RawSticker {
+  rel: number;
   name: string;
+  type?: string;
+  variant?: string;
+  displayCode?: string;
+}
+
+interface RawSection {
   code: string;
+  name: string;
   startNumber: number;
   endNumber: number;
-  isExtra: boolean;
   flagEmoji?: string;
-  goldenNumbers?: number[];
-  legendNumbers?: LegendEntry[];
-};
+  isExtra?: boolean;
+  relStart?: number;
+  stickers?: RawSticker[];
+}
 
-const FLAG_BY_CODE: Record<string, string> = {
-  USA: "🇺🇸", CAN: "🇨🇦", MEX: "🇲🇽",
-  RSA: "🇿🇦", KOR: "🇰🇷", CZE: "🇨🇿",
-  BIH: "🇧🇦", QAT: "🇶🇦", SUI: "🇨🇭",
-  BRA: "🇧🇷", MAR: "🇲🇦", HAI: "🇭🇹", SCO: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  PAR: "🇵🇾", AUS: "🇦🇺", TUR: "🇹🇷",
-  GER: "🇩🇪", CUW: "🇨🇼", CIV: "🇨🇮", ECU: "🇪🇨",
-  NED: "🇳🇱", JPN: "🇯🇵", SWE: "🇸🇪", TUN: "🇹🇳",
-  BEL: "🇧🇪", EGY: "🇪🇬", IRN: "🇮🇷", NZL: "🇳🇿",
-  ESP: "🇪🇸", CPV: "🇨🇻", KSA: "🇸🇦", URU: "🇺🇾",
-  FRA: "🇫🇷", SEN: "🇸🇳", IRQ: "🇮🇶", NOR: "🇳🇴",
-  ARG: "🇦🇷", ALG: "🇩🇿", AUT: "🇦🇹", JOR: "🇯🇴",
-  POR: "🇵🇹", COD: "🇨🇩", UZB: "🇺🇿", COL: "🇨🇴",
-  ENG: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", CRO: "🇭🇷", GHA: "🇬🇭", PAN: "🇵🇦",
-  EXT: "✨",
-};
-
-// Números "10 da camisa" da seleção = startNumber + 9 por padrão,
-// mais estrelas adicionais para grupos com várias estrelas.
 function defaultGolden(start: number, end: number): number[] {
-  // Sticker 10 (capitão/camisa 10) + sticker 20 (última figurinha/foto do time).
   const ten = start + 9;
   const last = end;
   return [ten, last];
 }
 
-const LEGENDS_BY_CODE: Record<string, LegendEntry[]> = {
-  BRA: [{ number: 190, name: "NEYMAR" }],
-  ARG: [{ number: 730, name: "MESSI" }],
-  FRA: [{ number: 650, name: "MBAPPÉ" }],
-  POR: [{ number: 810, name: "RONALDO" }],
-  NOR: [{ number: 710, name: "HAALAND" }],
-  ENG: [{ number: 890, name: "BELLINGHAM" }],
-  GER: [{ number: 330, name: "MUSIALA" }],
-  NED: [{ number: 410, name: "VAN DIJK" }],
-};
-
-const SECTIONS: SeedSection[] = [
-  { name: "EUA", code: "USA", startNumber: 1, endNumber: 20, isExtra: false },
-  { name: "Canadá", code: "CAN", startNumber: 21, endNumber: 40, isExtra: false },
-  { name: "México", code: "MEX", startNumber: 41, endNumber: 60, isExtra: false },
-  { name: "África do Sul", code: "RSA", startNumber: 61, endNumber: 80, isExtra: false },
-  { name: "Coreia do Sul", code: "KOR", startNumber: 81, endNumber: 100, isExtra: false },
-  { name: "Tchéquia", code: "CZE", startNumber: 101, endNumber: 120, isExtra: false },
-  { name: "Bósnia e Herzegovina", code: "BIH", startNumber: 121, endNumber: 140, isExtra: false },
-  { name: "Catar", code: "QAT", startNumber: 141, endNumber: 160, isExtra: false },
-  { name: "Suíça", code: "SUI", startNumber: 161, endNumber: 180, isExtra: false },
-  { name: "Brasil", code: "BRA", startNumber: 181, endNumber: 200, isExtra: false },
-  { name: "Marrocos", code: "MAR", startNumber: 201, endNumber: 220, isExtra: false },
-  { name: "Haiti", code: "HAI", startNumber: 221, endNumber: 240, isExtra: false },
-  { name: "Escócia", code: "SCO", startNumber: 241, endNumber: 260, isExtra: false },
-  { name: "Paraguai", code: "PAR", startNumber: 261, endNumber: 280, isExtra: false },
-  { name: "Austrália", code: "AUS", startNumber: 281, endNumber: 300, isExtra: false },
-  { name: "Turquia", code: "TUR", startNumber: 301, endNumber: 320, isExtra: false },
-  { name: "Alemanha", code: "GER", startNumber: 321, endNumber: 340, isExtra: false },
-  { name: "Curaçao", code: "CUW", startNumber: 341, endNumber: 360, isExtra: false },
-  { name: "Costa do Marfim", code: "CIV", startNumber: 361, endNumber: 380, isExtra: false },
-  { name: "Equador", code: "ECU", startNumber: 381, endNumber: 400, isExtra: false },
-  { name: "Holanda", code: "NED", startNumber: 401, endNumber: 420, isExtra: false },
-  { name: "Japão", code: "JPN", startNumber: 421, endNumber: 440, isExtra: false },
-  { name: "Suécia", code: "SWE", startNumber: 441, endNumber: 460, isExtra: false },
-  { name: "Tunísia", code: "TUN", startNumber: 461, endNumber: 480, isExtra: false },
-  { name: "Bélgica", code: "BEL", startNumber: 481, endNumber: 500, isExtra: false },
-  { name: "Egito", code: "EGY", startNumber: 501, endNumber: 520, isExtra: false },
-  { name: "Irã", code: "IRN", startNumber: 521, endNumber: 540, isExtra: false },
-  { name: "Nova Zelândia", code: "NZL", startNumber: 541, endNumber: 560, isExtra: false },
-  { name: "Espanha", code: "ESP", startNumber: 561, endNumber: 580, isExtra: false },
-  { name: "Cabo Verde", code: "CPV", startNumber: 581, endNumber: 600, isExtra: false },
-  { name: "Arábia Saudita", code: "KSA", startNumber: 601, endNumber: 620, isExtra: false },
-  { name: "Uruguai", code: "URU", startNumber: 621, endNumber: 640, isExtra: false },
-  { name: "França", code: "FRA", startNumber: 641, endNumber: 660, isExtra: false },
-  { name: "Senegal", code: "SEN", startNumber: 661, endNumber: 680, isExtra: false },
-  { name: "Iraque", code: "IRQ", startNumber: 681, endNumber: 700, isExtra: false },
-  { name: "Noruega", code: "NOR", startNumber: 701, endNumber: 720, isExtra: false },
-  { name: "Argentina", code: "ARG", startNumber: 721, endNumber: 740, isExtra: false },
-  { name: "Argélia", code: "ALG", startNumber: 741, endNumber: 760, isExtra: false },
-  { name: "Áustria", code: "AUT", startNumber: 761, endNumber: 780, isExtra: false },
-  { name: "Jordânia", code: "JOR", startNumber: 781, endNumber: 800, isExtra: false },
-  { name: "Portugal", code: "POR", startNumber: 801, endNumber: 820, isExtra: false },
-  { name: "RD Congo", code: "COD", startNumber: 821, endNumber: 840, isExtra: false },
-  { name: "Uzbequistão", code: "UZB", startNumber: 841, endNumber: 860, isExtra: false },
-  { name: "Colômbia", code: "COL", startNumber: 861, endNumber: 880, isExtra: false },
-  { name: "Inglaterra", code: "ENG", startNumber: 881, endNumber: 900, isExtra: false },
-  { name: "Croácia", code: "CRO", startNumber: 901, endNumber: 920, isExtra: false },
-  { name: "Gana", code: "GHA", startNumber: 921, endNumber: 940, isExtra: false },
-  { name: "Panamá", code: "PAN", startNumber: 941, endNumber: 960, isExtra: false },
-  { name: "Extras", code: "EXT", startNumber: 961, endNumber: 980, isExtra: true },
-];
-
-function enrichSection(s: SeedSection) {
-  return {
-    ...s,
-    flagEmoji: s.flagEmoji ?? FLAG_BY_CODE[s.code] ?? "",
-    goldenNumbers:
-      s.goldenNumbers ??
-      (s.isExtra ? [] : defaultGolden(s.startNumber, s.endNumber)),
-    legendNumbers: s.legendNumbers ?? LEGENDS_BY_CODE[s.code] ?? [],
-  };
-}
-
-const ALBUM_CONFIG_2026 = {
-  totalStickers: 980,
-  version: 3, // bump: campos novos (flagEmoji, goldenNumbers, legendNumbers)
-  year: 2026,
-  sections: SECTIONS.map(enrichSection),
-};
-
 export const seedAlbumConfig = mutation({
   args: {},
   handler: async (ctx) => {
-    const existing = await ctx.db.query("albumConfig").first();
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
 
-    if (!existing) {
-      const id = await ctx.db.insert("albumConfig", ALBUM_CONFIG_2026);
-      return { action: "created", id };
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user || !isAdmin(user.role)) throw new Error("Admin required");
+
+    const sections = albumData.sections as RawSection[];
+
+    const seenKeys = new Set<string>();
+    for (const section of sections) {
+      for (const sticker of section.stickers ?? []) {
+        const key = `${section.code}-${sticker.rel}`;
+        if (seenKeys.has(key)) throw new Error(`Duplicate sticker: ${key}`);
+        if (sticker.name.length > 100)
+          throw new Error(`Name too long: ${key}`);
+        seenKeys.add(key);
+      }
     }
 
-    // Patch-merge idempotente: preserva flags já setados, preenche apenas
-    // campos novos que ainda estejam undefined.
-    const existingByCode = new Map(
-      existing.sections.map((s) => [s.code.toUpperCase(), s])
-    );
-    const mergedSections = SECTIONS.map((seed) => {
-      const cur = existingByCode.get(seed.code.toUpperCase());
-      const enriched = enrichSection(seed);
-      if (!cur) return enriched;
-      return {
-        ...enriched,
-        // Mantém nome e ranges canônicos do seed;
-        // preserva overrides de flag/golden/legend quando já existirem.
-        flagEmoji: cur.flagEmoji ?? enriched.flagEmoji,
-        goldenNumbers: cur.goldenNumbers ?? enriched.goldenNumbers,
-        legendNumbers: cur.legendNumbers ?? enriched.legendNumbers,
-      };
+    const processedSections = sections.map((s) => ({
+      name: s.name,
+      code: s.code,
+      startNumber: s.startNumber,
+      endNumber: s.endNumber,
+      isExtra: s.isExtra ?? false,
+      flagEmoji: s.flagEmoji ?? "",
+      relStart: s.relStart,
+      goldenNumbers: s.isExtra ? [] : defaultGolden(s.startNumber, s.endNumber),
+      legendNumbers: [] as { number: number; name: string }[],
+      stickerDetails: (s.stickers ?? []).map((st) => ({
+        rel: st.rel,
+        name: sanitizeName(st.name),
+        type: (st.type as StickerType) ?? undefined,
+        variant: (st.variant as Variant) ?? undefined,
+        displayCode: st.displayCode,
+      })),
+    }));
+
+    const existing = await ctx.db.query("albumConfig").first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        totalStickers: albumData.totalStickers,
+        version: albumData.version,
+        year: albumData.year,
+        sections: processedSections,
+      });
+    } else {
+      await ctx.db.insert("albumConfig", {
+        totalStickers: albumData.totalStickers,
+        version: albumData.version,
+        year: albumData.year,
+        sections: processedSections,
+      });
+    }
+
+    await ctx.scheduler.runAfter(0, internal.seedAlbumConfig.seedStickerDetails, {
+      startIdx: 0,
     });
 
-    await ctx.db.patch(existing._id, {
-      totalStickers: ALBUM_CONFIG_2026.totalStickers,
-      version: Math.max(existing.version, ALBUM_CONFIG_2026.version),
-      year: ALBUM_CONFIG_2026.year,
-      sections: mergedSections,
-    });
-    return { action: "updated", id: existing._id };
+    return { action: existing ? "updated" : "created", version: albumData.version };
+  },
+});
+
+export const seedStickerDetails = internalMutation({
+  args: { startIdx: v.number(), retryCount: v.optional(v.number()) },
+  handler: async (ctx, { startIdx, retryCount = 0 }) => {
+    const albumConfig = await ctx.db.query("albumConfig").first();
+    if (!albumConfig) return { done: true, error: "No albumConfig found" };
+
+    const allStickers: Array<{
+      sectionCode: string;
+      sectionName: string;
+      flagEmoji: string;
+      relativeNum: number;
+      absoluteNum: number;
+      name: string;
+      nameNormalized: string;
+      slug: string;
+      type?: StickerType;
+      variant?: Variant;
+      displayCode?: string;
+    }> = [];
+
+    for (const section of albumConfig.sections) {
+      const stickerDetails = section.stickerDetails ?? [];
+      // Find minimum rel to handle sections where rel doesn't start at 1 (e.g., champions FWC-9 to FWC-19)
+      const minRel = stickerDetails.length > 0
+        ? Math.min(...stickerDetails.map(s => s.rel))
+        : 1;
+
+      for (const st of stickerDetails) {
+        allStickers.push({
+          sectionCode: section.code,
+          sectionName: section.name,
+          flagEmoji: section.flagEmoji ?? "",
+          relativeNum: st.rel,
+          absoluteNum: section.startNumber + (st.rel - minRel),
+          name: st.name,
+          nameNormalized: normalize(st.name),
+          slug: `${slugify(st.name)}-${section.code.toLowerCase()}-${st.rel}`,
+          type: st.type as StickerType | undefined,
+          variant: st.variant as Variant | undefined,
+          displayCode: st.displayCode,
+        });
+      }
+    }
+
+    const chunk = allStickers.slice(startIdx, startIdx + CHUNK_SIZE);
+
+    try {
+      for (const sticker of chunk) {
+        const existing = await ctx.db
+          .query("stickerDetail")
+          .withIndex("by_absolute", (q) => q.eq("absoluteNum", sticker.absoluteNum))
+          .first();
+
+        if (existing) {
+          await ctx.db.patch(existing._id, sticker);
+        } else {
+          await ctx.db.insert("stickerDetail", sticker);
+        }
+      }
+
+      if (startIdx + CHUNK_SIZE < allStickers.length) {
+        await ctx.scheduler.runAfter(0, internal.seedAlbumConfig.seedStickerDetails, {
+          startIdx: startIdx + CHUNK_SIZE,
+          retryCount: 0,
+        });
+        return { done: false, processed: chunk.length, remaining: allStickers.length - startIdx - CHUNK_SIZE };
+      }
+
+      return { done: true, totalProcessed: allStickers.length };
+    } catch (error) {
+      // Retry with exponential backoff (max 3 retries)
+      if (retryCount < 3) {
+        const backoffMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        await ctx.scheduler.runAfter(backoffMs, internal.seedAlbumConfig.seedStickerDetails, {
+          startIdx,
+          retryCount: retryCount + 1,
+        });
+        return { done: false, error: `Retry ${retryCount + 1}/3 scheduled`, startIdx };
+      }
+      throw error; // Re-throw after max retries
+    }
   },
 });

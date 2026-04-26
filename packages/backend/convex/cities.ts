@@ -52,18 +52,17 @@ export const getBySlug = query({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    const cities = await ctx.db
-      .query("cities")
-      .withIndex("by_isActive", (q) => q.eq("isActive", true))
-      .take(50);
-
-    return cities.map((c) => ({
-      _id: c._id,
-      name: c.name,
-      state: c.state,
-      lat: c.lat,
-      lng: c.lng,
-    }));
+    // Mesma regra que `search`: isActive omitido conta como ativo; só exclui false.
+    const cities = await ctx.db.query("cities").take(5000);
+    return cities
+      .filter((c) => c.isActive !== false)
+      .map((c) => ({
+        _id: c._id,
+        name: c.name,
+        state: c.state,
+        lat: c.lat,
+        lng: c.lng,
+      }));
   },
 });
 
