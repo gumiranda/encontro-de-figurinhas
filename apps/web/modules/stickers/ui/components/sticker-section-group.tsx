@@ -40,14 +40,17 @@ const EXT_PLAYERS = [
 
 type ExtVariant = "base" | "bronze" | "prata" | "ouro";
 
-const EXT_VARIANT_CONFIG: Record<ExtVariant, {
-  label: string;
-  subtitle: string;
-  icon: string;
-  gradient: string;
-  border: string;
-  textColor: string;
-}> = {
+const EXT_VARIANT_CONFIG: Record<
+  ExtVariant,
+  {
+    label: string;
+    subtitle: string;
+    icon: string;
+    gradient: string;
+    border: string;
+    textColor: string;
+  }
+> = {
   ouro: {
     label: "OURO",
     subtitle: "ULTRA-RARAS",
@@ -206,12 +209,9 @@ function StickerSectionGroupBase({
           <div className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className={cn(
-                "h-5 w-7 shrink-0 rounded",
-                getFlagGradient(section.code)
-              )}
+              className={cn("h-5 w-7 shrink-0 rounded", getFlagGradient(section.code))}
             />
-            <span className="font-headline text-sm font-bold uppercase tracking-wider">
+            <span className="font-headline text-md font-bold uppercase tracking-wider">
               {section.name} · {section.startNumber} – {section.endNumber}
             </span>
           </div>
@@ -236,21 +236,21 @@ function StickerSectionGroupBase({
                   <button
                     type="button"
                     onClick={() => onBulkAction("all")}
-                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-md hover:bg-muted"
                   >
                     Marcar todas
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction("none")}
-                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-md hover:bg-muted"
                   >
                     Desmarcar
                   </button>
                   <button
                     type="button"
                     onClick={() => onBulkAction("invert")}
-                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    className="block w-full cursor-pointer rounded px-3 py-2 text-left text-md hover:bg-muted"
                   >
                     Inverter
                   </button>
@@ -262,11 +262,11 @@ function StickerSectionGroupBase({
       ) : (
         <header className="space-y-2 py-2">
           <div className="flex items-center justify-between">
-            <span className="font-headline text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+            <span className="font-headline text-md font-bold uppercase tracking-widest text-on-surface-variant">
               {section.emoji ? `${section.emoji} ` : ""}
               {section.name} ({section.code}) · {section.startNumber}–{section.endNumber}
             </span>
-            <span className="font-mono text-[11px] text-outline">
+            <span className="font-mono text-md text-outline">
               {activeInSection}/{totalCount}
             </span>
           </div>
@@ -310,7 +310,7 @@ function StickerSectionGroupBase({
               <div key={variantKey} className="space-y-2">
                 {/* Variant header */}
                 <div className="flex items-center gap-2">
-                  <span className={cn("text-sm font-bold", config.textColor)}>
+                  <span className={cn("text-md font-bold", config.textColor)}>
                     {config.icon} {config.label} · {config.subtitle}
                   </span>
                   <div className="flex-1 h-px bg-outline-variant/30" />
@@ -350,31 +350,45 @@ function StickerSectionGroupBase({
                           state === "blocked"
                             ? "opacity-40 cursor-not-allowed border-muted"
                             : isActive
-                              ? cn(config.border, "ring-2 ring-offset-1 ring-offset-background",
-                                  state === "have" ? "ring-emerald-500" : "ring-rose-500")
-                              : cn(config.border, "hover:scale-105 hover:shadow-lg cursor-pointer")
+                              ? cn(
+                                  config.border,
+                                  "ring-2 ring-offset-1 ring-offset-background",
+                                  state === "have" ? "ring-emerald-500" : "ring-rose-500"
+                                )
+                              : cn(
+                                  config.border,
+                                  "hover:scale-105 hover:shadow-lg cursor-pointer"
+                                )
                         )}
                       >
                         {/* Player name */}
-                        <span className={cn(
-                          "text-[10px] font-bold truncate w-full text-left",
-                          config.textColor
-                        )}>
+                        <span
+                          className={cn(
+                            "text-md font-bold truncate w-full text-left",
+                            config.textColor
+                          )}
+                        >
                           {extInfo?.playerShort}
                         </span>
 
                         {/* Sparkle decorations */}
-                        <span className="absolute top-2 right-1.5 text-[6px] opacity-60">✦</span>
-                        <span className="absolute bottom-4 right-2 text-[5px] opacity-40">✦</span>
+                        <span className="absolute top-2 right-1.5 text-[6px] opacity-60">
+                          ✦
+                        </span>
+                        <span className="absolute bottom-4 right-2 text-[5px] opacity-40">
+                          ✦
+                        </span>
 
                         {/* State indicator */}
                         {isActive && (
-                          <span className={cn(
-                            "absolute bottom-1 left-1 text-[8px] font-bold px-1 rounded",
-                            state === "have"
-                              ? "bg-emerald-500/80 text-white"
-                              : "bg-rose-500/80 text-white"
-                          )}>
+                          <span
+                            className={cn(
+                              "absolute bottom-1 left-1 text-md font-bold px-1 rounded",
+                              state === "have"
+                                ? "bg-emerald-500/80 text-white"
+                                : "bg-rose-500/80 text-white"
+                            )}
+                          >
                             {state === "have" ? "✓" : "+"}
                           </span>
                         )}
@@ -389,10 +403,7 @@ function StickerSectionGroupBase({
       ) : (
         /* Regular section grid */
         <div
-          className={cn(
-            "grid gap-1.5",
-            "grid-cols-5 md:grid-cols-10 xl:grid-cols-14"
-          )}
+          className={cn("grid gap-1.5", "grid-cols-5 md:grid-cols-10 xl:grid-cols-14")}
         >
           {numbers.map((num) => {
             const relativeNum = num - section.startNumber + 1;
