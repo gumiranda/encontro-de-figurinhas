@@ -14,6 +14,46 @@ import { getFlagGradient } from "../../lib/flag-gradients";
 import type { ListKind } from "../../lib/use-stickers";
 import { StickerTile, type TileState } from "./sticker-tile";
 
+// EXT section player mapping (20 players × 4 variants each)
+const EXT_PLAYERS = [
+  { short: "Messi", name: "Lionel Messi" },
+  { short: "Doku", name: "Jérémy Doku" },
+  { short: "Vini Jr", name: "Vinícius Júnior" },
+  { short: "Davies", name: "Alphonso Davies" },
+  { short: "L.Díaz", name: "Luis Díaz" },
+  { short: "Modrić", name: "Luka Modrić" },
+  { short: "Caicedo", name: "Moisés Caicedo" },
+  { short: "Salah", name: "Mohamed Salah" },
+  { short: "Jude", name: "Jude Bellingham" },
+  { short: "Mbappé", name: "Kylian Mbappé" },
+  { short: "Wirtz", name: "Florian Wirtz" },
+  { short: "Jiménez", name: "Raúl Jiménez" },
+  { short: "Hakimi", name: "Achraf Hakimi" },
+  { short: "Haaland", name: "Erling Haaland" },
+  { short: "Lewa", name: "Robert Lewandowski" },
+  { short: "CR7", name: "Cristiano Ronaldo" },
+  { short: "Son", name: "Heung-min Son" },
+  { short: "Yamal", name: "Lamine Yamal" },
+  { short: "Pulisic", name: "Christian Pulisic" },
+  { short: "Valverde", name: "Federico Valverde" },
+];
+const EXT_VARIANTS = ["Base", "Bronze", "Prata", "Ouro"];
+const EXT_VARIANT_SUFFIX = ["", "🥉", "🥈", "🥇"]; // base, bronze, prata, ouro
+
+function getExtStickerInfo(relativeNum: number): { displayLabel: string; playerName: string } | null {
+  if (relativeNum < 1 || relativeNum > 80) return null;
+  const playerIdx = Math.floor((relativeNum - 1) / 4);
+  const variantIdx = (relativeNum - 1) % 4;
+  const player = EXT_PLAYERS[playerIdx];
+  const variant = EXT_VARIANTS[variantIdx];
+  const suffix = EXT_VARIANT_SUFFIX[variantIdx] ?? "";
+  if (!player || !variant) return null;
+  return {
+    displayLabel: suffix ? `${player.short}${suffix}` : player.short,
+    playerName: `${player.name} (${variant})`,
+  };
+}
+
 export type SectionInfo = {
   name: string;
   code: string;
@@ -167,6 +207,9 @@ function StickerSectionGroupBase({
           else if (isInDup) state = "have";
           else if (isInMiss) state = "need";
 
+          // For EXT section, show player initials instead of number
+          const extInfo = section.code === "EXT" ? getExtStickerInfo(relativeNum) : null;
+
           return (
             <StickerTile
               key={num}
@@ -174,6 +217,8 @@ function StickerSectionGroupBase({
               relativeNum={relativeNum}
               sectionCode={section.code}
               state={state}
+              displayLabel={extInfo?.displayLabel}
+              playerName={extInfo?.playerName}
               onClick={handleTileClick}
             />
           );
