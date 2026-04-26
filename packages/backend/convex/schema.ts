@@ -421,9 +421,14 @@ export default defineSchema({
     source: v.optional(v.string()),
     createdAt: v.number(),
     unsubscribedAt: v.optional(v.number()),
+    /** Opaque per-row token (UUIDv4) used by the email-link unsubscribe flow.
+     * Optional only because pre-existing rows pre-dated the field; new inserts
+     * always set it. Reused on resubscribe so old email links keep working. */
+    unsubscribeToken: v.optional(v.string()),
   })
     .index("by_email", ["email"])
-    .index("by_status_createdAt", ["status", "createdAt"]),
+    .index("by_status_createdAt", ["status", "createdAt"])
+    .index("by_token", ["unsubscribeToken"]),
 
   reports: defineTable({
     reporterId: v.id("users"),
@@ -450,7 +455,8 @@ export default defineSchema({
     ])
     .index("by_target_category_recent", ["targetKey", "category", "createdAt"])
     .index("by_target_unresolved", ["targetKey", "isResolved", "createdAt"])
-    .index("by_reporter_created", ["reporterId", "createdAt"]),
+    .index("by_reporter_created", ["reporterId", "createdAt"])
+    .index("by_status_createdAt", ["status", "createdAt"]),
 
   siteStats: defineTable({
     matchRecomputeEnabled: v.optional(v.boolean()),

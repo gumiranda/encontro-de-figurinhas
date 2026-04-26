@@ -11,6 +11,7 @@ import { getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { getPendingTradesCount } from "./lib/tradeHelpers";
+import { rateLimiter } from "./lib/rateLimiter";
 
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
@@ -93,16 +94,7 @@ export const initiate = mutation({
       throw new ConvexError("TOO_MANY_PENDING");
     }
 
-    const oneHourAgo = Date.now() - 3600_000;
-    const recentTrades = await ctx.db
-      .query("trades")
-      .withIndex("by_initiator_created", (q) =>
-        q.eq("initiatorId", user._id).gt("createdAt", oneHourAgo)
-      )
-      .take(11);
-    if (recentTrades.length >= 10) {
-      throw new ConvexError("RATE_LIMITED");
-    }
+    await rateLimiter.limit(ctx, "tradeInitiate", { key: user._id, throws: true });
 
     const counterparty = await ctx.db.get(args.matchedUserId);
     if (

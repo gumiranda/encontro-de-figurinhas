@@ -19,6 +19,7 @@ import {
   SCORE_BUMP_AMOUNT,
   SCORE_BUMP_COOLDOWN_MS,
 } from "./lib/limits";
+import { rateLimiter } from "./lib/rateLimiter";
 
 export const create = mutation({
   args: {
@@ -32,6 +33,8 @@ export const create = mutation({
       return { ok: false as const, error: auth.state };
     }
     const user = auth.user;
+
+    await rateLimiter.limit(ctx, "checkinCreate", { key: user._id, throws: true });
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
       throw new Error("Invalid location");

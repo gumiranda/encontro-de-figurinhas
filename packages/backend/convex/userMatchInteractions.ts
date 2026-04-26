@@ -1,6 +1,7 @@
 import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthenticatedUser } from "./lib/auth";
+import { rateLimiter } from "./lib/rateLimiter";
 
 export const toggleHidden = mutation({
   args: {
@@ -10,6 +11,8 @@ export const toggleHidden = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) throw new ConvexError("AUTH_REQUIRED");
+
+    await rateLimiter.limit(ctx, "toggleHidden", { key: user._id, throws: true });
 
     const existing = await ctx.db
       .query("userMatchInteractions")

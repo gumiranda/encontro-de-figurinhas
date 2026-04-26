@@ -27,6 +27,7 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { LoadMorePosts } from "@/modules/blog/ui/load-more-posts";
 import { NewsletterForm } from "@/modules/blog/ui/newsletter-form";
 import "@/modules/blog/ui/blog-home.css";
 
@@ -116,9 +117,11 @@ export default async function BlogPage() {
     { name: "Blog" },
   ]);
 
+  // SSR renders exactly 12 posts (1 featured + 2 big-pair + 9 grid) so
+  // LoadMorePosts can skip them cleanly when fetching subsequent pages.
   const featured = posts[0];
   const bigPair = posts.slice(1, 3);
-  const gridPosts = posts.slice(3, 9);
+  const gridPosts = posts.slice(3, 12);
 
   const categoryCounts = new Map<string, number>();
   for (const p of posts) {
@@ -362,6 +365,7 @@ export default async function BlogPage() {
                       </Link>
                     ))}
                   </div>
+                  <LoadMorePosts mode={{ kind: "all" }} />
                 </div>
               )}
             </div>

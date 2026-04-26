@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthenticatedUser } from "./lib/auth";
+import { rescheduleIfMore } from "./_helpers/pagination";
 import {
   EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
   reportCategoryValidator,
@@ -145,5 +146,43 @@ export const evaluateAutoAction = internalMutation({
     }
 
     return null;
+  },
+});
+
+const PRUNE_REPORTS_BATCH = 100;
+const PRUNE_REPORTS_MAX_CHUNKS = 50;
+const REPORTS_RETENTION_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+
+export const pruneOldReports = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    chunk: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0 }) => {
+    const cutoff = Date.now() - REPORTS_RETENTION_MS;
+
+    const page = await ctx.db
+      .query("reports")
+      .withIndex("by_status_createdAt", (q) => q.eq("status", "resolved"))
+      .paginate({ numItems: PRUNE_REPORTS_BATCH, cursor: cursor ?? null });
+
+    let deleted = 0;
+    for (const report of page.page) {
+      if (report.createdAt < cutoff) {
+        await ctx.db.delete(report._id);
+        deleted++;
+      }
+    }
+
+    await rescheduleIfMore(ctx, {
+      self: internal.reports.pruneOldReports,
+      args: { cursor: page.continueCursor },
+      hasMore: !page.isDone,
+      chunk,
+      maxChunks: PRUNE_REPORTS_MAX_CHUNKS,
+      label: "pruneOldReports",
+    });
+
+    return { deleted };
   },
 });

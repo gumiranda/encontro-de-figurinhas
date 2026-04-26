@@ -737,12 +737,6 @@ export function generateCollectionPageSchema() {
     description:
       "Coleção completa com 980 figurinhas do álbum oficial Panini da Copa do Mundo FIFA 2026. Inclui 68 figurinhas especiais metalizadas, 48 Legends e 20 Iconic Moments.",
     url: `${BASE_URL}/album-copa-do-mundo-2026`,
-    about: {
-      "@type": "SportsEvent",
-      name: "Copa do Mundo FIFA 2026",
-      startDate: "2026-06-11",
-      endDate: "2026-07-19",
-    },
     numberOfItems: 980,
     mainEntity: {
       "@type": "ProductCollection",
