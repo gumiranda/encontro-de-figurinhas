@@ -10,10 +10,11 @@ type ClerkAppearance = NonNullable<ComponentProps<typeof SignIn>["appearance"]>;
  * Use em <SignIn appearance={clerkAuthAppearance} /> e equivalentes.
  */
 export const clerkAuthAppearance: ClerkAppearance = {
-  baseTheme: dark,
+  theme: dark,
   variables: {
-    colorPrimary: BRAND_COLORS.primaryDim,
+    colorPrimary: BRAND_COLORS.primary,
     colorBackground: BRAND_COLORS.surfaceContainer,
+    colorForeground: BRAND_COLORS.onSurface,
     colorText: BRAND_COLORS.onSurface,
     colorTextSecondary: BRAND_COLORS.onSurfaceVariant,
     colorInputBackground: BRAND_COLORS.surfaceContainerHighest,
@@ -23,10 +24,20 @@ export const clerkAuthAppearance: ClerkAppearance = {
   },
   elements: {
     cardBox:
-      "rounded-2xl! border! border-outline-variant/30! shadow-none! bg-surface-container!",
+      "rounded-2xl! border! border-outline-variant/40! bg-surface-container! shadow-[0_24px_80px_rgba(0,0,0,0.35)]!",
+    headerTitle: "text-on-surface!",
+    headerSubtitle: "text-on-surface-variant!",
+    socialButtonsBlockButton:
+      "border-outline-variant/40! bg-surface-container-high! text-on-surface! hover:bg-surface-container-highest!",
+    socialButtonsBlockButtonText: "text-on-surface!",
+    dividerLine: "bg-outline-variant!",
+    dividerText: "text-on-surface-variant!",
+    formFieldLabel: "text-on-surface-variant!",
+    formFieldInput:
+      "border-outline-variant/60! bg-surface-container-highest! text-on-surface! placeholder:text-on-surface-variant!",
     formButtonPrimary:
       "bg-gradient-to-r from-primary to-primary-dim! text-primary-foreground! uppercase! tracking-wider! font-bold!",
-    socialButtonsBlockButton:
-      "border-outline-variant/40! hover:bg-surface-variant!",
+    footerActionText: "text-on-surface-variant!",
+    footerActionLink: "text-primary!",
   },
 };

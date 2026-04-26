@@ -6,10 +6,10 @@
     "dev:env-dev": "convex dev --env-file .env.dev",
     "dev:env-prod": "convex dev --env-file .env.prod",
     "setup": "convex dev --until-success --env-file .env.local",
-    "seed:cities": "convex run seeds/seedCities:seedCities --component _root",
-    "seed:tradepoints": "convex run seeds/seedTradePoints:seedTradePoints --component _root",
-    "seed:blog": "convex run seedBlog:seedBlogPosts --component _root",
-    "seed:all": "pnpm seed:cities && pnpm seed:tradepoints && pnpm seed:blog",
+    "seed:cities": "convex run seeds/seedCities:seedCities",
+    "seed:tradepoints": "convex run seeds/seedTradePoints:seedTradePoints",
+    "seed:blog": "convex run seedBlog:seedBlogPosts",
+    "seed:all": "pnpm seed:cities && pnpm seed:tradepoints",
     "seed:album:dashboard": "echo 'Run seedAlbumConfig from Convex dashboard (requires admin auth)'"
   },
   "exports": {

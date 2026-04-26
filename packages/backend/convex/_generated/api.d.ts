@@ -9,6 +9,7 @@
  */
 
 import type * as _helpers_pagination from "../_helpers/pagination.js";
+import type * as adminSeed from "../adminSeed.js";
 import type * as album from "../album.js";
 import type * as blog from "../blog.js";
 import type * as boringGame from "../boringGame.js";
@@ -71,6 +72,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "_helpers/pagination": typeof _helpers_pagination;
+  adminSeed: typeof adminSeed;
   album: typeof album;
   blog: typeof blog;
   boringGame: typeof boringGame;
