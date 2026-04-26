@@ -18,10 +18,9 @@ import { JsonLd } from "@/components/json-ld";
 import { VoteCard } from "../../_components/vote-card";
 import styles from "../../_components/chato.module.css";
 
-type Props = {
+interface Props {
   params: Promise<{ rodada: string; matchSlug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
+}
 
 async function loadMatchBySlug(slug: string) {
   "use cache";
@@ -29,18 +28,6 @@ async function loadMatchBySlug(slug: string) {
   cacheTag(`match:${slug}`);
   cacheLife("hours");
   return convexServer.query(api.boringGame.getMatchBySlug, { slug });
-}
-
-async function loadMatchesForParams() {
-  "use cache";
-  cacheTag("boring-game:rounds");
-  cacheLife("hours");
-  return convexServer.query(api.boringGame.listMatchesForSitemap, {});
-}
-
-export async function generateStaticParams() {
-  const matches = await loadMatchesForParams();
-  return matches.map((m) => ({ rodada: m.roundSlug, matchSlug: m.matchSlug }));
 }
 
 const REASON_LABEL: Record<string, string> = {
@@ -54,11 +41,14 @@ const REASON_LABEL: Record<string, string> = {
 
 export async function generateMetadata({
   params,
-}: Omit<Props, "searchParams">): Promise<Metadata> {
+}: Props): Promise<Metadata> {
   const { rodada, matchSlug } = await params;
+  const data = await loadMatchBySlug(matchSlug);
+  if (!data) return { title: "Jogo não encontrado" };
+  const { match, round } = data;
   const url = `${BASE_URL}/jogo-mais-chato/${rodada}/${matchSlug}`;
-  const title = "Foi o jogo mais chato?";
-  const description = "Diga por que esta partida da Copa 2026 foi (ou não foi) chato. Vote agora!";
+  const title = `${match.homeTeamName} x ${match.awayTeamName} — Foi o jogo mais chato?`;
+  const description = `Diga por que ${match.homeTeamName} x ${match.awayTeamName} pela ${round.name} foi (ou não foi) chato. ${match.totalVotes.toLocaleString("pt-BR")} já votaram.`;
   return {
     title,
     description,
