@@ -62,7 +62,7 @@ interface PontoPageProps {
 
 async function loadTradePoint(slug: string) {
   "use cache";
-  cacheTag(`ponto:${slug}`);
+  cacheTag(`ponto:v3:${slug}`);
   cacheLife("hours");
   return fetchQuery(api.tradePoints.getBySlug, { slug });
 }

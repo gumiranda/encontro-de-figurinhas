@@ -13,7 +13,8 @@ import {
   getAuthenticatedUser,
   requireAdmin,
 } from "./lib/auth";
-import { isInBrazil } from "./lib/geo";
+import { haversine, isInBrazil } from "./lib/geo";
+import type { QueryCtx } from "./_generated/server";
 import { rateLimiter } from "./lib/rateLimiter";
 import {
   EVALUATE_AUTO_ACTION_DEBOUNCE_MS,
@@ -30,6 +31,58 @@ const NON_PUBLIC_TRADE_POINT_STATUSES = new Set<string>([
   "suspended",
   "inactive",
 ]);
+
+/**
+ * `cityId` can reference a removed `cities` row. For public pages, recover display
+ * + links by snapping to the nearest active city (same coords as the point).
+ */
+const ORPHAN_CITY_RESOLVE_MAX_KM = 500;
+
+async function cityDisplayByNearestCoords(
+  ctx: QueryCtx,
+  lat: number,
+  lng: number
+) {
+  if (!isInBrazil(lat, lng)) return null;
+  const cities = await ctx.db.query("cities").take(5000);
+  let best: (typeof cities)[0] | null = null;
+  let bestD = Infinity;
+  for (const c of cities) {
+    if (c.isActive === false) continue;
+    const d = haversine(lat, lng, c.lat, c.lng);
+    if (d < bestD) {
+      bestD = d;
+      best = c;
+    }
+  }
+  if (!best || bestD > ORPHAN_CITY_RESOLVE_MAX_KM) return null;
+  return { name: best.name, state: best.state, slug: best.slug };
+}
+
+/**
+ * Ponto publicado com `nameSlug-citySlug-entropy` ou rótulo que começa com o slug
+ * da cidade (ex.: "natal-…" → city `natal`) quando o join por cityId quebrou.
+ * Maior prefixo vence (ex.: "sao-paulo" antes de "sao").
+ */
+async function cityDisplayFromSlugPrefixLookup(
+  ctx: QueryCtx,
+  pointSlug: string
+) {
+  const parts = pointSlug.split("-").filter((p) => p.length > 0);
+  if (parts.length === 0) return null;
+  for (let len = parts.length; len >= 1; len--) {
+    const candidate = parts.slice(0, len).join("-");
+    if (candidate.length < 2) continue;
+    const c = await ctx.db
+      .query("cities")
+      .withIndex("by_slug", (q) => q.eq("slug", candidate))
+      .unique();
+    if (c && c.isActive !== false) {
+      return { name: c.name, state: c.state, slug: c.slug };
+    }
+  }
+  return null;
+}
 
 const ALLOWED_COVER_CONTENT_TYPES = new Set<string>([
   "image/jpeg",
@@ -565,6 +618,16 @@ export const getBySlug = query({
       .unique();
     if (!point || point.status !== "approved") return null;
     const city = await ctx.db.get(point.cityId);
+    const fromSlugPrefix = city
+      ? null
+      : await cityDisplayFromSlugPrefixLookup(ctx, slug);
+    const fromCoords =
+      city || fromSlugPrefix
+        ? null
+        : await cityDisplayByNearestCoords(ctx, point.lat, point.lng);
+    const cityDisplay = city
+      ? { name: city.name, state: city.state, slug: city.slug }
+      : (fromSlugPrefix ?? fromCoords);
     return {
       name: point.name,
       slug: point.slug,
@@ -575,9 +638,7 @@ export const getBySlug = query({
       suggestedHours: point.suggestedHours ?? null,
       description: point.description ?? null,
       lastActivityAt: point.lastActivityAt,
-      city: city
-        ? { name: city.name, state: city.state, slug: city.slug }
-        : null,
+      city: cityDisplay,
     };
   },
 });
@@ -977,7 +1038,7 @@ export const seedForCity = internalMutation({
     }
 
     const tags = new Set<string>();
-    for (const slug of insertedSlugs) tags.add(`ponto:${slug}`);
+    for (const slug of insertedSlugs) tags.add(`ponto:v3:${slug}`);
     tags.add(`cidade:${city.slug}`);
     tags.add("sitemap");
     await ctx.scheduler.runAfter(0, internal.revalidate.notifyBatch, {
@@ -1139,7 +1200,7 @@ export const adminApprovePendingPoint = mutation({
     await decrementPendingCount(ctx, point.requestedBy);
 
     const city = await ctx.db.get(point.cityId);
-    const tags = new Set<string>([`ponto:${point.slug}`, "sitemap"]);
+    const tags = new Set<string>([`ponto:v3:${point.slug}`, "sitemap"]);
     if (city) tags.add(`cidade:${city.slug}`);
     await ctx.scheduler.runAfter(0, internal.revalidate.notifyBatch, {
       tags: [...tags],
