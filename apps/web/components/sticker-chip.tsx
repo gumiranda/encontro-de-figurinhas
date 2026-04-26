@@ -17,6 +17,7 @@ type StickerChipProps = {
   isRare?: boolean;
   className?: string;
   playerName?: string;
+  displayCode?: string; // For EXT stickers: "LM-BASE", "LM-OURO", etc.
 };
 
 const VARIANT_CLASSES: Record<StickerChipVariant, string> = {
@@ -31,9 +32,13 @@ export function StickerChip({
   isRare = false,
   className,
   playerName,
+  displayCode,
 }: StickerChipProps) {
   const lookup = useSectionLookup();
   const { display, fullName } = formatStickerNumber(num, lookup);
+
+  // Use displayCode for EXT stickers, fallback to standard display
+  const chipDisplay = displayCode ?? display;
 
   const tooltipText = playerName
     ? `${playerName} - ${display} (${fullName})`
@@ -42,7 +47,7 @@ export function StickerChip({
   const chip = (
     <span
       role="img"
-      aria-label={`Figurinha ${display} (${fullName})`}
+      aria-label={`Figurinha ${chipDisplay} (${fullName})`}
       className={cn(
         "min-w-12 rounded-lg px-2 py-1 text-center font-mono text-xs font-semibold cursor-default",
         isRare
@@ -51,7 +56,7 @@ export function StickerChip({
         className
       )}
     >
-      {display}
+      {chipDisplay}
     </span>
   );
 
@@ -62,7 +67,7 @@ export function StickerChip({
         <TooltipTrigger asChild>{chip}</TooltipTrigger>
         <TooltipContent>
           <p className="font-medium">{playerName}</p>
-          <p className="text-xs text-muted-foreground">{display} - {fullName}</p>
+          <p className="text-xs text-muted-foreground">{chipDisplay} - {fullName}</p>
         </TooltipContent>
       </Tooltip>
     );

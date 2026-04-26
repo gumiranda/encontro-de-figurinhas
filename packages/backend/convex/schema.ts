@@ -39,6 +39,7 @@ const stickerDetailInSectionValidator = v.object({
   name: v.string(),
   type: v.optional(stickerTypeValidator),
   variant: v.optional(variantValidator),
+  displayCode: v.optional(v.string()), // For EXT stickers: "LM-BASE", "LM-OURO", etc.
 });
 
 const cachedMatchValidator = v.object({
@@ -308,6 +309,7 @@ export default defineSchema({
     slug: v.string(),
     type: v.optional(stickerTypeValidator),
     variant: v.optional(variantValidator),
+    displayCode: v.optional(v.string()), // For EXT: "LM-BASE", "LM-OURO"
   })
     .index("by_section_rel", ["sectionCode", "relativeNum"])
     .index("by_absolute", ["absoluteNum"])

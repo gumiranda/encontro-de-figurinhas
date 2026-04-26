@@ -5700,481 +5700,561 @@
           "rel": 1,
           "name": "Lionel Messi",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "LM-BASE"
         },
         {
           "rel": 2,
           "name": "Lionel Messi",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "LM-BRONZE"
         },
         {
           "rel": 3,
           "name": "Lionel Messi",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "LM-PRATA"
         },
         {
           "rel": 4,
           "name": "Lionel Messi",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "LM-OURO"
         },
         {
           "rel": 5,
           "name": "Jérémy Doku",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "JD-BASE"
         },
         {
           "rel": 6,
           "name": "Jérémy Doku",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "JD-BRONZE"
         },
         {
           "rel": 7,
           "name": "Jérémy Doku",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "JD-PRATA"
         },
         {
           "rel": 8,
           "name": "Jérémy Doku",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "JD-OURO"
         },
         {
           "rel": 9,
           "name": "Vinícius Júnior",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "VJ-BASE"
         },
         {
           "rel": 10,
           "name": "Vinícius Júnior",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "VJ-BRONZE"
         },
         {
           "rel": 11,
           "name": "Vinícius Júnior",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "VJ-PRATA"
         },
         {
           "rel": 12,
           "name": "Vinícius Júnior",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "VJ-OURO"
         },
         {
           "rel": 13,
           "name": "Alphonso Davies",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "AD-BASE"
         },
         {
           "rel": 14,
           "name": "Alphonso Davies",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "AD-BRONZE"
         },
         {
           "rel": 15,
           "name": "Alphonso Davies",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "AD-PRATA"
         },
         {
           "rel": 16,
           "name": "Alphonso Davies",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "AD-OURO"
         },
         {
           "rel": 17,
           "name": "Luis Díaz",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "LD-BASE"
         },
         {
           "rel": 18,
           "name": "Luis Díaz",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "LD-BRONZE"
         },
         {
           "rel": 19,
           "name": "Luis Díaz",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "LD-PRATA"
         },
         {
           "rel": 20,
           "name": "Luis Díaz",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "LD-OURO"
         },
         {
           "rel": 21,
           "name": "Luka Modrić",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "LMO-BASE"
         },
         {
           "rel": 22,
           "name": "Luka Modrić",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "LMO-BRONZE"
         },
         {
           "rel": 23,
           "name": "Luka Modrić",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "LMO-PRATA"
         },
         {
           "rel": 24,
           "name": "Luka Modrić",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "LMO-OURO"
         },
         {
           "rel": 25,
           "name": "Moisés Caicedo",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "MC-BASE"
         },
         {
           "rel": 26,
           "name": "Moisés Caicedo",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "MC-BRONZE"
         },
         {
           "rel": 27,
           "name": "Moisés Caicedo",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "MC-PRATA"
         },
         {
           "rel": 28,
           "name": "Moisés Caicedo",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "MC-OURO"
         },
         {
           "rel": 29,
           "name": "Mohamed Salah",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "MS-BASE"
         },
         {
           "rel": 30,
           "name": "Mohamed Salah",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "MS-BRONZE"
         },
         {
           "rel": 31,
           "name": "Mohamed Salah",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "MS-PRATA"
         },
         {
           "rel": 32,
           "name": "Mohamed Salah",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "MS-OURO"
         },
         {
           "rel": 33,
           "name": "Jude Bellingham",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "JB-BASE"
         },
         {
           "rel": 34,
           "name": "Jude Bellingham",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "JB-BRONZE"
         },
         {
           "rel": 35,
           "name": "Jude Bellingham",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "JB-PRATA"
         },
         {
           "rel": 36,
           "name": "Jude Bellingham",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "JB-OURO"
         },
         {
           "rel": 37,
           "name": "Kylian Mbappé",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "KM-BASE"
         },
         {
           "rel": 38,
           "name": "Kylian Mbappé",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "KM-BRONZE"
         },
         {
           "rel": 39,
           "name": "Kylian Mbappé",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "KM-PRATA"
         },
         {
           "rel": 40,
           "name": "Kylian Mbappé",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "KM-OURO"
         },
         {
           "rel": 41,
           "name": "Florian Wirtz",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "FW-BASE"
         },
         {
           "rel": 42,
           "name": "Florian Wirtz",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "FW-BRONZE"
         },
         {
           "rel": 43,
           "name": "Florian Wirtz",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "FW-PRATA"
         },
         {
           "rel": 44,
           "name": "Florian Wirtz",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "FW-OURO"
         },
         {
           "rel": 45,
           "name": "Raúl Jiménez",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "RJ-BASE"
         },
         {
           "rel": 46,
           "name": "Raúl Jiménez",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "RJ-BRONZE"
         },
         {
           "rel": 47,
           "name": "Raúl Jiménez",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "RJ-PRATA"
         },
         {
           "rel": 48,
           "name": "Raúl Jiménez",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "RJ-OURO"
         },
         {
           "rel": 49,
           "name": "Achraf Hakimi",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "AH-BASE"
         },
         {
           "rel": 50,
           "name": "Achraf Hakimi",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "AH-BRONZE"
         },
         {
           "rel": 51,
           "name": "Achraf Hakimi",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "AH-PRATA"
         },
         {
           "rel": 52,
           "name": "Achraf Hakimi",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "AH-OURO"
         },
         {
           "rel": 53,
           "name": "Erling Haaland",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "EH-BASE"
         },
         {
           "rel": 54,
           "name": "Erling Haaland",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "EH-BRONZE"
         },
         {
           "rel": 55,
           "name": "Erling Haaland",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "EH-PRATA"
         },
         {
           "rel": 56,
           "name": "Erling Haaland",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "EH-OURO"
         },
         {
           "rel": 57,
-          "name": "Cristiano Ronaldo",
+          "name": "Robert Lewandowski",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "RL-BASE"
         },
         {
           "rel": 58,
-          "name": "Cristiano Ronaldo",
+          "name": "Robert Lewandowski",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "RL-BRONZE"
         },
         {
           "rel": 59,
-          "name": "Cristiano Ronaldo",
+          "name": "Robert Lewandowski",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "RL-PRATA"
         },
         {
           "rel": 60,
-          "name": "Cristiano Ronaldo",
+          "name": "Robert Lewandowski",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "RL-OURO"
         },
         {
           "rel": 61,
-          "name": "Heung-min Son",
+          "name": "Cristiano Ronaldo",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "CR-BASE"
         },
         {
           "rel": 62,
-          "name": "Heung-min Son",
+          "name": "Cristiano Ronaldo",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "CR-BRONZE"
         },
         {
           "rel": 63,
-          "name": "Heung-min Son",
+          "name": "Cristiano Ronaldo",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "CR-PRATA"
         },
         {
           "rel": 64,
-          "name": "Heung-min Son",
+          "name": "Cristiano Ronaldo",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "CR-OURO"
         },
         {
           "rel": 65,
-          "name": "Lamine Yamal",
+          "name": "Heung-min Son",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "HS-BASE"
         },
         {
           "rel": 66,
-          "name": "Lamine Yamal",
+          "name": "Heung-min Son",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "HS-BRONZE"
         },
         {
           "rel": 67,
-          "name": "Lamine Yamal",
+          "name": "Heung-min Son",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "HS-PRATA"
         },
         {
           "rel": 68,
-          "name": "Lamine Yamal",
+          "name": "Heung-min Son",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "HS-OURO"
         },
         {
           "rel": 69,
-          "name": "Christian Pulisic",
+          "name": "Lamine Yamal",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "LY-BASE"
         },
         {
           "rel": 70,
-          "name": "Christian Pulisic",
+          "name": "Lamine Yamal",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "LY-BRONZE"
         },
         {
           "rel": 71,
-          "name": "Christian Pulisic",
+          "name": "Lamine Yamal",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "LY-PRATA"
         },
         {
           "rel": 72,
-          "name": "Christian Pulisic",
+          "name": "Lamine Yamal",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "LY-OURO"
         },
         {
           "rel": 73,
-          "name": "Federico Valverde",
+          "name": "Christian Pulisic",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "CP-BASE"
         },
         {
           "rel": 74,
-          "name": "Federico Valverde",
+          "name": "Christian Pulisic",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "CP-BRONZE"
         },
         {
           "rel": 75,
-          "name": "Federico Valverde",
+          "name": "Christian Pulisic",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "CP-PRATA"
         },
         {
           "rel": 76,
-          "name": "Federico Valverde",
+          "name": "Christian Pulisic",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "CP-OURO"
         },
         {
           "rel": 77,
-          "name": "Robert Lewandowski",
+          "name": "Federico Valverde",
           "type": "special",
-          "variant": "base"
+          "variant": "base",
+          "displayCode": "FV-BASE"
         },
         {
           "rel": 78,
-          "name": "Robert Lewandowski",
+          "name": "Federico Valverde",
           "type": "special",
-          "variant": "bronze"
+          "variant": "bronze",
+          "displayCode": "FV-BRONZE"
         },
         {
           "rel": 79,
-          "name": "Robert Lewandowski",
+          "name": "Federico Valverde",
           "type": "special",
-          "variant": "prata"
+          "variant": "prata",
+          "displayCode": "FV-PRATA"
         },
         {
           "rel": 80,
-          "name": "Robert Lewandowski",
+          "name": "Federico Valverde",
           "type": "special",
-          "variant": "ouro"
+          "variant": "ouro",
+          "displayCode": "FV-OURO"
         }
       ]
     }

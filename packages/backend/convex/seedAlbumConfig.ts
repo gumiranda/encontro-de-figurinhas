@@ -37,6 +37,7 @@ interface RawSticker {
   name: string;
   type?: string;
   variant?: string;
+  displayCode?: string;
 }
 
 interface RawSection {
@@ -94,6 +95,7 @@ export const seedAlbumConfig = mutation({
         name: sanitizeName(st.name),
         type: (st.type as StickerType) ?? undefined,
         variant: (st.variant as Variant) ?? undefined,
+        displayCode: st.displayCode,
       })),
     }));
 
@@ -140,6 +142,7 @@ export const seedStickerDetails = internalMutation({
       slug: string;
       type?: StickerType;
       variant?: Variant;
+      displayCode?: string;
     }> = [];
 
     for (const section of albumConfig.sections) {
@@ -161,6 +164,7 @@ export const seedStickerDetails = internalMutation({
           slug: `${slugify(st.name)}-${section.code.toLowerCase()}-${st.rel}`,
           type: st.type as StickerType | undefined,
           variant: st.variant as Variant | undefined,
+          displayCode: st.displayCode,
         });
       }
     }
