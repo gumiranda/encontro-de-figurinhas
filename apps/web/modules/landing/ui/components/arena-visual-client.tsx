@@ -1,6 +1,6 @@
 "use client";
 
-import { Landmark } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { ArenaParticles } from "@/components/overdrive/arena-particles";
 
 export function ArenaVisualClient() {
@@ -28,7 +28,7 @@ export function ArenaVisualClient() {
       <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
         <div className="rounded-full p-[3px] bg-primary/20 ring-1 ring-primary/30">
           <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary shadow-[0_4px_24px_-4px_rgba(149,170,255,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)]">
-            <Landmark
+            <Trophy
               className="h-7 w-7 text-on-primary"
               aria-hidden="true"
               strokeWidth={1.5}

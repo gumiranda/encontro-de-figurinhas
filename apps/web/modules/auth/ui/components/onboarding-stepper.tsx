@@ -1,5 +1,5 @@
 import { cn } from "@workspace/ui/lib/utils";
-import { Check, Landmark } from "lucide-react";
+import { Check, Trophy } from "lucide-react";
 
 import { SignOutButton } from "./sign-out-button";
 
@@ -32,7 +32,7 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
           className="flex size-9 items-center justify-center rounded-xl bg-[var(--landing-primary)]"
           aria-hidden="true"
         >
-          <Landmark
+          <Trophy
             className="size-5 text-[var(--landing-on-primary)]"
             strokeWidth={2.5}
           />

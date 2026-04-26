@@ -1,4 +1,4 @@
-import { Landmark, MapPin, Users } from "lucide-react";
+import { MapPin, Trophy, Users } from "lucide-react";
 
 export function AuthPitchPanel() {
   return (
@@ -13,7 +13,7 @@ export function AuthPitchPanel() {
             className="flex size-9 items-center justify-center rounded-lg bg-primary shadow-sm"
             aria-hidden="true"
           >
-            <Landmark className="size-4 text-[var(--on-primary)]" strokeWidth={2} />
+            <Trophy className="size-4 text-[var(--on-primary)]" strokeWidth={2} />
           </span>
           <span className="font-[var(--font-headline)] text-lg font-semibold text-[var(--on-surface)]">
             Figurinha Fácil
