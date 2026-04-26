@@ -260,14 +260,41 @@ function StickerSectionGroupBase({
           </div>
         </header>
       ) : (
-        <header className="flex items-center justify-between py-2">
-          <span className="font-headline text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
-            {section.emoji ? `${section.emoji} ` : ""}
-            {section.name} · {section.startNumber}–{section.endNumber}
-          </span>
-          <span className="font-mono text-[11px] text-outline">
-            {activeInSection}/{totalCount}
-          </span>
+        <header className="space-y-2 py-2">
+          <div className="flex items-center justify-between">
+            <span className="font-headline text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+              {section.emoji ? `${section.emoji} ` : ""}
+              {section.name} ({section.code}) · {section.startNumber}–{section.endNumber}
+            </span>
+            <span className="font-mono text-[11px] text-outline">
+              {activeInSection}/{totalCount}
+            </span>
+          </div>
+          {onBulkAction && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => onBulkAction("all")}
+                className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+              >
+                Marcar todas
+              </button>
+              <button
+                type="button"
+                onClick={() => onBulkAction("none")}
+                className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+              >
+                Desmarcar
+              </button>
+              <button
+                type="button"
+                onClick={() => onBulkAction("invert")}
+                className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+              >
+                Inverter
+              </button>
+            </div>
+          )}
         </header>
       )}
 

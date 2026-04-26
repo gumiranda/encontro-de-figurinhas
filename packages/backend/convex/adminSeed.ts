@@ -3,6 +3,7 @@ import { internal } from "./_generated/api";
 import { makeFunctionReference, type FunctionReference } from "convex/server";
 import { isAdmin } from "./lib/auth";
 import albumData from "../data/album-2026.json";
+import { seedBlogPostsHandler } from "./seedBlog";
 
 const seedStickerDetails = makeFunctionReference(
   "seedAlbumConfig:seedStickerDetails"
@@ -65,6 +66,14 @@ export const seedAll = mutation({
       results.boringGame = { error: String(e) };
     }
 
+    // 5. Seed blog posts (inline — lightweight)
+    try {
+      const blogResult = await seedBlogPostsHandler(ctx);
+      results.blog = blogResult;
+    } catch (e) {
+      results.blog = { error: String(e) };
+    }
+
     return { ok: true, results };
   },
 });
@@ -121,5 +130,22 @@ export const seedAlbum = mutation({
     await ctx.scheduler.runAfter(0, seedStickerDetails, { startIdx: 0 });
 
     return { ok: true, action: existing ? "updated" : "created", version: albumData.version };
+  },
+});
+
+export const seedBlog = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+    if (!user || !isAdmin(user.role)) throw new Error("Admin required");
+
+    const result = await seedBlogPostsHandler(ctx);
+    return { ok: true, result };
   },
 });

@@ -31,8 +31,12 @@ export function SeedAdminView() {
   const [albumStatus, setAlbumStatus] = useState<SeedStatus>("idle");
   const [albumResult, setAlbumResult] = useState<SeedResult | null>(null);
 
+  const [blogStatus, setBlogStatus] = useState<SeedStatus>("idle");
+  const [blogResult, setBlogResult] = useState<SeedResult | null>(null);
+
   const seedAll = useMutation(api.adminSeed.seedAll);
   const seedAlbum = useMutation(api.adminSeed.seedAlbum);
+  const seedBlog = useMutation(api.adminSeed.seedBlog);
 
   const handleSeedAll = async () => {
     setAllStatus("loading");
@@ -66,6 +70,22 @@ export function SeedAdminView() {
     }
   };
 
+  const handleSeedBlog = async () => {
+    setBlogStatus("loading");
+    setBlogResult(null);
+    try {
+      const result = await seedBlog({});
+      setBlogResult(result);
+      setBlogStatus("success");
+    } catch (e) {
+      setBlogResult({
+        ok: false,
+        error: e instanceof Error ? e.message : "Unknown error",
+      });
+      setBlogStatus("error");
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
@@ -85,7 +105,7 @@ export function SeedAdminView() {
                 <div>
                   <CardTitle>Seed All</CardTitle>
                   <CardDescription>
-                    Cities, Trade Points, Album Config, Boring Game
+                    Cities, Trade Points, Album Config, Boring Game, Blog Posts
                   </CardDescription>
                 </div>
               </div>
@@ -139,6 +159,38 @@ export function SeedAdminView() {
           </CardContent>
         </Card>
 
+        {/* Seed Blog */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Database className="h-6 w-6 text-primary" />
+                <div>
+                  <CardTitle>Seed Blog</CardTitle>
+                  <CardDescription>
+                    ~60+ blog posts para SEO e conteúdo
+                  </CardDescription>
+                </div>
+              </div>
+              <StatusBadge status={blogStatus} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleSeedBlog}
+              disabled={blogStatus === "loading"}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              {blogStatus === "loading" && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Seed Blog Only
+            </Button>
+            {blogResult && <ResultDisplay result={blogResult} />}
+          </CardContent>
+        </Card>
+
         {/* Info Card */}
         <Card className="bg-muted/50">
           <CardHeader>
@@ -156,6 +208,9 @@ export function SeedAdminView() {
             </p>
             <p>
               <strong>Boring Game:</strong> Rodadas do jogo mais chato
+            </p>
+            <p>
+              <strong>Blog:</strong> ~60+ posts de seleções e dicas
             </p>
           </CardContent>
         </Card>

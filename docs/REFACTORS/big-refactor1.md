@@ -270,7 +270,7 @@ editCountRef.current++;
 const editId = editCountRef.current;
 
      // Validar tamanho (rate limit server-side)
-     if (dups.length > 980 || miss.length > 980) {
+     if (dups.length > 1109 || miss.length > 1109) {
        setError("Limite de figurinhas excedido");
        return;
      }

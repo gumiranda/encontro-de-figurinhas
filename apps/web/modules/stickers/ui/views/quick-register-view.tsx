@@ -85,6 +85,8 @@ export function QuickRegisterView({
     markAllInSection,
     clearSection,
     invertSection,
+    markAll,
+    clearAll,
     finalize,
     flush,
   } = useStickers();
@@ -298,10 +300,28 @@ export function QuickRegisterView({
                 </div>
               )}
 
+              {/* Global bulk actions */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => markAll(activeTab)}
+                  className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-medium"
+                >
+                  Marcar todas
+                </button>
+                <button
+                  type="button"
+                  onClick={() => clearAll(activeTab)}
+                  className="cursor-pointer text-xs px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant"
+                >
+                  Desmarcar todas
+                </button>
+              </div>
+
               <div className="space-y-3 md:space-y-4">
                 {sectionsWithEmoji.map((section) => (
                   <StickerSectionGroup
-                    key={section.code}
+                    key={`${section.code}-${section.startNumber}`}
                     section={section}
                     mode={activeTab}
                     duplicatesSet={duplicatesSet}
