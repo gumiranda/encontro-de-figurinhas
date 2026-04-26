@@ -30,7 +30,7 @@ export function ProposalDetailView({ id }: { id: Id<"trades"> }) {
     api.trades.getTradeById,
     isAuthenticated ? { tradeId: id } : "skip"
   );
-  const sections = useQuery(api.album.getSections, {});
+  const sections = useQuery(api.album.getSections, { includeExtras: true });
 
   const confirmTrade = useMutation(api.trades.confirm);
   const declineTrade = useMutation(api.trades.decline);

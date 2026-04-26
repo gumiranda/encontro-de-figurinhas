@@ -54,24 +54,19 @@ const REASON_LABEL: Record<string, string> = {
 
 export async function generateMetadata({
   params,
-  searchParams,
-}: Props): Promise<Metadata> {
+}: Omit<Props, "searchParams">): Promise<Metadata> {
   const { rodada, matchSlug } = await params;
-  const sp = await searchParams;
   const data = await loadMatchBySlug(matchSlug);
   if (!data) return { title: "Jogo não encontrado" };
   const { match, round } = data;
   const url = `${BASE_URL}/jogo-mais-chato/${rodada}/${matchSlug}`;
   const title = `${match.homeTeamName} x ${match.awayTeamName} — Foi o jogo mais chato?`;
   const description = `Diga por que ${match.homeTeamName} x ${match.awayTeamName} pela ${round.name} foi (ou não foi) chato. ${match.totalVotes.toLocaleString("pt-BR")} já votaram.`;
-  // Bloquear indexação de variantes ?intent=vote (auto-vote pós-login)
-  const hasIntent = sp?.intent !== undefined;
   return {
     title,
     description,
     openGraph: { title, description, url, type: "website" },
     alternates: { canonical: url },
-    ...(hasIntent ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

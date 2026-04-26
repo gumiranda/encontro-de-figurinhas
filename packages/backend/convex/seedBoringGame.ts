@@ -1,29 +1,151 @@
 import { internalMutation } from "./_generated/server";
 
 const FLAG: Record<string, string> = {
-  BRA: "🇧🇷",
+  // Grupo A
+  MEX: "🇲🇽",
+  RSA: "🇿🇦",
+  KOR: "🇰🇷",
+  CZE: "🇨🇿",
+
+  // Grupo B
   CAN: "🇨🇦",
-  ARG: "🇦🇷",
-  ESP: "🇪🇸",
-  FRA: "🇫🇷",
-  ENG: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+  SUI: "🇨🇭",
+  QAT: "🇶🇦",
+  BIH: "🇧🇦",
+
+  // Grupo C
+  BRA: "🇧🇷",
+  MAR: "🇲🇦",
+  HAI: "🇭🇹",
+  SCO: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+
+  // Grupo D
+  USA: "🇺🇸",
+  PAR: "🇵🇾",
+  AUS: "🇦🇺",
+  TUR: "🇹🇷",
+
+  // Grupo E
   GER: "🇩🇪",
-  POR: "🇵🇹",
+  CUW: "🇨🇼",
+  CIV: "🇨🇮",
+  ECU: "🇪🇨",
+
+  // Grupo F
   NED: "🇳🇱",
+  JPN: "🇯🇵",
+  SWE: "🇸🇪",
+  TUN: "🇹🇳",
+
+  // Grupo G
+  BEL: "🇧🇪",
+  EGY: "🇪🇬",
+  IRN: "🇮🇷",
+  NZL: "🇳🇿",
+
+  // Grupo H
+  ESP: "🇪🇸",
+  CPV: "🇨🇻",
+  KSA: "🇸🇦",
+  URU: "🇺🇾",
+
+  // Grupo I
+  FRA: "🇫🇷",
+  SEN: "🇸🇳",
+  NOR: "🇳🇴",
+  IRQ: "🇮🇶",
+
+  // Grupo J
+  ARG: "🇦🇷",
+  ALG: "🇩🇿",
+  AUT: "🇦🇹",
+  JOR: "🇯🇴",
+
+  // Grupo K
+  POR: "🇵🇹",
+  UZB: "🇺🇿",
+  COL: "🇨🇴",
+  COD: "🇨🇩",
+
+  // Grupo L
+  ENG: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
   CRO: "🇭🇷",
+  GHA: "🇬🇭",
+  PAN: "🇵🇦",
 };
 
 const NAME: Record<string, string> = {
-  BRA: "Brasil",
+  // Grupo A
+  MEX: "México",
+  RSA: "África do Sul",
+  KOR: "Coreia do Sul",
+  CZE: "República Tcheca",
+
+  // Grupo B
   CAN: "Canadá",
-  ARG: "Argentina",
-  ESP: "Espanha",
-  FRA: "França",
-  ENG: "Inglaterra",
+  SUI: "Suíça",
+  QAT: "Catar",
+  BIH: "Bósnia e Herzegovina",
+
+  // Grupo C
+  BRA: "Brasil",
+  MAR: "Marrocos",
+  HAI: "Haiti",
+  SCO: "Escócia",
+
+  // Grupo D
+  USA: "Estados Unidos",
+  PAR: "Paraguai",
+  AUS: "Austrália",
+  TUR: "Turquia",
+
+  // Grupo E
   GER: "Alemanha",
-  POR: "Portugal",
+  CUW: "Curaçao",
+  CIV: "Costa do Marfim",
+  ECU: "Equador",
+
+  // Grupo F
   NED: "Holanda",
+  JPN: "Japão",
+  SWE: "Suécia",
+  TUN: "Tunísia",
+
+  // Grupo G
+  BEL: "Bélgica",
+  EGY: "Egito",
+  IRN: "Irã",
+  NZL: "Nova Zelândia",
+
+  // Grupo H
+  ESP: "Espanha",
+  CPV: "Cabo Verde",
+  KSA: "Arábia Saudita",
+  URU: "Uruguai",
+
+  // Grupo I
+  FRA: "França",
+  SEN: "Senegal",
+  NOR: "Noruega",
+  IRQ: "Iraque",
+
+  // Grupo J
+  ARG: "Argentina",
+  ALG: "Argélia",
+  AUT: "Áustria",
+  JOR: "Jordânia",
+
+  // Grupo K
+  POR: "Portugal",
+  UZB: "Uzbequistão",
+  COL: "Colômbia",
+  COD: "RD Congo",
+
+  // Grupo L
+  ENG: "Inglaterra",
   CRO: "Croácia",
+  GHA: "Gana",
+  PAN: "Panamá",
 };
 
 const EMPTY_REASON_COUNTS = {

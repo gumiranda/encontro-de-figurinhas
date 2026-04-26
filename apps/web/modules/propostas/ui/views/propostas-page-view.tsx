@@ -143,7 +143,7 @@ export function PropostasPageView() {
     api.trades.listMyTrades,
     isAuthenticated ? {} : "skip"
   );
-  const sections = useQuery(api.album.getSections, {});
+  const sections = useQuery(api.album.getSections, { includeExtras: true });
 
   const [tab, setTab] = useState<TabValue>("recebidas");
   const [search, setSearch] = useState("");

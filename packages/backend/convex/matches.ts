@@ -56,6 +56,11 @@ function buildSpecialSet(sections: Doc<"albumConfig">["sections"]): Set<number> 
   for (const s of sections) {
     for (const n of s.goldenNumbers ?? []) set.add(n);
     for (const l of s.legendNumbers ?? []) set.add(l.number);
+    if (s.isExtra) {
+      for (let n = s.startNumber; n <= s.endNumber; n++) {
+        set.add(n);
+      }
+    }
   }
   return set;
 }
@@ -994,16 +999,14 @@ export const getFullStickerOverlap = query({
       .map((num) => ({ num, qty: myDupCounts.get(num) ?? 1 }));
 
     const albumConfig = await ctx.db.query("albumConfig").first();
-    const sections = (albumConfig?.sections ?? [])
-      .filter((s) => !s.isExtra)
-      .map((s) => ({
-        code: s.code,
-        name: s.name,
-        startNumber: s.startNumber,
-        endNumber: s.endNumber,
-        goldenNumbers: s.goldenNumbers ?? [],
-        legendNumbers: (s.legendNumbers ?? []).map((l) => l.number),
-      }));
+    const sections = (albumConfig?.sections ?? []).map((s) => ({
+      code: s.code,
+      name: s.name,
+      startNumber: s.startNumber,
+      endNumber: s.endNumber,
+      goldenNumbers: s.goldenNumbers ?? [],
+      legendNumbers: (s.legendNumbers ?? []).map((l) => l.number),
+    }));
 
     return {
       theyHaveINeed,

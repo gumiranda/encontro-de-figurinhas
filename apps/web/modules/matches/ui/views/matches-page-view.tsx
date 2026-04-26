@@ -88,7 +88,7 @@ export function MatchesPageView() {
   const share = useShare();
 
   const findData = useQuery(api.matches.findUserMatches, {});
-  const sectionsQ = useQuery(api.album.getSections, {});
+  const sectionsQ = useQuery(api.album.getSections, { includeExtras: true });
 
   const canLoadMatches =
     findData !== undefined &&

@@ -14,13 +14,13 @@ export const getPublicAlbumCount = query({
 });
 
 export const getSections = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { includeExtras: v.optional(v.boolean()) },
+  handler: async (ctx, { includeExtras }) => {
     const config = await ctx.db.query("albumConfig").first();
     if (!config) return [];
 
     return config.sections
-      .filter((s) => !s.isExtra)
+      .filter((s) => includeExtras || !s.isExtra)
       .map((s) => ({
         name: s.name,
         code: s.code,

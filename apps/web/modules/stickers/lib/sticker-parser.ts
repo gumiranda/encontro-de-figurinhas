@@ -72,8 +72,8 @@ export function findSectionForNumber(
 
 const MAX_PARSE_ENTRIES = 500;
 
-const SINGLE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})$/;
-const RANGE_PATTERN = /^([A-Z]{2,4})-(\d{1,2})-(\d{1,2})$/;
+const SINGLE_PATTERN = /^([A-Z]{2,8})-(\d{1,2})$/;
+const RANGE_PATTERN = /^([A-Z]{2,8})-(\d{1,2})-(\d{1,2})$/;
 export const MULTI_COUNT_PREFIX = /^\d+[xX]/;
 export const GLOBAL_SINGLE = /^\d+$/;
 export const GLOBAL_RANGE = /^(\d+)-(\d+)$/;

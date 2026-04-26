@@ -84,7 +84,7 @@ export function PresentMatchesSection({
   const data = useQuery(api.checkins.listPresentMatchesAtPoint, {
     tradePointId,
   });
-  const sectionsData = useQuery(api.album.getSections);
+  const sectionsData = useQuery(api.album.getSections, { includeExtras: true });
   const [filter, setFilter] = useState<FilterKey>("todos");
 
   useEffect(() => {
