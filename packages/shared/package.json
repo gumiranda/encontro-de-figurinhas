@@ -1,0 +1,15 @@
+{
+  "name": "@workspace/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./string-utils": "./src/string-utils.ts",
+    "./sticker-types": "./src/sticker-types.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "^5.6.3"
+  }
+}

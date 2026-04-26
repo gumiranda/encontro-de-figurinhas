@@ -18,43 +18,54 @@ import {
   generateStickerMetadata,
   generateBreadcrumbSchema,
   generateProductSchema,
+  generateStickerFAQSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { RelatedStickers } from "@/components/related-stickers";
 
+// ISR: revalidate every 24 hours
+export const revalidate = 86400;
+
+// Only pre-generated slugs, unknown slugs → 404 immediately
+export const dynamicParams = false;
+
 interface StickerPageProps {
-  params: Promise<{ number: string }>;
+  params: Promise<{ slug: string }>;
 }
 
-async function loadSticker(number: number) {
+async function loadStickerBySlug(slug: string) {
   "use cache";
-  cacheTag(`figurinha:${number}`);
+  cacheTag(`figurinha:${slug}`);
   cacheLife("days");
-  return convexServer.query(api.album.getStickerByNumber, { number });
+  return convexServer.query(api.album.getStickerDetailBySlug, { slug });
 }
 
 async function loadRelatedStickers(number: number) {
   "use cache";
-  cacheTag(`figurinha:${number}`);
+  cacheTag(`figurinha:related:${number}`);
   cacheLife("days");
   return convexServer.query(api.album.getRelatedStickers, { number, limit: 8 });
+}
+
+async function loadAlbumConfig() {
+  "use cache";
+  cacheTag("album-config");
+  cacheLife("days");
+  const config = await convexServer.query(api.album.getSections, {});
+  const totalStickers = config.reduce((acc, s) => Math.max(acc, s.endNumber), 0);
+  return { totalStickers };
 }
 
 export async function generateMetadata({
   params,
 }: StickerPageProps): Promise<Metadata> {
-  const { number: numberStr } = await params;
-  const number = parseInt(numberStr, 10);
+  const { slug } = await params;
 
-  if (isNaN(number) || number < 1) {
-    return { title: "Figurinha não encontrada" };
-  }
-
-  let sticker: Awaited<ReturnType<typeof loadSticker>>;
+  let sticker: Awaited<ReturnType<typeof loadStickerBySlug>>;
   try {
-    sticker = await loadSticker(number);
+    sticker = await loadStickerBySlug(slug);
   } catch {
     return { title: "Figurinha" };
   }
@@ -63,72 +74,83 @@ export async function generateMetadata({
     return { title: "Figurinha não encontrada" };
   }
 
-  const displayLabel = `${sticker.teamCode}-${sticker.relativeNum}`;
+  const displayLabel = `${sticker.sectionCode}-${sticker.relativeNum}`;
 
-  return generateStickerMetadata(
-    sticker.number,
+  return generateStickerMetadata({
+    number: sticker.absoluteNum,
+    slug: sticker.slug,
     displayLabel,
-    sticker.teamName,
-    sticker.flagEmoji ?? "",
-    sticker.isGolden,
-    sticker.isLegend,
-    sticker.legendName
-  );
+    teamName: sticker.sectionName,
+    flagEmoji: sticker.flagEmoji ?? "",
+    isGolden: false,
+    isLegend: false,
+    legendName: undefined,
+    playerName: sticker.name,
+    stickerType: sticker.type,
+  });
 }
 
 export async function generateStaticParams() {
-  const numbers = await convexServer.query(api.album.getAllStickerNumbers, {});
-  return numbers.map((number) => ({ number: String(number) }));
+  const stickers = await convexServer.query(api.album.getAllStickerDetailsForSitemap, {});
+  return stickers.map((s) => ({ slug: s.slug }));
 }
 
 export default async function StickerPage({ params }: StickerPageProps) {
-  const { number: numberStr } = await params;
-  const number = parseInt(numberStr, 10);
+  const { slug } = await params;
 
-  if (isNaN(number) || number < 1) {
-    notFound();
-  }
-
-  const [sticker, relatedStickers] = await Promise.all([
-    loadSticker(number),
-    loadRelatedStickers(number),
+  const [sticker, albumConfig] = await Promise.all([
+    loadStickerBySlug(slug),
+    loadAlbumConfig(),
   ]);
 
   if (!sticker) {
     notFound();
   }
 
-  const displayLabel = `${sticker.teamCode}-${sticker.relativeNum}`;
+  const relatedStickers = await loadRelatedStickers(sticker.absoluteNum);
+
+  const displayLabel = `${sticker.sectionCode}-${sticker.relativeNum}`;
+  const teamSlug = sticker.sectionCode.toLowerCase();
 
   const breadcrumbItems = [
     { label: "Figurinhas", href: "/figurinhas" },
-    { label: sticker.teamName, href: `/selecao/${sticker.teamSlug}` },
+    { label: sticker.sectionName, href: `/selecao/${teamSlug}` },
     { label: displayLabel },
   ];
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
     { name: "Álbum Copa 2026", url: `${BASE_URL}/album-copa-do-mundo-2026` },
-    { name: sticker.teamName, url: `${BASE_URL}/selecao/${sticker.teamSlug}` },
+    { name: sticker.sectionName, url: `${BASE_URL}/selecao/${teamSlug}` },
     { name: `Figurinha ${displayLabel}` },
   ]);
 
-  const productSchema = generateProductSchema(
-    number,
+  const productSchema = generateProductSchema({
+    number: sticker.absoluteNum,
     displayLabel,
-    sticker.teamName,
-    sticker.isGolden,
-    sticker.isLegend,
-    sticker.legendName
+    teamName: sticker.sectionName,
+    isGolden: false,
+    isLegend: false,
+    legendName: undefined,
+    playerName: sticker.name,
+    stickerType: sticker.type,
+  });
+
+  const faqSchema = generateStickerFAQSchema(
+    displayLabel,
+    sticker.sectionName,
+    sticker.name
   );
 
-  const prevNumber = number > 1 ? number - 1 : null;
-  const nextNumber = number < sticker.totalStickers ? number + 1 : null;
+  // Prev/next use number URLs (middleware redirects to slug)
+  const prevNumber = sticker.absoluteNum > 1 ? sticker.absoluteNum - 1 : null;
+  const nextNumber = sticker.absoluteNum < albumConfig.totalStickers ? sticker.absoluteNum + 1 : null;
 
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={productSchema} />
+      <JsonLd data={faqSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}
@@ -142,43 +164,39 @@ export default async function StickerPage({ params }: StickerPageProps) {
                 <Badge variant="outline" className="text-lg px-3 py-1">
                   {displayLabel}
                 </Badge>
-                {sticker.isGolden && (
-                  <Badge className="bg-yellow-500 text-yellow-950">
+                {sticker.variant && sticker.variant !== "base" && (
+                  <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-yellow-950">
                     <Star className="h-3 w-3 mr-1" />
-                    Dourada
-                  </Badge>
-                )}
-                {sticker.isLegend && (
-                  <Badge className="bg-purple-500 text-white">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Lenda
+                    {sticker.variant.charAt(0).toUpperCase() + sticker.variant.slice(1)}
                   </Badge>
                 )}
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-4">
-                Figurinha {displayLabel}
-                {sticker.isLegend && sticker.legendName && (
-                  <span className="block text-primary">{sticker.legendName}</span>
-                )}
+                {sticker.name}
+                <span className="block text-xl font-normal text-muted-foreground mt-2">
+                  {displayLabel} - {sticker.sectionName}
+                </span>
               </h1>
 
               <p className="text-xl text-muted-foreground mb-2">
                 <Link
-                  href={`/selecao/${sticker.teamSlug}`}
+                  href={`/selecao/${teamSlug}`}
                   className="hover:text-primary hover:underline"
                 >
-                  {sticker.teamName}
+                  {sticker.sectionName}
                 </Link>{" "}
                 - Copa do Mundo 2026
               </p>
 
               <p className="text-lg text-muted-foreground mb-8">
-                {sticker.isLegend && sticker.legendName
-                  ? `Figurinha especial de ${sticker.legendName}, uma das mais procuradas do álbum.`
-                  : sticker.isGolden
-                    ? `Figurinha dourada da ${sticker.teamName}. Mais rara e valiosa para colecionadores.`
-                    : `Figurinha da seleção ${sticker.teamName} para completar seu álbum da Copa 2026.`}
+                {sticker.type === "escudo"
+                  ? `Escudo oficial da seleção ${sticker.sectionName} no álbum Copa do Mundo 2026.`
+                  : sticker.type === "team_photo"
+                    ? `Foto oficial do elenco da ${sticker.sectionName} para a Copa 2026.`
+                    : sticker.type === "special"
+                      ? `Figurinha especial do álbum Copa do Mundo 2026.`
+                      : `${sticker.name}, jogador da seleção ${sticker.sectionName}. Figurinha ${displayLabel} do álbum Copa 2026.`}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -189,8 +207,8 @@ export default async function StickerPage({ params }: StickerPageProps) {
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link href={`/selecao/${sticker.teamSlug}`}>
-                    Ver todas da {sticker.teamName}
+                  <Link href={`/selecao/${teamSlug}`}>
+                    Ver todas da {sticker.sectionName}
                   </Link>
                 </Button>
               </div>
@@ -214,7 +232,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
                 <div />
               )}
               <span className="text-sm text-muted-foreground">
-                {displayLabel} ({number} de {sticker.totalStickers})
+                {displayLabel} ({sticker.absoluteNum} de {albumConfig.totalStickers})
               </span>
               {nextNumber ? (
                 <Link
@@ -243,42 +261,26 @@ export default async function StickerPage({ params }: StickerPageProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-lg font-semibold">{sticker.teamName}</p>
+                  <p className="text-lg font-semibold">{sticker.sectionName}</p>
                   <p className="text-sm text-muted-foreground">
-                    Código FIFA: {sticker.teamCode}
+                    Código FIFA: {sticker.sectionCode}
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Raridade</CardTitle>
+                  <CardTitle>Tipo</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {sticker.isLegend ? (
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-purple-500" />
-                      <span className="text-lg font-semibold text-purple-600">
-                        Lenda
-                      </span>
-                    </div>
-                  ) : sticker.isGolden ? (
-                    <div className="flex items-center gap-2">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <span className="text-lg font-semibold text-yellow-600">
-                        Dourada
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-lg font-semibold">Comum</span>
+                  <span className="text-lg font-semibold capitalize">
+                    {sticker.type === "team_photo" ? "Foto do Time" : sticker.type ?? "Jogador"}
+                  </span>
+                  {sticker.variant && sticker.variant !== "base" && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Variante: {sticker.variant}
+                    </p>
                   )}
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {sticker.isLegend
-                      ? "Figurinha de jogador lendário"
-                      : sticker.isGolden
-                        ? "Figurinha especial mais rara"
-                        : "Figurinha padrão do álbum"}
-                  </p>
                 </CardContent>
               </Card>
 
@@ -305,20 +307,12 @@ export default async function StickerPage({ params }: StickerPageProps) {
               <h2>Sobre a figurinha {displayLabel}</h2>
               <p>
                 A figurinha {displayLabel} faz parte da coleção da{" "}
-                <Link href={`/selecao/${sticker.teamSlug}`}>{sticker.teamName}</Link>{" "}
+                <Link href={`/selecao/${teamSlug}`}>{sticker.sectionName}</Link>{" "}
                 {sticker.flagEmoji} no álbum oficial da Copa do Mundo 2026.
-                {sticker.isLegend && sticker.legendName && (
+                {sticker.type === "player" && (
                   <>
-                    {" "}Esta é uma figurinha especial de <strong>{sticker.legendName}</strong>,
-                    um dos jogadores mais icônicos da seleção e uma das figurinhas
-                    mais buscadas pelos colecionadores.
-                  </>
-                )}
-                {sticker.isGolden && !sticker.isLegend && (
-                  <>
-                    {" "}Esta é uma <strong>figurinha dourada</strong>, mais rara que
-                    as figurinhas comuns e especialmente valorizada pelos
-                    colecionadores.
+                    {" "}<strong>{sticker.name}</strong> é um dos jogadores convocados
+                    para representar a {sticker.sectionName} no mundial.
                   </>
                 )}
               </p>
@@ -340,12 +334,12 @@ export default async function StickerPage({ params }: StickerPageProps) {
                 </li>
               </ul>
 
-              <h3>Outras figurinhas da {sticker.teamName}</h3>
+              <h3>Outras figurinhas da {sticker.sectionName}</h3>
               <p>
-                A {sticker.teamName} possui diversas figurinhas no álbum da Copa
+                A {sticker.sectionName} possui diversas figurinhas no álbum da Copa
                 2026.{" "}
-                <Link href={`/selecao/${sticker.teamSlug}`}>
-                  Veja todas as figurinhas da {sticker.teamName}
+                <Link href={`/selecao/${teamSlug}`}>
+                  Veja todas as figurinhas da {sticker.sectionName}
                 </Link>{" "}
                 e encontre as que você precisa para completar a seção.
               </p>
@@ -361,7 +355,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
             teamSlug={relatedStickers.teamSlug}
             flagEmoji={relatedStickers.flagEmoji}
             stickers={relatedStickers.stickers}
-            currentNumber={number}
+            currentNumber={sticker.absoluteNum}
           />
         )}
 

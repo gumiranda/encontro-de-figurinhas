@@ -11,6 +11,7 @@
 import type * as _helpers_pagination from "../_helpers/pagination.js";
 import type * as album from "../album.js";
 import type * as blog from "../blog.js";
+import type * as boringGame from "../boringGame.js";
 import type * as checkins from "../checkins.js";
 import type * as cities from "../cities.js";
 import type * as crons from "../crons.js";
@@ -42,6 +43,7 @@ import type * as reports from "../reports.js";
 import type * as revalidate from "../revalidate.js";
 import type * as seedAlbumConfig from "../seedAlbumConfig.js";
 import type * as seedBlog from "../seedBlog.js";
+import type * as seedBoringGame from "../seedBoringGame.js";
 import type * as seeds_seedCities from "../seeds/seedCities.js";
 import type * as seeds_seedTradePoints from "../seeds/seedTradePoints.js";
 import type * as siteStats from "../siteStats.js";
@@ -71,6 +73,7 @@ declare const fullApi: ApiFromModules<{
   "_helpers/pagination": typeof _helpers_pagination;
   album: typeof album;
   blog: typeof blog;
+  boringGame: typeof boringGame;
   checkins: typeof checkins;
   cities: typeof cities;
   crons: typeof crons;
@@ -102,6 +105,7 @@ declare const fullApi: ApiFromModules<{
   revalidate: typeof revalidate;
   seedAlbumConfig: typeof seedAlbumConfig;
   seedBlog: typeof seedBlog;
+  seedBoringGame: typeof seedBoringGame;
   "seeds/seedCities": typeof seeds_seedCities;
   "seeds/seedTradePoints": typeof seeds_seedTradePoints;
   siteStats: typeof siteStats;

@@ -301,11 +301,18 @@ export function parseStickers(
   return { valid, invalid, rejectedMultiCount, formatted };
 }
 
+export type StickerType = "escudo" | "player" | "team_photo" | "special";
+export type Variant = "base" | "bronze" | "prata" | "ouro";
+
 export type StickerDisplay = {
   code: string;
   relativeNum: number;
   fullName: string;
   display: string;
+  playerName?: string;
+  stickerType?: StickerType;
+  slug?: string;
+  variant?: Variant;
 };
 
 export function getRelativeNum(num: number, section: Section): number {

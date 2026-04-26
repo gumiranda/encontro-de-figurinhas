@@ -54,7 +54,7 @@ async function loadStickersForSitemap() {
   "use cache";
   cacheTag("sitemap");
   cacheLife("days");
-  return convexServer.query(api.album.listStickersForSitemap, {});
+  return convexServer.query(api.album.getAllStickerDetailsForSitemap, {});
 }
 
 async function loadTeamsForSitemap() {
@@ -82,6 +82,27 @@ async function loadBlogForSitemap() {
     cursor = result.continueCursor;
   }
   return all;
+}
+
+// SLA invalidação:
+// - Webhook OK: ≤5s pós-vote (scheduler runAfter(0) + revalidateTag → next render).
+// - Webhook FAIL (após 4 retries com backoff 0/2s/10s/60s): cacheLife("minutes")
+//   = 5min stale max. Monitorar Convex logs filter `function:notifyRevalidate`
+//   pra detectar drift sustentado.
+async function loadBoringRoundsForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheTag("boring-game:sitemap");
+  cacheLife("minutes");
+  return convexServer.query(api.boringGame.listRoundsForSitemap, {});
+}
+
+async function loadBoringMatchesForSitemap() {
+  "use cache";
+  cacheTag("sitemap");
+  cacheTag("boring-game:sitemap");
+  cacheLife("minutes");
+  return convexServer.query(api.boringGame.listMatchesForSitemap, {});
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -179,9 +200,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/jogo-mais-chato`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/jogo-mais-chato/ranking`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
   ];
 
-  const [cities, tradePoints, states, stickers, teams, blogPosts] =
+  const [cities, tradePoints, states, stickers, teams, blogPosts, boringRounds, boringMatches] =
     await Promise.all([
       loadCitiesForSitemap(),
       loadTradePointsForSitemap(),
@@ -189,6 +222,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       loadStickersForSitemap(),
       loadTeamsForSitemap(),
       loadBlogForSitemap(),
+      loadBoringRoundsForSitemap(),
+      loadBoringMatchesForSitemap(),
     ]);
 
   const cityPages: MetadataRoute.Sitemap = cities.map((c) => ({
@@ -213,10 +248,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const stickerPages: MetadataRoute.Sitemap = stickers.map((s) => ({
-    url: `${BASE_URL}/figurinha/${s.number}`,
+    url: `${BASE_URL}/figurinha/${s.slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: 0.5,
+    priority: 0.6,
   }));
 
   const teamPages: MetadataRoute.Sitemap = teams.map((slug) => ({
@@ -240,6 +275,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const boringRoundPages: MetadataRoute.Sitemap = boringRounds.flatMap((r) => [
+    {
+      url: `${BASE_URL}/jogo-mais-chato/${r.slug}`,
+      lastModified: new Date(r.lastModified),
+      changeFrequency: r.isActive ? ("hourly" as const) : ("weekly" as const),
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/jogo-mais-chato/${r.slug}/resultado`,
+      lastModified: new Date(r.lastModified),
+      changeFrequency: r.isActive ? ("hourly" as const) : ("weekly" as const),
+      priority: 0.65,
+    },
+  ]);
+
+  const boringMatchPages: MetadataRoute.Sitemap = boringMatches.map((m) => ({
+    url: `${BASE_URL}/jogo-mais-chato/${m.roundSlug}/${m.matchSlug}`,
+    lastModified: new Date(m.lastModified),
+    changeFrequency: "hourly" as const,
+    priority: 0.6,
+  }));
+
   return [
     ...staticPages,
     ...cityPages,
@@ -249,5 +306,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...stickerPages,
     ...tradePointPages,
     ...blogPages,
+    ...boringRoundPages,
+    ...boringMatchPages,
   ];
 }

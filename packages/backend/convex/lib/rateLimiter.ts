@@ -124,4 +124,29 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: MINUTE,
     capacity: 240,
   },
+
+  // boringGame.castVote — per-user throttle (revote legítimo)
+  boringGameVoteUser: {
+    kind: "token bucket",
+    rate: 30,
+    period: HOUR,
+    capacity: 30,
+  },
+
+  // boringGame.castVote — per-IP throttle (multi-account anti-spam, NAT/CGNAT margem)
+  boringGameVoteIp: {
+    kind: "token bucket",
+    rate: 60,
+    period: HOUR,
+    capacity: 60,
+  },
+
+  // HTTP /api/sticker-slug — middleware redirect lookup, global bucket
+  stickerSlugLookup: {
+    kind: "token bucket",
+    rate: 300,
+    period: MINUTE,
+    capacity: 600,
+    shards: 4,
+  },
 });

@@ -1,5 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
 const isPublicRoute = createRouteMatcher([
   // Landing + auth
@@ -28,18 +31,50 @@ const isPublicRoute = createRouteMatcher([
   "/album-copa-do-mundo-2026(.*)",
   "/blog(.*)",
   "/cidade(.*)",
+  "/figurinha(.*)",
+  "/jogo-mais-chato(.*)",
   "/ponto/id(.*)",
   // /ponto/[slug] público (SEO) exceto /ponto/solicitar (autenticado)
   /^\/ponto\/(?!solicitar(?:\/|$))[^/]+(?:\/.*)?$/,
 ]);
 
-// Routes that require auth but allow incomplete onboarding
-// Onboarding redirect is handled client-side via useProfileRedirect hook
-const isOnboardingRoute = createRouteMatcher([
-  "/complete-profile",
-]);
+async function resolveNumericStickerRedirect(request: NextRequest) {
+  const match = request.nextUrl.pathname.match(/^\/figurinha\/(\d+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const num = match[1];
+
+  try {
+    const response = await fetch(`${CONVEX_URL}/api/sticker-slug?num=${num}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as { slug?: unknown };
+    if (typeof data.slug === "string") {
+      const url = request.nextUrl.clone();
+      url.pathname = `/figurinha/${data.slug}`;
+      return NextResponse.redirect(url, 301);
+    }
+  } catch {
+    // Let the route handle missing or unavailable sticker lookups.
+  }
+
+  return null;
+}
 
 export default clerkMiddleware(async (auth, req) => {
+  const stickerRedirect = await resolveNumericStickerRedirect(req);
+  if (stickerRedirect) {
+    return stickerRedirect;
+  }
+
   if (req.nextUrl.pathname.startsWith('/org-selection')) {
     return NextResponse.redirect(new URL('/', req.url));
   }
