@@ -12,6 +12,7 @@ import { rateLimiter } from "./lib/rateLimiter";
 import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
 import { isValidAbsolute } from "./lib/stickerNumbering";
+import { readSiteStatsOrNull } from "./siteStats";
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 3000;
@@ -68,7 +69,7 @@ async function syncActiveCheckinsStickerSnapshot(
   await Promise.all(needsPatch.map((c) => ctx.db.patch(c._id, denorm)));
 }
 
-type AlbumSection = Doc<"albumConfig">["sections"][number];
+type AlbumSection = Doc<"albumSections">;
 
 /**
  * Seções legadas (ex.: adminSeed sem `relStart`) ainda têm `stickerDetails` com `rel` correto;
@@ -76,11 +77,7 @@ type AlbumSection = Doc<"albumConfig">["sections"][number];
  */
 function withResolvedRelStart(section: AlbumSection): AlbumSection {
   if (section.relStart != null) return section;
-  const details = section.stickerDetails;
-  if (!details?.length) return section;
-  const minRel = Math.min(...details.map((d) => d.rel));
-  if (minRel === 1) return section;
-  return { ...section, relStart: minRel };
+  return { ...section, relStart: 1 };
 }
 
 export const getUserStickers = query({
@@ -88,13 +85,13 @@ export const getUserStickers = query({
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const rawSections = albumConfig?.sections ?? [];
+    const rawSections = await ctx.db.query("albumSections").collect();
+    const stats = await readSiteStatsOrNull(ctx);
     return {
       duplicates: user.duplicates ?? [],
       missing: user.missing ?? [],
       sections: rawSections.map(withResolvedRelStart),
-      totalStickers: albumConfig?.totalStickers ?? DEFAULT_TOTAL_STICKERS,
+      totalStickers: stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS,
     };
   },
 });
@@ -118,8 +115,8 @@ export const updateStickerList = mutation({
       );
     }
 
-    const config = await ctx.db.query("albumConfig").first();
-    const totalCount = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const stats = await readSiteStatsOrNull(ctx);
+    const totalCount = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const newDup = new Set<number>(args.duplicates);
     const newMiss = new Set<number>(args.missing);
@@ -201,8 +198,8 @@ export const toggleSticker = mutation({
 
     await rateLimiter.limit(ctx, "toggleSticker", { key: user._id, throws: true });
 
-    const config = await ctx.db.query("albumConfig").first();
-    const totalCount = config?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const stats = await readSiteStatsOrNull(ctx);
+    const totalCount = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const n = args.number;
     if (!isValidAbsolute(n, totalCount)) {

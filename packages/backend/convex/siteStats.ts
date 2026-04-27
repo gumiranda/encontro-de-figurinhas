@@ -26,6 +26,8 @@ export async function ensureSiteStats(ctx: MutationCtx) {
     matchRecomputeEnabled: true,
     hardDeleteOversizedCount: 0,
     lastReconcileAt: 0,
+    totalStickers: undefined,
+    albumYear: undefined,
   });
   const created = await ctx.db.get(id);
   if (!created) throw new Error("siteStats insert failed");
@@ -45,6 +47,8 @@ export const initSiteStats = internalMutation({
       matchRecomputeEnabled: true,
       hardDeleteOversizedCount: 0,
       lastReconcileAt: 0,
+      totalStickers: undefined,
+      albumYear: undefined,
     });
     return { ok: true, created: true, id };
   },

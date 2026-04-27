@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, query, type MutationCtx } from "./_generated/server";
+import { internalMutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
@@ -51,15 +51,12 @@ function scoreOf(ihave: number, ineed: number): number {
   return Math.min(ihave, ineed) * 2 + Math.max(ihave, ineed);
 }
 
-function buildSpecialSet(sections: Doc<"albumConfig">["sections"]): Set<number> {
+async function buildSpecialSet(ctx: { db: QueryCtx["db"] }): Promise<Set<number>> {
+  const all = await ctx.db.query("stickerDetail").collect();
   const set = new Set<number>();
-  for (const s of sections) {
-    for (const n of s.goldenNumbers ?? []) set.add(n);
-    for (const l of s.legendNumbers ?? []) set.add(l.number);
-    if (s.isExtra) {
-      for (let n = s.startNumber; n <= s.endNumber; n++) {
-        set.add(n);
-      }
+  for (const s of all) {
+    if (s.isGolden || s.isLegend || s.isExtra) {
+      set.add(s.absoluteNum);
     }
   }
   return set;
@@ -144,10 +141,7 @@ export const recomputeMatchCache = internalMutation({
 
     const cityId = me.cityId;
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const specialSet = albumConfig
-      ? buildSpecialSet(albumConfig.sections)
-      : new Set<number>();
+    const specialSet = await buildSpecialSet(ctx);
 
     const myDupSorted = [...(me.duplicates ?? [])].sort((a, b) => a - b);
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
@@ -444,10 +438,7 @@ export const listMyMatches = query({
     const userMissingCount = me.missing?.length ?? 0;
     const layers: (1 | 2)[] = args.layer === null ? [1, 2] : [args.layer];
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const specialSet = albumConfig
-      ? buildSpecialSet(albumConfig.sections)
-      : new Set<number>();
+    const specialSet = await buildSpecialSet(ctx);
 
     const rows: Doc<"precomputedMatches">[] = [];
     for (const layer of layers) {
@@ -569,10 +560,7 @@ export const listPresentMatchRowsAtActivePoint = query({
       return { matches: [], meta: { userMissingCount } };
     }
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const specialSet = albumConfig
-      ? buildSpecialSet(albumConfig.sections)
-      : new Set<number>();
+    const specialSet = await buildSpecialSet(ctx);
 
     const myDupSorted = [...(me.duplicates ?? [])].sort((a, b) => a - b);
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
@@ -998,8 +986,8 @@ export const getFullStickerOverlap = query({
       .slice(0, MAX_STICKERS_OVERLAP)
       .map((num) => ({ num, qty: myDupCounts.get(num) ?? 1 }));
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const sections = (albumConfig?.sections ?? []).map((s) => ({
+    const allSections = await ctx.db.query("albumSections").collect();
+    const sections = allSections.map((s) => ({
       code: s.code,
       name: s.name,
       startNumber: s.startNumber,

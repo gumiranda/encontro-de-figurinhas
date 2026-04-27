@@ -160,7 +160,7 @@ export const getStatsBySlug = query({
 
     if (!city) return null;
 
-    const [collectors, tradePoints, config] = await Promise.all([
+    const [collectors, tradePoints, sections] = await Promise.all([
       ctx.db
         .query("users")
         .withIndex("by_city_not_shadowbanned", (q) =>
@@ -173,7 +173,7 @@ export const getStatsBySlug = query({
           q.eq("cityId", city._id).eq("status", "approved")
         )
         .take(1000),
-      ctx.db.query("albumConfig").first(),
+      ctx.db.query("albumSections").collect(),
     ]);
 
     const activeCollectors = collectors.filter(
@@ -192,7 +192,7 @@ export const getStatsBySlug = query({
     }
 
     const formatSticker = (n: number) => {
-      const section = config?.sections.find(
+      const section = sections.find(
         (s) => n >= s.startNumber && n <= s.endNumber
       );
       if (!section) {

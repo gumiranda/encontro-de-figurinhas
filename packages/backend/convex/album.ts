@@ -1,14 +1,14 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { readSiteStatsOrNull } from "./siteStats";
 import { relativeFromAbsolute } from "./lib/stickerNumbering";
 
 /** `totalStickers` = quantidade; números absolutos válidos: 0 .. totalStickers - 1. */
 export const getPublicAlbumCount = query({
   args: {},
   handler: async (ctx) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return { totalStickers: 0, maxAbsolute: -1 };
-    const t = config.totalStickers;
+    const stats = await readSiteStatsOrNull(ctx);
+    const t = stats?.totalStickers ?? 0;
     return { totalStickers: t, maxAbsolute: t - 1 };
   },
 });
@@ -16,15 +16,16 @@ export const getPublicAlbumCount = query({
 export const getSections = query({
   args: { includeExtras: v.optional(v.boolean()) },
   handler: async (ctx, { includeExtras }) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return [];
+    const sections = await ctx.db
+      .query("albumSections")
+      .collect();
 
-    return config.sections
+    return sections
       .filter((s) => includeExtras || !s.isExtra)
       .map((s) => ({
         name: s.name,
         code: s.code,
-        slug: s.code.toLowerCase(),
+        slug: s.slug,
         flagEmoji: s.flagEmoji,
         startNumber: s.startNumber,
         endNumber: s.endNumber,
@@ -38,26 +39,26 @@ export const getSections = query({
 export const getSectionBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return null;
+    const section = await ctx.db
+      .query("albumSections")
+      .withIndex("by_slug", (q) => q.eq("slug", slug.toLowerCase()))
+      .first();
+    if (!section || section.isExtra) return null;
 
-    const section = config.sections.find(
-      (s) => s.code.toLowerCase() === slug.toLowerCase() && !s.isExtra
-    );
-    if (!section) return null;
+    const stats = await readSiteStatsOrNull(ctx);
 
     return {
       name: section.name,
       code: section.code,
-      slug: section.code.toLowerCase(),
+      slug: section.slug,
       flagEmoji: section.flagEmoji,
       startNumber: section.startNumber,
       endNumber: section.endNumber,
       stickerCount: section.endNumber - section.startNumber + 1,
       goldenNumbers: section.goldenNumbers ?? [],
       legendNumbers: section.legendNumbers ?? [],
-      totalAlbumStickers: config.totalStickers,
-      year: config.year,
+      totalAlbumStickers: stats?.totalStickers ?? 0,
+      year: section.year,
     };
   },
 });
@@ -65,25 +66,21 @@ export const getSectionBySlug = query({
 export const getAllSectionSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return [];
-
-    return config.sections
+    const sections = await ctx.db.query("albumSections").collect();
+    return sections
       .filter((s) => !s.isExtra)
-      .map((s) => s.code.toLowerCase());
+      .map((s) => s.slug);
   },
 });
 
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return [];
-
-    return config.sections
+    const sections = await ctx.db.query("albumSections").collect();
+    return sections
       .filter((s) => !s.isExtra)
       .map((s) => ({
-        slug: s.code.toLowerCase(),
+        slug: s.slug,
         name: s.name,
       }));
   },
@@ -92,30 +89,32 @@ export const listForSitemap = query({
 export const getStickerByNumber = query({
   args: { number: v.number() },
   handler: async (ctx, { number }) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return null;
+    const detail = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_absolute", (q) => q.eq("absoluteNum", number))
+      .first();
+    if (!detail) return null;
 
-    const section = config.sections.find(
-      (s) => number >= s.startNumber && number <= s.endNumber
-    );
-    if (!section) return null;
+    const section = await ctx.db
+      .query("albumSections")
+      .withIndex("by_code", (q) => q.eq("code", detail.sectionCode))
+      .first();
 
-    const isGolden = section.goldenNumbers?.includes(number) ?? false;
-    const legend = section.legendNumbers?.find((l) => l.number === number);
+    const stats = await readSiteStatsOrNull(ctx);
 
     return {
       number,
-      teamName: section.name,
-      teamCode: section.code,
-      teamSlug: section.code.toLowerCase(),
-      flagEmoji: section.flagEmoji,
-      teamStartNumber: section.startNumber,
-      teamEndNumber: section.endNumber,
-      relativeNum: relativeFromAbsolute(number, section),
-      isGolden,
-      isLegend: !!legend,
-      legendName: legend?.name,
-      totalStickers: config.totalStickers,
+      teamName: detail.sectionName,
+      teamCode: detail.sectionCode,
+      teamSlug: detail.sectionCode.toLowerCase(),
+      flagEmoji: detail.flagEmoji,
+      teamStartNumber: section?.startNumber ?? 0,
+      teamEndNumber: section?.endNumber ?? 0,
+      relativeNum: detail.relativeNum,
+      isGolden: detail.isGolden ?? false,
+      isLegend: detail.isLegend ?? false,
+      legendName: detail.legendName,
+      totalStickers: stats?.totalStickers ?? 0,
     };
   },
 });
@@ -123,11 +122,12 @@ export const getStickerByNumber = query({
 export const getAllStickerNumbers = query({
   args: {},
   handler: async (ctx) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return [];
+    const stats = await readSiteStatsOrNull(ctx);
+    const total = stats?.totalStickers ?? 0;
+    if (total === 0) return [];
 
     const numbers: number[] = [];
-    for (let i = 0; i < config.totalStickers; i++) {
+    for (let i = 0; i < total; i++) {
       numbers.push(i);
     }
     return numbers;
@@ -137,78 +137,59 @@ export const getAllStickerNumbers = query({
 export const listStickersForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return [];
-
-    const stickers: Array<{
-      number: number;
-      teamCode: string;
-      isSpecial: boolean;
-    }> = [];
-
-    for (const section of config.sections) {
-      const goldenSet = new Set(section.goldenNumbers ?? []);
-      const legendSet = new Set(
-        (section.legendNumbers ?? []).map((l) => l.number)
-      );
-
-      for (let n = section.startNumber; n <= section.endNumber; n++) {
-        stickers.push({
-          number: n,
-          teamCode: section.code,
-          isSpecial: goldenSet.has(n) || legendSet.has(n),
-        });
-      }
-    }
-
-    return stickers;
+    const details = await ctx.db.query("stickerDetail").collect();
+    return details.map((d) => ({
+      number: d.absoluteNum,
+      teamCode: d.sectionCode,
+      isSpecial: (d.isGolden ?? false) || (d.isLegend ?? false) || (d.isExtra ?? false),
+    }));
   },
 });
 
 export const getRelatedStickers = query({
   args: { number: v.number(), limit: v.optional(v.number()) },
   handler: async (ctx, { number, limit = 8 }) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return null;
+    const current = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_absolute", (q) => q.eq("absoluteNum", number))
+      .first();
+    if (!current) return null;
 
-    const section = config.sections.find(
-      (s) => number >= s.startNumber && number <= s.endNumber
-    );
+    const section = await ctx.db
+      .query("albumSections")
+      .withIndex("by_code", (q) => q.eq("code", current.sectionCode))
+      .first();
     if (!section) return null;
 
-    const goldenSet = new Set(section.goldenNumbers ?? []);
-    const legendMap = new Map(
-      (section.legendNumbers ?? []).map((l) => [l.number, l.name])
-    );
+    const allStickers = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_section_rel", (q) => q.eq("sectionCode", current.sectionCode))
+      .collect();
 
-    const allNumbers: number[] = [];
-    for (let n = section.startNumber; n <= section.endNumber; n++) {
-      if (n !== number) allNumbers.push(n);
-    }
+    const others = allStickers.filter((s) => s.absoluteNum !== number);
 
-    const specialNumbers = allNumbers.filter(
-      (n) => goldenSet.has(n) || legendMap.has(n)
-    );
-    const regularNumbers = allNumbers.filter(
-      (n) => !goldenSet.has(n) && !legendMap.has(n)
-    );
+    const isSpecial = (s: typeof others[0]) =>
+      (s.isGolden ?? false) || (s.isLegend ?? false) || (s.variant ?? "base") !== "base";
 
-    const selectedNumbers = [
-      ...specialNumbers.slice(0, Math.min(3, limit)),
-      ...regularNumbers.slice(0, limit - Math.min(3, specialNumbers.length)),
+    const specials = others.filter(isSpecial);
+    const regulars = others.filter((s) => !isSpecial(s));
+
+    const selected = [
+      ...specials.slice(0, Math.min(3, limit)),
+      ...regulars.slice(0, limit - Math.min(3, specials.length)),
     ].slice(0, limit);
 
     return {
       teamName: section.name,
       teamCode: section.code,
-      teamSlug: section.code.toLowerCase(),
+      teamSlug: section.slug,
       flagEmoji: section.flagEmoji,
-      stickers: selectedNumbers.map((n) => ({
-        number: n,
-        relativeNum: relativeFromAbsolute(n, section),
-        isGolden: goldenSet.has(n),
-        isLegend: legendMap.has(n),
-        legendName: legendMap.get(n),
+      stickers: selected.map((s) => ({
+        number: s.absoluteNum,
+        relativeNum: s.relativeNum,
+        isGolden: s.isGolden ?? false,
+        isLegend: s.isLegend ?? false,
+        legendName: s.legendName,
       })),
     };
   },
@@ -291,18 +272,16 @@ export const getAllStickerDetailsForSitemap = query({
 export const getSectionByCode = query({
   args: { code: v.string() },
   handler: async (ctx, { code }) => {
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return null;
-
-    const section = config.sections.find(
-      (s) => s.code.toLowerCase() === code.toLowerCase()
-    );
+    const section = await ctx.db
+      .query("albumSections")
+      .withIndex("by_code", (q) => q.eq("code", code.toUpperCase()))
+      .first();
     if (!section) return null;
 
     return {
       name: section.name,
       code: section.code,
-      slug: section.code.toLowerCase(),
+      slug: section.slug,
       flagEmoji: section.flagEmoji,
       startNumber: section.startNumber,
       endNumber: section.endNumber,
@@ -338,68 +317,37 @@ export const getTeamStickers = query({
 export const getStickerWithDetail = query({
   args: { number: v.number() },
   handler: async (ctx, { number }) => {
-    // Try stickerDetail first (O(1) lookup with denormalized data)
     const detail = await ctx.db
       .query("stickerDetail")
       .withIndex("by_absolute", (q) => q.eq("absoluteNum", number))
       .first();
 
-    if (detail) {
-      // Fast path: use denormalized data
-      const config = await ctx.db.query("albumConfig").first();
-      const section = config?.sections.find(
-        (s) => number >= s.startNumber && number <= s.endNumber
-      );
+    if (!detail) return null;
 
-      return {
-        number,
-        teamName: detail.sectionName,
-        teamCode: detail.sectionCode,
-        teamSlug: detail.sectionCode.toLowerCase(),
-        flagEmoji: detail.flagEmoji,
-        teamStartNumber: section?.startNumber ?? 0,
-        teamEndNumber: section?.endNumber ?? 0,
-        relativeNum: detail.relativeNum,
-        isGolden: section?.goldenNumbers?.includes(number) ?? false,
-        isLegend: section?.legendNumbers?.some((l) => l.number === number) ?? false,
-        legendName: section?.legendNumbers?.find((l) => l.number === number)?.name,
-        totalStickers: config?.totalStickers ?? 0,
-        playerName: detail.name,
-        stickerType: detail.type,
-        variant: detail.variant,
-        slug: detail.slug,
-      };
-    }
+    const section = await ctx.db
+      .query("albumSections")
+      .withIndex("by_code", (q) => q.eq("code", detail.sectionCode))
+      .first();
 
-    // Fallback: use albumConfig (for stickers not yet in stickerDetail table)
-    const config = await ctx.db.query("albumConfig").first();
-    if (!config) return null;
-
-    const section = config.sections.find(
-      (s) => number >= s.startNumber && number <= s.endNumber
-    );
-    if (!section) return null;
-
-    const isGolden = section.goldenNumbers?.includes(number) ?? false;
-    const legend = section.legendNumbers?.find((l) => l.number === number);
+    const stats = await readSiteStatsOrNull(ctx);
 
     return {
       number,
-      teamName: section.name,
-      teamCode: section.code,
-      teamSlug: section.code.toLowerCase(),
-      flagEmoji: section.flagEmoji,
-      teamStartNumber: section.startNumber,
-      teamEndNumber: section.endNumber,
-      relativeNum: relativeFromAbsolute(number, section),
-      isGolden,
-      isLegend: !!legend,
-      legendName: legend?.name,
-      totalStickers: config.totalStickers,
-      playerName: undefined,
-      stickerType: undefined,
-      variant: undefined,
-      slug: undefined,
+      teamName: detail.sectionName,
+      teamCode: detail.sectionCode,
+      teamSlug: detail.sectionCode.toLowerCase(),
+      flagEmoji: detail.flagEmoji,
+      teamStartNumber: section?.startNumber ?? 0,
+      teamEndNumber: section?.endNumber ?? 0,
+      relativeNum: detail.relativeNum,
+      isGolden: detail.isGolden ?? false,
+      isLegend: detail.isLegend ?? false,
+      legendName: detail.legendName,
+      totalStickers: stats?.totalStickers ?? 0,
+      playerName: detail.name,
+      stickerType: detail.type,
+      variant: detail.variant,
+      slug: detail.slug,
     };
   },
 });

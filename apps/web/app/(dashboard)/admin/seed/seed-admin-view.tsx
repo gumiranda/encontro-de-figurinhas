@@ -105,7 +105,7 @@ export function SeedAdminView() {
                 <div>
                   <CardTitle>Seed All</CardTitle>
                   <CardDescription>
-                    Cities, Trade Points, Album Config, Boring Game, Blog Posts
+                    Cities, Trade Points, Album Sections + Stickers, Boring Game, Blog Posts
                   </CardDescription>
                 </div>
               </div>

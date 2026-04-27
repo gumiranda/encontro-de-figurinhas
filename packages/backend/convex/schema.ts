@@ -273,30 +273,23 @@ export default defineSchema({
     .index("by_at", ["at"])
     .index("by_user", ["userId"]),
 
-  albumConfig: defineTable({
-    totalStickers: v.number(),
-    sections: v.array(
-      v.object({
-        name: v.string(),
-        code: v.string(), // Código FIFA (ex: BRA, ARG, ENG)
-        startNumber: v.number(),
-        endNumber: v.number(),
-        isExtra: v.optional(v.boolean()),
-        flagEmoji: v.optional(v.string()),
-        relStart: v.optional(v.number()), // First relative number (default 1). FWC champions uses 9.
-        goldenNumbers: v.optional(v.array(v.number())),
-        legendNumbers: v.optional(
-          v.array(
-            v.object({ number: v.number(), name: v.string() })
-          )
-        ),
-        stickerDetails: v.optional(v.array(stickerDetailInSectionValidator)),
-      })
-    ),
-    version: v.number(),
+  albumSections: defineTable({
+    name: v.string(),
+    code: v.string(),
+    slug: v.string(),
+    flagEmoji: v.optional(v.string()),
+    startNumber: v.number(),
+    endNumber: v.number(),
+    isExtra: v.optional(v.boolean()),
     year: v.number(),
+    relStart: v.optional(v.number()),
+    goldenNumbers: v.optional(v.array(v.number())),
+    legendNumbers: v.optional(
+      v.array(v.object({ number: v.number(), name: v.string() }))
+    ),
   })
-    .index("by_version", ["version"]),
+    .index("by_code", ["code"])
+    .index("by_slug", ["slug"]),
 
   // O(1) lookup for sticker details (denormalized for breadcrumbs/SEO)
   stickerDetail: defineTable({
@@ -311,6 +304,10 @@ export default defineSchema({
     type: v.optional(stickerTypeValidator),
     variant: v.optional(variantValidator),
     displayCode: v.optional(v.string()), // For EXT: "LM-BASE", "LM-OURO"
+    isGolden: v.optional(v.boolean()),
+    isLegend: v.optional(v.boolean()),
+    legendName: v.optional(v.string()),
+    isExtra: v.optional(v.boolean()),
   })
     .index("by_section_rel", ["sectionCode", "relativeNum"])
     .index("by_absolute", ["absoluteNum"])
@@ -517,6 +514,8 @@ export default defineSchema({
     matchRecomputeEnabled: v.optional(v.boolean()),
     hardDeleteOversizedCount: v.optional(v.number()),
     lastReconcileAt: v.optional(v.number()),
+    totalStickers: v.optional(v.number()),
+    albumYear: v.optional(v.number()),
   }),
 
   postMetrics: defineTable({

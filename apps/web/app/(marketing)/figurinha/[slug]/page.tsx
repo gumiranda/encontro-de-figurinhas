@@ -92,7 +92,7 @@ export async function generateStaticParams() {
 export default async function StickerPage({ params }: StickerPageProps) {
   const { slug } = await params;
 
-  const [sticker, albumConfig] = await Promise.all([
+  const [sticker, albumCount] = await Promise.all([
     loadStickerBySlug(slug),
     loadAlbumConfig(),
   ]);
@@ -141,7 +141,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
   // Prev/next use number URLs (middleware redirects to slug)
   const prevNumber = sticker.absoluteNum > 0 ? sticker.absoluteNum - 1 : null;
   const nextNumber =
-    sticker.absoluteNum < albumConfig.totalStickers - 1
+    sticker.absoluteNum < albumCount.totalStickers - 1
       ? sticker.absoluteNum + 1
       : null;
 
@@ -233,7 +233,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
               <span className="text-sm text-muted-foreground">
                 {displayLabel} (
                 {sticker.absoluteNum === 0 ? "00" : sticker.absoluteNum} de{" "}
-                {albumConfig.totalStickers})
+                {albumCount.totalStickers})
               </span>
               {nextNumber ? (
                 <Link

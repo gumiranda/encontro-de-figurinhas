@@ -10,6 +10,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import { readSiteStatsOrNull } from "./siteStats";
 import { getPendingTradesCount } from "./lib/tradeHelpers";
 import { rateLimiter } from "./lib/rateLimiter";
 
@@ -265,8 +266,8 @@ export const confirm = mutation({
       (n) => !stickersCounterpartyReceives.includes(n)
     );
 
-    const albumConfig = await ctx.db.query("albumConfig").first();
-    const totalStickers = albumConfig?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const stats = await readSiteStatsOrNull(ctx);
+    const totalStickers = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
     const initiatorAlbumCompletionPct =
       totalStickers === 0

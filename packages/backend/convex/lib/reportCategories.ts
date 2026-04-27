@@ -30,15 +30,11 @@ export async function countExtraStickersOwned(
   ctx: { db: QueryCtx["db"] },
   user: Doc<"users">
 ): Promise<number> {
-  const config = await ctx.db.query("albumConfig").first();
-  if (!config) return 0;
+  const all = await ctx.db.query("stickerDetail").collect();
   const missing = new Set(user.missing ?? []);
   let count = 0;
-  for (const section of config.sections) {
-    if (!section.isExtra) continue;
-    for (let n = section.startNumber; n <= section.endNumber; n++) {
-      if (!missing.has(n)) count++;
-    }
+  for (const s of all) {
+    if (s.isExtra && !missing.has(s.absoluteNum)) count++;
   }
   return count;
 }

@@ -10,25 +10,22 @@ export const contentType = "image/png";
 export default async function Image({
   params,
 }: {
-  params: Promise<{ number: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { number } = await params;
-  const num = parseInt(number, 10);
-  const sticker = await fetchQuery(api.album.getStickerByNumber, { number: num });
+  const { slug } = await params;
+  const sticker = await fetchQuery(api.album.getStickerDetailBySlug, { slug });
 
-  const teamName = sticker?.teamName ?? "Seleção";
+  const teamName = sticker?.sectionName ?? "Seleção";
   const flagEmoji = sticker?.flagEmoji ?? "🏳️";
-  const isGolden = sticker?.isGolden ?? false;
-  const isLegend = sticker?.isLegend ?? false;
-  const legendName = sticker?.legendName;
+  const displayNum = sticker?.absoluteNum ?? 0;
 
-  const bgGradient = isGolden
+  const bgGradient = sticker?.variant && sticker.variant !== "base"
     ? "linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%)"
-    : isLegend
-      ? "linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%)"
-      : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)";
+    : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)";
 
-  const specialLabel = isLegend ? "LEGEND" : isGolden ? "DOURADA" : null;
+  const specialLabel = sticker?.variant && sticker.variant !== "base"
+    ? sticker.variant.toUpperCase()
+    : null;
 
   return new ImageResponse(
     (
@@ -86,7 +83,7 @@ export default async function Image({
               marginTop: 8,
             }}
           >
-            {num}
+            {displayNum}
           </span>
         </div>
 
@@ -99,7 +96,7 @@ export default async function Image({
             textAlign: "center",
           }}
         >
-          Figurinha {num}
+          Figurinha {displayNum}
         </h1>
 
         <p
@@ -109,7 +106,7 @@ export default async function Image({
             margin: "16px 0 0 0",
           }}
         >
-          {legendName ? legendName : teamName}
+          {teamName}
         </p>
 
         <div
