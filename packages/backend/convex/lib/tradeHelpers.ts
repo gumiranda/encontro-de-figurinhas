@@ -10,7 +10,7 @@ export async function getPendingTradesCount(
     .withIndex("by_initiator_status", (q) =>
       q.eq("initiatorId", userId).eq("status", "pending_confirmation")
     )
-    .collect();
+    .take(100);
   return asInitiator.length;
 }
 
@@ -23,6 +23,6 @@ export async function getPendingProposalsForUserCount(
     .withIndex("by_counterparty_status", (q) =>
       q.eq("counterpartyId", userId).eq("status", "pending_confirmation")
     )
-    .collect();
+    .take(100);
   return incoming.length;
 }
