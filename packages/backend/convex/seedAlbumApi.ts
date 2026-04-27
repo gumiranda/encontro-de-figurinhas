@@ -1,10 +1,10 @@
 import { mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { isAdmin } from "./lib/auth";
-import { seedAlbumData } from "./lib/seedAlbumData";
 
-export const seedAlbumConfig = mutation({
+export const seedAlbum = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ ok: boolean; action: string; totalStickers: number; version: number }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
@@ -14,6 +14,8 @@ export const seedAlbumConfig = mutation({
       .first();
     if (!user || !isAdmin(user.role)) throw new Error("Admin required");
 
-    return seedAlbumData(ctx);
+    const result: { action: string; totalStickers: number; version: number } =
+      await ctx.runMutation(internal.seedAlbumRunner.doSeedAlbum, {});
+    return { ok: true, ...result };
   },
 });

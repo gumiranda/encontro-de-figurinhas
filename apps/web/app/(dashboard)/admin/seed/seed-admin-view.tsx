@@ -35,7 +35,7 @@ export function SeedAdminView() {
   const [blogResult, setBlogResult] = useState<SeedResult | null>(null);
 
   const seedAll = useMutation(api.adminSeed.seedAll);
-  const seedAlbum = useMutation(api.adminSeed.seedAlbum);
+  const seedAlbum = useMutation(api.seedAlbumApi.seedAlbum);
   const seedBlog = useMutation(api.adminSeed.seedBlog);
 
   const handleSeedAll = async () => {

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     if (seeds.includes("album")) {
-      const result = await client.mutation(api.adminSeed.seedAlbum, {});
+      const result = await client.mutation(api.seedAlbumApi.seedAlbum, {});
       return NextResponse.json(result);
     }
 
