@@ -9,10 +9,12 @@ import {
 } from "./lib/checkinHelpers";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { rateLimiter } from "./lib/rateLimiter";
-import { setsEqual } from "./lib/utils";
 import { scheduleDebouncedMatchRecompute } from "./matches";
 import { isValidAbsolute } from "./lib/stickerNumbering";
 import { readSiteStatsOrNull } from "./siteStats";
+
+const setsEqual = <T>(a: Set<T>, b: Set<T>): boolean =>
+  a.size === b.size && [...a].every((x) => b.has(x));
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 3000;

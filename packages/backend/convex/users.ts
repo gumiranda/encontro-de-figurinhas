@@ -8,9 +8,9 @@ import { verifyIpLocationToken } from "./lib/ipLocationToken";
 import {
   GEO_VALIDATION,
   LOCATION_RATE_LIMIT,
+  checkRateLimit,
   getLocationUpdateTimestampsForWindow,
 } from "./lib/locationRateLimit";
-import { checkRateLimit } from "./lib/rateLimit";
 import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
 import { getPendingProposalsForUserCount } from "./lib/tradeHelpers";

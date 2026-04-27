@@ -728,108 +728,6 @@ export function generateCityItemListSchema(
   };
 }
 
-export function generateLocalBusinessSchema(point: {
-  name: string;
-  slug: string;
-  address: string;
-  city: string;
-  state: string;
-  lat?: number;
-  lng?: number;
-  suggestedHours?: string;
-  description?: string;
-  participantCount?: number;
-  confidenceScore?: number;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": `${BASE_URL}/ponto/${point.slug}`,
-    name: point.name,
-    description:
-      point.description ||
-      `Ponto de troca de figurinhas da Copa 2026 em ${point.city}, ${point.state}. Local para colecionadores trocarem figurinhas repetidas.`,
-    url: `${BASE_URL}/ponto/${point.slug}`,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: point.address,
-      addressLocality: point.city,
-      addressRegion: point.state,
-      addressCountry: "BR",
-    },
-    ...(point.lat &&
-      point.lng && {
-        geo: {
-          "@type": "GeoCoordinates",
-          latitude: point.lat,
-          longitude: point.lng,
-        },
-      }),
-    ...(point.suggestedHours && {
-      openingHoursSpecification: {
-        "@type": "OpeningHoursSpecification",
-        description: point.suggestedHours,
-      },
-    }),
-    ...(point.participantCount &&
-      point.participantCount > 0 && {
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: Math.min(5, (point.confidenceScore || 5) / 2),
-          reviewCount: point.participantCount,
-          bestRating: 5,
-        },
-      }),
-    priceRange: "Gratuito",
-    currenciesAccepted: "BRL",
-    areaServed: {
-      "@type": "City",
-      name: point.city,
-    },
-  };
-}
-
-// Article Schema for Content Pages (GEO Optimized)
-export function generateGeoArticleSchema(article: {
-  title: string;
-  description: string;
-  slug: string;
-  publishedDate: string;
-  modifiedDate: string;
-  images?: string[];
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.description,
-    url: `${BASE_URL}/${article.slug}`,
-    datePublished: article.publishedDate,
-    dateModified: article.modifiedDate,
-    author: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: BASE_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      logo: {
-        "@type": "ImageObject",
-        url: `${BASE_URL}/logo.svg`,
-      },
-    },
-    ...(article.images?.length && {
-      image: article.images,
-    }),
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${BASE_URL}/${article.slug}`,
-    },
-    inLanguage: "pt-BR",
-    isAccessibleForFree: true,
-  };
-}
 
 // CollectionPage Schema for Album Page (GEO Optimized)
 export function generateCollectionPageSchema() {
@@ -1053,31 +951,6 @@ export function generateItemListSchema(
   };
 }
 
-// Enhanced Person schema for authors (EEAT optimization)
-export function generatePersonSchema(author: {
-  name: string;
-  url?: string;
-  image?: string;
-  jobTitle?: string;
-  description?: string;
-  sameAs?: string[];
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: author.name,
-    ...(author.url && { url: author.url }),
-    ...(author.image && { image: author.image }),
-    ...(author.jobTitle && { jobTitle: author.jobTitle }),
-    ...(author.description && { description: author.description }),
-    ...(author.sameAs?.length && { sameAs: author.sameAs }),
-    worksFor: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: BASE_URL,
-    },
-  };
-}
 
 // Service schema for the platform
 export function generateServiceSchema() {
@@ -1111,29 +984,6 @@ export function generateServiceSchema() {
   };
 }
 
-// SoftwareApplication schema for app stores
-export function generateSoftwareApplicationSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: SITE_NAME,
-    applicationCategory: "LifestyleApplication",
-    operatingSystem: "Web, iOS, Android",
-    description:
-      "Aplicativo para troca de figurinhas da Copa do Mundo 2026. Encontre colecionadores perto de você.",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "BRL",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "1200",
-      bestRating: "5",
-    },
-  };
-}
 
 export function generateRareMetadata(
   teamName: string,
@@ -1206,30 +1056,4 @@ export function generateRareCollectionSchema(
   };
 }
 
-// QAPage schema for AEO (alternative to FAQPage)
-export function generateQAPageSchema(
-  questions: Array<{
-    question: string;
-    answer: string;
-    upvoteCount?: number;
-    dateCreated?: string;
-  }>
-) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "QAPage",
-    mainEntity: questions.map((q) => ({
-      "@type": "Question",
-      name: q.question,
-      answerCount: 1,
-      ...(q.upvoteCount && { upvoteCount: q.upvoteCount }),
-      ...(q.dateCreated && { dateCreated: q.dateCreated }),
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: q.answer,
-        ...(q.upvoteCount && { upvoteCount: q.upvoteCount }),
-      },
-    })),
-  };
-}
 
