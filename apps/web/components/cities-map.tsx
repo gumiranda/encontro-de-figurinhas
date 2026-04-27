@@ -38,7 +38,7 @@ export function CitiesMap({ cities }: CitiesMapProps) {
       zoom={BRAZIL_ZOOM}
       scrollWheelZoom={false}
       className="h-64 md:h-80 w-full"
-      style={{ background: "#1a1a2e" }}
+      style={{ background: BRAND_COLORS.surfaceContainerHigh }}
     >
       <TileLayer
         attribution='&copy; <a href="https://carto.com/">CARTO</a>'

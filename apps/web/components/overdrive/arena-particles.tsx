@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { BRAND_COLORS, hexToRgba } from "@workspace/ui/lib/design-tokens";
 
 interface Particle {
   x: number;
@@ -17,9 +18,9 @@ interface ArenaParticlesProps {
 }
 
 const PARTICLE_COLORS = [
-  "rgba(149, 170, 255, 0.6)", // primary
-  "rgba(79, 243, 37, 0.5)",   // secondary
-  "rgba(255, 184, 0, 0.5)",   // tertiary
+  hexToRgba(BRAND_COLORS.primary, 0.6),
+  hexToRgba(BRAND_COLORS.secondary, 0.5),
+  hexToRgba(BRAND_COLORS.tertiary, 0.5),
 ];
 
 export function ArenaParticles({ className }: ArenaParticlesProps) {

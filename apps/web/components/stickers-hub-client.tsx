@@ -117,7 +117,7 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
             variant={filter === "golden" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("golden")}
-            className="rounded-full text-yellow-600 border-yellow-600 hover:bg-yellow-500 hover:text-black"
+            className="rounded-full text-tertiary border-tertiary hover:bg-tertiary hover:text-tertiary-foreground"
           >
             <Star className="h-3.5 w-3.5 mr-1 fill-current" />
             Douradas ({totalGolden})
@@ -126,7 +126,7 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
             variant={filter === "legend" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("legend")}
-            className="rounded-full text-purple-600 border-purple-600 hover:bg-purple-600 hover:text-white"
+            className="rounded-full text-primary border-primary hover:bg-primary hover:text-primary-foreground"
           >
             <Trophy className="h-3.5 w-3.5 mr-1" />
             Lendas ({totalLegends})
@@ -171,8 +171,8 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
                           variant={isGolden || legend ? "default" : "outline"}
                           className={`
                             cursor-pointer transition-colors hover:scale-105
-                            ${isGolden ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}
-                            ${legend ? "bg-purple-600 hover:bg-purple-700" : ""}
+                            ${isGolden ? "bg-tertiary hover:bg-tertiary/90 text-tertiary-foreground" : ""}
+                            ${legend ? "bg-primary hover:bg-primary/90" : ""}
                             ${!isGolden && !legend ? "hover:bg-primary hover:text-primary-foreground" : ""}
                           `}
                           title={legend?.name}

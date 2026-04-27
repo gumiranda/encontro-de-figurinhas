@@ -9,9 +9,9 @@ interface SuccessCheckmarkProps {
 }
 
 const TONE_COLORS = {
-  primary: { stroke: "var(--primary)", bg: "rgba(149, 170, 255, 0.15)" },
-  secondary: { stroke: "var(--secondary)", bg: "rgba(79, 243, 37, 0.15)" },
-  tertiary: { stroke: "var(--tertiary)", bg: "rgba(255, 201, 101, 0.15)" },
+  primary: { stroke: "var(--primary)", bg: "color-mix(in oklab, var(--primary) 15%, transparent)" },
+  secondary: { stroke: "var(--secondary)", bg: "color-mix(in oklab, var(--secondary) 15%, transparent)" },
+  tertiary: { stroke: "var(--tertiary)", bg: "color-mix(in oklab, var(--tertiary) 15%, transparent)" },
 };
 
 export function SuccessCheckmark({
