@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cacheLife, cacheTag } from "next/cache";
+
 import Link from "next/link";
 import { Map, ArrowRight, Users } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -11,7 +11,7 @@ import {
 } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { convexServer, api } from "@/lib/convex-server";
+import { STATES } from "@/modules/landing/lib/landing-data";
 import {
   generateStatesHubMetadata,
   generateBreadcrumbSchema,
@@ -24,15 +24,8 @@ import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = generateStatesHubMetadata();
 
-async function loadStates() {
-  "use cache";
-  cacheTag("states");
-  cacheLife("hours");
-  return convexServer.query(api.states.getAllStates, {});
-}
-
 export default async function StatesHubPage() {
-  const states = await loadStates();
+  const states = STATES;
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
@@ -118,8 +111,8 @@ export default async function StatesHubPage() {
               para trocar figurinhas da Copa 2026.
             </p>
             <Button size="lg" asChild>
-              <Link href="/sign-up">
-                Criar conta grátis
+              <Link href="/cadastrar-figurinhas/quick">
+                Cadastrar figurinhas
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

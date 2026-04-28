@@ -1,8 +1,8 @@
 "use client";
 
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { LandingCard } from "./landing-card";
 import { PROBLEM_STATS } from "../../lib/landing-data";
+import { LandingCard } from "./landing-card";
 
 const COLOR_CLASSES: Record<string, string> = {
   error: "text-[#ff6e84]",
@@ -25,14 +25,12 @@ export function ProblemSection() {
           >
             <span className="eyebrow">O problema</span>
             <h2 className="mt-4 font-bold text-3xl md:text-5xl tracking-tight leading-[1.05] text-pretty text-[#e1e4fa]">
-              Você gastou{" "}
-              <span className="text-[#ff6e84]">R$ 480</span> em pacotes
+              Você gastou <span className="text-[#ff6e84]">R$ 480</span> em pacotes
               <br />e ainda tem 47 figurinhas faltando.
             </h2>
             <p className="mt-5 text-[#a6aabf] text-lg leading-relaxed max-w-lg">
-              O álbum da Copa promete. A banca não. Você abre 8 pacotes e ganha
-              mais 6 BRA-10 repetidas. Sua pilha de duplicatas cresce mais rápido
-              que o álbum.
+              O álbum da Copa promete. A banca não. Você abre 8 pacotes e ganha mais 6
+              MEX-10 repetidas. Sua pilha de duplicatas cresce mais rápido que o álbum.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-3">
               {PROBLEM_STATS.map((stat) => (
@@ -40,10 +38,14 @@ export function ProblemSection() {
                   key={stat.label}
                   className="rounded-xl bg-[#13192b] border border-white/5 p-3 sm:p-4 text-center"
                 >
-                  <p className={`font-mono text-lg sm:text-2xl font-bold ${COLOR_CLASSES[stat.color]}`}>
+                  <p
+                    className={`font-mono text-lg sm:text-2xl font-bold ${COLOR_CLASSES[stat.color]}`}
+                  >
                     {stat.value}
                   </p>
-                  <p className="text-[10px] sm:text-[11px] text-[#a6aabf] mt-1 leading-tight">{stat.label}</p>
+                  <p className="text-[10px] sm:text-[11px] text-[#a6aabf] mt-1 leading-tight">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -58,8 +60,18 @@ export function ProblemSection() {
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
-              <LandingCard variant="sticker-need" code="ARG-09" flag="🇦🇷" photoText="faltando" />
-              <LandingCard variant="sticker-need" code="FRA-07" flag="🇫🇷" photoText="faltando" />
+              <LandingCard
+                variant="sticker-need"
+                code="ARG-09"
+                flag="🇦🇷"
+                photoText="faltando"
+              />
+              <LandingCard
+                variant="sticker-need"
+                code="FRA-07"
+                flag="🇫🇷"
+                photoText="faltando"
+              />
             </div>
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full glass-ethereal text-[10px] sm:text-[11px] font-mono whitespace-nowrap">
               <span className="text-[#ff6e84]">6× BRA-10</span>

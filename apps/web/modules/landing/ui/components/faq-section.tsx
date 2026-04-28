@@ -61,7 +61,7 @@ export function FAQSection({ faqs }: FAQSectionProps) {
                       <>
                         {" "}
                         <Link
-                          href="/selecao/brasil"
+                          href="/selecao/bra"
                           className="text-[#95aaff] underline"
                         >
                           Ver todas as raras da Seleção Brasileira →

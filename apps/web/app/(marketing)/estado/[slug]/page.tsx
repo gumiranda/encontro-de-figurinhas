@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { MapPin, Users, ArrowRight, Store, Building2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { convexServer, api } from "@/lib/convex-server";
 import {
   generateStateMetadata,
   generateBreadcrumbSchema,
@@ -20,77 +12,50 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { STATES } from "@/modules/landing/lib/landing-data";
 
 interface StatePageProps {
   params: Promise<{ slug: string }>;
 }
 
-async function loadState(slug: string) {
-  "use cache";
-  cacheTag(`estado:${slug}`);
-  cacheLife("hours");
-  return convexServer.query(api.states.getBySlug, { slug });
+function getStaticState(slug: string) {
+  return STATES.find((s) => s.slug === slug) ?? null;
 }
 
-async function loadStateStats(slug: string) {
-  "use cache";
-  cacheTag(`estado:${slug}`);
-  cacheLife("hours");
-  return convexServer.query(api.states.getStatsBySlug, { slug });
+function getAllStaticStates() {
+  return STATES.map((s) => ({ slug: s.slug, code: s.code, name: s.name }));
 }
 
-async function loadAllStates() {
-  "use cache";
-  cacheTag("estados");
-  cacheLife("days");
-  return convexServer.query(api.states.getAllStates, {});
-}
-
-export async function generateStaticParams() {
-  const states = await convexServer.query(api.states.listForSitemap, {});
-  if (states.length === 0) {
-    return [{ slug: "_placeholder" }];
-  }
-  return states.map((s) => ({ slug: s.slug }));
+export function generateStaticParams() {
+  return STATES.map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: StatePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [state, stats] = await Promise.all([
-    loadState(slug),
-    loadStateStats(slug),
-  ]);
+  const state = getStaticState(slug);
 
   if (!state) {
     return { title: "Estado não encontrado" };
   }
 
-  return generateStateMetadata(
-    state.name,
-    state.slug,
-    stats?.citiesCount ?? 0,
-    stats?.collectorsCount ?? 0
-  );
+  const collectorsNum = parseInt(state.collectors.replace(/\D/g, "")) * (state.collectors.includes("k") ? 1000 : 1);
+  return generateStateMetadata(state.name, state.slug, state.cities, collectorsNum);
 }
 
 export default async function StatePage({ params }: StatePageProps) {
   const { slug } = await params;
-  const [state, stats, allStates] = await Promise.all([
-    loadState(slug),
-    loadStateStats(slug),
-    loadAllStates(),
-  ]);
+  const state = getStaticState(slug);
 
   if (!state) {
     notFound();
   }
 
-  const citiesCount = stats?.citiesCount ?? 0;
-  const collectorsCount = stats?.collectorsCount ?? 0;
-  const tradePointsCount = stats?.tradePointsCount ?? 0;
-  const topCities = stats?.topCities ?? [];
+  const citiesCount = state.cities;
+  const collectorsCount = state.collectors;
+  const tradePointsCount = state.points;
+  const topCities: { slug: string; name: string; collectorsCount: number }[] = [];
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
@@ -100,7 +65,7 @@ export default async function StatePage({ params }: StatePageProps) {
 
   const stateSchema = generateStateSchema(state.name, state.slug);
 
-  const otherStates = allStates
+  const otherStates = getAllStaticStates()
     .filter((s) => s.slug !== state.slug)
     .slice(0, 8);
 
@@ -144,13 +109,13 @@ export default async function StatePage({ params }: StatePageProps) {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild>
-                  <Link href="/sign-up">
-                    Começar a trocar
+                  <Link href="/cadastrar-figurinhas/quick">
+                    Cadastrar figurinhas
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link href="/map">Ver mapa de trocas</Link>
+                  <Link href="/pontos">Ver pontos de troca</Link>
                 </Button>
               </div>
 
@@ -380,13 +345,13 @@ export default async function StatePage({ params }: StatePageProps) {
               Pronto para começar a trocar em {state.name}?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Cadastre-se gratuitamente e encontre colecionadores em{" "}
+              Cadastre suas figurinhas e encontre colecionadores em{" "}
               {citiesCount} {citiesCount === 1 ? "cidade" : "cidades"} do
               estado.
             </p>
             <Button size="lg" asChild>
-              <Link href="/sign-up">
-                Criar conta grátis
+              <Link href="/cadastrar-figurinhas/quick">
+                Cadastrar minhas figurinhas
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
