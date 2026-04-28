@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { useScrollReveal, useScrollRevealGroup } from "@/hooks/use-scroll-reveal";
-import { SOCIAL_STATS, RARITY_LEADERBOARD } from "../../lib/landing-data";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { RARITY_LEADERBOARD, SOCIAL_STATS } from "../../lib/landing-data";
 
 const STATS_ARRAY = [
   { ...SOCIAL_STATS.trocas, gradient: true },
@@ -38,7 +38,7 @@ export function SocialProofSection() {
         >
           <span className="eyebrow eyebrow-green">
             <span className="pulse-dot" />
-            Dados ao vivo · Convex
+            Dados ao vivo
           </span>
           <h2 className="mt-4 font-bold text-3xl md:text-5xl tracking-tight text-[#e1e4fa]">
             A maior arena de trocas
@@ -46,12 +46,17 @@ export function SocialProofSection() {
           </h2>
         </div>
 
-        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-14">
+        <div
+          ref={statsRef}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-14"
+        >
           {STATS_ARRAY.map((stat, index) => (
             <div
               key={stat.label}
               className={`rounded-2xl glass-ethereal p-6 md:p-8 shadow-ambient transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                statsVisible[index] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                statsVisible[index]
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-6"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
