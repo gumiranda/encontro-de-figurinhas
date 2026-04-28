@@ -26,14 +26,14 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
             id="hero-heading"
             className="font-headline text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] text-on-surface sm:text-5xl lg:text-[3.5rem] animate-fade-in-up opacity-0 delay-100"
           >
-            Troque Figurinhas da Copa 2026{" "}
+            Suas Repetidas Viram{" "}
             <span className="text-gradient-primary block sm:inline mt-1 sm:mt-0">
-              Perto de Você
+              as Figurinhas que Faltam
             </span>
           </h1>
 
           <p className="hero-description max-w-lg text-base leading-[1.7] text-on-surface-variant sm:text-lg animate-fade-in-up opacity-0 delay-200">
-            Cadastre suas figurinhas repetidas do álbum Copa 2026, encontre colecionadores perto de você — match automático, troca presencial.
+            O app encontra quem tem o que você precisa — e precisa do que você tem. Grátis.
           </p>
 
           {/* Double-bezel search container */}
@@ -61,7 +61,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
               href="/sign-up"
               className="btn-primary-gradient btn-primary-gradient-xl group flex items-center justify-center text-center active:scale-[0.96] transition-transform"
             >
-              Começar a trocar
+              Cadastrar Minhas Figurinhas
               <span className="btn-icon-nest">
                 <ArrowRight className="w-4 h-4" strokeWidth={2} />
               </span>

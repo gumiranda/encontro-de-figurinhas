@@ -62,12 +62,12 @@ export function FeaturesSection() {
               id="features-heading"
               className={`font-headline font-semibold text-[2rem] sm:text-4xl md:text-[2.75rem] leading-[1.15] tracking-[-0.02em] text-balance text-on-surface transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
             >
-              Figurinha Fácil{" "}
-              <span className="text-secondary block mt-1">resolve.</span>
+              Chega de repetida{" "}
+              <span className="text-secondary block mt-1">parada na gaveta.</span>
             </h2>
 
             <p className={`text-on-surface-variant text-base sm:text-lg leading-[1.7] max-w-md text-pretty transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-              Encontre quem tem o que você precisa — e precisa do que você tem — em minutos.
+              Transforme suas repetidas nas figurinhas que faltam. Sem gastar mais.
             </p>
 
             {/* CTAs with button-in-button */}
@@ -76,7 +76,7 @@ export function FeaturesSection() {
                 href="/sign-up"
                 className="btn-primary-gradient group flex items-center justify-center active:scale-[0.96] transition-transform"
               >
-                Comece a trocar grátis
+                Encontrar Trocas Agora
                 <span className="btn-icon-nest">
                   <ArrowRight className="w-4 h-4" strokeWidth={2} />
                 </span>

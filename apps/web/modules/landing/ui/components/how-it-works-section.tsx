@@ -7,20 +7,20 @@ const STEPS = [
   {
     number: 1,
     icon: UserPlus,
-    title: "Crie sua conta em 30 segundos",
-    description: "E-mail ou Google. Sem formulários longos, sem espera.",
+    title: "Cadastre-se em 30 segundos",
+    description: "Só precisa de e-mail. Sem burocracia.",
   },
   {
     number: 2,
     icon: ListChecks,
-    title: "Cadastre repetidas e faltantes",
-    description: "Digite os números e pronto. O sistema organiza tudo pra você.",
+    title: "Diga o que tem e o que falta",
+    description: "Cole a lista ou digite. O sistema organiza.",
   },
   {
     number: 3,
     icon: Handshake,
-    title: "Encontre quem tem o que você precisa",
-    description: "Matches automáticos com colecionadores perto de você. Combine via WhatsApp.",
+    title: "Combine a troca pelo WhatsApp",
+    description: "Veja quem está perto, mande mensagem, marque o encontro.",
   },
 ];
 
