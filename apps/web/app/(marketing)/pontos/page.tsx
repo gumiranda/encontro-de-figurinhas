@@ -16,6 +16,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateTradePointsHubMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -41,6 +43,22 @@ export default async function TradePointsHubPage() {
     { name: "Pontos de Troca" },
   ]);
 
+  const itemListSchema = generateItemListSchema(
+    "Pontos de Troca de Figurinhas da Copa 2026",
+    "Locais verificados para trocar figurinhas em todo o Brasil.",
+    groupedPoints
+      .flatMap((g) =>
+        g.points.map((p) => ({
+          name: p.name,
+          url: `${BASE_URL}/ponto/${p.slug}`,
+          description: `Ponto de troca em ${g.cityName}, ${g.state}`,
+        }))
+      )
+      .slice(0, 100)
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   const totalPoints = groupedPoints.reduce(
     (acc, g) => acc + g.points.length,
     0
@@ -58,7 +76,7 @@ export default async function TradePointsHubPage() {
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24">

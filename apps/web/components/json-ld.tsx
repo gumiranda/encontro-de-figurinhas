@@ -3,10 +3,18 @@ interface JsonLdProps {
 }
 
 export function JsonLd({ data }: JsonLdProps) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  try {
+    const json = JSON.stringify(data);
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: json }}
+      />
+    );
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("Schema serialization failed:", e);
+    }
+    return null;
+  }
 }

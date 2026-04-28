@@ -4,8 +4,8 @@ export const BASE_URL = "https://figurinhafacil.com.br";
 export const SITE_NAME = "Figurinha Fácil";
 
 // Content Freshness - GEO optimization requires updates every 7-14 days
-export const CONTENT_VERSION = "2026.04.19";
-export const LAST_CONTENT_UPDATE = "2026-04-19T00:00:00Z";
+export const CONTENT_VERSION = "2026.04.28";
+export const LAST_CONTENT_UPDATE = "2026-04-28T00:00:00Z";
 
 export function getContentFreshnessHeaders() {
   return {
@@ -123,15 +123,19 @@ export function generatePlaceSchema(
   lat?: number,
   lng?: number
 ) {
+  const safeName = sanitizeForJsonLd(name);
+  const safeCity = sanitizeForJsonLd(city);
+  const safeState = sanitizeForJsonLd(state);
+
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Place",
-    name,
-    description: `Ponto de troca de figurinhas em ${city}, ${state}`,
+    name: safeName,
+    description: `Ponto de troca de figurinhas em ${safeCity}, ${safeState}`,
     address: {
       "@type": "PostalAddress",
-      addressLocality: city,
-      addressRegion: state,
+      addressLocality: safeCity,
+      addressRegion: safeState,
       addressCountry: "BR",
     },
   };
@@ -610,18 +614,22 @@ export function generateArticleSchema(
   author?: { name: string; avatar?: string },
   coverImage?: string
 ) {
+  const safeTitle = sanitizeForJsonLd(title);
+  const safeExcerpt = sanitizeForJsonLd(excerpt);
+  const safeAuthorName = author?.name ? sanitizeForJsonLd(author.name) : SITE_NAME;
+
   return {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: title,
-    description: excerpt,
+    headline: safeTitle,
+    description: safeExcerpt,
     url: `${BASE_URL}/blog/${slug}`,
     datePublished: new Date(publishedAt).toISOString(),
     ...(updatedAt && { dateModified: new Date(updatedAt).toISOString() }),
     ...(coverImage && { image: coverImage }),
     author: {
       "@type": "Person",
-      name: author?.name || SITE_NAME,
+      name: safeAuthorName,
     },
     publisher: {
       "@type": "Organization",
@@ -679,25 +687,30 @@ export function generateTradePointPlaceSchema(point: {
   lng: number;
   description?: string;
 }) {
-  const streetAddress = point.address.trim();
+  const safeName = sanitizeForJsonLd(point.name);
+  const safeCity = sanitizeForJsonLd(point.city);
+  const safeState = sanitizeForJsonLd(point.state);
+  const safeAddress = sanitizeForJsonLd(point.address.trim());
+  const safeDescription = point.description
+    ? sanitizeForJsonLd(point.description)
+    : `Ponto de troca de figurinhas da Copa 2026 em ${safeCity}, ${safeState}.`;
+
   const postalAddress: Record<string, unknown> = {
     "@type": "PostalAddress",
-    addressLocality: point.city,
-    addressRegion: point.state,
+    addressLocality: safeCity,
+    addressRegion: safeState,
     addressCountry: "BR",
   };
-  if (streetAddress.length > 0) {
-    postalAddress.streetAddress = streetAddress;
+  if (safeAddress.length > 0) {
+    postalAddress.streetAddress = safeAddress;
   }
 
   return {
     "@context": "https://schema.org",
     "@type": "Place",
     "@id": `${BASE_URL}/ponto/${point.slug}`,
-    name: point.name,
-    description:
-      point.description ||
-      `Ponto de troca de figurinhas da Copa 2026 em ${point.city}, ${point.state}.`,
+    name: safeName,
+    description: safeDescription,
     url: `${BASE_URL}/ponto/${point.slug}`,
     address: postalAddress,
     geo: {

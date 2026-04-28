@@ -24,6 +24,8 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateBlogListMetadata,
   generateBreadcrumbSchema,
+  generateItemListSchema,
+  generateCombinedSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -117,6 +119,18 @@ export default async function BlogPage() {
     { name: "Blog" },
   ]);
 
+  const itemListSchema = generateItemListSchema(
+    "Blog Figurinha Fácil - Artigos sobre Figurinhas da Copa 2026",
+    "Guias de trocas, histórias de colecionadores, raridades e dicas para completar seu álbum.",
+    posts.slice(0, 100).map((p) => ({
+      name: p.title,
+      url: `${BASE_URL}/blog/${p.slug}`,
+      description: p.excerpt,
+    }))
+  );
+
+  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+
   // SSR renders exactly 12 posts (1 featured + 2 big-pair + 9 grid) so
   // LoadMorePosts can skip them cleanly when fetching subsequent pages.
   const featured = posts[0];
@@ -137,7 +151,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="min-h-screen bg-background pt-24">
         {/* Hero */}
