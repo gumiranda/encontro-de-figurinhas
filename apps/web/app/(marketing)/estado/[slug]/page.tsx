@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Users, ArrowRight, Store, Building2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
@@ -55,6 +56,7 @@ export default async function StatePage({ params }: StatePageProps) {
   const citiesCount = state.cities;
   const collectorsCount = state.collectors;
   const tradePointsCount = state.points;
+  const collectorsNum = parseInt(state.collectors.replace(/\D/g, "")) * (state.collectors.includes("k") ? 1000 : 1);
   const topCities: { slug: string; name: string; collectorsCount: number }[] = [];
 
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -120,7 +122,7 @@ export default async function StatePage({ params }: StatePageProps) {
               </div>
 
               {(citiesCount > 0 ||
-                collectorsCount > 0 ||
+                collectorsNum > 0 ||
                 tradePointsCount > 0) && (
                 <div className="flex flex-wrap gap-6 mt-8 pt-8 border-t">
                   {citiesCount > 0 && (
@@ -136,7 +138,7 @@ export default async function StatePage({ params }: StatePageProps) {
                       </div>
                     </div>
                   )}
-                  {collectorsCount > 0 && (
+                  {collectorsNum > 0 && (
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <Users className="h-5 w-5 text-primary" />
@@ -144,7 +146,7 @@ export default async function StatePage({ params }: StatePageProps) {
                       <div>
                         <p className="text-2xl font-bold">{collectorsCount}</p>
                         <p className="text-sm text-muted-foreground">
-                          {collectorsCount === 1
+                          {collectorsNum === 1
                             ? "colecionador"
                             : "colecionadores"}
                         </p>
@@ -159,9 +161,7 @@ export default async function StatePage({ params }: StatePageProps) {
                       <div>
                         <p className="text-2xl font-bold">{tradePointsCount}</p>
                         <p className="text-sm text-muted-foreground">
-                          {tradePointsCount === 1
-                            ? "ponto de troca"
-                            : "pontos de troca"}
+                          pontos de troca
                         </p>
                       </div>
                     </div>
@@ -225,10 +225,10 @@ export default async function StatePage({ params }: StatePageProps) {
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
               <h2>Troca de figurinhas em {state.name}</h2>
               <p>
-                {collectorsCount > 0 ? (
+                {collectorsNum > 0 ? (
                   <>
                     {state.name} já conta com {collectorsCount}{" "}
-                    {collectorsCount === 1
+                    {collectorsNum === 1
                       ? "colecionador cadastrado"
                       : "colecionadores cadastrados"}{" "}
                     no Figurinha Fácil, distribuídos em {citiesCount}{" "}
@@ -236,10 +236,7 @@ export default async function StatePage({ params }: StatePageProps) {
                     {tradePointsCount > 0 && (
                       <>
                         {" "}
-                        O estado possui {tradePointsCount}{" "}
-                        {tradePointsCount === 1
-                          ? "ponto de troca aprovado"
-                          : "pontos de troca aprovados"}{" "}
+                        O estado possui {tradePointsCount} pontos de troca aprovados{" "}
                         onde você pode realizar trocas presenciais.
                       </>
                     )}
@@ -264,10 +261,7 @@ export default async function StatePage({ params }: StatePageProps) {
                 </li>
                 {tradePointsCount > 0 ? (
                   <li>
-                    Acesse {tradePointsCount}{" "}
-                    {tradePointsCount === 1
-                      ? "ponto de troca verificado"
-                      : "pontos de troca verificados"}
+                    Acesse {tradePointsCount} pontos de troca verificados
                   </li>
                 ) : (
                   <li>Sugira pontos de troca e ajude a expandir a rede</li>
