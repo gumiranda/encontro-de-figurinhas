@@ -19,6 +19,7 @@ interface StickerTileProps {
   blockedReason?: string;
   displayLabel?: string; // Override for EXT stickers: "LM", "JD", etc.
   playerName?: string;   // For tooltip
+  shortName?: string;    // Short name to display inside card
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -49,6 +50,7 @@ function StickerTileBase({
   blockedReason = "Já está na outra lista. Remova de lá primeiro.",
   displayLabel,
   playerName,
+  shortName,
   onClick,
 }: StickerTileProps) {
   const isBlocked = state === "blocked";
@@ -68,11 +70,16 @@ function StickerTileBase({
       aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relLabel}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       title={playerName}
       className={cn(
-        "sticker-spring relative flex aspect-[3/4] w-full items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
+        "sticker-spring relative flex aspect-[3/4] w-full flex-col items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
         STATE_CLASSES[state]
       )}
     >
-      {label}
+      <span>{label}</span>
+      {shortName && (
+        <span className="mt-0.5 max-w-full truncate px-0.5 text-[9px] font-medium opacity-80">
+          {shortName}
+        </span>
+      )}
 
       {state === "have" && (
         <span
@@ -94,16 +101,29 @@ function StickerTileBase({
     </button>
   );
 
-  if (!isBlocked) return button;
+  if (isBlocked) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent>
+          <p className="max-w-[200px] text-xs">{blockedReason}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
 
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent>
-        <p className="max-w-[200px] text-xs">{blockedReason}</p>
-      </TooltipContent>
-    </Tooltip>
-  );
+  if (playerName) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs font-medium">{playerName}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return button;
 }
 
 export const StickerTile = memo(StickerTileBase);

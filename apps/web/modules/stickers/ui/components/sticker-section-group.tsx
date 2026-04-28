@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import {
   Popover,
@@ -8,6 +9,7 @@ import {
 } from "@workspace/ui/components/popover";
 import { Progress } from "@workspace/ui/components/progress";
 import { cn } from "@workspace/ui/lib/utils";
+import { useQuery } from "convex/react";
 import { SlidersHorizontal } from "lucide-react";
 import { memo, useCallback, useMemo, type MouseEvent } from "react";
 import { getFlagGradient } from "../../lib/flag-gradients";
@@ -202,6 +204,18 @@ function StickerSectionGroupBase({
   const relRangeLabel =
     relStart === 0 && relEnd === 0 ? "00" : `${relStart}–${relEnd}`;
   const activeSet = mode === "duplicates" ? duplicatesSet : missingSet;
+
+  const stickerDetails = useQuery(api.album.getTeamStickers, { sectionCode: section.code });
+  const playerNameMap = useMemo(() => {
+    if (!stickerDetails) return new Map<number, { name: string; short: string }>();
+    const map = new Map<number, { name: string; short: string }>();
+    for (const s of stickerDetails) {
+      const parts = s.name.split(" ");
+      const short = parts.length > 1 ? parts[parts.length - 1] : s.name.slice(0, 8);
+      map.set(s.absoluteNum, { name: s.name, short });
+    }
+    return map;
+  }, [stickerDetails]);
 
   const activeInSection = useMemo(() => {
     let c = 0;
@@ -576,6 +590,7 @@ function StickerSectionGroupBase({
             else if (isInDup) state = "have";
             else if (isInMiss) state = "need";
 
+            const playerInfo = playerNameMap.get(num);
             return (
               <StickerTile
                 key={num}
@@ -583,6 +598,8 @@ function StickerSectionGroupBase({
                 relativeNum={relativeNum}
                 sectionCode={section.code}
                 state={state}
+                playerName={playerInfo?.name}
+                shortName={playerInfo?.short}
                 onClick={handleTileClick}
               />
             );
