@@ -6,27 +6,27 @@ import { useScrollReveal, useScrollRevealGroup } from "@/hooks/use-scroll-reveal
 const STATS = [
   {
     icon: Users,
-    value: "10.000+",
+    value: "9.847",
     label: "Colecionadores ativos",
     color: "text-[var(--primary)]",
   },
   {
     icon: RefreshCw,
-    value: "50.000+",
+    value: "48.236",
     label: "Trocas realizadas",
     color: "text-[var(--secondary)]",
   },
   {
     icon: MapPin,
-    value: "800+",
+    value: "784",
     label: "Pontos de troca",
     color: "text-[var(--tertiary)]",
   },
   {
     icon: Building2,
-    value: "150+",
+    value: "147",
     label: "Cidades cobertas",
-    color: "text-yellow-500",
+    color: "text-[var(--tertiary)]",
   },
 ];
 

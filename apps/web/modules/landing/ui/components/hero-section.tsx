@@ -1,13 +1,34 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { CitySearch } from "./city-search";
-import { ArenaVisualClient } from "./arena-visual-client";
+
+const HERO_IMAGES = [
+  {
+    src: "https://images.pexels.com/photos/8551084/pexels-photo-8551084.jpeg?auto=compress&w=1248&h=832&fit=crop",
+    alt: "Grupo de amigos trocando figurinhas em volta de uma mesa",
+  },
+  {
+    src: "https://images.pexels.com/photos/8111358/pexels-photo-8111358.jpeg?auto=compress&w=1248&h=832&fit=crop",
+    alt: "Pessoas trocando cartas colecionáveis juntas",
+  },
+  {
+    src: "https://images.pexels.com/photos/9661252/pexels-photo-9661252.jpeg?auto=compress&w=1248&h=832&fit=crop",
+    alt: "Mãos segurando cartas colecionáveis",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1248&h=832&fit=crop&q=80",
+    alt: "Amigos reunidos se divertindo juntos",
+  },
+];
 
 interface HeroSectionProps {
   totalTrocas?: string | null;
 }
 
 export function HeroSection({ totalTrocas }: HeroSectionProps) {
+  const heroImage = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]!;
+  
   return (
     <section
       className="relative mx-auto max-w-7xl overflow-hidden px-4 py-24 sm:px-6 md:py-40"
@@ -75,8 +96,16 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           </div>
         </div>
 
-        <div className="hidden md:block animate-fade-in-scale opacity-0 delay-300 arena-scroll-fade">
-          <ArenaVisualClient />
+        <div className="hidden md:block animate-fade-in-scale opacity-0 delay-300 relative aspect-[3/2] w-full overflow-hidden rounded-3xl ring-1 ring-outline-variant/10">
+          <Image
+            src={heroImage.src}
+            alt={heroImage.alt}
+            fill
+            priority
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface/60 via-transparent to-transparent" />
         </div>
       </div>
 

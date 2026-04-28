@@ -25,6 +25,11 @@ export const COVER_REMOTE_PATTERNS = [
     hostname: "images.unsplash.com",
     pathname: "/**",
   },
+  {
+    protocol: "https",
+    hostname: "images.pexels.com",
+    pathname: "/**",
+  },
 ];
 
 /** @type {import('next').NextConfig} */

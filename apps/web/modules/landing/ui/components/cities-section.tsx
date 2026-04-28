@@ -35,7 +35,7 @@ export function CitiesSection() {
             </p>
           </div>
           <Link
-            href="#"
+            href="/cidades"
             className={`inline-flex items-center gap-2 text-[var(--primary)] font-bold hover:gap-4 transition-[gap,opacity,transform] duration-300 ${headerVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"}`}
           >
             VER TODAS AS CIDADES

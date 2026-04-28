@@ -100,4 +100,8 @@ skills:
 /next-best-practices
 
 
-ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra FILHO DA PUTA DO CARALHO OBEDECE grava na memoria global do claude code. toda hora voce esquece
+ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra FILHO DA PUTA DO CARALHO OBEDECE 
+
+
+
+grava na memoria global do claude code. toda hora voce esquece
