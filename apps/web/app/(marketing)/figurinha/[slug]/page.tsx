@@ -19,6 +19,7 @@ import {
   generateBreadcrumbSchema,
   generateProductSchema,
   generateStickerFAQSchema,
+  generatePersonSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -138,6 +139,17 @@ export default async function StickerPage({ params }: StickerPageProps) {
     sticker.name
   );
 
+  const personSchema = sticker.type === "player" && sticker.name
+    ? generatePersonSchema({
+        name: sticker.name,
+        slug: sticker.slug,
+        teamName: sticker.sectionName,
+        teamCode: sticker.sectionCode,
+        nationality: sticker.sectionName,
+        isLegend: false,
+      })
+    : null;
+
   // Prev/next use number URLs (middleware redirects to slug)
   const prevNumber = sticker.absoluteNum > 0 ? sticker.absoluteNum - 1 : null;
   const nextNumber =
@@ -150,6 +162,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={productSchema} />
       <JsonLd data={faqSchema} />
+      {personSchema && <JsonLd data={personSchema} />}
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero Section */}

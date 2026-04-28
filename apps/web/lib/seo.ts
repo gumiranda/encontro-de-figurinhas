@@ -70,14 +70,6 @@ export function generateWebSiteSchema() {
     url: BASE_URL,
     description:
       "A maior rede de troca de figurinhas do Brasil. Encontre colecionadores perto de você.",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${BASE_URL}/?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
@@ -478,6 +470,37 @@ function sanitizeForJsonLd(text: string): string {
     .replace(/\n/g, ' ')
     .replace(/\r/g, '')
     .trim();
+}
+
+export type PersonSchemaInput = {
+  name: string;
+  slug: string;
+  teamName: string;
+  teamCode: string;
+  nationality?: string;
+  image?: string;
+  isLegend?: boolean;
+};
+
+export function generatePersonSchema(input: PersonSchemaInput) {
+  const safeName = sanitizeForJsonLd(input.name);
+  const safeTeam = sanitizeForJsonLd(input.teamName);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${BASE_URL}/figurinha/${input.slug}#person`,
+    name: safeName,
+    ...(input.image && { image: input.image }),
+    ...(input.nationality && { nationality: input.nationality }),
+    jobTitle: input.isLegend ? "Lenda do Futebol" : "Jogador de Futebol",
+    memberOf: {
+      "@type": "SportsTeam",
+      name: `Seleção ${safeTeam}`,
+      sport: "Association Football",
+    },
+    sameAs: [],
+  };
 }
 
 export function generateStickerFAQSchema(
