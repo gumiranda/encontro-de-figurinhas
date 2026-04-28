@@ -34,24 +34,24 @@ export function ProblemSection() {
               mais 6 BRA-10 repetidas. Sua pilha de duplicatas cresce mais rápido
               que o álbum.
             </p>
-            <div className="mt-8 grid grid-cols-3 gap-3">
+            <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-3">
               {PROBLEM_STATS.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl bg-[#13192b] border border-white/5 p-4 text-center"
+                  className="rounded-xl bg-[#13192b] border border-white/5 p-3 sm:p-4 text-center"
                 >
-                  <p className={`font-mono text-2xl font-bold ${COLOR_CLASSES[stat.color]}`}>
+                  <p className={`font-mono text-lg sm:text-2xl font-bold ${COLOR_CLASSES[stat.color]}`}>
                     {stat.value}
                   </p>
-                  <p className="text-[11px] text-[#a6aabf] mt-1">{stat.label}</p>
+                  <p className="text-[10px] sm:text-[11px] text-[#a6aabf] mt-1 leading-tight">{stat.label}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative mt-8 lg:mt-0">
             <div className="absolute inset-0 bg-[#ff6e84]/5 rounded-3xl blur-2xl" />
-            <div className="relative grid grid-cols-4 gap-2.5">
+            <div className="relative grid grid-cols-4 gap-1.5 sm:gap-2.5 max-w-xs sm:max-w-sm mx-auto lg:max-w-none">
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
               <LandingCard variant="sticker-have" code="BRA-10" flag="🇧🇷" />
@@ -61,7 +61,7 @@ export function ProblemSection() {
               <LandingCard variant="sticker-need" code="ARG-09" flag="🇦🇷" photoText="faltando" />
               <LandingCard variant="sticker-need" code="FRA-07" flag="🇫🇷" photoText="faltando" />
             </div>
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full glass-ethereal text-[11px] font-mono">
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full glass-ethereal text-[10px] sm:text-[11px] font-mono whitespace-nowrap">
               <span className="text-[#ff6e84]">6× BRA-10</span>
               <span className="text-[#a6aabf]"> · 2 faltando</span>
             </div>
