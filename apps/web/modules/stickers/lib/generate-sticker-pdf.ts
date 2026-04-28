@@ -13,13 +13,56 @@ const FONT_SIZE = 11;
 const FONT_SIZE_EXT = 9;
 const HEADER_SIZE = 13;
 const CHECKBOX_SIZE = 4;
-const MAX_Y = PAGE_HEIGHT - MARGIN;
+const FOOTER_HEIGHT = 20;
+const MAX_Y = PAGE_HEIGHT - MARGIN - FOOTER_HEIGHT;
+
+function drawFooter(doc: jsPDF) {
+  const footerY = PAGE_HEIGHT - 15;
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(MARGIN, footerY - 5, PAGE_WIDTH - MARGIN, footerY - 5);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("COMPLETE SEU ALBUM MAIS RAPIDO!", PAGE_WIDTH / 2, footerY, {
+    align: "center",
+  });
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "Encontre colecionadores perto de voce e troque figurinhas",
+    PAGE_WIDTH / 2,
+    footerY + 4,
+    { align: "center" }
+  );
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("figurinhafacil.com.br", PAGE_WIDTH / 2, footerY + 10, { align: "center" });
+}
 
 const EXT_PLAYERS = [
-  "Messi", "Doku", "Vini Jr", "Davies", "L.Díaz",
-  "Modrić", "Caicedo", "Salah", "Jude", "Mbappé",
-  "Wirtz", "Jiménez", "Hakimi", "Haaland", "Lewa",
-  "CR7", "Son", "Yamal", "Pulisic", "Valverde",
+  "Messi",
+  "Doku",
+  "Vini Jr",
+  "Davies",
+  "L.Díaz",
+  "Modric",
+  "Caicedo",
+  "Salah",
+  "Jude",
+  "Mbappé",
+  "Wirtz",
+  "Jiménez",
+  "Hakimi",
+  "Haaland",
+  "Lewa",
+  "CR7",
+  "Son",
+  "Yamal",
+  "Pulisic",
+  "Valverde",
 ];
 
 const VARIANT_LABELS: Record<string, string> = {
@@ -62,8 +105,19 @@ export function generateStickerPdf(
   // Título
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("Figurinhas que faltam para completar", PAGE_WIDTH / 2, y, { align: "center" });
-  y += 10;
+  doc.text("Figurinhas que faltam para completar", PAGE_WIDTH / 2, y, {
+    align: "center",
+  });
+  y += 6;
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "Album Copa do Mundo 2026 - Gerado em figurinhafacil.com.br",
+    PAGE_WIDTH / 2,
+    y,
+    { align: "center" }
+  );
+  y += 8;
 
   for (const section of sections) {
     const relStart = section.relStart ?? 1;
@@ -74,7 +128,7 @@ export function generateStickerPdf(
       if (onlyMissing && !missingSet.has(num)) continue;
       const relNum = num - section.startNumber + relStart;
       const code = `${section.code}-${relNum === 0 ? "00" : relNum}`;
-      const label = isExt ? getExtLabel(relNum) ?? code : code;
+      const label = isExt ? (getExtLabel(relNum) ?? code) : code;
       stickers.push({ code, absoluteNum: num, label });
     }
 
@@ -82,6 +136,7 @@ export function generateStickerPdf(
     hasContent = true;
 
     if (y + HEADER_SIZE > MAX_Y) {
+      drawFooter(doc);
       doc.addPage();
       y = MARGIN;
     }
@@ -100,20 +155,21 @@ export function generateStickerPdf(
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", "normal");
 
-    for (let i = 0; i < stickers.length; i++) {
+    for (const [i, sticker] of stickers.entries()) {
       const col = i % cols;
 
       if (col === 0 && y + CELL_HEIGHT > MAX_Y) {
+        drawFooter(doc);
         doc.addPage();
         y = MARGIN;
       }
 
       const x = MARGIN + col * cellWidth;
-      const { absoluteNum, label } = stickers[i];
+      const { absoluteNum, label } = sticker;
       const hasSticker = !missingSet.has(absoluteNum);
 
       doc.rect(x, y - CHECKBOX_SIZE, CHECKBOX_SIZE, CHECKBOX_SIZE);
-      
+
       if (hasSticker) {
         doc.setFont("helvetica", "bold");
         doc.text("X", x + 0.8, y - 0.5);
@@ -136,6 +192,9 @@ export function generateStickerPdf(
     doc.setFontSize(12);
     doc.text("Nenhuma figurinha para exibir.", MARGIN, MARGIN + 10);
   }
+
+  // Footer na última página
+  drawFooter(doc);
 
   const filename = onlyMissing ? "figurinhas-faltantes.pdf" : "figurinhas-todas.pdf";
   doc.save(filename);
