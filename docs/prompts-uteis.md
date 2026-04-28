@@ -58,6 +58,31 @@ review my UI using /web-design-guidelines in @apps/web/ . audit design for mobil
 
 review my UI using /ui-ux-pro-max in @apps/web/ . audit design for mobile devices. review ux. check accessibility (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
 
+review my SEO using /programmatic-seo in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /ai-seo in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /seo in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /seo-aeo-best-practices in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /seo-audit in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /seo-content-brief in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /seo-geo in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /landing-page-copywriter in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /landing-page-design in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /launch-strategy in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /copywriting in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+review my SEO using /marketing-ideas in @apps/web/ . audit everything to rank on google. (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+
+
 skills:
 /reducing-entropy
 /react-useeffect
