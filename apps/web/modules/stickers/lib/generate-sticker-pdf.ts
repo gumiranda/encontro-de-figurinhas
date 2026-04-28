@@ -59,6 +59,12 @@ export function generateStickerPdf(
   let y = MARGIN;
   let hasContent = false;
 
+  // Título
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Figurinhas que faltam para completar", PAGE_WIDTH / 2, y, { align: "center" });
+  y += 10;
+
   for (const section of sections) {
     const relStart = section.relStart ?? 1;
     const stickers: StickerEntry[] = [];
@@ -104,11 +110,11 @@ export function generateStickerPdf(
 
       const x = MARGIN + col * cellWidth;
       const { absoluteNum, label } = stickers[i];
-      const isMissing = missingSet.has(absoluteNum);
+      const hasSticker = !missingSet.has(absoluteNum);
 
       doc.rect(x, y - CHECKBOX_SIZE, CHECKBOX_SIZE, CHECKBOX_SIZE);
       
-      if (isMissing) {
+      if (hasSticker) {
         doc.setFont("helvetica", "bold");
         doc.text("X", x + 0.8, y - 0.5);
         doc.setFont("helvetica", "normal");
