@@ -1056,4 +1056,34 @@ export function generateRareCollectionSchema(
   };
 }
 
+export function generateSoftwareApplicationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    description:
+      "Plataforma gratuita para troca de figurinhas da Copa do Mundo 2026. Cadastre repetidas e faltantes, encontre colecionadores perto de você.",
+    url: BASE_URL,
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "Web",
+    inLanguage: "pt-BR",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "BRL",
+    },
+    provider: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
+    featureList: [
+      "Cadastro de figurinhas repetidas e faltantes",
+      "Match automático com outros colecionadores",
+      "Mapa de pontos de troca",
+      "100% gratuito",
+    ],
+  };
+}
+
 

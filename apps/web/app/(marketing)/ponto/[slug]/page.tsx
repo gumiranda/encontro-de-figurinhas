@@ -76,6 +76,24 @@ async function loadRelatedPoints(citySlug: string) {
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
+function getSsgSecret(): string {
+  const secret = process.env.SSG_SECRET;
+  if (!secret) throw new Error("SSG_SECRET not configured");
+  return secret;
+}
+
+export async function generateStaticParams() {
+  const result = await fetchQuery(api.tradePoints.listApprovedForSitemapPage, {
+    secret: getSsgSecret(),
+    cursor: null,
+    pageSize: 5000,
+  });
+  if (result.page.length === 0) {
+    return [{ slug: "_placeholder" }];
+  }
+  return result.page.map((p) => ({ slug: p.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: PontoPageProps): Promise<Metadata> {

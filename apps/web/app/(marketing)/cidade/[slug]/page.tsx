@@ -47,6 +47,14 @@ async function loadCityTopPoints(slug: string) {
   return convexServer.query(api.tradePoints.listTopByCity, { citySlug: slug, limit: 20 });
 }
 
+export async function generateStaticParams() {
+  const cities = await convexServer.query(api.cities.listForSitemap, {});
+  if (cities.length === 0) {
+    return [{ slug: "_placeholder" }];
+  }
+  return cities.map((c) => ({ slug: c.slug }));
+}
+
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { slug } = await params;
   const [city, stats] = await Promise.all([loadCity(slug), loadCityStats(slug)]);

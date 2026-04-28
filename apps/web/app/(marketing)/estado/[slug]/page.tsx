@@ -46,6 +46,14 @@ async function loadAllStates() {
   return convexServer.query(api.states.getAllStates, {});
 }
 
+export async function generateStaticParams() {
+  const states = await convexServer.query(api.states.listForSitemap, {});
+  if (states.length === 0) {
+    return [{ slug: "_placeholder" }];
+  }
+  return states.map((s) => ({ slug: s.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: StatePageProps): Promise<Metadata> {

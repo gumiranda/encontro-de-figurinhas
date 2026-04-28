@@ -212,6 +212,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/custo-album-copa-2026`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
   ];
 
   const [cities, tradePoints, states, stickers, teams, blogPosts, boringRounds, boringMatches] =
@@ -297,6 +303,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const blogCategoryPages: MetadataRoute.Sitemap = [
+    "guias",
+    "historia",
+    "raridades",
+    "copa-2026",
+  ].map((slug) => ({
+    url: `${BASE_URL}/blog/categoria/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...staticPages,
     ...cityPages,
@@ -306,6 +324,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...stickerPages,
     ...tradePointPages,
     ...blogPages,
+    ...blogCategoryPages,
     ...boringRoundPages,
     ...boringMatchPages,
   ];
