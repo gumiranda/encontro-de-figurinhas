@@ -11,7 +11,15 @@ import { Button } from "@workspace/ui/components/button";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
+import { generateStickerPdf } from "../../lib/generate-sticker-pdf";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -123,6 +131,7 @@ export function QuickRegisterView({
   const navGroups = useAppNavGroups();
 
   const [activeTab, setActiveTab] = useState<ListKind>("duplicates");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const {
     duplicates,
@@ -235,6 +244,28 @@ export function QuickRegisterView({
     [sections]
   );
 
+  const handlePrint = useCallback((onlyMissing: boolean) => {
+    if (isGenerating) return;
+    if (!sectionsWithEmoji?.length) {
+      toast.error("Seções não carregadas. Aguarde.");
+      return;
+    }
+    if (onlyMissing && missingSet.size === 0) {
+      toast.info("Nenhuma figurinha faltante cadastrada");
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      generateStickerPdf(sectionsWithEmoji, { onlyMissing, missingSet });
+      toast.success("PDF gerado!");
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      toast.error("Erro ao gerar PDF. Tente novamente.");
+    } finally {
+      setTimeout(() => setIsGenerating(false), 500);
+    }
+  }, [isGenerating, sectionsWithEmoji, missingSet]);
+
   if (isLoading && sections.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
@@ -290,13 +321,34 @@ export function QuickRegisterView({
                 modeSwitch={modeSwitchLink}
               />
 
-              <StickerStatsRow
-                have={haveCount}
-                duplicates={duplicates.length}
-                missing={needCount}
-                total={totalStickers}
-                className="hidden md:grid"
-              />
+              <div className="hidden md:flex md:items-center md:justify-between md:gap-4">
+                <StickerStatsRow
+                  have={haveCount}
+                  duplicates={duplicates.length}
+                  missing={needCount}
+                  total={totalStickers}
+                  className="flex-1"
+                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={isGenerating || isLoading}>
+                      <Printer className="h-4 w-4 mr-2" />
+                      {isGenerating ? "Gerando..." : "PDF"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[140px]">
+                    <DropdownMenuItem onClick={() => handlePrint(false)}>
+                      Todas ({totalStickers})
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handlePrint(true)}
+                      disabled={missingSet.size === 0}
+                    >
+                      Faltantes ({missingSet.size})
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
               {/* Quick bar desktop */}
               <div className="hidden flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container p-3 md:flex lg:flex-row lg:items-center">

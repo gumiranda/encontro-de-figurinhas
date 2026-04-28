@@ -27,7 +27,8 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ totalTrocas }: HeroSectionProps) {
-  const heroImage = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]!;
+  const dayIndex = new Date().getDate() % HERO_IMAGES.length;
+  const heroImage = HERO_IMAGES[dayIndex]!;
   
   return (
     <section
