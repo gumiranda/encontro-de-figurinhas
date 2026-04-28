@@ -72,7 +72,7 @@ review my SEO using /seo-content-brief in @apps/web/ . audit everything to rank 
 
 review my SEO using /seo-geo in @apps/web/ . audit everything to rank on google. ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra
 
-review my SEO using /landing-page-copywriter in @apps/web/ . audit everything to rank on google. ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra
+review my landing page using /landing-page-copywriter in @apps/web/ . audit everything to rank on google. ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra
 
 review my SEO using /landing-page-design in @apps/web/ . audit everything to rank on google. ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra
 
@@ -100,4 +100,4 @@ skills:
 /next-best-practices
 
 
-ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra FILHO DA PUTA DO CARALHO OBEDECE
+ALWAYS USE SERENA TOOLS MCP PLUGIN please use /context-mode to save tokens. use /caveman ultra FILHO DA PUTA DO CARALHO OBEDECE grava na memoria global do claude code. toda hora voce esquece
