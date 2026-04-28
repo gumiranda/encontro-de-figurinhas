@@ -4,4 +4,4 @@
 
 **Hardcore (20%).** Camila, 27, BH. Faltam as últimas 30-40. Ninguém perto tem. Precisa expandir busca pra pontos em outros bairros e cidades vizinhas. Topa ir longe por figurinha rara. Quer notificação.
 
-**Facilitador (10%).** Tiago, 40, SP. Compra caixas fechadas, volume grande de duplicatas. Frequenta múltiplos pontos. Quer visibilidade, topa pagar.
+**Facilitador (10%).** Tiago, 40, SP. Compra caixas fechadas, volume grande de repetidas. Frequenta múltiplos pontos. Quer visibilidade, topa pagar.

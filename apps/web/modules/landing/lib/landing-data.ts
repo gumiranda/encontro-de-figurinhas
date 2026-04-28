@@ -7,7 +7,8 @@ export const CITIES = [
     stateDescription: "Estado de São Paulo",
     activePoints: 342,
     participants: "12.4k",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAuuUtCCr4bfjwCv8uXSHbMzTGSF7QHZ6uH_ZaCGk49rqtzLweP3SQvj6cOvOqvMK9owKbZ67QIs378iZd5e2XDl1A3Pnjc2ETwlNl7ZyOnh4Mzo4aYga45W9sZt_apGuxEbMQHbIGA1038jvCyDraG0TlPksOkeO2cmSc7lHPl9VBGZb6HAFBLyam8_zV9ak08UImAIeh5nXbcG8fC7We1s-wieG1lnuvPwurv6zoQCyOtKDAnoRDFZ2DAYHHcM883Y0x2W3h3alWJ",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuAuuUtCCr4bfjwCv8uXSHbMzTGSF7QHZ6uH_ZaCGk49rqtzLweP3SQvj6cOvOqvMK9owKbZ67QIs378iZd5e2XDl1A3Pnjc2ETwlNl7ZyOnh4Mzo4aYga45W9sZt_apGuxEbMQHbIGA1038jvCyDraG0TlPksOkeO2cmSc7lHPl9VBGZb6HAFBLyam8_zV9ak08UImAIeh5nXbcG8fC7We1s-wieG1lnuvPwurv6zoQCyOtKDAnoRDFZ2DAYHHcM883Y0x2W3h3alWJ",
     imageAlt: "Vista aérea de São Paulo à noite",
   },
   {
@@ -18,7 +19,8 @@ export const CITIES = [
     stateDescription: "Estado do Rio de Janeiro",
     activePoints: 218,
     participants: "8.9k",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB4gaJXFfwtBUeMQbVikd4Aa1-cwF4zr6ezo8sna8no0-vo5udxpIAszRIYRFenUncQQF-_abuUz5NCoJnUXe7OqXGNPoIYrYd6kNWiPOeCsJmgihDMlDrX40PyzXnmZzPpQbpe80Qsix2qPgPRedOo35D0iNBU6WD_2w-3I5NVG2Jy5jFt8_DIlbBsfBkUWpUm_68vBTZMPz3CqoFd4A_dt7aACJ6WsKytcsUVgMNXbXwLOeWdco_SnFZ1ro8BN1Y6aGnV-HkHQzAT",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuB4gaJXFfwtBUeMQbVikd4Aa1-cwF4zr6ezo8sna8no0-vo5udxpIAszRIYRFenUncQQF-_abuUz5NCoJnUXe7OqXGNPoIYrYd6kNWiPOeCsJmgihDMlDrX40PyzXnmZzPpQbpe80Qsix2qPgPRedOo35D0iNBU6WD_2w-3I5NVG2Jy5jFt8_DIlbBsfBkUWpUm_68vBTZMPz3CqoFd4A_dt7aACJ6WsKytcsUVgMNXbXwLOeWdco_SnFZ1ro8BN1Y6aGnV-HkHQzAT",
     imageAlt: "Rio de Janeiro com Cristo Redentor ao pôr do sol",
   },
   {
@@ -29,15 +31,31 @@ export const CITIES = [
     stateDescription: "Minas Gerais",
     activePoints: 156,
     participants: "5.2k",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDUB2G0kZC9MXt2HmYl7Ls11spLftjo98iEMXU-ZHUW5qqcUxjU4Ut01bT5LGKRUSwndupUqBBA35T1lL8S01W4INOmfOq-YB9WS-seArDE_l1c9AQOwc7hU_CVMWVOB86TDVHf0sej1G5e8P8oHNUEf67g4IijzfAbdY4v1OJw2NB9E0gs2xyNayVznZx4wZ5OmWofV7ZNRrVLl5jV5TctjM0JRuLn7MBzZpVNr02Gnb_kmCHGAorlEXhMxyAbPRzHFxJXoAZoETxF",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDUB2G0kZC9MXt2HmYl7Ls11spLftjo98iEMXU-ZHUW5qqcUxjU4Ut01bT5LGKRUSwndupUqBBA35T1lL8S01W4INOmfOq-YB9WS-seArDE_l1c9AQOwc7hU_CVMWVOB86TDVHf0sej1G5e8P8oHNUEf67g4IijzfAbdY4v1OJw2NB9E0gs2xyNayVznZx4wZ5OmWofV7ZNRrVLl5jV5TctjM0JRuLn7MBzZpVNr02Gnb_kmCHGAorlEXhMxyAbPRzHFxJXoAZoETxF",
     imageAlt: "Arquitetura e montanhas de Belo Horizonte",
   },
 ];
 
 export const CITY_SUGGESTIONS = [
-  { name: "São Paulo", slug: "sao-paulo", state: "Estado de São Paulo", activeUsers: "1.2k" },
-  { name: "Rio de Janeiro", slug: "rio-de-janeiro", state: "Estado do Rio de Janeiro", activeUsers: "850" },
-  { name: "Belo Horizonte", slug: "belo-horizonte", state: "Minas Gerais", activeUsers: "620" },
+  {
+    name: "São Paulo",
+    slug: "sao-paulo",
+    state: "Estado de São Paulo",
+    activeUsers: "1.2k",
+  },
+  {
+    name: "Rio de Janeiro",
+    slug: "rio-de-janeiro",
+    state: "Estado do Rio de Janeiro",
+    activeUsers: "850",
+  },
+  {
+    name: "Belo Horizonte",
+    slug: "belo-horizonte",
+    state: "Minas Gerais",
+    activeUsers: "620",
+  },
 ];
 
 export const FEATURES = [
@@ -115,7 +133,7 @@ export const FAQ_DATA = [
   {
     question: "Como funciona a troca pelo FigurinhaFácil?",
     answer:
-      "Você cadastra suas duplicatas e faltantes. O app encontra colecionadores próximos com match perfeito. Vocês confirmam pelo chat e marcam um ponto público de encontro.",
+      "Você cadastra suas repetidas e faltantes. O app encontra colecionadores próximos com match perfeito. Vocês confirmam pelo chat e marcam um ponto público de encontro.",
   },
   {
     question: "Onde trocar figurinhas perto de mim?",
@@ -136,15 +154,49 @@ export const FAQ_DATA = [
 
 export const SOCIAL_STATS = {
   trocas: { value: "847.291", label: "Trocas realizadas", delta: "+12.847 hoje" },
-  colecionadores: { value: "48.291", label: "Colecionadores ativos", delta: "2.418 online agora" },
+  colecionadores: {
+    value: "48.291",
+    label: "Colecionadores ativos",
+    delta: "2.418 online agora",
+  },
   matchMedio: { value: "4m 18s", label: "Match médio", delta: "do cadastro à proposta" },
   cidades: { value: "847", label: "Cidades cobertas", delta: "26 estados" },
 } as const;
 
 export const RARITY_LEADERBOARD = [
-  { rank: 1, code: "BRA-10 Legend", player: "Capitão", team: "Seleção Brasileira", flag: "🇧🇷", slug: "bra", seeking: "9.482", odds: "1 a cada 412", gold: true },
-  { rank: 2, code: "ARG-FWC Legend", player: "Camisa 10", team: "Seleção Argentina", flag: "🇦🇷", slug: "arg", seeking: "7.214", odds: "1 a cada 388", gold: false },
-  { rank: 3, code: "POR-FWC Legend", player: "Camisa 7", team: "Seleção Portuguesa", flag: "🇵🇹", slug: "por", seeking: "5.097", odds: "1 a cada 360", gold: false },
+  {
+    rank: 1,
+    code: "BRA-10 Legend",
+    player: "Capitão",
+    team: "Seleção Brasileira",
+    flag: "🇧🇷",
+    slug: "bra",
+    seeking: "9.482",
+    odds: "1 a cada 412",
+    gold: true,
+  },
+  {
+    rank: 2,
+    code: "ARG-FWC Legend",
+    player: "Camisa 10",
+    team: "Seleção Argentina",
+    flag: "🇦🇷",
+    slug: "arg",
+    seeking: "7.214",
+    odds: "1 a cada 388",
+    gold: false,
+  },
+  {
+    rank: 3,
+    code: "POR-FWC Legend",
+    player: "Camisa 7",
+    team: "Seleção Portuguesa",
+    flag: "🇵🇹",
+    slug: "por",
+    seeking: "5.097",
+    odds: "1 a cada 360",
+    gold: false,
+  },
 ] as const;
 
 export const TICKER_ITEMS = [
@@ -161,44 +213,167 @@ export const TICKER_ITEMS = [
 export const COMPARE_TABLE = {
   headers: ["", "FigurinhaFácil", "Mercado Livre"],
   rows: [
-    { label: "Taxa por transação", ff: "R$ 0 · sempre", ml: "11–16% + frete", ffGood: true },
-    { label: "Tempo até a figurinha chegar", ff: "≤ 24h (encontro)", ml: "3–10 dias", ffGood: true },
-    { label: "Match por código exato", ff: "Sim · BRA-10 ↔ ARG-09", ml: "Busca por título", ffGood: true },
-    { label: "Risco de figurinha falsificada", ff: "Conferência presencial", ml: "Só na chegada", ffGood: true },
-    { label: "Comunidade de coletores", ff: "48k verificados", ml: "Vendedores anônimos", ffGood: true },
+    {
+      label: "Taxa por transação",
+      ff: "R$ 0 · sempre",
+      ml: "11–16% + frete",
+      ffGood: true,
+    },
+    {
+      label: "Tempo até a figurinha chegar",
+      ff: "≤ 24h (encontro)",
+      ml: "3–10 dias",
+      ffGood: true,
+    },
+    {
+      label: "Match por código exato",
+      ff: "Sim · BRA-10 ↔ ARG-09",
+      ml: "Busca por título",
+      ffGood: true,
+    },
+    {
+      label: "Risco de figurinha falsificada",
+      ff: "Conferência presencial",
+      ml: "Só na chegada",
+      ffGood: true,
+    },
+    {
+      label: "Comunidade de coletores",
+      ff: "48k verificados",
+      ml: "Vendedores anônimos",
+      ffGood: true,
+    },
   ],
 } as const;
 
 export const PROBLEM_STATS = [
-  { value: "73%", label: "colecionadores com duplicatas", color: "error" },
+  { value: "73%", label: "colecionadores com repetidas", color: "error" },
   { value: "R$ 1.840", label: "custo médio para completar", color: "tertiary" },
   { value: "412 pacotes", label: "pra achar uma legendária", color: "primary" },
 ] as const;
 
 export const STATES = [
-  { slug: "sp", code: "SP", name: "São Paulo", collectors: "14.2k", cities: 645, points: 1247 },
-  { slug: "rj", code: "RJ", name: "Rio de Janeiro", collectors: "8.9k", cities: 92, points: 534 },
-  { slug: "mg", code: "MG", name: "Minas Gerais", collectors: "5.2k", cities: 853, points: 412 },
-  { slug: "rs", code: "RS", name: "Rio Grande do Sul", collectors: "3.8k", cities: 497, points: 287 },
-  { slug: "pr", code: "PR", name: "Paraná", collectors: "3.1k", cities: 399, points: 245 },
+  {
+    slug: "sp",
+    code: "SP",
+    name: "São Paulo",
+    collectors: "14.2k",
+    cities: 645,
+    points: 1247,
+  },
+  {
+    slug: "rj",
+    code: "RJ",
+    name: "Rio de Janeiro",
+    collectors: "8.9k",
+    cities: 92,
+    points: 534,
+  },
+  {
+    slug: "mg",
+    code: "MG",
+    name: "Minas Gerais",
+    collectors: "5.2k",
+    cities: 853,
+    points: 412,
+  },
+  {
+    slug: "rs",
+    code: "RS",
+    name: "Rio Grande do Sul",
+    collectors: "3.8k",
+    cities: 497,
+    points: 287,
+  },
+  {
+    slug: "pr",
+    code: "PR",
+    name: "Paraná",
+    collectors: "3.1k",
+    cities: 399,
+    points: 245,
+  },
   { slug: "ba", code: "BA", name: "Bahia", collectors: "2.7k", cities: 417, points: 198 },
-  { slug: "pe", code: "PE", name: "Pernambuco", collectors: "2.1k", cities: 185, points: 156 },
-  { slug: "sc", code: "SC", name: "Santa Catarina", collectors: "2.0k", cities: 295, points: 167 },
+  {
+    slug: "pe",
+    code: "PE",
+    name: "Pernambuco",
+    collectors: "2.1k",
+    cities: 185,
+    points: 156,
+  },
+  {
+    slug: "sc",
+    code: "SC",
+    name: "Santa Catarina",
+    collectors: "2.0k",
+    cities: 295,
+    points: 167,
+  },
   { slug: "go", code: "GO", name: "Goiás", collectors: "1.8k", cities: 246, points: 134 },
   { slug: "ce", code: "CE", name: "Ceará", collectors: "1.6k", cities: 184, points: 112 },
-  { slug: "df", code: "DF", name: "Distrito Federal", collectors: "1.4k", cities: 1, points: 89 },
-  { slug: "es", code: "ES", name: "Espírito Santo", collectors: "1.2k", cities: 78, points: 76 },
+  {
+    slug: "df",
+    code: "DF",
+    name: "Distrito Federal",
+    collectors: "1.4k",
+    cities: 1,
+    points: 89,
+  },
+  {
+    slug: "es",
+    code: "ES",
+    name: "Espírito Santo",
+    collectors: "1.2k",
+    cities: 78,
+    points: 76,
+  },
   { slug: "pa", code: "PA", name: "Pará", collectors: "980", cities: 144, points: 67 },
-  { slug: "ma", code: "MA", name: "Maranhão", collectors: "890", cities: 217, points: 54 },
-  { slug: "mt", code: "MT", name: "Mato Grosso", collectors: "850", cities: 141, points: 52 },
-  { slug: "ms", code: "MS", name: "Mato Grosso do Sul", collectors: "780", cities: 79, points: 48 },
+  {
+    slug: "ma",
+    code: "MA",
+    name: "Maranhão",
+    collectors: "890",
+    cities: 217,
+    points: 54,
+  },
+  {
+    slug: "mt",
+    code: "MT",
+    name: "Mato Grosso",
+    collectors: "850",
+    cities: 141,
+    points: 52,
+  },
+  {
+    slug: "ms",
+    code: "MS",
+    name: "Mato Grosso do Sul",
+    collectors: "780",
+    cities: 79,
+    points: 48,
+  },
   { slug: "pb", code: "PB", name: "Paraíba", collectors: "720", cities: 223, points: 45 },
-  { slug: "rn", code: "RN", name: "Rio Grande do Norte", collectors: "680", cities: 167, points: 42 },
+  {
+    slug: "rn",
+    code: "RN",
+    name: "Rio Grande do Norte",
+    collectors: "680",
+    cities: 167,
+    points: 42,
+  },
   { slug: "al", code: "AL", name: "Alagoas", collectors: "540", cities: 102, points: 34 },
   { slug: "pi", code: "PI", name: "Piauí", collectors: "480", cities: 224, points: 28 },
   { slug: "se", code: "SE", name: "Sergipe", collectors: "420", cities: 75, points: 26 },
   { slug: "am", code: "AM", name: "Amazonas", collectors: "380", cities: 62, points: 24 },
-  { slug: "to", code: "TO", name: "Tocantins", collectors: "320", cities: 139, points: 19 },
+  {
+    slug: "to",
+    code: "TO",
+    name: "Tocantins",
+    collectors: "320",
+    cities: 139,
+    points: 19,
+  },
   { slug: "ro", code: "RO", name: "Rondônia", collectors: "280", cities: 52, points: 17 },
   { slug: "ac", code: "AC", name: "Acre", collectors: "180", cities: 22, points: 11 },
   { slug: "ap", code: "AP", name: "Amapá", collectors: "150", cities: 16, points: 9 },

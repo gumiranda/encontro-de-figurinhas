@@ -138,7 +138,7 @@
    tradePointSlug: string;
    pendingTrade: {
    \_id: Id<"trades">;
-   status: "pending_confirmation" | "confirmed" | "cancelled" | "disputed" | "expired";
+   status: "pending*confirmation" | "confirmed" | "cancelled" | "disputed" | "expired";
    role: "initiator" | "counterparty";
    createdAt: number;
    stickersInitiatorGave: number[];
@@ -230,7 +230,7 @@
    theyHaveINeed: r.theyHaveINeed,
    iHaveTheyNeed: r.iHaveTheyNeed,
    isBidirectional: r.isBidirectional,
-   distanceKm: Math.round(r.distanceKm _ 2) / 2,
+   distanceKm: Math.round(r.distanceKm * 2) / 2,
    layer: r.layer,
    tradePointId: r.tradePointId,
    tradePointSlug: r.tradePointSlug,
@@ -254,14 +254,14 @@
    stickersIGave: v.array(v.number()),
    stickersIReceived: v.array(v.number()),
    }
-   returns: { ok: true, tradeId: Id<"trades"> } | { ok: false, error: "rate-limited" | "stickers_mismatch" | "forbidden" | "already-pending" }
+   returns: { ok: true, tradeId: Id<"trades"> } | { ok: false, error: "rate-limited" | "stickers*mismatch" | "forbidden" | "already-pending" }
    Rate limiting:
    const pairKey = [caller._id, args.matchedUserId].sort().join(":");
    if (Math.floor(caller.reliabilityScore) < 2) {
    const recent = await ctx.db
    .query("trades")
    .withIndex("by_pairKey_created", q =>
-   q.eq("pairKey", pairKey).gt("createdAt", Date.now() - 24 _ 60 _ 60 _ 1000)
+   q.eq("pairKey", pairKey).gt("createdAt", Date.now() - 24 * 60 _ 60 _ 1000)
    )
    .first();
    if (recent) return { ok: false, error: "rate-limited" };
@@ -318,12 +318,12 @@
   return { ok: false, error: "state_changed" };
   }
   Efeito colateral (atualização de álbuns):
-  // Remover das duplicatas do initiator o que ele deu
+  // Remover das repetidas do initiator o que ele deu
   await ctx.db.patch(trade.initiatorId, {
   duplicates: initiator.duplicates.filter(s => !trade.stickersInitiatorGave.includes(s)),
   missing: initiator.missing.filter(s => !trade.stickersInitiatorReceived.includes(s)),
   });
-  // Remover das duplicatas do counterparty o que ele deu (= o que initiator recebeu)
+  // Remover das repetidas do counterparty o que ele deu (= o que initiator recebeu)
   await ctx.db.patch(trade.counterpartyId, {
   duplicates: counterparty.duplicates.filter(s => !trade.stickersInitiatorReceived.includes(s)),
   missing: counterparty.missing.filter(s => !trade.stickersInitiatorGave.includes(s)),

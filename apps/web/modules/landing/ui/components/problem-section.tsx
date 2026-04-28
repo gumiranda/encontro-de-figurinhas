@@ -30,7 +30,7 @@ export function ProblemSection() {
             </h2>
             <p className="mt-5 text-[#a6aabf] text-lg leading-relaxed max-w-lg">
               O álbum da Copa promete. A banca não. Você abre 8 pacotes e ganha mais 6
-              MEX-10 repetidas. Sua pilha de duplicatas cresce mais rápido que o álbum.
+              MEX-10 repetidas. Sua pilha de repetidas cresce mais rápido que o álbum.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-3">
               {PROBLEM_STATS.map((stat) => (
