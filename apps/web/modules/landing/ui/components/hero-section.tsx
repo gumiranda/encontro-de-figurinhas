@@ -18,7 +18,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           {/* Eyebrow tag */}
           <span className="tag-chip animate-fade-in-up opacity-0">
             <span className="pulse-dot" aria-hidden="true" />
-            12.400+ trocas realizadas · 847 cidades
+            50.000+ trocas realizadas · 150+ cidades
           </span>
 
           {/* Hero headline — premium typography */}
@@ -26,14 +26,14 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
             id="hero-heading"
             className="font-headline text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] text-on-surface sm:text-5xl lg:text-[3.5rem] animate-fade-in-up opacity-0 delay-100"
           >
-            Pare de acumular repetidas.{" "}
+            Troque Figurinhas da Copa 2026{" "}
             <span className="text-gradient-primary block sm:inline mt-1 sm:mt-0">
-              Comece a trocar hoje.
+              Perto de Você
             </span>
           </h1>
 
-          <p className="max-w-lg text-base leading-[1.7] text-on-surface-variant sm:text-lg animate-fade-in-up opacity-0 delay-200">
-            Cadastre suas repetidas, encontre quem precisa delas — e quem tem as que você procura. Match automático, troca presencial.
+          <p className="hero-description max-w-lg text-base leading-[1.7] text-on-surface-variant sm:text-lg animate-fade-in-up opacity-0 delay-200">
+            Cadastre suas figurinhas repetidas do álbum Copa 2026, encontre colecionadores perto de você — match automático, troca presencial.
           </p>
 
           {/* Double-bezel search container */}
@@ -46,12 +46,12 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           {/* Stats with premium spacing */}
           <dl className="grid grid-cols-3 gap-4 pt-4 animate-fade-in-up opacity-0 delay-400">
             <StatHero
-              value={totalTrocas ?? "12.4k"}
+              value={totalTrocas ?? "10k+"}
               label="Colecionadores"
               tone="primary"
               featured
             />
-            <Stat value="842" label="Pontos" tone="secondary" />
+            <Stat value="800+" label="Pontos" tone="secondary" />
             <Stat value="98%" label="Match" tone="tertiary" />
           </dl>
 
@@ -195,7 +195,7 @@ function AeoExplainer() {
           </h2>
           <p className="text-sm text-on-surface-variant leading-[1.7]">
             <strong className="text-on-surface font-medium">Figurinha Fácil é uma plataforma gratuita que conecta colecionadores de figurinhas da Copa do Mundo 2026 em todo o Brasil.</strong>{" "}
-            Usuários cadastram suas figurinhas repetidas e faltantes, o sistema encontra automaticamente outros colecionadores com necessidades complementares (matches), e as trocas são combinadas via WhatsApp em pontos de encontro verificados. Mais de 10.000 colecionadores ativos em 150+ cidades.
+            Usuários cadastram suas figurinhas repetidas e faltantes, o sistema encontra automaticamente outros colecionadores com necessidades complementares (matches), e as trocas são combinadas via WhatsApp em mais de 800 pontos de encontro verificados. Mais de 10.000 colecionadores ativos em 150+ cidades.
           </p>
         </div>
       </div>

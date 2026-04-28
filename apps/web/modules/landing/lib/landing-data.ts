@@ -44,22 +44,22 @@ export const FEATURES = [
   {
     id: "nearby",
     icon: "map",
-    title: "Trocas perto de você",
+    title: "Trocas de figurinhas perto de você",
     description: "Veja pontos de troca e colecionadores num raio de 5km. Sem deslocamento desnecessário.",
     colorClass: "text-[var(--primary)] bg-[var(--primary)]/10",
   },
   {
     id: "smart-list",
     icon: "shield",
-    title: "Lista inteligente",
-    description: "Cadastre suas repetidas e faltantes. O sistema cruza automaticamente com outros colecionadores.",
+    title: "Lista inteligente de repetidas",
+    description: "Cadastre suas figurinhas repetidas e faltantes do álbum Copa 2026. O sistema cruza automaticamente com outros colecionadores.",
     colorClass: "text-[var(--secondary)] bg-[var(--secondary)]/10",
   },
   {
     id: "match",
     icon: "zap",
-    title: "Match instantâneo",
-    description: "Receba alerta quando alguém próximo tiver a figurinha que você procura.",
+    title: "Match instantâneo com colecionadores",
+    description: "Receba alerta quando alguém próximo tiver a figurinha da Copa 2026 que você procura.",
     colorClass: "text-[var(--tertiary)] bg-[var(--tertiary)]/10",
   },
 ];

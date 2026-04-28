@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, MapPin, RefreshCw, Star } from "lucide-react";
+import { Users, MapPin, RefreshCw, Building2 } from "lucide-react";
 import { useScrollReveal, useScrollRevealGroup } from "@/hooks/use-scroll-reveal";
 
 const STATS = [
@@ -18,14 +18,14 @@ const STATS = [
   },
   {
     icon: MapPin,
-    value: "150+",
-    label: "Cidades cobertas",
+    value: "800+",
+    label: "Pontos de troca",
     color: "text-[var(--tertiary)]",
   },
   {
-    icon: Star,
-    value: "4.8",
-    label: "Avaliação média",
+    icon: Building2,
+    value: "150+",
+    label: "Cidades cobertas",
     color: "text-yellow-500",
   },
 ];
