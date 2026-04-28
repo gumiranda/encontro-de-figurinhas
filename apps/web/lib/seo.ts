@@ -597,7 +597,7 @@ export function generateBlogPostMetadata(
       card: coverImage ? "summary_large_image" : "summary",
       title: finalTitle,
       description: finalDescription,
-      ...(coverImage && { images: [coverImage] }),
+      ...(coverImage && { images: [{ url: coverImage, alt: finalTitle }] }),
     },
     alternates: {
       canonical: `${BASE_URL}/blog/${slug}`,
@@ -780,6 +780,7 @@ export function generateCitiesHubMetadata(): Metadata {
       "colecionadores perto de mim",
     ],
     openGraph: { title, description, url: `${BASE_URL}/cidades`, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/cidades` },
   };
 }
@@ -798,6 +799,7 @@ export function generateStatesHubMetadata(): Metadata {
       "colecionadores brasil",
     ],
     openGraph: { title, description, url: `${BASE_URL}/estados`, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/estados` },
   };
 }
@@ -817,6 +819,7 @@ export function generateTeamsHubMetadata(): Metadata {
       "álbum copa 2026 seleções",
     ],
     openGraph: { title, description, url: `${BASE_URL}/selecoes`, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/selecoes` },
   };
 }
@@ -837,6 +840,7 @@ export function generateStickersHubMetadata(): Metadata {
       "980 figurinhas",
     ],
     openGraph: { title, description, url: `${BASE_URL}/figurinhas`, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/figurinhas` },
   };
 }
@@ -856,6 +860,7 @@ export function generateTradePointsHubMetadata(): Metadata {
       "locais troca figurinhas",
     ],
     openGraph: { title, description, url: `${BASE_URL}/pontos`, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/pontos` },
   };
 }

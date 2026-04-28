@@ -18,7 +18,8 @@ export async function GET() {
       <link>${BASE_URL}/blog/${post.slug}</link>
       <guid isPermaLink="true">${BASE_URL}/blog/${post.slug}</guid>
       <description><![CDATA[${post.excerpt}]]></description>
-      <pubDate>${pubDate}</pubDate>
+      <pubDate>${pubDate}</pubDate>${post.coverImage ? `
+      <enclosure url="${post.coverImage}" type="image/jpeg"/>` : ""}
       <author>${post.author.name}</author>
       <category>${post.category}</category>
     </item>`;

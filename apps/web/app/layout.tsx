@@ -78,6 +78,14 @@ export const metadata: Metadata = {
     title: "Figurinha Fácil — Troque Figurinhas da Copa 2026",
     description:
       "980 figurinhas no álbum da Copa 2026. Encontre colecionadores em mais de 100 cidades e troque suas repetidas — grátis.",
+    images: [
+      {
+        url: `${BASE_URL}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: "Figurinha Fácil — Troque Figurinhas da Copa 2026",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
