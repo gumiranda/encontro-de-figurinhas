@@ -1029,7 +1029,7 @@ export function generateRareMetadata(
       url: `${BASE_URL}/raras/${teamSlug}`,
       type: "website",
     },
-    twitter: { title, description },
+    twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `${BASE_URL}/raras/${teamSlug}` },
   };
 }
