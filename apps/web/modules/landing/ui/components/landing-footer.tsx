@@ -1,145 +1,112 @@
-import { Globe, Share2, Trophy } from "lucide-react";
+"use client";
+
 import Link from "next/link";
+import { Trophy } from "lucide-react";
 
-const PRODUCT_LINKS = [
-  { label: "Como Funciona", href: "/como-funciona" },
-  { label: "Álbum Copa 2026", href: "/album-copa-do-mundo-2026" },
-  { label: "Blog", href: "/blog" },
-];
-
-const HUB_LINKS = [
-  { label: "Cidades", href: "/cidades" },
-  { label: "Estados", href: "/estados" },
-  { label: "Seleções", href: "/selecoes" },
-  { label: "Figurinhas", href: "/figurinhas" },
-  { label: "Pontos de Troca", href: "/pontos" },
-];
-
-const CITY_LINKS = [
-  { label: "São Paulo", href: "/cidade/sao-paulo-sp" },
-  { label: "Rio de Janeiro", href: "/cidade/rio-de-janeiro-rj" },
-  { label: "Belo Horizonte", href: "/cidade/belo-horizonte-mg" },
-  { label: "Curitiba", href: "/cidade/curitiba-pr" },
-  { label: "Porto Alegre", href: "/cidade/porto-alegre-rs" },
-];
-
-const LEGAL_LINKS = [
-  { label: "Sobre", href: "/sobre" },
-  { label: "Contato", href: "/contato" },
-  { label: "Termos de Uso", href: "/termos" },
-  { label: "Privacidade", href: "/privacidade" },
-];
+const FOOTER_LINKS = {
+  produto: [
+    { label: "Propostas ao vivo", href: "/propostas" },
+    { label: "Figurinhas raras", href: "/raras" },
+    { label: "Seleções", href: "/selecoes" },
+    { label: "Mapa de calor", href: "/mapa" },
+  ],
+  comunidade: [
+    { label: "Blog", href: "/blog" },
+    { label: "Imprensa", href: "/imprensa" },
+    { label: "Regras de troca", href: "/regras" },
+    { label: "Segurança", href: "/seguranca" },
+  ],
+  legal: [
+    { label: "Termos de uso", href: "/termos" },
+    { label: "Privacidade", href: "/privacidade" },
+    { label: "Contato", href: "/contato" },
+  ],
+};
 
 export function LandingFooter() {
   return (
-    <footer
-      role="contentinfo"
-      className="w-full border-t border-outline-variant/40 bg-surface-container-low"
-    >
-      <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-          <div className="col-span-2 md:col-span-1">
+    <footer className="border-t border-white/5 bg-[#0d1323]/60">
+      <div className="max-w-7xl mx-auto px-6 py-14">
+        <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-10 sm:gap-8 mb-10">
+          <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <Trophy className="text-primary w-6 h-6" aria-hidden="true" />
-              <span className="text-primary-dim font-bold text-xl">Figurinha Fácil</span>
+              <span
+                className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#95aaff] to-[#3766ff]"
+                aria-hidden="true"
+              >
+                <Trophy className="size-4 text-[#00247e]" strokeWidth={2.5} />
+              </span>
+              <span className="font-bold text-lg text-[#e1e4fa]">
+                FigurinhaFácil
+              </span>
             </Link>
-            <p className="text-sm text-on-surface-variant mb-4">
-              A melhor plataforma para trocar figurinhas da Copa do Mundo 2026.
+            <p className="text-xs text-[#a6aabf] leading-relaxed max-w-xs">
+              A maior arena de trocas da Copa 2026. Direto entre coletores. Zero
+              taxa. Só troca.
             </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                className="w-9 h-9 rounded-full bg-[var(--surface-container-high)] flex items-center justify-center text-[var(--outline)] hover:text-[var(--primary)] transition-colors border border-[var(--outline-variant)]/10"
-                aria-label="Compartilhar"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                className="w-9 h-9 rounded-full bg-[var(--surface-container-high)] flex items-center justify-center text-[var(--outline)] hover:text-[var(--primary)] transition-colors border border-[var(--outline-variant)]/10"
-                aria-label="Mudar idioma"
-              >
-                <Globe className="w-4 h-4" />
-              </button>
-            </div>
           </div>
 
-          <nav aria-label="Produto">
-            <h3 className="font-semibold text-sm text-on-surface mb-4 uppercase tracking-wider">
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[#a6aabf] mb-4">
               Produto
-            </h3>
-            <ul className="space-y-3">
-              {PRODUCT_LINKS.map((link) => (
-                <li key={link.label}>
+            </p>
+            <ul className="space-y-2 text-sm text-[#a6aabf]">
+              {FOOTER_LINKS.produto.map((link) => (
+                <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+                    className="hover:text-[#e1e4fa] transition-colors"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
 
-          <nav aria-label="Explorar">
-            <h3 className="font-semibold text-sm text-on-surface mb-4 uppercase tracking-wider">
-              Explorar
-            </h3>
-            <ul className="space-y-3">
-              {HUB_LINKS.map((link) => (
-                <li key={link.label}>
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[#a6aabf] mb-4">
+              Comunidade
+            </p>
+            <ul className="space-y-2 text-sm text-[#a6aabf]">
+              {FOOTER_LINKS.comunidade.map((link) => (
+                <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+                    className="hover:text-[#e1e4fa] transition-colors"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
 
-          <nav aria-label="Cidades populares">
-            <h3 className="font-semibold text-sm text-on-surface mb-4 uppercase tracking-wider">
-              Cidades
-            </h3>
-            <ul className="space-y-3">
-              {CITY_LINKS.map((link) => (
-                <li key={link.label}>
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[#a6aabf] mb-4">
+              Legal
+            </p>
+            <ul className="space-y-2 text-sm text-[#a6aabf]">
+              {FOOTER_LINKS.legal.map((link) => (
+                <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+                    className="hover:text-[#e1e4fa] transition-colors"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
-
-          <nav aria-label="Empresa">
-            <h3 className="font-semibold text-sm text-on-surface mb-4 uppercase tracking-wider">
-              Empresa
-            </h3>
-            <ul className="space-y-3">
-              {LEGAL_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-on-surface-variant hover:text-on-surface transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          </div>
         </div>
 
-        <div className="pt-8 border-t border-outline-variant/20 text-center">
-          <p className="text-sm text-on-surface-variant">
-            &copy; 2026 Figurinha Fácil. Todos os direitos reservados.
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs font-mono text-[#a6aabf]">
+            © 2026 FigurinhaFácil · feito por coletores, para coletores
+          </p>
+          <p className="text-xs font-mono text-[#a6aabf]">
+            Não afiliado a FIFA, Panini ou Copa do Mundo.
           </p>
         </div>
       </div>

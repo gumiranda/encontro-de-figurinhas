@@ -58,10 +58,10 @@ export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
         <div className="flex justify-center">
           <div className=" rounded-full p-[3px] bg-on-primary/20 ring-1 ring-on-primary/30">
             <Link
-              href="/sign-up"
+              href="/cadastrar-figurinhas/quick"
               className="text-white group flex items-center gap-3 px-7 py-3.5 bg-on-primary  font-medium rounded-full shadow-[0_4px_24px_-4px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.8)] transition-[box-shadow] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.25)]"
             >
-              Quero completar meu álbum
+              Cadastrar minhas figurinhas
               <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:bg-primary/15">
                 <ArrowRight className="w-4 h-4 text-primary-dim" strokeWidth={2} />
               </span>

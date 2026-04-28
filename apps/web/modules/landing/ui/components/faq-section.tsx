@@ -1,54 +1,78 @@
 "use client";
 
-import { useScrollReveal, useScrollRevealGroup } from "@/hooks/use-scroll-reveal";
+import Link from "next/link";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@workspace/ui/components/accordion";
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
 
 interface FAQSectionProps {
-  faqs: Array<{
-    question: string;
-    answer: string;
-  }>;
+  faqs: readonly FAQ[];
 }
 
 export function FAQSection({ faqs }: FAQSectionProps) {
-  const [headingRef, headingVisible] = useScrollReveal<HTMLHeadingElement>();
-  const [faqsRef, faqsVisible] = useScrollRevealGroup(faqs.length);
+  const [ref, isVisible] = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section
-      className="px-6 py-24 bg-[var(--surface-container-low)]/50"
-      aria-labelledby="faq-heading"
-    >
-      <div className="max-w-3xl mx-auto">
-        <h2
-          ref={headingRef}
-          id="faq-heading"
-          className={`font-[var(--font-headline)] text-3xl md:text-5xl tracking-tight mb-12 text-balance text-center text-[var(--on-surface)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${headingVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+    <section id="faq" className="px-6 py-24">
+      <div className="max-w-7xl mx-auto">
+        <div
+          ref={ref}
+          className={`grid lg:grid-cols-3 gap-3 lg:gap-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          }`}
         >
-          Perguntas frequentes
-        </h2>
+          <div className="lg:col-span-1 lg:pr-4">
+            <span className="eyebrow">FAQ · AEO</span>
+            <h3 className="mt-3 font-bold text-2xl md:text-3xl leading-tight text-pretty text-[#e1e4fa]">
+              As perguntas que
+              <br />
+              os colecionadores fazem.
+            </h3>
+            <p className="mt-3 text-sm text-[#a6aabf]">
+              Estruturado em{" "}
+              <span className="font-mono text-[#95aaff]">FAQPage</span> schema
+              para featured snippets do Google.
+            </p>
+          </div>
 
-        <div ref={faqsRef} className="space-y-6">
-          {faqs.map((faq, index) => (
-            <details
-              key={faq.question}
-              className={`group bg-[var(--surface-container)] rounded-xl border border-[var(--outline-variant)]/10 overflow-hidden transition-[border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[var(--primary)]/20 hover:shadow-[0_4px_16px_-4px_rgba(149,170,255,0.15)] ${faqsVisible[index] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
-              style={{ transitionDelay: `${index * 75}ms` }}
-            >
-              <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
-                <h3 className="font-[var(--font-headline)] font-semibold text-lg text-[var(--on-surface)] pr-4">
-                  {faq.question}
-                </h3>
-                <span className="shrink-0 w-6 h-6 rounded-full bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)] group-open:rotate-45 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                  +
-                </span>
-              </summary>
-              <div className="px-6 pb-6 animate-fade-in-up">
-                <p className="text-[var(--on-surface-variant)] font-[var(--font-body)]">
-                  {faq.answer}
-                </p>
-              </div>
-            </details>
-          ))}
+          <div className="lg:col-span-2">
+            <Accordion type="single" collapsible className="space-y-2">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={faq.question}
+                  value={`faq-${index}`}
+                  className="rounded-xl border border-white/10 px-5 py-1 data-[state=open]:bg-[#95aaff]/[0.04] data-[state=open]:border-[#95aaff]/20 transition-colors"
+                >
+                  <AccordionTrigger className="text-left font-semibold text-base md:text-lg text-[#e1e4fa] hover:no-underline py-4">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[#a6aabf] leading-relaxed pb-4 faq-answer">
+                    {faq.answer}
+                    {faq.question.includes("rara") && (
+                      <>
+                        {" "}
+                        <Link
+                          href="/selecao/brasil"
+                          className="text-[#95aaff] underline"
+                        >
+                          Ver todas as raras da Seleção Brasileira →
+                        </Link>
+                      </>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </div>
       </div>
     </section>

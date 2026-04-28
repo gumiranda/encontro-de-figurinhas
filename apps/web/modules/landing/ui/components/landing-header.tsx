@@ -16,103 +16,82 @@ export function LandingHeader() {
   return (
     <header
       role="banner"
-      className="fixed top-0 z-50 w-full bg-background/80 shadow-header backdrop-blur-xl"
+      className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-[#090e1c]/80 border-b border-white/5"
     >
-      <div className="flex min-h-14 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
-        <Link
-          href="/"
-          className="flex min-w-0 flex-1 items-center gap-3 pr-2"
-        >
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5">
           <span
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dim shadow-logo-glow"
+            className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#95aaff] to-[#3766ff]"
             aria-hidden="true"
           >
-            <Trophy
-              className="size-5 text-[var(--on-primary)]"
-              strokeWidth={2.5}
-            />
+            <Trophy className="size-4 text-[#00247e]" strokeWidth={2.5} />
           </span>
-          <span className="truncate font-[var(--font-headline)] text-lg font-bold tracking-tight text-[var(--on-surface)] sm:text-xl md:text-2xl">
-            Figurinha Fácil
+          <span className="font-bold text-lg tracking-tight text-[#e1e4fa]">
+            FigurinhaFácil
           </span>
         </Link>
 
-        <nav aria-label="Navegacao principal" className="hidden md:flex items-center gap-8">
+        <nav
+          aria-label="Navegacao principal"
+          className="hidden md:flex items-center gap-8 text-sm font-semibold"
+        >
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className={`font-headline text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${
-                item.active
-                  ? "text-secondary drop-shadow-nav-active"
-                  : "text-slate-400 hover:text-primary"
-              }`}
-              aria-current={item.active ? "page" : undefined}
+              className="text-[#a6aabf] hover:text-[#e1e4fa] transition-colors"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Button
-            asChild
-            variant="ghost"
-            size="lg"
-            className="hidden rounded-lg px-4 text-xs font-bold uppercase tracking-wider text-[var(--on-surface)] hover:bg-[var(--surface-variant)] sm:inline-flex sm:text-sm"
+        <div className="flex items-center gap-3">
+          <Link
+            href="/pontos"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono text-[#4ff325]"
           >
-            <Link href="/sign-in" className="whitespace-nowrap">
-              Entrar
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            className="rounded-lg bg-primary px-4 text-xs font-bold uppercase tracking-wider text-on-primary sm:px-6 sm:text-sm"
-          >
-            <Link href="/sign-up" className="whitespace-nowrap">
-              Criar conta
-            </Link>
+            <span className="pulse-dot" />
+            <span className="font-semibold">847 pontos ativos</span>
+          </Link>
+          <Button asChild size="sm" className="h-10 px-5 text-xs rounded-full">
+            <Link href="/sign-in">Entrar</Link>
           </Button>
 
           <Sheet>
             <SheetTrigger asChild>
-              <button
-                type="button"
-                className="md:hidden p-2 text-[var(--on-surface)]"
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
                 aria-label="Abrir menu"
               >
-                <Menu className="w-6 h-6" />
-              </button>
+                <Menu className="size-5" />
+              </Button>
             </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-64 !bg-surface-container border-outline-variant p-0 [&>button]:text-[var(--on-surface)] [&>button]:hover:text-white"
-            >
-              <SheetTitle className="sr-only">Menu de navegacao</SheetTitle>
-              <div className="p-6 border-b border-[var(--outline-variant)]">
-                <Link href="/" className="flex items-center gap-2">
-                  <Trophy className="text-[var(--primary)] w-6 h-6" />
-                  <span className="font-[var(--font-headline)] font-bold text-lg text-[var(--primary)]">
-                    Figurinha Fácil
-                  </span>
-                </Link>
-              </div>
-              <nav aria-label="Menu mobile" className="flex flex-col">
+            <SheetContent side="right" className="w-72 bg-[#0d1323] border-white/5">
+              <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
+              <nav className="flex flex-col gap-4 mt-8">
                 {NAV_ITEMS.map((item) => (
                   <SheetClose asChild key={item.label}>
                     <Link
                       href={item.href}
-                      className={`px-6 py-4 font-[var(--font-headline)] text-sm font-bold uppercase tracking-widest ${
-                        item.active
-                          ? "text-[var(--secondary)] bg-[var(--surface-variant)]"
-                          : "text-slate-400 hover:bg-[var(--surface-variant)]"
-                      }`}
+                      className="text-lg font-semibold text-[#e1e4fa] hover:text-[#95aaff] transition-colors"
                     >
                       {item.label}
                     </Link>
                   </SheetClose>
                 ))}
+                <div className="pt-4 border-t border-white/10">
+                  <SheetClose asChild>
+                    <Link
+                      href="/sign-in"
+                      className="block w-full text-center py-3 rounded-full bg-gradient-to-r from-[#95aaff] to-[#3766ff] text-[#00247e] font-bold"
+                    >
+                      Entrar
+                    </Link>
+                  </SheetClose>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

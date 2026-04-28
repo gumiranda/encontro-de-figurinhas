@@ -1,236 +1,78 @@
 "use client";
 
+import { Button } from "@workspace/ui/components/button";
+import { ArrowRight, PlayCircle, ShieldCheck, Star, Verified } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
-import { CitySearch } from "./city-search";
-
-const HERO_IMAGES = [
-  {
-    src: "https://images.pexels.com/photos/8551084/pexels-photo-8551084.jpeg?auto=compress&w=1248&h=832&fit=crop",
-    alt: "Grupo de amigos trocando figurinhas em volta de uma mesa",
-  },
-  {
-    src: "https://images.pexels.com/photos/8111358/pexels-photo-8111358.jpeg?auto=compress&w=1248&h=832&fit=crop",
-    alt: "Pessoas trocando cartas colecionáveis juntas",
-  },
-  {
-    src: "https://images.pexels.com/photos/9661252/pexels-photo-9661252.jpeg?auto=compress&w=1248&h=832&fit=crop",
-    alt: "Mãos segurando cartas colecionáveis",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1248&h=832&fit=crop&q=80",
-    alt: "Amigos reunidos se divertindo juntos",
-  },
-];
+import { LiveTicker } from "./live-ticker";
+import { MatchCard } from "./match-card";
 
 interface HeroSectionProps {
   totalTrocas?: string | null;
 }
 
 export function HeroSection({ totalTrocas }: HeroSectionProps) {
-  const dayIndex = new Date().getDate() % HERO_IMAGES.length;
-  const heroImage = HERO_IMAGES[dayIndex]!;
-  
   return (
-    <section
-      className="relative mx-auto max-w-7xl overflow-hidden px-4 py-24 sm:px-6 md:py-40"
-      aria-labelledby="hero-heading"
-    >
-      <div className="grid items-center gap-16 md:grid-cols-2 lg:gap-24">
-        <div className="z-10 space-y-10">
-          {/* Eyebrow tag */}
-          <span className="tag-chip animate-fade-in-up opacity-0">
-            <span className="pulse-dot" aria-hidden="true" />
-            50.000+ trocas realizadas · 150+ cidades
+    <section className="relative px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7 space-y-7 animate-fade-in-up">
+          <span className="eyebrow eyebrow-green">
+            <span className="pulse-dot" />
+            Copa do Mundo 2026 · ao vivo
           </span>
 
-          {/* Hero headline — premium typography */}
-          <h1
-            id="hero-heading"
-            className="font-headline text-[2.5rem] font-semibold leading-[1.1] tracking-[-0.02em] text-on-surface sm:text-5xl lg:text-[3.5rem] animate-fade-in-up opacity-0 delay-100"
-          >
-            Suas Repetidas Viram{" "}
-            <span className="text-gradient-primary block sm:inline mt-1 sm:mt-0">
-              as Figurinhas que Faltam
-            </span>
+          <h1 className="font-bold text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[#e1e4fa]">
+            Troca de figurinhas
+            <br />
+            Copa 2026 <span className="text-gradient-hero">complete seu álbum</span>.
           </h1>
 
-          <p className="hero-description max-w-lg text-base leading-[1.7] text-on-surface-variant sm:text-lg animate-fade-in-up opacity-0 delay-200">
-            O app encontra quem tem o que você precisa — e precisa do que você tem. Grátis.
+          <p className="hero-description text-lg md:text-xl text-[#a6aabf] max-w-xl leading-relaxed text-pretty">
+            Encontre figurinhas raras perto de você. Match em tempo real com
+            colecionadores verificados, ponto de encontro público, zero taxa.
           </p>
 
-          {/* Double-bezel search container */}
-          <div className="card-shell animate-fade-in-up opacity-0 delay-300">
-            <div className="card-core p-5">
-              <CitySearch />
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button asChild size="lg" className="h-[3.25rem] px-7 rounded-full gap-2.5">
+              <Link href="/cadastrar-figurinhas/quick">
+                Cadastrar minhas figurinhas
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="h-[3.25rem] px-6 rounded-full gap-2.5 bg-white/[0.04] border-white/10 hover:bg-white/[0.08] hover:border-white/[0.18]"
+            >
+              <Link href="#como">
+                <PlayCircle className="w-4 h-4" />
+                Como funciona
+              </Link>
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-6 pt-3 text-xs text-[#a6aabf] font-mono flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <Verified className="w-4 h-4 text-[#4ff325]" />
+              <span>{totalTrocas ?? "48k"} colecionadores</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Star className="w-4 h-4 text-[#ffc965]" />
+              <span>4.9 · 2.4k reviews</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-[#95aaff]" />
+              <span>trocas validadas</span>
             </div>
           </div>
-
-          {/* Stats with premium spacing */}
-          <dl className="grid grid-cols-3 gap-4 pt-4 animate-fade-in-up opacity-0 delay-400">
-            <StatHero
-              value={totalTrocas ?? "10k+"}
-              label="Colecionadores"
-              tone="primary"
-              featured
-            />
-            <Stat value="800+" label="Pontos" tone="secondary" />
-            <Stat value="98%" label="Match" tone="tertiary" />
-          </dl>
-
-          {/* CTAs with button-in-button pattern */}
-          <div className="flex flex-col gap-4 pt-6 sm:flex-row animate-fade-in-up opacity-0 delay-500">
-            <Link
-              href="/sign-up"
-              className="btn-primary-gradient btn-primary-gradient-xl group flex items-center justify-center text-center active:scale-[0.96] transition-transform"
-            >
-              Cadastrar Minhas Figurinhas
-              <span className="btn-icon-nest">
-                <ArrowRight className="w-4 h-4" strokeWidth={2} />
-              </span>
-            </Link>
-            <Link
-              href="/como-funciona"
-              className="flex h-[3.5rem] items-center justify-center rounded-full border border-outline-variant/30 px-7 font-medium text-sm text-on-surface transition-colors duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-surface-variant hover:border-outline-variant/50"
-            >
-              Como funciona
-            </Link>
-          </div>
         </div>
 
-        <div className="hidden md:block animate-fade-in-scale opacity-0 delay-300 relative aspect-[3/2] w-full overflow-hidden rounded-3xl ring-1 ring-outline-variant/10">
-          <Image
-            src={heroImage.src}
-            alt={heroImage.alt}
-            fill
-            priority
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-surface/60 via-transparent to-transparent" />
+        <div className="lg:col-span-5 animate-fade-in-up delay-200">
+          <MatchCard />
         </div>
       </div>
 
-      <AeoExplainer />
+      <LiveTicker />
     </section>
-  );
-}
-
-function StatHero({
-  value,
-  label,
-  tone,
-  featured,
-}: {
-  value: string;
-  label: string;
-  tone: "primary" | "secondary" | "tertiary";
-  featured?: boolean;
-}) {
-  const toneStyles = {
-    primary: {
-      text: "text-primary",
-      shell: "bg-primary/5 ring-1 ring-primary/10",
-      core: "bg-surface-container",
-    },
-    secondary: {
-      text: "text-secondary",
-      shell: "bg-secondary/4 ring-1 ring-secondary/8",
-      core: "bg-surface-container",
-    },
-    tertiary: {
-      text: "text-tertiary",
-      shell: "bg-tertiary/4 ring-1 ring-tertiary/8",
-      core: "bg-surface-container",
-    },
-  }[tone];
-
-  if (featured) {
-    return (
-      <div className={`rounded-[1.25rem] p-[3px] ${toneStyles.shell}`}>
-        <div className={`rounded-[calc(1.25rem-3px)] ${toneStyles.core} p-4 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]`}>
-          <dd className={`font-headline text-[1.75rem] font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text} animate-number-pop`}>
-            {value}
-          </dd>
-          <dt className="mt-1 text-[0.625rem] uppercase tracking-[0.12em] text-on-surface-variant font-medium">
-            {label}
-          </dt>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`rounded-[1rem] p-[2px] ${toneStyles.shell}`}>
-      <div className={`rounded-[calc(1rem-2px)] ${toneStyles.core} p-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
-        <dd className={`font-headline text-xl font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text}`}>
-          {value}
-        </dd>
-        <dt className="mt-0.5 text-[0.5625rem] uppercase tracking-[0.1em] text-on-surface-variant">
-          {label}
-        </dt>
-      </div>
-    </div>
-  );
-}
-
-function Stat({
-  value,
-  label,
-  tone,
-}: {
-  value: string;
-  label: string;
-  tone: "primary" | "secondary" | "tertiary";
-}) {
-  const toneStyles = {
-    primary: {
-      text: "text-primary",
-      shell: "bg-primary/4 ring-1 ring-primary/8",
-      core: "bg-surface-container",
-    },
-    secondary: {
-      text: "text-secondary",
-      shell: "bg-secondary/3 ring-1 ring-secondary/6",
-      core: "bg-surface-container",
-    },
-    tertiary: {
-      text: "text-tertiary",
-      shell: "bg-tertiary/3 ring-1 ring-tertiary/6",
-      core: "bg-surface-container",
-    },
-  }[tone];
-
-  return (
-    <div className={`rounded-[1rem] p-[2px] ${toneStyles.shell}`}>
-      <div className={`rounded-[calc(1rem-2px)] ${toneStyles.core} p-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
-        <dd className={`font-headline text-lg font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text}`}>
-          {value}
-        </dd>
-        <dt className="mt-0.5 text-[0.5625rem] uppercase tracking-[0.1em] text-on-surface-variant">
-          {label}
-        </dt>
-      </div>
-    </div>
-  );
-}
-
-function AeoExplainer() {
-  return (
-    <div className="mt-20 max-w-3xl">
-      {/* Double-bezel card */}
-      <div className="rounded-[1.5rem] p-[3px] bg-surface-variant/30 ring-1 ring-outline-variant/15">
-        <div className="rounded-[calc(1.5rem-3px)] bg-surface-container-low p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)]">
-          <h2 className="mb-3 font-headline text-base font-semibold tracking-[-0.01em] text-on-surface">
-            O que é o Figurinha Fácil?
-          </h2>
-          <p className="text-sm text-on-surface-variant leading-[1.7]">
-            <strong className="text-on-surface font-medium">Figurinha Fácil é uma plataforma gratuita que conecta colecionadores de figurinhas da Copa do Mundo 2026 em todo o Brasil.</strong>{" "}
-            Usuários cadastram suas figurinhas repetidas e faltantes, o sistema encontra automaticamente outros colecionadores com necessidades complementares (matches), e as trocas são combinadas via WhatsApp em mais de 800 pontos de encontro verificados. Mais de 10.000 colecionadores ativos em 150+ cidades.
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
