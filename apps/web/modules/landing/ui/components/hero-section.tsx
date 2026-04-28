@@ -67,7 +67,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           </div>
         </div>
 
-        <div className="lg:col-span-5 animate-fade-in-up delay-200">
+        <div className="hidden md:block lg:col-span-5 animate-fade-in-up delay-200">
           <MatchCard />
         </div>
       </div>
