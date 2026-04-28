@@ -32,6 +32,13 @@ function categorySlug(category: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+const VALID_CATEGORY_SLUGS = ["guias", "guia", "historia", "raridades", "copa-2026"] as const;
+type ValidCategorySlug = (typeof VALID_CATEGORY_SLUGS)[number];
+
+function isValidCategorySlug(slug: string): slug is ValidCategorySlug {
+  return VALID_CATEGORY_SLUGS.includes(slug as ValidCategorySlug);
+}
+
 const CATEGORY_META: Record<
   string,
   { Icon: typeof BookOpen; accent: string; desc: string }
@@ -99,6 +106,11 @@ export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+
+  if (!isValidCategorySlug(slug)) {
+    return { title: "Categoria não encontrada" };
+  }
+
   const all = await loadAllPosts();
   const inCat = all.filter((p) => categorySlug(p.category) === slug);
   const label = inCat[0]?.category ?? slug;
@@ -118,6 +130,11 @@ export async function generateMetadata({
 
 export default async function BlogCategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
+
+  if (!isValidCategorySlug(slug)) {
+    notFound();
+  }
+
   const all = await loadAllPosts();
   const posts = all.filter((p) => categorySlug(p.category) === slug);
 

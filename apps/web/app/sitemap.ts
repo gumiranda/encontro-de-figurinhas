@@ -218,6 +218,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.85,
     },
+    {
+      url: `${BASE_URL}/calculadora-figurinhas`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
   ];
 
   const [cities, tradePoints, states, stickers, teams, blogPosts, boringRounds, boringMatches] =
