@@ -211,7 +211,7 @@ function StickerSectionGroupBase({
     const map = new Map<number, { name: string; short: string }>();
     for (const s of stickerDetails) {
       const parts = s.name.split(" ");
-      const short = parts.length > 1 ? parts[parts.length - 1] : s.name.slice(0, 8);
+      const short = parts.length > 1 ? (parts[parts.length - 1] ?? s.name.slice(0, 8)) : s.name.slice(0, 8);
       map.set(s.absoluteNum, { name: s.name, short });
     }
     return map;
