@@ -33,7 +33,15 @@ import { LoadMorePosts } from "@/modules/blog/ui/load-more-posts";
 import { NewsletterForm } from "@/modules/blog/ui/newsletter-form";
 import "@/modules/blog/ui/blog-home.css";
 
-export const metadata: Metadata = generateBlogListMetadata();
+export const metadata: Metadata = {
+  ...generateBlogListMetadata(),
+  alternates: {
+    ...generateBlogListMetadata().alternates,
+    types: {
+      "application/rss+xml": "https://figurinhafacil.com.br/blog/feed.xml",
+    },
+  },
+};
 
 async function loadPosts() {
   "use cache";

@@ -19,6 +19,7 @@ import {
   generateSportsEventSchema,
   generateServiceSchema,
   generateSoftwareApplicationSchema,
+  generateSpeakableSchema,
   generateCombinedSchema,
   GEO_OPTIMIZED_FAQS,
   BASE_URL,
@@ -95,6 +96,7 @@ const howToSchema = generateHowToSchema(
 const sportsEventSchema = generateSportsEventSchema();
 const serviceSchema = generateServiceSchema();
 const softwareAppSchema = generateSoftwareApplicationSchema();
+const speakableSchema = generateSpeakableSchema(BASE_URL, ["h1", ".faq-answer", ".hero-description"]);
 
 const combinedSchema = generateCombinedSchema([
   organizationSchema,
@@ -104,6 +106,7 @@ const combinedSchema = generateCombinedSchema([
   sportsEventSchema,
   serviceSchema,
   softwareAppSchema,
+  speakableSchema,
 ]);
 
 async function DynamicFinalCTA() {

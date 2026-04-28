@@ -201,6 +201,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/blog/feed.xml`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.5,
+    },
+    {
       url: `${BASE_URL}/jogo-mais-chato`,
       lastModified: now,
       changeFrequency: "daily",
