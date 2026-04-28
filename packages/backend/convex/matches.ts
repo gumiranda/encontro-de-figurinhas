@@ -6,6 +6,8 @@ import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
+import { computeStickerOverlap } from "./lib/stickerOverlap";
+import { getUserDisplayName } from "./lib/userDisplay";
 
 const PAGE_SIZE = 500;
 const TOP_N = 50;
@@ -505,7 +507,7 @@ export const listMyMatches = query({
 
       matches.push({
         matchedUserId: r.matchedUserId,
-        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: getUserDisplayName(other),
         avatarSeed: r.matchedUserId,
         albumCompletionPct: other.albumProgress ?? 0,
         confirmedTradesCount: other.totalTrades ?? 0,
@@ -596,17 +598,12 @@ export const listPresentMatchRowsAtActivePoint = query({
       if (!other || !other.hasCompletedStickerSetup) continue;
       if (other.isBanned === true || other.isShadowBanned === true) continue;
 
-      const theirDup = new Set<number>(other.duplicates ?? []);
-      const theirMiss = new Set<number>(other.missing ?? []);
-
-      const theyHaveINeed: number[] = [];
-      for (const n of myMissSorted) {
-        if (theirDup.has(n)) theyHaveINeed.push(n);
-      }
-      const iHaveTheyNeed: number[] = [];
-      for (const n of myDupSorted) {
-        if (theirMiss.has(n)) iHaveTheyNeed.push(n);
-      }
+      const { theyHaveINeed, iHaveTheyNeed } = computeStickerOverlap(
+        myDupSorted,
+        myMissSorted,
+        other.duplicates ?? [],
+        other.missing ?? []
+      );
 
       const okBoth = theyHaveINeed.length >= 1 && iHaveTheyNeed.length >= 1;
       const okOneWay = theyHaveINeed.length >= 1 || iHaveTheyNeed.length >= 1;
@@ -624,7 +621,7 @@ export const listPresentMatchRowsAtActivePoint = query({
 
       matches.push({
         matchedUserId: other._id,
-        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: getUserDisplayName(other),
         avatarSeed: other._id,
         albumCompletionPct: other.albumProgress ?? 0,
         confirmedTradesCount: other.totalTrades ?? 0,
@@ -745,14 +742,14 @@ export const findUserMatches = query({
       let ineedSample = m.ineedSample;
 
       if (i < LIVE_REFRESH_TOP) {
-        const theirDup = new Set<number>(other.duplicates ?? []);
-        const theirMiss = new Set<number>(other.missing ?? []);
-        const ihave: number[] = [];
-        const ineed: number[] = [];
-        for (const n of myDupSet) if (theirMiss.has(n)) ihave.push(n);
-        for (const n of myMissSet) if (theirDup.has(n)) ineed.push(n);
-        ihave.sort((a, b) => a - b);
-        ineed.sort((a, b) => a - b);
+        const overlap = computeStickerOverlap(
+          [...myDupSet],
+          [...myMissSet],
+          other.duplicates ?? [],
+          other.missing ?? []
+        );
+        const ihave = overlap.iHaveTheyNeed.sort((a, b) => a - b);
+        const ineed = overlap.theyHaveINeed.sort((a, b) => a - b);
         ihaveCount = ihave.length;
         ineedCount = ineed.length;
         ihaveSample = ihave.slice(0, 3);
@@ -762,7 +759,7 @@ export const findUserMatches = query({
 
       enriched.push({
         otherUserId: m.otherUserId,
-        displayNickname: other.displayNickname ?? other.nickname ?? other.name,
+        displayNickname: getUserDisplayName(other),
         reliabilityScore: other.reliabilityScore,
         totalTrades: other.totalTrades ?? 0,
         lastActiveAt: other.lastActiveAt ?? null,
@@ -947,20 +944,14 @@ export const getFullStickerOverlap = query({
       distanceKm = precomputed.distanceKm;
     } else {
       if (!matchedUser.hasCompletedStickerSetup) return null;
-      const theirDup = new Set(matchedUser.duplicates ?? []);
-      const theirMiss = new Set(matchedUser.missing ?? []);
-
-      theyHaveINeedNums = [];
-      for (const n of me.missing ?? []) {
-        if (theirDup.has(n)) theyHaveINeedNums.push(n);
-      }
-      theyHaveINeedNums.sort((a, b) => a - b);
-
-      iHaveTheyNeedNums = [];
-      for (const n of me.duplicates ?? []) {
-        if (theirMiss.has(n)) iHaveTheyNeedNums.push(n);
-      }
-      iHaveTheyNeedNums.sort((a, b) => a - b);
+      const overlap = computeStickerOverlap(
+        me.duplicates ?? [],
+        me.missing ?? [],
+        matchedUser.duplicates ?? [],
+        matchedUser.missing ?? []
+      );
+      theyHaveINeedNums = overlap.theyHaveINeed.sort((a, b) => a - b);
+      iHaveTheyNeedNums = overlap.iHaveTheyNeed.sort((a, b) => a - b);
 
       distanceKm = 0;
       if (
@@ -1002,7 +993,7 @@ export const getFullStickerOverlap = query({
       sections,
       matchedUser: {
         displayNickname:
-          matchedUser.displayNickname ?? matchedUser.nickname ?? matchedUser.name,
+          getUserDisplayName(matchedUser),
         avatarSeed: matchedUserId,
         albumCompletionPct: matchedUser.albumProgress ?? 0,
         confirmedTradesCount: matchedUser.totalTrades ?? 0,

@@ -6,6 +6,7 @@ import { Search, X, Star, Trophy, Sparkles, Filter } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   Card,
   CardContent,
@@ -169,12 +170,12 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
                       <Link key={num} href={`/figurinha/${num}`}>
                         <Badge
                           variant={isGolden || legend ? "default" : "outline"}
-                          className={`
-                            cursor-pointer transition-colors hover:scale-105
-                            ${isGolden ? "bg-tertiary hover:bg-tertiary/90 text-tertiary-foreground" : ""}
-                            ${legend ? "bg-primary hover:bg-primary/90" : ""}
-                            ${!isGolden && !legend ? "hover:bg-primary hover:text-primary-foreground" : ""}
-                          `}
+                          className={cn(
+                            "cursor-pointer transition-colors hover:scale-105",
+                            isGolden && "bg-tertiary hover:bg-tertiary/90 text-tertiary-foreground",
+                            legend && "bg-primary hover:bg-primary/90",
+                            !isGolden && !legend && "hover:bg-primary hover:text-primary-foreground"
+                          )}
                           title={legend?.name}
                         >
                           {num}

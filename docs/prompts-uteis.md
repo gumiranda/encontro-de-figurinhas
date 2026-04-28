@@ -36,7 +36,7 @@ review my code in @apps/web/ using /tailwind-patterns (please use serena tools) 
 
 review my code in @apps/web/ using /next-best-practices (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
 
-review my code in @packages/backend/ using /convex-actions-general /convex-queries /convex-mutations (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
+review my code in @packages/backend/ using /convex-actions-general /convex-queries /convex-perfomance-audit /convex-mutations (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
 
 review my code in @packages/backend/ @apps/web/ using /convex-actions-general /convex-queries /convex-mutations (please use serena tools) please use /context-mode to save tokens. use /caveman ultra
 

@@ -13,6 +13,8 @@ import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { readSiteStatsOrNull } from "./siteStats";
 import { getPendingTradesCount } from "./lib/tradeHelpers";
 import { rateLimiter } from "./lib/rateLimiter";
+import { computeStickerOverlap } from "./lib/stickerOverlap";
+import { getUserDisplayName } from "./lib/userDisplay";
 
 const MAX_PENDING_TRADES = 5;
 const TRADE_EXPIRATION_MS = 72 * 60 * 60 * 1000;
@@ -23,22 +25,16 @@ function computeLiveOverlap(
   user: Doc<"users">,
   counterparty: Doc<"users">
 ): { theyHaveINeed: number[]; iHaveTheyNeed: number[] } {
-  const theirDup = new Set(counterparty.duplicates ?? []);
-  const theirMiss = new Set(counterparty.missing ?? []);
-
-  const theyHaveINeed: number[] = [];
-  for (const n of user.missing ?? []) {
-    if (theirDup.has(n)) theyHaveINeed.push(n);
-  }
-  theyHaveINeed.sort((a, b) => a - b);
-
-  const iHaveTheyNeed: number[] = [];
-  for (const n of user.duplicates ?? []) {
-    if (theirMiss.has(n)) iHaveTheyNeed.push(n);
-  }
-  iHaveTheyNeed.sort((a, b) => a - b);
-
-  return { theyHaveINeed, iHaveTheyNeed };
+  const overlap = computeStickerOverlap(
+    user.duplicates ?? [],
+    user.missing ?? [],
+    counterparty.duplicates ?? [],
+    counterparty.missing ?? []
+  );
+  return {
+    theyHaveINeed: overlap.theyHaveINeed.sort((a, b) => a - b),
+    iHaveTheyNeed: overlap.iHaveTheyNeed.sort((a, b) => a - b),
+  };
 }
 
 async function assertBothPublicCheckinAtPoint(
@@ -187,12 +183,12 @@ export const initiate = mutation({
       createdAt: Date.now(),
       initiatorMessage: sanitizedMessage || undefined,
       initiatorDisplayNickname:
-        user.displayNickname ?? user.nickname ?? user.name,
+        getUserDisplayName(user),
       initiatorAvatarUrl: user.avatarUrl,
       initiatorTotalTrades: user.totalTrades ?? 0,
       initiatorReliabilityScore: user.reliabilityScore,
       counterpartyDisplayNickname:
-        counterparty.displayNickname ?? counterparty.nickname ?? counterparty.name,
+        getUserDisplayName(counterparty),
       counterpartyAvatarUrl: counterparty.avatarUrl,
       counterpartyTotalTrades: counterparty.totalTrades ?? 0,
       counterpartyReliabilityScore: counterparty.reliabilityScore,

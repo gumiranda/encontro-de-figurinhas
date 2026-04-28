@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth } from "./lib/auth";
 import {
@@ -20,6 +20,28 @@ import {
   SCORE_BUMP_COOLDOWN_MS,
 } from "./lib/limits";
 import { rateLimiter } from "./lib/rateLimiter";
+
+/**
+ * Batch-decrement activeCheckinsCount for multiple tradePoints.
+ * Used by expireCheckins and cleanupForShadowBannedUser.
+ */
+async function applyCheckinDecrements(
+  ctx: MutationCtx,
+  decrements: Map<Id<"tradePoints">, number>
+): Promise<void> {
+  const ids = [...decrements.keys()];
+  const points = await Promise.all(ids.map((id) => ctx.db.get(id)));
+  await Promise.all(
+    ids.map((id, i) => {
+      const point = points[i];
+      if (!point) return;
+      const count = decrements.get(id) ?? 0;
+      return ctx.db.patch(id, {
+        activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
+      });
+    })
+  );
+}
 
 export const create = mutation({
   args: {
@@ -299,20 +321,8 @@ export const expireCheckins = internalMutation({
     // BARRIER 1: Delete all checkins in parallel
     await Promise.all(expired.map((c) => ctx.db.delete(c._id)));
 
-    // BARRIER 2: Batch get+patch for each unique tradePoint (after deletes complete)
-    const tradePointIds = [...decrements.keys()];
-    const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
-
-    await Promise.all(
-      tradePointIds.map((id, i) => {
-        const point = points[i];
-        if (!point) return;
-        const count = decrements.get(id) ?? 0;
-        return ctx.db.patch(id, {
-          activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
-        });
-      })
-    );
+    // Batch decrement activeCheckinsCount
+    await applyCheckinDecrements(ctx, decrements);
 
     const result = await rescheduleIfMore(ctx, {
       self: internal.checkins.expireCheckins,
@@ -394,20 +404,8 @@ export const cleanupForShadowBannedUser = internalMutation({
       // BARRIER 1: Delete all checkins in parallel
       await Promise.all(batch.map((c) => ctx.db.delete(c._id)));
 
-      // BARRIER 2: Batch get+patch for each unique tradePoint
-      const tradePointIds = [...decrements.keys()];
-      const points = await Promise.all(tradePointIds.map((id) => ctx.db.get(id)));
-
-      await Promise.all(
-        tradePointIds.map((id, i) => {
-          const point = points[i];
-          if (!point) return;
-          const count = decrements.get(id) ?? 0;
-          return ctx.db.patch(id, {
-            activeCheckinsCount: Math.max(0, (point.activeCheckinsCount ?? 0) - count),
-          });
-        })
-      );
+      // Batch decrement activeCheckinsCount
+      await applyCheckinDecrements(ctx, decrements);
 
       if (batch.length === CLEANUP_BATCH) {
         const result = await rescheduleIfMore(ctx, {
