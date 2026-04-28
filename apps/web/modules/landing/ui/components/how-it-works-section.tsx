@@ -39,14 +39,14 @@ export function HowItWorksSection() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div ref={headerRef} className="text-center mb-20">
-          <span className={`eyebrow-tag mb-6 inline-flex transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>3 passos</span>
+          <span className={`eyebrow-tag mb-6 inline-flex transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>3 passos</span>
           <h2
             id="how-it-works-heading"
-            className={`font-headline font-semibold text-[1.75rem] sm:text-3xl md:text-4xl tracking-[-0.02em] mb-5 text-on-surface transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+            className={`font-headline font-semibold text-[1.75rem] sm:text-3xl md:text-4xl tracking-[-0.02em] mb-5 text-on-surface text-balance transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           >
             Como funciona
           </h2>
-          <p className={`text-on-surface-variant max-w-lg mx-auto text-base leading-[1.7] transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+          <p className={`text-on-surface-variant max-w-lg mx-auto text-base leading-[1.7] text-pretty transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
             Em 3 passos simples você encontra as figurinhas que faltam e completa seu álbum.
           </p>
         </div>
@@ -64,7 +64,7 @@ export function HowItWorksSection() {
             return (
               <div
                 key={step.number}
-                className={`relative rounded-[1.75rem] p-[3px] ${colorSchemes.shell} transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-ambient-lg ${stepsVisible[index] ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"}`}
+                className={`relative rounded-[1.75rem] p-[3px] ${colorSchemes.shell} transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-ambient-lg ${stepsVisible[index] ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"}`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <div className="rounded-[calc(1.75rem-3px)] bg-surface-container p-7 md:p-8 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.04)]">

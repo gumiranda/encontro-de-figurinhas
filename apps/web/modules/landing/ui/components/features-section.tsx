@@ -60,13 +60,13 @@ export function FeaturesSection() {
 
             <h2
               id="features-heading"
-              className={`font-headline font-semibold text-[2rem] sm:text-4xl md:text-[2.75rem] leading-[1.15] tracking-[-0.02em] text-on-surface transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+              className={`font-headline font-semibold text-[2rem] sm:text-4xl md:text-[2.75rem] leading-[1.15] tracking-[-0.02em] text-balance text-on-surface transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
             >
               Figurinha Fácil{" "}
               <span className="text-secondary block mt-1">resolve.</span>
             </h2>
 
-            <p className={`text-on-surface-variant text-base sm:text-lg leading-[1.7] max-w-md transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+            <p className={`text-on-surface-variant text-base sm:text-lg leading-[1.7] max-w-md text-pretty transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
               Encontre quem tem o que você precisa — e precisa do que você tem — em minutos.
             </p>
 
@@ -74,7 +74,7 @@ export function FeaturesSection() {
             <div className={`flex flex-col sm:flex-row gap-4 pt-2 transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300 ${sectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
               <Link
                 href="/sign-up"
-                className="btn-primary-gradient group flex items-center justify-center"
+                className="btn-primary-gradient group flex items-center justify-center active:scale-[0.96] transition-transform"
               >
                 Comece a trocar grátis
                 <span className="btn-icon-nest">

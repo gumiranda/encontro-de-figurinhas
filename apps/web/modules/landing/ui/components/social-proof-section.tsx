@@ -40,7 +40,7 @@ export function SocialProofSection() {
       className="px-6 py-12 bg-[var(--surface-container-low)]/50 border-y border-[var(--outline-variant)]/10"
     >
       <div className="max-w-7xl mx-auto">
-        <p className={`text-center text-[var(--outline)] text-sm uppercase tracking-widest mb-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <p className={`text-center text-[var(--outline)] text-sm uppercase tracking-widest mb-8 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           Onde colecionadores completam o álbum mais rápido
         </p>
         <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -49,7 +49,7 @@ export function SocialProofSection() {
             return (
               <div
                 key={stat.label}
-                className={`text-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${statsVisible[index] ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-6 scale-95"}`}
+                className={`text-center transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${statsVisible[index] ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-6 scale-95"}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className="flex justify-center mb-2">
@@ -58,7 +58,7 @@ export function SocialProofSection() {
                     aria-hidden="true"
                   />
                 </div>
-                <p className={`font-[var(--font-headline)] font-bold text-3xl md:text-4xl ${stat.color}`}>
+                <p className={`font-[var(--font-headline)] font-bold text-3xl md:text-4xl tabular-nums ${stat.color}`}>
                   {stat.value}
                 </p>
                 <p className="text-[var(--outline)] text-sm mt-1">

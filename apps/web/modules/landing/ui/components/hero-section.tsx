@@ -59,7 +59,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
           <div className="flex flex-col gap-4 pt-6 sm:flex-row animate-fade-in-up opacity-0 delay-500">
             <Link
               href="/sign-up"
-              className="btn-primary-gradient btn-primary-gradient-xl group flex items-center justify-center text-center"
+              className="btn-primary-gradient btn-primary-gradient-xl group flex items-center justify-center text-center active:scale-[0.96] transition-transform"
             >
               Começar a trocar
               <span className="btn-icon-nest">
@@ -118,7 +118,7 @@ function StatHero({
     return (
       <div className={`rounded-[1.25rem] p-[3px] ${toneStyles.shell}`}>
         <div className={`rounded-[calc(1.25rem-3px)] ${toneStyles.core} p-4 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]`}>
-          <dd className={`font-headline text-[1.75rem] font-semibold tracking-[-0.01em] ${toneStyles.text} animate-number-pop`}>
+          <dd className={`font-headline text-[1.75rem] font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text} animate-number-pop`}>
             {value}
           </dd>
           <dt className="mt-1 text-[0.625rem] uppercase tracking-[0.12em] text-on-surface-variant font-medium">
@@ -132,7 +132,7 @@ function StatHero({
   return (
     <div className={`rounded-[1rem] p-[2px] ${toneStyles.shell}`}>
       <div className={`rounded-[calc(1rem-2px)] ${toneStyles.core} p-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
-        <dd className={`font-headline text-xl font-semibold tracking-[-0.01em] ${toneStyles.text}`}>
+        <dd className={`font-headline text-xl font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text}`}>
           {value}
         </dd>
         <dt className="mt-0.5 text-[0.5625rem] uppercase tracking-[0.1em] text-on-surface-variant">
@@ -173,7 +173,7 @@ function Stat({
   return (
     <div className={`rounded-[1rem] p-[2px] ${toneStyles.shell}`}>
       <div className={`rounded-[calc(1rem-2px)] ${toneStyles.core} p-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
-        <dd className={`font-headline text-lg font-semibold tracking-[-0.01em] ${toneStyles.text}`}>
+        <dd className={`font-headline text-lg font-semibold tracking-[-0.01em] tabular-nums ${toneStyles.text}`}>
           {value}
         </dd>
         <dt className="mt-0.5 text-[0.5625rem] uppercase tracking-[0.1em] text-on-surface-variant">

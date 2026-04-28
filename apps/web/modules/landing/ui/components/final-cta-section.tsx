@@ -45,12 +45,12 @@ export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
           Contagem regressiva
         </span>
 
-        <h2 className="font-headline font-semibold text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.75rem] tracking-[-0.02em] mb-6 text-on-primary leading-[1.15]">
+        <h2 className="font-headline font-semibold text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.75rem] tracking-[-0.02em] mb-6 text-balance text-on-primary leading-[1.15]">
           {countdownLead}{" "}
           <span className="block mt-2 text-tertiary">E as suas figurinhas?</span>
         </h2>
 
-        <p className="text-on-primary text-base md:text-lg mb-12 max-w-lg mx-auto leading-[1.7]">
+        <p className="text-on-primary text-base md:text-lg mb-12 max-w-lg mx-auto leading-[1.7] text-pretty">
           Enquanto você espera, alguém está trocando. Entre agora e complete seu álbum.
         </p>
 

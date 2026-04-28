@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { CityCard } from "./city-card";
-import { CITIES } from "../../lib/landing-data";
 import { useScrollReveal, useScrollRevealGroup } from "@/hooks/use-scroll-reveal";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { CITIES } from "../../lib/landing-data";
+import { CityCard } from "./city-card";
 
 export function CitiesSection() {
   const [headerRef, headerVisible] = useScrollReveal<HTMLDivElement>();
@@ -23,12 +23,15 @@ export function CitiesSection() {
           <div>
             <h2
               id="cities-heading"
-              className={`font-[var(--font-headline)] font-bold text-3xl md:text-5xl tracking-tight mb-4 text-[var(--on-surface)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+              className={`font-[var(--font-headline)] text-3xl md:text-5xl tracking-tight mb-4 text-balance text-[var(--on-surface)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
             >
               Principais Arenas
             </h2>
-            <p className={`text-[var(--on-surface-variant)] max-w-md font-[var(--font-body)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-              As cidades com maior volume de trocas e pontos de encontro ativos esta semana.
+            <p
+              className={`text-[var(--on-surface-variant)] max-w-md font-[var(--font-body)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] delay-100 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+            >
+              As cidades com maior volume de trocas e pontos de encontro ativos esta
+              semana.
             </p>
           </div>
           <Link
@@ -40,7 +43,10 @@ export function CitiesSection() {
           </Link>
         </div>
 
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          ref={cardsRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {CITIES.map((city, index) => (
             <div
               key={city.id}

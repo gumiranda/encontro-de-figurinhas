@@ -14,7 +14,7 @@ export function CitySearch() {
 
   return (
     <div className="relative group w-full max-w-xl">
-      <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary)]/20 to-[var(--secondary)]/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary)]/20 to-[var(--secondary)]/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition-opacity duration-1000 group-hover:duration-200" />
       <div className="relative flex flex-col gap-2 rounded-xl border border-[var(--outline-variant)]/15 bg-[var(--surface-container-highest)] p-2 sm:flex-row sm:items-center sm:gap-0">
         <div className="flex min-w-0 flex-1 items-center">
           <Search
@@ -36,7 +36,7 @@ export function CitySearch() {
         </div>
         <Button
           type="button"
-          className="w-full shrink-0 rounded-lg bg-[var(--primary)] px-6 py-4 font-bold text-[var(--on-primary)] hover:bg-[var(--primary-dim)] active:scale-95 sm:w-auto sm:px-8"
+          className="w-full shrink-0 rounded-lg bg-[var(--primary)] px-6 py-4 font-bold text-[var(--on-primary)] hover:bg-[var(--primary-dim)] active:scale-[0.96] sm:w-auto sm:px-8"
         >
           BUSCAR
         </Button>

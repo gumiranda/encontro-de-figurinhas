@@ -22,7 +22,7 @@ export function FAQSection({ faqs }: FAQSectionProps) {
         <h2
           ref={headingRef}
           id="faq-heading"
-          className={`font-[var(--font-headline)] font-bold text-3xl md:text-5xl tracking-tight mb-12 text-center text-[var(--on-surface)] transition-all duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${headingVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+          className={`font-[var(--font-headline)] text-3xl md:text-5xl tracking-tight mb-12 text-balance text-center text-[var(--on-surface)] transition-[opacity,transform] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${headingVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
           Perguntas frequentes
         </h2>
