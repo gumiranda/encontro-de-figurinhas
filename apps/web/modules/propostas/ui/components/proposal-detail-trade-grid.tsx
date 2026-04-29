@@ -24,6 +24,7 @@ export function ProposalDetailTradeGrid({
         label="Você dá"
         sublabel={`${giveCount} ${giveCount === 1 ? "figurinha" : "figurinhas"}`}
         stickers={trade.stickersIGive}
+        stickerNames={trade.stickerNames}
       />
 
       <div className="flex items-center justify-center gap-3 lg:flex-col">
@@ -60,6 +61,7 @@ export function ProposalDetailTradeGrid({
         label="Você recebe"
         sublabel={`${getCount} ${getCount === 1 ? "figurinha" : "figurinhas"}`}
         stickers={trade.stickersIReceive}
+        stickerNames={trade.stickerNames}
       />
     </section>
   );
@@ -71,12 +73,14 @@ function Lane({
   label,
   sublabel,
   stickers,
+  stickerNames,
 }: {
   tone: "give" | "get";
   icon: typeof ArrowUpRight;
   label: string;
   sublabel: string;
   stickers: number[];
+  stickerNames?: Record<number, string>;
 }) {
   return (
     <div
@@ -113,7 +117,7 @@ function Lane({
       ) : (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {stickers.map((n) => (
-            <StickerTile key={n} num={n} tone={tone} />
+            <StickerTile key={n} num={n} tone={tone} playerName={stickerNames?.[n]} />
           ))}
         </div>
       )}

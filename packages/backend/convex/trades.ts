@@ -424,6 +424,7 @@ export type ListMyTradeRow = {
     name: string;
     address: string;
   } | null;
+  stickerNames?: Record<number, string>;
 };
 
 export const listMyTrades = query({
@@ -565,6 +566,31 @@ export const getTradeById = query({
     if (role === "outgoing") {
       row.initiatorMessage = null;
     }
+
+    // Enrich with player names
+    const allNums = [...new Set([...row.stickersIGive, ...row.stickersIReceive])];
+    const MAX_STICKERS = 200;
+    const limitedNums = allNums.slice(0, MAX_STICKERS);
+
+    const details = await Promise.all(
+      limitedNums.map((n) =>
+        ctx.db
+          .query("stickerDetail")
+          .withIndex("by_absolute", (q) => q.eq("absoluteNum", n))
+          .first()
+      )
+    );
+
+    const stickerNames: Record<number, string> = {};
+    for (let i = 0; i < limitedNums.length; i++) {
+      const num = limitedNums[i];
+      const detail = details[i];
+      if (num !== undefined && detail?.name) {
+        stickerNames[num] = detail.name;
+      }
+    }
+    row.stickerNames = stickerNames;
+
     return row;
   },
 });

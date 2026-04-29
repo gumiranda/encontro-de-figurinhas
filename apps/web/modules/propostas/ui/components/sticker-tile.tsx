@@ -11,10 +11,12 @@ export function StickerTile({
   num,
   tone,
   hint,
+  playerName,
 }: {
   num: number;
   tone: Tone;
   hint?: string;
+  playerName?: string;
 }) {
   const lookup = useOptionalSectionLookup();
   const parsed = lookup ? formatStickerNumber(num, lookup) : null;
@@ -22,14 +24,16 @@ export function StickerTile({
   const code = parsed?.code ?? null;
   const relativeNum = parsed?.relativeNum ?? num;
   const fullName = parsed?.fullName ?? null;
+  const displayName = playerName ?? fullName;
+  const tooltipText = playerName && fullName ? `${playerName} — ${fullName}` : (fullName ?? display);
 
   return (
     <div
       role="img"
       aria-label={
-        fullName ? `Figurinha ${display} — ${fullName}` : `Figurinha ${display}`
+        displayName ? `Figurinha ${display} — ${displayName}` : `Figurinha ${display}`
       }
-      title={fullName ?? display}
+      title={tooltipText}
       className={cn(
         "group relative rounded-2xl border bg-surface-container p-3 transition-all hover:-translate-y-0.5",
         tone === "give"
@@ -79,9 +83,9 @@ export function StickerTile({
           </span>
         )}
       </div>
-      {fullName ? (
+      {displayName ? (
         <div className="truncate text-center text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant">
-          {fullName}
+          {displayName}
         </div>
       ) : (
         hint && (
