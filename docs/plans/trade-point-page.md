@@ -496,8 +496,6 @@ export function fetchQueryWithTags<Query extends FunctionReference<"query">>(
 Note: On Convex failure in build-time, pages cached from previous deploy remain served via ISR until next rebuild. Log in Sentry required.
 
 ```typescript
-export const dynamicParams = true;
-export const revalidate = 3600;
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   try {
@@ -962,8 +960,7 @@ import { fetchQueryWithTags } from "@/lib/convex-fetch";
 import { api } from "@workspace/backend/_generated/api";
 import { BASE_URL } from "@/lib/seo";
 
-export const revalidate = 3600;
-
+ 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let points: { slug: string; updatedAt: number }[] = [];
   try {

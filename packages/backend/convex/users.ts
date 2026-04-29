@@ -365,6 +365,117 @@ export const getMyFavoriteTradePointIds = query({
 // Ramp-up para 200 quando premium gating entrar (schema ganhar premiumExpiresAt).
 export const MAX_FAVORITE_TRADE_POINTS = 50;
 
+// --- Public Profile (unauthenticated) ---
+
+const NICKNAME_PUBLIC_REGEX = /^[a-zA-Z0-9_-]{3,20}$/;
+
+export const getPublicProfile = query({
+  args: { nickname: v.string() },
+  handler: async (ctx, { nickname }) => {
+    // Rate limit global (não por nickname = evita user enumeration)
+    const status = await rateLimiter.check(ctx, "publicProfile", { key: "global" });
+    if (!status.ok) return null;
+
+    // Validação regex antes de query
+    const normalized = nickname.toLowerCase().replace(/^@/, "");
+    if (!NICKNAME_PUBLIC_REGEX.test(normalized)) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_nickname", (q) => q.eq("nickname", normalized))
+      .first();
+
+    // Checagens de segurança
+    if (!user) return null;
+    if (user.isBanned || user.isShadowBanned) return null;
+    if (!user.hasCompletedStickerSetup) return null;
+    if (user.isProfilePublic !== true) return null;
+
+    // Parallel queries (index by_absolute existe em schema.ts)
+    const dupSample = (user.duplicates ?? []).slice(0, 12);
+    const dupDetails = await Promise.all(
+      dupSample.map((n) =>
+        ctx.db
+          .query("stickerDetail")
+          .withIndex("by_absolute", (q) => q.eq("absoluteNum", n))
+          .first()
+      )
+    );
+
+    const duplicatesSample = dupDetails
+      .filter(Boolean)
+      .map((d) => ({
+        displayCode: d!.displayCode ?? `${d!.sectionCode}-${d!.relativeNum}`,
+        flagEmoji: d!.flagEmoji,
+      }));
+
+    return {
+      nickname: user.nickname,
+      displayNickname: (user.displayNickname ?? user.nickname ?? "?").slice(0, 12) || "?",
+      avatarSeed: user._id,
+      albumCompletionPct: user.albumCompletionPct ?? 0,
+      albumProgress: user.albumProgress ?? 0,
+      totalTrades: user.totalTrades ?? 0,
+      ratingAvg: user.ratingAvg,
+      ratingCount: user.ratingCount ?? 0,
+      duplicatesCount: (user.duplicates ?? []).length,
+      missingCount: (user.missing ?? []).length,
+      duplicatesSample,
+    };
+  },
+});
+
+export const updateProfileSettings = mutation({
+  args: {
+    isProfilePublic: v.optional(v.boolean()),
+    acceptsMail: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+
+    const updates: Partial<{
+      isProfilePublic: boolean;
+      acceptsMail: boolean;
+    }> = {};
+
+    if (args.isProfilePublic !== undefined) {
+      updates.isProfilePublic = args.isProfilePublic;
+    }
+    if (args.acceptsMail !== undefined) {
+      updates.acceptsMail = args.acceptsMail;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return { success: true };
+    }
+
+    await ctx.db.patch(user._id, updates);
+    return { success: true };
+  },
+});
+
+export const getProfileSettings = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return null;
+
+    return {
+      nickname: user.nickname,
+      displayNickname: user.displayNickname,
+      avatarUrl: user.avatarUrl,
+      isProfilePublic: user.isProfilePublic ?? false,
+      acceptsMail: user.acceptsMail ?? false,
+      hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
+      albumCompletionPct: user.albumCompletionPct ?? 0,
+      totalTrades: user.totalTrades ?? 0,
+      ratingAvg: user.ratingAvg,
+      ratingCount: user.ratingCount ?? 0,
+      duplicatesCount: (user.duplicates ?? []).length,
+    };
+  },
+});
+
 export const toggleFavoriteTradePoint = mutation({
   args: { tradePointId: v.id("tradePoints") },
   handler: async (ctx, { tradePointId }) => {

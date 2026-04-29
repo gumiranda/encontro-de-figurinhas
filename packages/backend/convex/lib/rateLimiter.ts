@@ -141,6 +141,15 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 60,
   },
 
+  // publicProfile — global bucket (não por nickname pra evitar user enumeration)
+  publicProfile: {
+    kind: "token bucket",
+    rate: 60,
+    period: MINUTE,
+    capacity: 120,
+    shards: 4,
+  },
+
   // HTTP /api/sticker-slug — middleware redirect lookup, global bucket
   stickerSlugLookup: {
     kind: "token bucket",

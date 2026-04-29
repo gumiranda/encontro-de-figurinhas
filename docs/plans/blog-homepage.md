@@ -155,7 +155,6 @@ export const dynamicParams = false;
 
 ```ts
 // /apps/web/app/(marketing)/blog/rss.xml/route.ts
-export const revalidate = 3600;
 
 export async function GET() {
   const posts = await fetchQuery(api.blog.getPublishedPaginated, {

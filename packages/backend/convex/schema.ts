@@ -129,6 +129,9 @@ export default defineSchema({
     warningCount: v.optional(v.number()),
     pushSubscription: v.optional(v.string()),
 
+    // Public profile opt-in
+    isProfilePublic: v.optional(v.boolean()),
+
     coverUploadTimestamps: v.optional(v.array(v.number())),
 
     locationSource: v.optional(

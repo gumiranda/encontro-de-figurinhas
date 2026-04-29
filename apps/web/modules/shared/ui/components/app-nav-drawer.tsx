@@ -22,6 +22,7 @@ import {
   Menu,
   ShieldCheck,
   StickyNote,
+  User,
   UserCog,
   type LucideIcon,
 } from "lucide-react";
@@ -93,6 +94,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
       {
         title: "Meus dados",
         items: [
+          { label: "Perfil", href: "/perfil", icon: User },
           { label: "Meus pontos", href: "/meus-pontos", icon: MapPin },
           { label: "Sugerir ponto", href: "/ponto/solicitar", icon: MapPinPlus },
         ],
