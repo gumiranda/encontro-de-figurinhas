@@ -285,26 +285,7 @@ function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolea
   );
 }
 
-async function countActiveUsersInCity(
-  ctx: MutationCtx,
-  cityId: Id<"cities">,
-  cutoff: number
-): Promise<number> {
-  let count = 0;
-  let cursor: string | null = null;
-  for (;;) {
-    const page = await ctx.db
-      .query("users")
-      .withIndex("by_city", (q) => q.eq("cityId", cityId))
-      .paginate({ numItems: BATCH_RECOMPUTE_PAGE_SIZE, cursor });
-    for (const u of page.page) {
-      if (userQualifiesForBatchRecompute(u, cutoff)) count += 1;
-    }
-    if (page.isDone) break;
-    cursor = page.continueCursor;
-  }
-  return count;
-}
+
 
 /**
  * Cron: refresh match caches for users active in the last 6h.
@@ -350,17 +331,14 @@ export const batchRecomputeMatches = internalMutation({
       };
     }
 
+    // Scan cities - schedule all, let per-city handler filter users
     const citiesPage = await ctx.db.query("cities").paginate({
       numItems: CITIES_SCAN_PAGE_SIZE,
       cursor: citiesCursor ?? null,
     });
 
-    let totalActive = 0;
     let scheduled = 0;
     for (const city of citiesPage.page) {
-      const n = await countActiveUsersInCity(ctx, city._id, cutoff);
-      totalActive += n;
-      if (n === 0) continue;
       await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
         cityId: city._id,
       });
@@ -378,7 +356,6 @@ export const batchRecomputeMatches = internalMutation({
 
     return {
       mode: "scan" as const,
-      totalActive,
       scheduled,
       done: citiesPage.isDone,
       aborted: tail.aborted ?? false,
