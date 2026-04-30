@@ -47,6 +47,9 @@ async function loadAllRoundsForParams() {
 
 export async function generateStaticParams() {
   const rounds = await loadAllRoundsForParams();
+  if (rounds.length === 0) {
+    return [{ rodada: "__placeholder__" }];
+  }
   return rounds.map((r) => ({ rodada: r.slug }));
 }
 
