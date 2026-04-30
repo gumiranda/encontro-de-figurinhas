@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Logo — FigurinhaFácil</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<style>
+  body { background:#1a1f2e; font-family:"Manrope",sans-serif; }
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'opsz' 24; vertical-align:middle; }
+  .icon-fill { font-variation-settings:'FILL' 1,'wght' 500,'opsz' 24; }
+
+  /* Canvas helpers */
+  .stage-dark  { background:#090e1c; color:#e1e4fa; }
+  .stage-deep  { background:#0d1323; color:#e1e4fa; }
+  .stage-light { background:#f4f1ea; color:#0d1323; }
+  .stage-pitch { background:#176e00; color:#fff; background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 60px, transparent 60px 120px); }
+  .stage-gold  { background:linear-gradient(135deg,#ffc965,#ecaa00); color:#5f4200; }
+
+  .hairline {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Type */
+  .ff-headline { font-family:"Space Grotesk",sans-serif; font-weight:800; letter-spacing:-0.04em; }
+  .ff-mono     { font-family:"JetBrains Mono",monospace; }
+
+  /* ──────────────────────────────────────────────────────────
+     STICKER PRIMITIVES — die-cut card aesthetic, used by V01/05
+     ────────────────────────────────────────────────────────── */
+  .ff-sticker {
+    position:relative;
+    background:linear-gradient(160deg,#1e253b 0%,#13192b 100%);
+    border-radius:14px;
+    padding:14px;
+    box-shadow:
+      0 0 0 4px #fff,
+      0 0 0 5px rgba(0,0,0,0.15),
+      0 18px 40px -12px rgba(0,0,0,0.5);
+  }
+  .ff-sticker-light {
+    background:linear-gradient(160deg,#fff 0%,#f0eee9 100%);
+    box-shadow:
+      0 0 0 4px #fff,
+      0 0 0 5px rgba(0,0,0,0.15),
+      0 18px 40px -12px rgba(0,0,0,0.25);
+  }
+  .ff-sticker-photo {
+    aspect-ratio:1/1;
+    border-radius:8px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 6px, transparent 6px 14px),
+      linear-gradient(180deg, #2a3354 0%, #181f33 100%);
+  }
+
+  /* Peeled corner effect for V05 */
+  .ff-peel {
+    position:absolute; right:-6px; top:-6px;
+    width:48px; height:48px;
+    background:linear-gradient(225deg, #fff 0%, #fff 50%, transparent 50%);
+    transform:rotate(0deg);
+    filter: drop-shadow(-2px 2px 4px rgba(0,0,0,0.3));
+    clip-path: polygon(50% 0, 100% 0, 100% 50%);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SHIELD (V04)
+     ────────────────────────────────────────────────────────── */
+  .ff-shield {
+    width:160px; aspect-ratio:1/1.15;
+    background:linear-gradient(160deg, #95aaff 0%, #3766ff 100%);
+    border:3px solid #fff;
+    border-radius:14px 14px 60% 60% / 14px 14px 38% 38%;
+    box-shadow: 0 0 0 4px #00247e, 0 18px 40px -12px rgba(0,0,0,0.5);
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SEAL (V03) — circular badge with rotating text
+     ────────────────────────────────────────────────────────── */
+  .ff-seal {
+    width:180px; height:180px; border-radius:50%;
+    background:#ffc965;
+    border:4px solid #5f4200;
+    box-shadow:
+      inset 0 0 0 8px #ffc965,
+      inset 0 0 0 9px #5f4200,
+      0 14px 32px -8px rgba(0,0,0,0.5);
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ff-seal::before {
+    content:""; position:absolute; inset:14px; border-radius:50%;
+    background:
+      conic-gradient(from 0deg, #5f4200 0 8deg, transparent 8deg 22deg, #5f4200 22deg 30deg, transparent 30deg 45deg);
+    mask: radial-gradient(circle, transparent 65%, black 66%);
+    -webkit-mask: radial-gradient(circle, transparent 65%, black 66%);
+    opacity:0.6;
+  }
+
+  /* Pitch arc — for V03 inner ring */
+  .ff-pitch-arc {
+    position:absolute; inset:18px;
+    border-radius:50%;
+    border:2px dashed rgba(95,66,0,0.4);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     APP ICON (V06) — squircle with monogram
+     ────────────────────────────────────────────────────────── */
+  .ff-squircle {
+    width:140px; height:140px;
+    border-radius:30px;
+    background:linear-gradient(160deg,#3766ff 0%, #95aaff 60%, #4ff325 130%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -8px 16px rgba(0,36,126,0.4),
+      0 16px 36px -10px rgba(0,36,126,0.6),
+      0 0 0 1px rgba(0,0,0,0.06);
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .ff-squircle::after {
+    content:""; position:absolute; top:0; left:0; right:0; height:50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    pointer-events:none;
+  }
+
+  /* Knockout helpers */
+  .ff-knock-light  { color:#0d1323; }
+  .ff-knock-dark   { color:#fff; }
+
+  /* Variations row labels */
+  .label-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 10px; border-radius:999px;
+    background:rgba(149,170,255,0.1);
+    border:1px solid rgba(149,170,255,0.25);
+    color:#95aaff;
+    font-family:"Space Grotesk",sans-serif;
+    font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
+  }
+
+  /* Subtle noise for sticker faces */
+  .grain::before {
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+  }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="logo-variants.jsx"></script>
+<script type="text/babel" src="logo-app.jsx"></script>
+
+<div id="root"></div>
+</body>
+</html>
