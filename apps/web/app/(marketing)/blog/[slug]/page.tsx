@@ -69,6 +69,9 @@ export async function generateStaticParams() {
     if (result.isDone) break;
     cursor = result.continueCursor;
   }
+  if (all.length === 0) {
+    return [{ slug: "__placeholder__" }];
+  }
   return all.map((slug) => ({ slug }));
 }
 
