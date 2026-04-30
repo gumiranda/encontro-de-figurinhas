@@ -83,9 +83,13 @@ export const seedBlog = mutation({
   },
 });
 
+type SeedCitiesExtraResult = { added: number; skipped: number };
+
 export const seedCitiesExtra = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async (
+    ctx
+  ): Promise<{ ok: true; result: SeedCitiesExtraResult }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
@@ -95,8 +99,8 @@ export const seedCitiesExtra = mutation({
       .first();
     if (!user || !isAdmin(user.role)) throw new Error("Admin required");
 
-    const result = await ctx.runMutation(
-      internal.seeds.seedCitiesExtra.seedCitiesExtra,
+    const result: SeedCitiesExtraResult = await ctx.runMutation(
+      internal.seeds.seedCities.seedCitiesExtra,
       {}
     );
     return { ok: true, result };
