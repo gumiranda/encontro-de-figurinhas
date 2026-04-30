@@ -93,7 +93,7 @@ export default function SobrePage() {
                 <span className="text-primary">Brasil</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
-                O Figurinha Fácil nasceu da paixão por colecionar e da vontade
+                O <span className="text-[#87d400]">Figurinha Fácil</span> nasceu da paixão por colecionar e da vontade
                 de facilitar a vida de quem, assim como nós, adora completar
                 álbuns de figurinhas.
               </p>
@@ -164,7 +164,7 @@ export default function SobrePage() {
               </h2>
               <div className="prose prose-lg dark:prose-invert">
                 <p>
-                  O Figurinha Fácil surgiu de uma frustração comum a todo
+                  O <span className="text-[#87d400]">Figurinha Fácil</span> surgiu de uma frustração comum a todo
                   colecionador: a dificuldade de encontrar as últimas figurinhas
                   para completar o álbum.
                 </p>

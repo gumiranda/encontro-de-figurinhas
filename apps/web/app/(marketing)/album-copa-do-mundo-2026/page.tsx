@@ -675,7 +675,7 @@ export default function AlbumCopaDoMundo2026Page() {
               Comece a trocar figurinhas da Copa 2026 ainda hoje
             </h2>
             <p className="text-[var(--on-surface-variant)] text-base md:text-lg max-w-2xl mx-auto">
-              Milhares de colecionadores já estão usando o Figurinha Fácil para
+              Milhares de colecionadores já estão usando o <span className="text-[#87d400]">Figurinha Fácil</span> para
               completar o álbum gastando muito menos. Cadastre-se grátis e encontre
               colecionadores perto de você.
             </p>

@@ -101,7 +101,7 @@ export default async function Image({ params }: Props) {
           <span
             style={{
               fontSize: 20,
-              color: "#444",
+              color: "#87d400",
               marginTop: 32,
               fontWeight: 500,
             }}
@@ -131,7 +131,7 @@ export default async function Image({ params }: Props) {
             color: "#1a472a",
           }}
         >
-          <span style={{ fontSize: 64, fontWeight: 700 }}>Figurinha Fácil</span>
+          <span style={{ fontSize: 64, fontWeight: 700, color: "#87d400" }}>Figurinha Fácil</span>
         </div>
       ),
       { ...size }

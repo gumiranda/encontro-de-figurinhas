@@ -52,7 +52,7 @@ export default function PrivacidadePage() {
               </p>
 
               <p>
-                Esta Política de Privacidade descreve como o Figurinha Fácil
+                Esta Política de Privacidade descreve como o <span className="text-[#87d400]">Figurinha Fácil</span>
                 coleta, usa e protege suas informações pessoais em conformidade
                 com a Lei Geral de Proteção de Dados (LGPD).
               </p>

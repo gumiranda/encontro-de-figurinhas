@@ -59,7 +59,7 @@ export default async function Image() {
             style={{
               fontSize: 72,
               fontWeight: 700,
-              color: "white",
+              color: "#87d400",
               margin: 0,
               textAlign: "center",
             }}

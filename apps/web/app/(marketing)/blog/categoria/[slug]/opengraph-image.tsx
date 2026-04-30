@@ -52,7 +52,7 @@ export default async function Image({
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          Blog Figurinha Fácil
+          Blog <span style={{ color: "#87d400" }}>Figurinha Fácil</span>
         </div>
       ),
       { ...size }
@@ -159,7 +159,7 @@ export default async function Image({
               background: "rgba(255, 255, 255, 0.2)",
               padding: "16px 32px",
               borderRadius: 12,
-              color: "white",
+              color: "#87d400",
               fontSize: 24,
               fontWeight: 600,
             }}

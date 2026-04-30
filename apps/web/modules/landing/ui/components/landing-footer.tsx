@@ -36,7 +36,7 @@ export function LandingFooter() {
               >
                 <Trophy className="size-4 text-[#00247e]" strokeWidth={2.5} />
               </span>
-              <span className="font-bold text-lg text-[#e1e4fa]">
+              <span className="font-bold text-lg text-[#87d400]">
                 FigurinhaFácil
               </span>
             </Link>
@@ -103,7 +103,7 @@ export function LandingFooter() {
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-mono text-[#a6aabf]">
-            © 2026 FigurinhaFácil · feito por coletores, para coletores
+            © 2026 <span className="text-[#87d400]">FigurinhaFácil</span> · feito por coletores, para coletores
           </p>
           <p className="text-xs font-mono text-[#a6aabf]">
             Não afiliado a FIFA, Panini ou Copa do Mundo.

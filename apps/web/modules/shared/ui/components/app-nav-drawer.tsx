@@ -140,7 +140,7 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
         <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground font-headline text-sm font-black">
           FF
         </div>
-        <span className="font-headline text-base font-bold tracking-tight">
+        <span className="font-headline text-base font-bold tracking-tight text-[#87d400]">
           figurinhafácil
         </span>
       </div>

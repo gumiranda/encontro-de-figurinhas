@@ -15,7 +15,7 @@ export function AuthPitchPanel() {
           >
             <Trophy className="size-4 text-[var(--on-primary)]" strokeWidth={2} />
           </span>
-          <span className="font-[var(--font-headline)] text-lg font-semibold text-[var(--on-surface)]">
+          <span className="font-[var(--font-headline)] text-lg font-semibold text-[#87d400]">
             Figurinha Fácil
           </span>
         </div>

@@ -124,7 +124,7 @@ export default function ComoFuncionaPage() {
 
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
-                Como funciona o <span className="text-primary">Figurinha Fácil</span>
+                Como funciona o <span className="text-[#87d400]">Figurinha Fácil</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
                 Trocar figurinhas nunca foi tão fácil. Em poucos passos você encontra
@@ -171,7 +171,7 @@ export default function ComoFuncionaPage() {
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-headline font-bold mb-12 text-center">
-              Por que usar o Figurinha Fácil?
+              Por que usar o <span className="text-[#87d400]">Figurinha Fácil</span>?
             </h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

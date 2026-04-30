@@ -51,14 +51,14 @@ export default function TermosPage() {
 
               <h2>1. Aceitação dos Termos</h2>
               <p>
-                Ao acessar e usar o Figurinha Fácil, você concorda com estes
+                Ao acessar e usar o <span className="text-[#87d400]">Figurinha Fácil</span>, você concorda com estes
                 Termos de Uso. Se você não concordar com qualquer parte destes
                 termos, não utilize nossa plataforma.
               </p>
 
               <h2>2. Descrição do Serviço</h2>
               <p>
-                O Figurinha Fácil é uma plataforma que conecta colecionadores de
+                O <span className="text-[#87d400]">Figurinha Fácil</span> é uma plataforma que conecta colecionadores de
                 figurinhas, permitindo que encontrem outros usuários para
                 realizar trocas. Não vendemos figurinhas diretamente e não
                 intermediamos as transações entre usuários.
@@ -85,7 +85,7 @@ export default function TermosPage() {
               <h2>5. Trocas entre Usuários</h2>
               <p>
                 As trocas de figurinhas são realizadas diretamente entre os
-                usuários. O Figurinha Fácil não se responsabiliza por:
+                usuários. O <span className="text-[#87d400]">Figurinha Fácil</span> não se responsabiliza por:
               </p>
               <ul>
                 <li>Qualidade ou autenticidade das figurinhas trocadas</li>
@@ -96,14 +96,14 @@ export default function TermosPage() {
 
               <h2>6. Propriedade Intelectual</h2>
               <p>
-                Todo o conteúdo do Figurinha Fácil, incluindo textos, gráficos,
+                Todo o conteúdo do <span className="text-[#87d400]">Figurinha Fácil</span>, incluindo textos, gráficos,
                 logos e software, é de nossa propriedade ou licenciado para nós
                 e está protegido por leis de direitos autorais.
               </p>
 
               <h2>7. Limitação de Responsabilidade</h2>
               <p>
-                O Figurinha Fácil é fornecido &ldquo;como está&rdquo;. Não garantimos que o
+                O <span className="text-[#87d400]">Figurinha Fácil</span> é fornecido &ldquo;como está&rdquo;. Não garantimos que o
                 serviço será ininterrupto ou livre de erros. Em nenhuma
                 circunstância seremos responsáveis por danos indiretos,
                 incidentais ou consequentes.

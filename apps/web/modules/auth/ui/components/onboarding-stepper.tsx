@@ -37,7 +37,7 @@ export function OnboardingStepper({ currentStep }: { currentStep: 1 | 2 | 3 }) {
             strokeWidth={2.5}
           />
         </span>
-        <span className="text-lg font-bold text-[var(--landing-on-surface)] [font-family:var(--font-headline)]">
+        <span className="text-lg font-bold text-[#87d400] [font-family:var(--font-headline)]">
           Figurinha Fácil
         </span>
       </div>

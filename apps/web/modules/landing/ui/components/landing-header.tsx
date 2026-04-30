@@ -26,7 +26,7 @@ export function LandingHeader() {
           >
             <Trophy className="size-4 text-[#00247e]" strokeWidth={2.5} />
           </span>
-          <span className="font-bold text-lg tracking-tight text-[#e1e4fa]">
+          <span className="font-bold text-lg tracking-tight text-[#87d400]">
             FigurinhaFácil
           </span>
         </Link>
