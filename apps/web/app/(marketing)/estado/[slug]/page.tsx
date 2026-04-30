@@ -231,7 +231,7 @@ export default async function StatePage({ params }: StatePageProps) {
                     {collectorsNum === 1
                       ? "colecionador cadastrado"
                       : "colecionadores cadastrados"}{" "}
-                    no <span className="text-[#87d400]">Figurinha Fácil</span>, distribuídos em {citiesCount}{" "}
+                    no Figurinha <span className="text-[#87d400]">Fácil</span>, distribuídos em {citiesCount}{" "}
                     {citiesCount === 1 ? "cidade" : "cidades"}.
                     {tradePointsCount > 0 && (
                       <>
@@ -254,7 +254,7 @@ export default async function StatePage({ params }: StatePageProps) {
                 no estado tem crescido.
               </p>
 
-              <h3>Por que usar o <span className="text-[#87d400]">Figurinha Fácil</span> em {state.name}?</h3>
+              <h3>Por que usar o Figurinha <span className="text-[#87d400]">Fácil</span> em {state.name}?</h3>
               <ul>
                 <li>
                   Encontre colecionadores em {citiesCount} cidades do estado

@@ -59,12 +59,12 @@ export default async function Image() {
             style={{
               fontSize: 72,
               fontWeight: 700,
-              color: "#87d400",
+              color: "white",
               margin: 0,
               textAlign: "center",
             }}
           >
-            Figurinha Fácil
+            Figurinha <span style={{ color: "#87d400" }}>Fácil</span>
           </h1>
           <p
             style={{

@@ -39,7 +39,7 @@ export default function Image() {
             marginTop: 16,
           }}
         >
-          Todas as Figurinhas • <span style={{ color: "#87d400" }}>Figurinha Fácil</span>
+          Todas as Figurinhas • Figurinha <span style={{ color: "#87d400" }}>Fácil</span>
         </p>
       </div>
     ),

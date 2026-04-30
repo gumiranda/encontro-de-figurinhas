@@ -39,7 +39,7 @@ export default function Image() {
             marginTop: 16,
           }}
         >
-          Copa 2026 • <span style={{ color: "#87d400" }}>Figurinha Fácil</span>
+          Copa 2026 • Figurinha <span style={{ color: "#87d400" }}>Fácil</span>
         </p>
       </div>
     ),

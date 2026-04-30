@@ -248,8 +248,8 @@ export function LocationSelectorView({
             >
               <Trophy className="h-4 w-4" strokeWidth={2} />
             </span>
-            <span className="font-[var(--font-headline)] text-base font-semibold tracking-tight text-[#87d400]">
-              Figurinha Fácil
+            <span className="font-[var(--font-headline)] text-base font-semibold tracking-tight text-[var(--on-surface)]">
+              Figurinha <span className="text-[#87d400]">Fácil</span>
             </span>
           </div>
 

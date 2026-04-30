@@ -72,8 +72,8 @@ export function SecuritySection() {
                 </p>
               </div>
               <div className="p-5 bg-[#95aaff]/5 border-l border-[#95aaff]/20">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-[#87d400]">
-                  FigurinhaFácil
+                <p className="text-[10px] font-mono uppercase tracking-widest text-[#95aaff]">
+                  FIGURINHA<span className="text-[#87d400]">FÁCIL</span>
                 </p>
                 <p className="font-bold mt-1 text-[#e1e4fa]">Troca direta</p>
               </div>

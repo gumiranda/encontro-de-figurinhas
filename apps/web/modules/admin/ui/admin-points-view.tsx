@@ -233,7 +233,7 @@ export function AdminPointsView() {
         </div>
         <div className="mt-auto border-t border-[var(--ap-outline)]/10 p-6">
           <p className="text-[10px] uppercase tracking-widest text-[var(--ap-muted)]">
-<span className="text-[#87d400]">Figurinha Fácil</span> · moderação
+Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
           </p>
         </div>
       </aside>

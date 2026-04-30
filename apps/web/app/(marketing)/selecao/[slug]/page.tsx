@@ -279,7 +279,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
               <h3>Como trocar figurinhas da {section.name}</h3>
               <ul>
                 <li>
-                  Cadastre-se gratuitamente no <span className="text-[#87d400]">Figurinha Fácil</span>
+                  Cadastre-se gratuitamente no Figurinha <span className="text-[#87d400]">Fácil</span>
                 </li>
                 <li>
                   Informe quais figurinhas da {section.name} você tem repetidas
