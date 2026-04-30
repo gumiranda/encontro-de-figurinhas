@@ -617,12 +617,9 @@ export const skipLocation = mutation({
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
 
-    if (user.locationSource) {
-      throw new Error("Location already set");
-    }
-
     await ctx.db.patch(user._id, {
       locationSource: "skipped",
+      cityId: undefined,
     });
 
     return { success: true };
