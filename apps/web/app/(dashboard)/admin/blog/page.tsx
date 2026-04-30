@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
+import type { FunctionReturnType } from "convex/server";
+
+type AdminPost = FunctionReturnType<typeof api.blog.listForAdmin>[number];
 import {
   Card,
   CardContent,
@@ -175,7 +178,7 @@ export default function AdminBlogPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {posts.map((p) => (
+                {posts.map((p: AdminPost) => (
                   <TableRow key={p._id}>
                     <TableCell>
                       <div>
