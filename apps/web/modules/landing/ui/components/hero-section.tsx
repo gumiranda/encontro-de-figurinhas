@@ -33,7 +33,7 @@ export function HeroSection({ totalTrocas }: HeroSectionProps) {
 
           <div className="flex flex-wrap gap-3 pt-1">
             <Button asChild size="lg" className="h-[3.25rem] px-7 rounded-full gap-2.5">
-              <Link href="/cadastrar-figurinhas/quick">
+              <Link href="/sign-in">
                 Cadastrar minhas figurinhas
                 <ArrowRight className="w-4 h-4" />
               </Link>

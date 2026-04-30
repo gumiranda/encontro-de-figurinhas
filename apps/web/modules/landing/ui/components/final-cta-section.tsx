@@ -57,7 +57,7 @@ export function FinalCTASection({ cityName }: FinalCTASectionProps = {}) {
         {/* CTA Button */}
         <div className="flex justify-center">
           <Link
-            href="/cadastrar-figurinhas/quick"
+            href="/sign-in"
             className="group inline-flex items-center gap-3 px-7 py-4 bg-gradient-to-r from-[#95aaff] to-[#3766ff] text-[#00247e] font-bold rounded-full shadow-[0_4px_24px_-4px_rgba(55,102,255,0.4)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_rgba(55,102,255,0.5)] hover:scale-[1.02]"
           >
             Cadastrar minhas figurinhas
