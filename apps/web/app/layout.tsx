@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk, Manrope } from "next/font/google";
 
+import { Analytics } from "@vercel/analytics/next";
 import "@workspace/ui/globals.css";
 import { Toaster } from "@workspace/ui/components/sonner";
 
@@ -124,6 +125,7 @@ export default function RootLayout({
       >
         <Toaster />
         {children}
+        <Analytics />
       </body>
     </html>
   );
