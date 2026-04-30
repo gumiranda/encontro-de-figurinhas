@@ -87,6 +87,23 @@ export function LocationSelectorView({
   } = useLocationFlow({ cities: citiesForFlow, citiesError, currentCityId });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const skipLocationMutation = useMutation(api.users.skipLocation);
+
+  const handleSkip = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await skipLocationMutation({});
+      await new Promise<void>((resolve) => {
+        queueMicrotask(() => queueMicrotask(resolve));
+      });
+      router.replace("/dashboard");
+    } catch (error) {
+      toast.error("Erro ao pular seleção");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const selectedCity = selectedCityId
     ? citiesForFlow.find((c) => c._id === selectedCityId) ?? null
@@ -236,6 +253,16 @@ export function LocationSelectorView({
           onSelect={selectCityManual}
           max={3}
         />
+
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full text-sm text-[var(--on-surface-variant)]"
+          onClick={handleSkip}
+          disabled={isSubmitting}
+        >
+          Pular por enquanto
+        </Button>
       </section>
 
       {/* Desktop */}
@@ -293,6 +320,16 @@ export function LocationSelectorView({
             onSelect={selectCityManual}
             max={2}
           />
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full text-sm text-[var(--on-surface-variant)]"
+            onClick={handleSkip}
+            disabled={isSubmitting}
+          >
+            Pular por enquanto
+          </Button>
         </div>
 
         <div className="relative flex items-center justify-center overflow-hidden border-l border-[var(--outline-variant)] bg-[var(--surface-container-low)]">

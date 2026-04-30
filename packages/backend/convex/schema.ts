@@ -135,7 +135,7 @@ export default defineSchema({
     coverUploadTimestamps: v.optional(v.array(v.number())),
 
     locationSource: v.optional(
-      v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"))
+      v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"), v.literal("skipped"))
     ),
     lat: v.optional(v.float64()),
     lng: v.optional(v.float64()),
