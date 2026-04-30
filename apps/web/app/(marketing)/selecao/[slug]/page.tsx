@@ -62,6 +62,9 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   const slugs = await convexServer.query(api.album.getAllSectionSlugs, {});
+  if (slugs.length === 0) {
+    return [{ slug: "__placeholder__" }];
+  }
   return slugs.map((slug) => ({ slug }));
 }
 

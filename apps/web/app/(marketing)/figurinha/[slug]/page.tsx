@@ -87,6 +87,9 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   const stickers = await convexServer.query(api.album.getAllStickerDetailsForSitemap, {});
+  if (stickers.length === 0) {
+    return [{ slug: "__placeholder__" }];
+  }
   return stickers.map((s) => ({ slug: s.slug }));
 }
 
