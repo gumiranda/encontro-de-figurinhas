@@ -34,9 +34,13 @@ export function SeedAdminView() {
   const [blogStatus, setBlogStatus] = useState<SeedStatus>("idle");
   const [blogResult, setBlogResult] = useState<SeedResult | null>(null);
 
+  const [citiesExtraStatus, setCitiesExtraStatus] = useState<SeedStatus>("idle");
+  const [citiesExtraResult, setCitiesExtraResult] = useState<SeedResult | null>(null);
+
   const seedAll = useMutation(api.adminSeed.seedAll);
   const seedAlbum = useMutation(api.seedAlbumApi.seedAlbum);
   const seedBlog = useMutation(api.adminSeed.seedBlog);
+  const seedCitiesExtra = useMutation(api.adminSeed.seedCitiesExtra);
 
   const handleSeedAll = async () => {
     setAllStatus("loading");
@@ -83,6 +87,22 @@ export function SeedAdminView() {
         error: e instanceof Error ? e.message : "Unknown error",
       });
       setBlogStatus("error");
+    }
+  };
+
+  const handleSeedCitiesExtra = async () => {
+    setCitiesExtraStatus("loading");
+    setCitiesExtraResult(null);
+    try {
+      const result = await seedCitiesExtra({});
+      setCitiesExtraResult(result);
+      setCitiesExtraStatus("success");
+    } catch (e) {
+      setCitiesExtraResult({
+        ok: false,
+        error: e instanceof Error ? e.message : "Unknown error",
+      });
+      setCitiesExtraStatus("error");
     }
   };
 
@@ -191,6 +211,38 @@ export function SeedAdminView() {
           </CardContent>
         </Card>
 
+        {/* Seed Cities Extra */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Database className="h-6 w-6 text-primary" />
+                <div>
+                  <CardTitle>Seed Cities Extra</CardTitle>
+                  <CardDescription>
+                    +405 cidades brasileiras (além das 54 originais)
+                  </CardDescription>
+                </div>
+              </div>
+              <StatusBadge status={citiesExtraStatus} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleSeedCitiesExtra}
+              disabled={citiesExtraStatus === "loading"}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              {citiesExtraStatus === "loading" && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Seed Cities Extra
+            </Button>
+            {citiesExtraResult && <ResultDisplay result={citiesExtraResult} />}
+          </CardContent>
+        </Card>
+
         {/* Info Card */}
         <Card className="bg-muted/50">
           <CardHeader>
@@ -198,7 +250,7 @@ export function SeedAdminView() {
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>
-              <strong>Cities:</strong> 54 cidades brasileiras
+              <strong>Cities:</strong> 54 cidades base + 405 extras (459 total)
             </p>
             <p>
               <strong>Trade Points:</strong> 80 pontos de troca exemplo
