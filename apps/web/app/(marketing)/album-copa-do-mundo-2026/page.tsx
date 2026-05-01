@@ -584,6 +584,181 @@ export default function AlbumCopaDoMundo2026Page() {
           </div>
         </section>
 
+        {/* Onde comprar */}
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
+          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
+            Onde comprar o álbum e pacotes de figurinhas da Copa 2026
+          </h2>
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
+            <p>
+              O <strong>álbum da Copa do Mundo 2026</strong> está disponível em
+              múltiplos canais de venda. Você pode encontrar tanto o álbum quanto
+              os <strong>pacotinhos de figurinhas</strong> em:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-[var(--on-surface-variant)]">
+              <li><strong>Bancas de jornal</strong> — o ponto de venda tradicional, com atendimento personalizado</li>
+              <li><strong>Supermercados</strong> — disponível em redes como Carrefour, Pão de Açúcar, Sonda</li>
+              <li><strong>Amazon.com.br</strong> — frete rápido, garantia de autenticidade</li>
+              <li><strong>Magazine Luiza</strong> — opção com entrega para todo Brasil</li>
+              <li><strong>Mercado Livre</strong> — promoções e vendedores certificados</li>
+              <li><strong>Site oficial Panini.com.br</strong> — compra direta da fabricante</li>
+              <li><strong>Livrarias e Comic shops</strong> — pontos especializados em coleções</li>
+              <li><strong>Aplicativos (iFood, Daki, Shopper)</strong> — integração com delivery</li>
+            </ul>
+            <p>
+              Para <strong>completar o álbum da Copa</strong>, considere começar
+              com uma versão mais econômica (brochura) e investir em trocas com
+              outros colecionadores para reduzir custos.
+            </p>
+          </div>
+        </section>
+
+        {/* Produção e curiosidades */}
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
+          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
+            Curiosidades: como é feito o álbum da Copa do Mundo
+          </h2>
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
+            <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-6">
+              <h3 className="font-semibold mb-4 text-[var(--on-surface)] text-lg">
+                Produção em números
+              </h3>
+              <ul className="space-y-3 text-sm">
+                <li className="flex justify-between">
+                  <span>Figurinhas produzidas por dia</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    11 milhões
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Total de jogadores no álbum</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    864 jogadores
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Estádios inclusos</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    16 arenas
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Tempo de preparação</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    3 anos antes
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <p>
+              A Panini começa o desenvolvimento do álbum <strong>3 anos antes da
+              Copa</strong>, analisando o histórico de convocações das seleções.
+              Os jogadores são escolhidos com base em participações anteriores,
+              não na convocação final do técnico. Por isso alguns craques podem
+              aparecer no álbum mas não jogarem o Mundial (como ocorreu com Éder
+              Militão em 2022).
+            </p>
+            <p>
+              A fábrica da Panini em Barueri, São Paulo, imprime
+              <strong> 11 milhões de figurinhas por dia</strong>, abastecendo não
+              apenas o Brasil, mas também países da América Latina. Isso garante
+              que haja oferta suficiente de figurinhas no mercado desde o
+              lançamento.
+            </p>
+          </div>
+        </section>
+
+        {/* Dicas estratégicas */}
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
+          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
+            Dicas estratégicas para coletar figurinhas da Copa 2026
+          </h2>
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
+            <p>
+              <strong>1. Comece cedo e organize-se</strong>
+            </p>
+            <p className="text-base">
+              Quanto mais cedo você começar a colecionar, melhores suas chances de
+              encontrar figurinhas raras com outros colecionadores. Use pastas ou
+              envelopes para organizar suas repetidas por seleção — isso facilita
+              as trocas.
+            </p>
+            <p>
+              <strong>2. Não compre muitos pacotinhos de uma vez</strong>
+            </p>
+            <p className="text-base">
+              Investir tudo em pacotinhos resulta em muitas repetidas. Compre uma
+              quantidade menor e use as repetidas para trocar com outros
+              colecionadores. Uma caixa inicial (20-30 pacotinhos) é suficiente.
+            </p>
+            <p>
+              <strong>3. Participe de comunidades de troca</strong>
+            </p>
+            <p className="text-base">
+              Grupos no Facebook, WhatsApp e plataformas como Figurinha Fácil
+              aceleram o processo. Você cadastra as figurinhas que tem repetidas e
+              as que faltam, e a plataforma encontra matches automáticos com
+              colecionadores da sua cidade.
+            </p>
+            <p>
+              <strong>4. Deixe as especiais para o fim</strong>
+            </p>
+            <p className="text-base">
+              As 68 figurinhas especiais são as mais raras. Construa um bom estoque
+              de repetidas primeiro, depois use-as para negociar as figurinhas
+              brilhantes com outros colecionadores experientes.
+            </p>
+            <p>
+              <strong>5. Conheça as figurinhas lendárias</strong>
+            </p>
+            <p className="text-base">
+              O álbum inclui figurinhas homenageando lendas da Copa do Mundo.
+              Essas têm grande valor emocional e de troca. Se encontrar repetidas
+              delas cedo, reserve para negociar por outras peças raras.
+            </p>
+          </div>
+        </section>
+
+        {/* Custo final */}
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
+          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
+            Quanto custa completar o álbum da Copa 2026?
+          </h2>
+          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
+            <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-6">
+              <h3 className="font-semibold mb-4 text-[var(--on-surface)] text-lg">
+                Cenários de custo
+              </h3>
+              <ul className="space-y-3 text-sm">
+                <li className="flex justify-between border-b border-[var(--outline-variant)]/10 pb-3">
+                  <span>Só comprando pacotinhos (sem sorte)</span>
+                  <span className="font-mono text-[var(--secondary)] font-bold">
+                    R$ 2.500+
+                  </span>
+                </li>
+                <li className="flex justify-between border-b border-[var(--outline-variant)]/10 pb-3">
+                  <span>Com trocas (economia moderada)</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    R$ 800-1.200
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Com trocas ativas (economia máxima)</span>
+                  <span className="font-mono text-[var(--primary)] font-bold">
+                    R$ 300-500
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <p>
+              A grande diferença está nas <strong>trocas com colecionadores</strong>.
+              Quem troca ativamente consegue completar o álbum gastando até 80%
+              menos. Por isso o Figurinha Fácil tem crescido tanto — conecta
+              colecionadores e reduz drasticamente o custo final.
+            </p>
+          </div>
+        </section>
+
         {/* Onde trocar */}
         <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
           <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-8 md:p-12">
