@@ -137,8 +137,6 @@ export const getAllStickerNumbers = query({
   },
 });
 
-export const ;
-
 export const getRelatedStickers = query({
   args: { number: v.number(), limit: v.optional(v.number()) },
   handler: async (ctx, { number, limit = 8 }) => {
@@ -233,8 +231,6 @@ export const searchStickersByVariant = query({
       .take(100);
   },
 });
-
-export const ;
 
 export const getAllStickerDetailsForSitemap = query({
   args: {},
