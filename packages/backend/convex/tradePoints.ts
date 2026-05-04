@@ -180,28 +180,38 @@ export const getMapView = query({
       return { state: "needs-city" as const };
     }
 
+    const origin =
+      user.lat != null && user.lng != null
+        ? { lat: user.lat, lng: user.lng }
+        : { lat: city.lat, lng: city.lng };
+
     const rawPoints = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .collect();
 
-    const points = rawPoints.map((p) => ({
-      _id: p._id,
-      slug: p.slug,
-      name: p.name,
-      address: p.address,
-      lat: p.lat,
-      lng: p.lng,
-      suggestedHours: p.suggestedHours,
-      description: p.description,
-      confidenceScore: p.confidenceScore,
-      lastActivityAt: p.lastActivityAt,
-      confirmedTradesCount: p.confirmedTradesCount,
-      activeCheckinsCount: p.activeCheckinsCount ?? 0,
-      participantCount: p.participantCount ?? 0,
-      acceptsMail: p.acceptsMail === true,
-      pointType: p.pointType ?? ("fixed" as const),
-    }));
+    const points = rawPoints
+      .map((p) => ({
+        _id: p._id,
+        slug: p.slug,
+        name: p.name,
+        address: p.address,
+        lat: p.lat,
+        lng: p.lng,
+        suggestedHours: p.suggestedHours,
+        description: p.description,
+        confidenceScore: p.confidenceScore,
+        lastActivityAt: p.lastActivityAt,
+        confirmedTradesCount: p.confirmedTradesCount,
+        activeCheckinsCount: p.activeCheckinsCount ?? 0,
+        participantCount: p.participantCount ?? 0,
+        acceptsMail: p.acceptsMail === true,
+        pointType: p.pointType ?? ("fixed" as const),
+        distanceKm: haversine(origin.lat, origin.lng, p.lat, p.lng),
+      }))
+      .sort((a, b) => a.distanceKm - b.distanceKm)
+      .slice(0, 50)
+      .map(({ distanceKm, ...rest }) => rest);
 
     return {
       state: "ready" as const,

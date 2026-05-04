@@ -292,7 +292,8 @@ export default defineSchema({
     ),
   })
     .index("by_code", ["code"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .index("by_isExtra", ["isExtra"]),
 
   // O(1) lookup for sticker details (denormalized for breadcrumbs/SEO)
   stickerDetail: defineTable({

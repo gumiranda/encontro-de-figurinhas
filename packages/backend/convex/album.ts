@@ -16,23 +16,24 @@ export const getPublicAlbumCount = query({
 export const getSections = query({
   args: { includeExtras: v.optional(v.boolean()) },
   handler: async (ctx, { includeExtras }) => {
-    const sections = await ctx.db
-      .query("albumSections")
-      .collect();
+    const sections = includeExtras
+      ? await ctx.db.query("albumSections").collect()
+      : await ctx.db
+          .query("albumSections")
+          .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
+          .collect();
 
-    return sections
-      .filter((s) => includeExtras || !s.isExtra)
-      .map((s) => ({
-        name: s.name,
-        code: s.code,
-        slug: s.slug,
-        flagEmoji: s.flagEmoji,
-        startNumber: s.startNumber,
-        endNumber: s.endNumber,
-        stickerCount: s.endNumber - s.startNumber + 1,
-        goldenNumbers: s.goldenNumbers ?? [],
-        legendNumbers: s.legendNumbers ?? [],
-      }));
+    return sections.map((s) => ({
+      name: s.name,
+      code: s.code,
+      slug: s.slug,
+      flagEmoji: s.flagEmoji,
+      startNumber: s.startNumber,
+      endNumber: s.endNumber,
+      stickerCount: s.endNumber - s.startNumber + 1,
+      goldenNumbers: s.goldenNumbers ?? [],
+      legendNumbers: s.legendNumbers ?? [],
+    }));
   },
 });
 
@@ -66,23 +67,25 @@ export const getSectionBySlug = query({
 export const getAllSectionSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const sections = await ctx.db.query("albumSections").collect();
-    return sections
-      .filter((s) => !s.isExtra)
-      .map((s) => s.slug);
+    const sections = await ctx.db
+      .query("albumSections")
+      .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
+      .collect();
+    return sections.map((s) => s.slug);
   },
 });
 
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const sections = await ctx.db.query("albumSections").collect();
-    return sections
-      .filter((s) => !s.isExtra)
-      .map((s) => ({
-        slug: s.slug,
-        name: s.name,
-      }));
+    const sections = await ctx.db
+      .query("albumSections")
+      .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
+      .collect();
+    return sections.map((s) => ({
+      slug: s.slug,
+      name: s.name,
+    }));
   },
 });
 
