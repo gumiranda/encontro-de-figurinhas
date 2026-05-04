@@ -321,14 +321,16 @@ export function QuickRegisterView({
                 modeSwitch={modeSwitchLink}
               />
 
-              <div className="hidden md:flex md:items-center md:justify-between md:gap-4">
-                <StickerStatsRow
-                  have={haveCount}
-                  duplicates={duplicates.length}
-                  missing={needCount}
-                  total={totalStickers}
-                  className="flex-1"
-                />
+              <div className="flex items-center justify-between gap-4">
+                <div className="hidden flex-1 md:block">
+                  <StickerStatsRow
+                    have={haveCount}
+                    duplicates={duplicates.length}
+                    missing={needCount}
+                    total={totalStickers}
+                    className="w-full"
+                  />
+                </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" disabled={isGenerating || isLoading}>
