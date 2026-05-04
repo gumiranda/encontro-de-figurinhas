@@ -20,7 +20,6 @@ export default async function PontoSolicitarPage() {
 
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
   if (!user?.hasCompletedOnboarding) redirect("/complete-profile");
-  if (!user?.hasCompletedStickerSetup) redirect("/cadastrar-figurinhas");
   if (!user.cityId) redirect("/selecionar-localizacao");
 
   const city = await fetchQuery(

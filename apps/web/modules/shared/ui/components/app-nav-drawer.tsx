@@ -51,11 +51,6 @@ interface RenderedNavGroup {
   items: RenderedNavItem[];
 }
 
-const ONBOARDING_ALLOWED_HREFS = new Set<string>([
-  "/cadastrar-figurinhas",
-  "/cadastrar-figurinhas/quick",
-]);
-
 export function useAppNavGroups(): RenderedNavGroup[] {
   const { isAuthenticated } = useConvexAuth();
   const navContext = useQuery(api.users.getNavContext, isAuthenticated ? {} : "skip");
@@ -64,10 +59,6 @@ export function useAppNavGroups(): RenderedNavGroup[] {
     const isSuperadminOrCeo =
       navContext?.role === "superadmin" || navContext?.role === "ceo";
 
-    // Fail-closed: enquanto navContext === undefined (primeiro tick) ou null (not authed),
-    // desabilitar tudo exceto /cadastrar-figurinhas. Evita flash clicável que dispararia
-    // o redirect loop do DashboardShell antes do setup completar.
-    const setupCompleted = navContext?.hasCompletedStickerSetup === true;
     const pendingProposalsCount = navContext?.pendingProposalsCount ?? 0;
 
     const baseGroups: NavGroup[] = [
@@ -117,12 +108,11 @@ export function useAppNavGroups(): RenderedNavGroup[] {
       title: group.title,
       items: group.items.map((item) => ({
         ...item,
-        ariaDisabled: !setupCompleted && !ONBOARDING_ALLOWED_HREFS.has(item.href),
+        ariaDisabled: false,
       })),
     }));
   }, [
     navContext?.role,
-    navContext?.hasCompletedStickerSetup,
     navContext?.pendingProposalsCount,
   ]);
 }

@@ -125,8 +125,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       if (!ia || al || u === undefined) return;
       if (u === null || !u.hasCompletedOnboarding) {
         router.replace("/complete-profile");
-      } else if (u.hasCompletedStickerSetup !== true) {
-        router.replace("/cadastrar-figurinhas");
       } else if (!u.locationSource) {
         router.replace("/selecionar-localizacao");
       }
@@ -136,9 +134,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, authLoading, currentUser, router]);
 
   const isFullyOnboarded =
-    currentUser?.hasCompletedOnboarding &&
-    currentUser?.hasCompletedStickerSetup &&
-    currentUser?.locationSource;
+    currentUser?.hasCompletedOnboarding && currentUser?.locationSource;
 
   const isLoading = authLoading || !isAuthenticated || currentUser === undefined;
   if (isLoading || !currentUser || !isFullyOnboarded) {

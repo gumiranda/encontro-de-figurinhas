@@ -55,12 +55,9 @@ export function CompleteProfileView() {
   useLayoutEffect(() => {
     if (!currentUser?.hasCompletedOnboarding) return;
 
-    const next =
-      currentUser.hasCompletedStickerSetup !== true
-        ? "/cadastrar-figurinhas"
-        : !currentUser.locationSource
-          ? "/selecionar-localizacao"
-          : "/dashboard";
+    const next = !currentUser.locationSource
+      ? "/selecionar-localizacao"
+      : "/dashboard";
 
     router.replace(next);
   }, [currentUser, router]);

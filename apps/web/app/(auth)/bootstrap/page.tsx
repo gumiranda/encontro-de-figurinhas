@@ -36,8 +36,6 @@ export default function BootstrapPage() {
     if (currentUser) {
       if (!currentUser.hasCompletedOnboarding) {
         router.replace("/complete-profile");
-      } else if (!currentUser.hasCompletedStickerSetup) {
-        router.replace("/cadastrar-figurinhas");
       } else if (!currentUser.locationSource) {
         router.replace("/selecionar-localizacao");
       } else {

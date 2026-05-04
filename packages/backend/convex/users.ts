@@ -14,6 +14,8 @@ import {
 import { rateLimiter } from "./lib/rateLimiter";
 import { throwSetLocationError } from "./lib/setLocationErrors";
 import { getPendingProposalsForUserCount } from "./lib/tradeHelpers";
+import { readSiteStatsOrNull } from "./siteStats";
+import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 
 export const getCurrentUser = query({
   args: {},
@@ -297,6 +299,10 @@ export const completeProfile = mutation({
 
     const now = Date.now();
 
+    const stats = await readSiteStatsOrNull(ctx);
+    const totalCount = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const allMissing = Array.from({ length: totalCount }, (_, i) => i);
+
     await ctx.db.patch(user._id, {
       nickname: nicknameLower,
       displayNickname: args.nickname,
@@ -306,7 +312,11 @@ export const completeProfile = mutation({
       totalTrades: 0,
       isShadowBanned: false,
       duplicates: [],
-      missing: [],
+      missing: allMissing,
+      hasCompletedStickerSetup: true,
+      albumProgress: 0,
+      albumCompletionPct: 0,
+      totalStickersOwned: 0,
       hasSeenSafetyTips: false,
       isPremium: false,
       lastActiveAt: now,

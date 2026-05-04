@@ -74,7 +74,7 @@ export function CompleteProfileForm() {
       });
 
       celebrateMilestone("profileComplete");
-      router.push("/cadastrar-figurinhas");
+      router.push("/selecionar-localizacao");
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "Nickname already taken") {

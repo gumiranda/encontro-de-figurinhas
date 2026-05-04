@@ -38,7 +38,6 @@ export default async function SelecionarLocalizacaoPage() {
 
   const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
   if (!user?.hasCompletedOnboarding) redirect("/complete-profile");
-  if (!user?.hasCompletedStickerSetup) redirect("/cadastrar-figurinhas");
 
   let cities: CityWithCoords[] = [];
   let citiesError: string | undefined;

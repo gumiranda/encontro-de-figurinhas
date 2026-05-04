@@ -132,15 +132,9 @@ export default function PerfilPage() {
               id="public-profile"
               checked={settings.isProfilePublic}
               onCheckedChange={handleTogglePublic}
-              disabled={isUpdating || !settings.hasCompletedStickerSetup}
+              disabled={isUpdating}
             />
           </div>
-
-          {!settings.hasCompletedStickerSetup && (
-            <p className="text-sm text-amber-600">
-              Complete a configuração do álbum para ativar o perfil público.
-            </p>
-          )}
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -159,7 +153,7 @@ export default function PerfilPage() {
         </CardContent>
       </Card>
 
-      {settings.isProfilePublic && settings.hasCompletedStickerSetup && (
+      {settings.isProfilePublic && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
