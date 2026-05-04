@@ -1,7 +1,24 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 import { readSiteStatsOrNull } from "./siteStats";
 import { relativeFromAbsolute } from "./lib/stickerNumbering";
+
+// In-memory cache for static albumSections (changes ~1x/year).
+let _albumSectionsCache: Doc<"albumSections">[] | null = null;
+let _albumSectionsCacheTs = 0;
+const ALBUM_SECTIONS_CACHE_TTL_MS = 60_000;
+
+async function getCachedAlbumSections(ctx: { db: { query: (table: "albumSections") => { collect: () => Promise<Doc<"albumSections">[]> } } }): Promise<Doc<"albumSections">[]> {
+  const now = Date.now();
+  if (_albumSectionsCache && now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS) {
+    return _albumSectionsCache;
+  }
+  const rows = await ctx.db.query("albumSections").collect();
+  _albumSectionsCache = rows;
+  _albumSectionsCacheTs = now;
+  return rows;
+}
 
 /** `totalStickers` = quantidade; números absolutos válidos: 0 .. totalStickers - 1. */
 export const getPublicAlbumCount = query({
@@ -16,12 +33,10 @@ export const getPublicAlbumCount = query({
 export const getSections = query({
   args: { includeExtras: v.optional(v.boolean()) },
   handler: async (ctx, { includeExtras }) => {
+    const allSections = await getCachedAlbumSections(ctx);
     const sections = includeExtras
-      ? await ctx.db.query("albumSections").collect()
-      : await ctx.db
-          .query("albumSections")
-          .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
-          .collect();
+      ? allSections
+      : allSections.filter((s) => !s.isExtra);
 
     return sections.map((s) => ({
       name: s.name,
@@ -67,25 +82,21 @@ export const getSectionBySlug = query({
 export const getAllSectionSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const sections = await ctx.db
-      .query("albumSections")
-      .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
-      .collect();
-    return sections.map((s) => s.slug);
+    const sections = await getCachedAlbumSections(ctx);
+    return sections.filter((s) => !s.isExtra).map((s) => s.slug);
   },
 });
 
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const sections = await ctx.db
-      .query("albumSections")
-      .withIndex("by_isExtra", (q) => q.eq("isExtra", false))
-      .collect();
-    return sections.map((s) => ({
-      slug: s.slug,
-      name: s.name,
-    }));
+    const sections = await getCachedAlbumSections(ctx);
+    return sections
+      .filter((s) => !s.isExtra)
+      .map((s) => ({
+        slug: s.slug,
+        name: s.name,
+      }));
   },
 });
 
@@ -235,7 +246,7 @@ export const searchStickersByVariant = query({
 export const getAllStickerDetailsForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const details = await ctx.db.query("stickerDetail").collect();
+    const details = await ctx.db.query("stickerDetail").take(1000);
     return details.map((d) => ({
       slug: d.slug,
       absoluteNum: d.absoluteNum,

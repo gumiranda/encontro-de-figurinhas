@@ -11,8 +11,8 @@ import { rateLimiter } from "./lib/rateLimiter";
 const FREQUENT_THRESHOLD = 5;
 const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const PRESENCE_SAMPLE_LIMIT = 5;
-const TRADES_FETCH_CAP = 1000;
-const CHECKINS_FETCH_CAP = 500;
+const TRADES_FETCH_CAP = 200;
+const CHECKINS_FETCH_CAP = 100;
 
 export const getMyPoints = query({
   args: {},
@@ -29,17 +29,11 @@ export const getMyPoints = query({
       memberships.map(async (m) => {
         const point = await ctx.db.get(m.tradePointId);
         if (!point) return null;
-        // Prefer denormalized snapshot from join time; fall back to city fetch
-        // for memberships predating the denorm field.
-        let cityName: string | null = m.cityName ?? null;
-        if (cityName === null && point.cityId) {
-          const city = await ctx.db.get(point.cityId);
-          cityName = city?.name ?? null;
-        }
+        // cityName is snapshotted at join time; no fallback N+1 fetch.
         return {
           ...point,
           joinedAt: m.joinedAt,
-          cityName,
+          cityName: m.cityName ?? null,
         };
       })
     );
@@ -184,27 +178,14 @@ export const getMyPointsDashboard = query({
     }
 
     const now = Date.now();
-    const presence = await Promise.all(
-      validPoints.map(async (p) => {
-        const checkins = await ctx.db
-          .query("checkins")
-          .withIndex("by_tradePoint_active", (q) =>
-            q.eq("tradePointId", p._id).gt("expiresAt", now)
-          )
-          .take(PRESENCE_SAMPLE_LIMIT);
-        return [
-          p._id,
-          {
-            count: p.activeCheckinsCount ?? 0,
-            sample: checkins.map((c) => ({
-              nickname: c.displayNickname ?? null,
-              avatarSeed: c.avatarSeed ?? null,
-            })),
-          },
-        ] as const;
-      })
+    // Presence sample removed from dashboard to eliminate N+1 checkins queries.
+    // Clients can fetch per-point presence lazily via a dedicated query.
+    const presenceById = new Map(
+      validPoints.map((p) => [
+        p._id,
+        { count: p.activeCheckinsCount ?? 0, sample: [] },
+      ])
     );
-    const presenceById = new Map(presence);
 
     const favIds = new Set(me.favoriteTradePointIds ?? []);
 

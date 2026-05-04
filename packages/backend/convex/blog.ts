@@ -270,12 +270,12 @@ export const listForAdmin = query({
 
     const allPosts =
       filter === "all"
-        ? await ctx.db.query("blogPosts").order("desc").take(500)
+        ? await ctx.db.query("blogPosts").order("desc").take(200)
         : await ctx.db
             .query("blogPosts")
             .withIndex("by_status_publishedAt", (q) => q.eq("status", filter))
             .order("desc")
-            .take(500);
+            .take(200);
 
     const term = search?.trim().toLowerCase();
     const filtered = term
@@ -327,7 +327,7 @@ export const adminStats = query({
   args: {},
   handler: async (ctx) => {
     await requireAdmin(ctx);
-    const posts = await ctx.db.query("blogPosts").take(1000);
+    const posts = await ctx.db.query("blogPosts").take(200);
     const published = posts.filter((p) => p.status === "published").length;
     const drafts = posts.filter((p) => p.status === "draft").length;
 

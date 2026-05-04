@@ -10,6 +10,23 @@ import { computeStickerOverlap } from "./lib/stickerOverlap";
 import { getUserDisplayName } from "./lib/userDisplay";
 import { readSpecialNumbersFromSiteStats } from "./siteStats";
 
+// In-memory cache for static albumSections (changes ~1x/year).
+// Survives across queries in the same isolate; falls back to DB on cold start.
+let _albumSectionsCache: Doc<"albumSections">[] | null = null;
+let _albumSectionsCacheTs = 0;
+const ALBUM_SECTIONS_CACHE_TTL_MS = 60_000;
+
+async function getCachedAlbumSections(ctx: QueryCtx): Promise<Doc<"albumSections">[]> {
+  const now = Date.now();
+  if (_albumSectionsCache && now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS) {
+    return _albumSectionsCache;
+  }
+  const rows = await ctx.db.query("albumSections").collect();
+  _albumSectionsCache = rows;
+  _albumSectionsCacheTs = now;
+  return rows;
+}
+
 const PAGE_SIZE = 500;
 const TOP_N = 50;
 const RETURN_LIMIT = 30;
@@ -462,23 +479,38 @@ export const listMyMatches = query({
       return b.computedAt - a.computedAt;
     });
 
-    // Bounded: matchedIds ≤ 50 (from matches.length check in loop below)
-    const matchedIds = [...new Set(filteredRows.map((r) => r.matchedUserId))];
-    const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
-    const otherById = new Map(
-      others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
+    // Prefer denormalized fields to eliminate N+1 db.get; fallback only when absent.
+    const needsFallback = filteredRows.some(
+      (r) => r.matchedDisplayNickname == null
     );
+
+    let otherById = new Map<Id<"users">, Doc<"users">>();
+    if (needsFallback) {
+      const matchedIds = [...new Set(filteredRows.map((r) => r.matchedUserId))];
+      const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
+      otherById = new Map(
+        others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
+      );
+    }
 
     const matches: ListMyMatchRow[] = [];
     for (const r of filteredRows) {
       if (matches.length >= 50) break;
-      const other = otherById.get(r.matchedUserId);
-      if (!other) continue;
-      if (other.isBanned === true || other.isShadowBanned === true) continue;
+
+      const displayNickname =
+        r.matchedDisplayNickname ??
+        (otherById.get(r.matchedUserId)
+          ? getUserDisplayName(otherById.get(r.matchedUserId)!)
+          : "");
+      if (!displayNickname) continue;
+
+      const albumProgress = r.matchedAlbumProgress ?? otherById.get(r.matchedUserId)?.albumProgress ?? 0;
+      const totalTrades = r.matchedTotalTrades ?? otherById.get(r.matchedUserId)?.totalTrades ?? 0;
+      const reliabilityScore = r.matchedReliabilityScore ?? otherById.get(r.matchedUserId)?.reliabilityScore ?? 0;
 
       const isVerified =
-        other.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
-        (other.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+        reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
+        totalTrades >= VERIFIED_TRADES_THRESHOLD;
 
       if (args.verifiedOnly && !isVerified) continue;
 
@@ -488,10 +520,10 @@ export const listMyMatches = query({
 
       matches.push({
         matchedUserId: r.matchedUserId,
-        displayNickname: getUserDisplayName(other),
-        avatarSeed: r.matchedUserId,
-        albumCompletionPct: other.albumProgress ?? 0,
-        confirmedTradesCount: other.totalTrades ?? 0,
+        displayNickname,
+        avatarSeed: r.matchedAvatarSeed ?? r.matchedUserId,
+        albumCompletionPct: albumProgress,
+        confirmedTradesCount: totalTrades,
         theyHaveINeed: r.theyHaveINeed.slice(0, MATCH_STICKER_SAMPLE),
         iHaveTheyNeed: r.iHaveTheyNeed.slice(0, MATCH_STICKER_SAMPLE),
         isBidirectional: r.isBidirectional,
@@ -958,7 +990,7 @@ export const getFullStickerOverlap = query({
       .slice(0, MAX_STICKERS_OVERLAP)
       .map((num) => ({ num, qty: myDupCounts.get(num) ?? 1 }));
 
-    const allSections = await ctx.db.query("albumSections").collect();
+    const allSections = await getCachedAlbumSections(ctx);
     const sections = allSections.map((s) => ({
       code: s.code,
       name: s.name,
@@ -982,5 +1014,41 @@ export const getFullStickerOverlap = query({
       },
       tradePointName: tradePoint.name,
     };
+  },
+});
+
+/**
+ * Internal: backfill denormalized user fields into precomputedMatches rows.
+ * Run periodically (e.g. nightly cron) or after user profile changes.
+ */
+export const syncPrecomputedMatchesDenorm = internalMutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+    if (!user || user.isBanned || user.isShadowBanned) return { updated: 0 };
+
+    const isVerified =
+      user.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
+      (user.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+
+    const rows = await ctx.db
+      .query("precomputedMatches")
+      .withIndex("by_matchedUser", (q) => q.eq("matchedUserId", userId))
+      .take(200);
+
+    for (const row of rows) {
+      await ctx.db.patch(row._id, {
+        matchedDisplayNickname: getUserDisplayName(user),
+        matchedAvatarSeed: userId,
+        matchedAlbumProgress: user.albumProgress ?? 0,
+        matchedTotalTrades: user.totalTrades ?? 0,
+        matchedReliabilityScore: user.reliabilityScore,
+        matchedIsVerified: isVerified,
+      });
+    }
+
+    return { updated: rows.length };
   },
 });

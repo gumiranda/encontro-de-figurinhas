@@ -157,6 +157,14 @@ export const listRoundsForSitemap = query({
   args: {},
   handler: async (ctx) => {
     const rounds = await ctx.db.query("worldCupRounds").take(64);
+    // Single fetch for all matches to avoid N+1 per round.
+    const allMatches = await ctx.db.query("worldCupMatches").take(1000);
+    const matchesByRound = new Map<string, typeof allMatches>();
+    for (const m of allMatches) {
+      const arr = matchesByRound.get(m.roundId) ?? [];
+      arr.push(m);
+      matchesByRound.set(m.roundId, arr);
+    }
     const result: Array<{
       slug: string;
       endDate: number;
@@ -164,10 +172,7 @@ export const listRoundsForSitemap = query({
       lastModified: number;
     }> = [];
     for (const r of rounds) {
-      const matches = await ctx.db
-        .query("worldCupMatches")
-        .withIndex("by_round_kickoff", (q) => q.eq("roundId", r._id))
-        .collect();
+      const matches = matchesByRound.get(r._id) ?? [];
       const maxVote = matches.reduce(
         (acc, m) => Math.max(acc, m.lastVoteAt ?? 0),
         0,

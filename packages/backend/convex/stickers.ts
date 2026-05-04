@@ -13,6 +13,22 @@ import { scheduleDebouncedMatchRecompute } from "./matches";
 import { isValidAbsolute } from "./lib/stickerNumbering";
 import { readSiteStatsOrNull } from "./siteStats";
 
+// In-memory cache for static albumSections (changes ~1x/year).
+let _albumSectionsCache: Doc<"albumSections">[] | null = null;
+let _albumSectionsCacheTs = 0;
+const ALBUM_SECTIONS_CACHE_TTL_MS = 60_000;
+
+async function getCachedAlbumSections(ctx: { db: { query: (table: "albumSections") => { collect: () => Promise<Doc<"albumSections">[]> } } }): Promise<Doc<"albumSections">[]> {
+  const now = Date.now();
+  if (_albumSectionsCache && now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS) {
+    return _albumSectionsCache;
+  }
+  const rows = await ctx.db.query("albumSections").collect();
+  _albumSectionsCache = rows;
+  _albumSectionsCacheTs = now;
+  return rows;
+}
+
 const setsEqual = <T>(a: Set<T>, b: Set<T>): boolean =>
   a.size === b.size && [...a].every((x) => b.has(x));
 
@@ -87,7 +103,7 @@ export const getUserStickers = query({
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
 
-    const rawSections = await ctx.db.query("albumSections").collect();
+    const rawSections = await getCachedAlbumSections(ctx);
     const stats = await readSiteStatsOrNull(ctx);
     return {
       duplicates: user.duplicates ?? [],

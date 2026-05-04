@@ -52,17 +52,19 @@ export const getBySlug = query({
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    // Mesma regra que `search`: isActive omitido conta como ativo; só exclui false.
-    const cities = await ctx.db.query("cities").take(5000);
-    return cities
-      .filter((c) => c.isActive !== false)
-      .map((c) => ({
-        _id: c._id,
-        name: c.name,
-        state: c.state,
-        lat: c.lat,
-        lng: c.lng,
-      }));
+    // Use index for active cities; rows with omitted isActive are not returned.
+    // If your seed sets isActive on all rows, this is exact. Otherwise, consider a backfill.
+    const cities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .take(5000);
+    return cities.map((c) => ({
+      _id: c._id,
+      name: c.name,
+      state: c.state,
+      lat: c.lat,
+      lng: c.lng,
+    }));
   },
 });
 
@@ -93,22 +95,15 @@ export const listTopActiveForSSG = query({
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const usersWithSetup = await ctx.db
-      .query("users")
-      .withIndex("by_sticker_setup", (q) =>
-        q.eq("hasCompletedStickerSetup", true)
-      )
-      .take(10000);
+    // Derive active cities from approved tradePoints instead of scanning 10k users.
+    const points = await ctx.db
+      .query("tradePoints")
+      .withIndex("by_status", (q) => q.eq("status", "approved"))
+      .take(2000);
 
     const activeCityIds = new Set<Id<"cities">>();
-    for (const u of usersWithSetup) {
-      if (
-        u.cityId &&
-        u.isShadowBanned !== true &&
-        u.isBanned !== true
-      ) {
-        activeCityIds.add(u.cityId);
-      }
+    for (const p of points) {
+      activeCityIds.add(p.cityId);
     }
 
     if (activeCityIds.size === 0) return [];

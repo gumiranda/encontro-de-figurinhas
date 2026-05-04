@@ -569,7 +569,7 @@ export const getTradeById = query({
 
     // Enrich with player names
     const allNums = [...new Set([...row.stickersIGive, ...row.stickersIReceive])];
-    const MAX_STICKERS = 200;
+    const MAX_STICKERS = 30;
     const limitedNums = allNums.slice(0, MAX_STICKERS);
 
     const details = await Promise.all(

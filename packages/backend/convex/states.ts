@@ -127,8 +127,9 @@ export const getStatsBySlug = query({
     const stateCities = allCities.filter((c) => c.state === stateCode);
     if (stateCities.length === 0) return null;
 
-    const CAP_USERS_PER_CITY = 5000;
-    const CAP_TRADE_POINTS_PER_CITY = 500;
+    // Capped reads per city to protect DB I/O. Counts are approximate ceilings.
+    const CAP_USERS_PER_CITY = 200;
+    const CAP_TRADE_POINTS_PER_CITY = 50;
 
     const buckets = await Promise.all(
       stateCities.map(async (c) => {

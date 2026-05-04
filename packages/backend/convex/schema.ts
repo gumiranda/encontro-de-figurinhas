@@ -344,6 +344,13 @@ export default defineSchema({
     distanceKm: v.float64(),
     layer: v.union(v.literal(1), v.literal(2)),
     computedAt: v.number(),
+    // Denormalized user fields to eliminate N+1 db.get on listMyMatches
+    matchedDisplayNickname: v.optional(v.string()),
+    matchedAvatarSeed: v.optional(v.string()),
+    matchedAlbumProgress: v.optional(v.number()),
+    matchedTotalTrades: v.optional(v.number()),
+    matchedReliabilityScore: v.optional(v.number()),
+    matchedIsVerified: v.optional(v.boolean()),
   })
     .index("by_user_layer", ["userId", "layer"])
     .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])

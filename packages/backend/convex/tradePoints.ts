@@ -44,11 +44,14 @@ async function cityDisplayByNearestCoords(
   lng: number
 ) {
   if (!isInBrazil(lat, lng)) return null;
-  const cities = await ctx.db.query("cities").take(5000);
+  // Orphan-point fallback: reduced from 5000 to 1000 to cap reads.
+  const cities = await ctx.db
+    .query("cities")
+    .withIndex("by_isActive", (q) => q.eq("isActive", true))
+    .take(1000);
   let best: (typeof cities)[0] | null = null;
   let bestD = Infinity;
   for (const c of cities) {
-    if (c.isActive === false) continue;
     const d = haversine(lat, lng, c.lat, c.lng);
     if (d < bestD) {
       bestD = d;
@@ -185,10 +188,21 @@ export const getMapView = query({
         ? { lat: user.lat, lng: user.lng }
         : { lat: city.lat, lng: city.lng };
 
-    const rawPoints = await ctx.db
+    // Start with user's own city to reduce reads (typical city has < 50 points).
+    const cityPoints = await ctx.db
       .query("tradePoints")
-      .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .take(200);
+      .withIndex("by_city_status", (q) =>
+        q.eq("cityId", cityId).eq("status", "approved")
+      )
+      .take(100);
+
+    const rawPoints =
+      cityPoints.length >= 20
+        ? cityPoints
+        : await ctx.db
+            .query("tradePoints")
+            .withIndex("by_status", (q) => q.eq("status", "approved"))
+            .take(100);
 
     const points = rawPoints
       .map((p) => ({
@@ -652,7 +666,7 @@ export const getBySlug = query({
 });
 
 const SSG_MAX_SLUGS = 5000;
-const SSG_MAX_GROUPED = 2000;
+const SSG_MAX_GROUPED = 500;
 
 function assertSsgSecret(secret: string | undefined) {
   const expected = process.env.SSG_SECRET;
