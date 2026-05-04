@@ -64,11 +64,9 @@ export default function AdminUsersPage() {
     results: users,
     status: usersStatus,
     loadMore,
-  } = usePaginatedQuery(
-    api.users.getAllUsers,
-    canListUsers ? {} : "skip",
-    { initialNumItems: 50 }
-  );
+  } = usePaginatedQuery(api.users.getAllUsers, canListUsers ? {} : "skip", {
+    initialNumItems: 50,
+  });
   const updateUserRole = useMutation(api.users.updateUserRole);
   const updateUserSector = useMutation(api.users.updateUserSector);
 
@@ -143,7 +141,7 @@ export default function AdminUsersPage() {
       setEditingUser(null);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Error updating user"
+        error instanceof Error ? error.message : "Error updating user",
       );
     } finally {
       setIsLoading(false);
@@ -184,79 +182,95 @@ export default function AdminUsersPage() {
             </div>
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Sector</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead>Album</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => {
-                    const albumPercent = getAlbumPercent(
-                      user.albumCompletionPct
-                    );
-                    const albumProgress = user.albumProgress ?? 0;
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Setor</TableHead>
+                      <TableHead>Cidade</TableHead>
+                      <TableHead>Álbum</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => {
+                      const albumPercent = getAlbumPercent(
+                        user.albumCompletionPct,
+                      );
+                      const albumProgress = user.albumProgress ?? 0;
+                      const hasAlbumSetup =
+                        user.hasCompletedStickerSetup === true;
 
-                    return (
-                      <TableRow key={user._id}>
-                        <TableCell className="font-medium">
-                          {user.name}
-                        </TableCell>
-                        <TableCell>
-                          <RoleBadge role={user.role} />
-                        </TableCell>
-                        <TableCell>{getSectorName(user.sector)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span>{getCityLabel(user.city)}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="min-w-48">
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between gap-3 text-sm">
-                              <span className="flex items-center gap-2 font-medium">
-                                <BookOpen className="h-4 w-4 text-muted-foreground" />
-                                {albumPercent.toFixed(1)}%
-                              </span>
-                              <span className="text-muted-foreground">
-                                {albumProgress} completas
-                              </span>
+                      return (
+                        <TableRow key={user._id}>
+                          <TableCell className="font-medium">
+                            {user.name}
+                          </TableCell>
+                          <TableCell>
+                            <RoleBadge role={user.role} />
+                          </TableCell>
+                          <TableCell>{getSectorName(user.sector)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2 text-sm">
+                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                              <span>{getCityLabel(user.city)}</span>
                             </div>
-                            <Progress value={albumPercent} className="h-2" />
-                            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                              <span>{user.missingCount} faltando</span>
-                              <span>{user.duplicatesCount} repetidas</span>
-                              {!user.hasCompletedStickerSetup && (
-                                <span className="font-medium text-amber-600">
-                                  setup pendente
+                          </TableCell>
+                          <TableCell className="min-w-48">
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between gap-3 text-sm">
+                                <span className="flex items-center gap-2 font-medium">
+                                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                                  {hasAlbumSetup
+                                    ? `${albumPercent.toFixed(1)}%`
+                                    : "Pendente"}
                                 </span>
-                              )}
+                                <span className="text-muted-foreground">
+                                  {hasAlbumSetup
+                                    ? `${albumProgress} completas`
+                                    : "Sem cadastro"}
+                                </span>
+                              </div>
+                              <Progress
+                                value={hasAlbumSetup ? albumPercent : 0}
+                                className="h-2"
+                              />
+                              <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                {hasAlbumSetup ? (
+                                  <>
+                                    <span>{user.missingCount} faltando</span>
+                                    <span>
+                                      {user.duplicatesCount} repetidas
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="font-medium text-amber-600">
+                                    setup pendente
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {canEditUser(user.role) &&
-                            user._id !== currentUser._id && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditUser(user)}
-                              >
-                                Edit
-                              </Button>
-                            )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {canEditUser(user.role) &&
+                              user._id !== currentUser._id && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditUser(user)}
+                                >
+                                  Edit
+                                </Button>
+                              )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
               {usersStatus === "CanLoadMore" && (
                 <div className="flex justify-center pt-4">
                   <Button variant="outline" onClick={() => loadMore(50)}>
@@ -286,7 +300,9 @@ export default function AdminUsersPage() {
           <div className="space-y-4 py-4">
             {isSuperadmin && (
               <div className="space-y-2">
-                <label htmlFor="role-select" className="text-sm font-medium">Role</label>
+                <label htmlFor="role-select" className="text-sm font-medium">
+                  Role
+                </label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
                   <SelectTrigger id="role-select">
                     <SelectValue placeholder="Select a role" />
@@ -310,7 +326,12 @@ export default function AdminUsersPage() {
 
             {selectedRole === "user" && (
               <div className="space-y-2">
-                <label htmlFor="user-sector-select" className="text-sm font-medium">Sector</label>
+                <label
+                  htmlFor="user-sector-select"
+                  className="text-sm font-medium"
+                >
+                  Sector
+                </label>
                 <Select
                   value={selectedSector}
                   onValueChange={setSelectedSector}
