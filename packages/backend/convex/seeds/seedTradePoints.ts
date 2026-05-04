@@ -32,12 +32,8 @@ function mapPointType(
   return "fixed";
 }
 
-function mapStatus(
-  active2026: boolean,
-  category: string
-): "approved" | "inactive" {
-  if (active2026) return "approved";
-  return "inactive";
+function mapStatus(): "approved" {
+  return "approved";
 }
 
 function buildDescription(seed: TradePointSeed): string {
@@ -135,7 +131,7 @@ export const seedTradePoints = internalMutation({
         whatsappLinkStatus: "active",
         suggestedHours: seed.schedule,
         description: buildDescription(seed) || undefined,
-        status: mapStatus(seed.active2026, seed.category),
+        status: mapStatus(),
         requestedBy: systemUser._id,
         confidenceScore: Math.min(confidenceScore + traditionBonus, 1.0),
         lastActivityAt: now,
@@ -155,5 +151,51 @@ export const seedTradePoints = internalMutation({
     }
 
     return { skipped: false, count, errors };
+  },
+});
+
+export const fixInactiveSeedPoints = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const allInactive = await ctx.db
+      .query("tradePoints")
+      .withIndex("by_status", (q) => q.eq("status", "inactive"))
+      .collect();
+
+    // Group by requestedBy to identify the seed user
+    const byUser = new Map<string, number>();
+    for (const p of allInactive) {
+      const key = p.requestedBy;
+      byUser.set(key, (byUser.get(key) ?? 0) + 1);
+    }
+
+    if (byUser.size === 0) {
+      return { updated: 0, message: "No inactive points found" };
+    }
+
+    // Pick the user with the most inactive points (should be the seed user)
+    let seedUserId: string | null = null;
+    let maxCount = 0;
+    for (const [userId, count] of byUser) {
+      if (count > maxCount) {
+        maxCount = count;
+        seedUserId = userId;
+      }
+    }
+
+    if (!seedUserId) {
+      throw new Error("Could not determine seed user from inactive points");
+    }
+
+    let updated = 0;
+    for (const point of allInactive) {
+      if (point.requestedBy === seedUserId) {
+        await ctx.db.patch(point._id, { status: "approved" });
+        updated++;
+      }
+    }
+
+    console.log(`fixInactiveSeedPoints: updated ${updated} points to approved`);
+    return { updated, seedUserId, totalInactive: allInactive.length };
   },
 });

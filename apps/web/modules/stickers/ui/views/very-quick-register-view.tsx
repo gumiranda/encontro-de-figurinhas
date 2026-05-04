@@ -5,7 +5,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeft, ArrowRight, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { GlobalCheckbox } from "../components/global-checkbox";
 import { SectionAccordion } from "../components/section-accordion";
@@ -82,6 +82,9 @@ export function VeryQuickRegisterView({
     clearAll,
   } = useStickers();
 
+  const duplicatesSet = useMemo(() => new Set(duplicates), [duplicates]);
+  const missingSet = useMemo(() => new Set(missing), [missing]);
+
   const tabConfig: Record<Tab, TabConfig> = {
     duplicates: {
       list: duplicates,
@@ -110,9 +113,21 @@ export function VeryQuickRegisterView({
   const current = tabConfig[activeTab];
 
   const handleToggle = (num: number, action: "add" | "remove") => {
-    const { add, remove } = tabConfig[activeTab];
-    if (action === "add") add([num]);
-    else remove(num);
+    if (action === "add") {
+      if (activeTab === "duplicates" && missingSet.has(num)) {
+        removeMissing(num);
+        addDuplicates([num]);
+      } else if (activeTab === "missing" && duplicatesSet.has(num)) {
+        removeDuplicate(num);
+        addMissing([num]);
+      } else {
+        const { add } = tabConfig[activeTab];
+        add([num]);
+      }
+    } else {
+      const { remove } = tabConfig[activeTab];
+      remove(num);
+    }
   };
 
   const handleBulkAction = (sectionCode: string, action: "all" | "none" | "invert") => {

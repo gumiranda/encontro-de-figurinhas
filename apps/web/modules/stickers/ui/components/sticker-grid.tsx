@@ -228,8 +228,7 @@ function StickerGridBase({
                       key={num}
                       type="button"
                       data-sticker-num={num}
-                      onClick={state !== "blocked" ? handleStickerButtonClick : undefined}
-                      disabled={state === "blocked"}
+                      onClick={handleStickerButtonClick}
                       title={extInfo?.playerName}
                       className={cn(
                         "relative aspect-[3/4] rounded-lg border-2 p-1.5 transition-all duration-200",
@@ -315,9 +314,7 @@ function StickerGridBase({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">
-                  Já está em {mode === "duplicates" ? "Faltantes" : "Repetidas"}.
-                  <br />
-                  Remova de lá primeiro.
+                  Clique para mover para {mode === "duplicates" ? "Repetidas" : "Faltantes"}.
                 </p>
               </TooltipContent>
             </Tooltip>

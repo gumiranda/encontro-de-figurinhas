@@ -167,10 +167,16 @@ export function QuickRegisterView({
     (num: number) => {
       if (activeTab === "duplicates") {
         if (duplicatesSet.has(num)) removeDuplicate(num);
-        else if (!missingSet.has(num)) addDuplicates([num]);
+        else {
+          if (missingSet.has(num)) removeMissing(num);
+          addDuplicates([num]);
+        }
       } else {
         if (missingSet.has(num)) removeMissing(num);
-        else if (!duplicatesSet.has(num)) addMissing([num]);
+        else {
+          if (duplicatesSet.has(num)) removeDuplicate(num);
+          addMissing([num]);
+        }
       }
     },
     [

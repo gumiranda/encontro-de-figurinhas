@@ -64,8 +64,6 @@ function StickerTileBase({
       data-sticker-num={num}
       data-state={state}
       onClick={onClick}
-      disabled={isBlocked}
-      aria-disabled={isBlocked || undefined}
       aria-pressed={state === "have" || state === "need" || undefined}
       aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relLabel}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       title={playerName}

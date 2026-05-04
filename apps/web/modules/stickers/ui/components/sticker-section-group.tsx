@@ -396,7 +396,6 @@ function StickerSectionGroupBase({
                         type="button"
                         data-sticker-num={num}
                         onClick={handleTileClick}
-                        disabled={state === "blocked"}
                         title={extInfo?.playerName}
                         className={cn(
                           "relative aspect-[3/4] rounded-lg border-2 p-1.5 transition-all duration-200",
@@ -497,7 +496,6 @@ function StickerSectionGroupBase({
                   type="button"
                   data-sticker-num={num}
                   onClick={handleTileClick}
-                  disabled={state === "blocked"}
                   title={labelTitle}
                   aria-label={
                     cc
