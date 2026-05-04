@@ -97,8 +97,9 @@ export const recomputeMatchCache = internalMutation({
   args: {
     userId: v.id("users"),
     cursor: v.optional(v.union(v.string(), v.null())),
+    specialNumbers: v.optional(v.array(v.number())),
   },
-  handler: async (ctx, { userId, cursor }) => {
+  handler: async (ctx, { userId, cursor, specialNumbers }) => {
     const me = await ctx.db.get(userId);
     if (!me) return;
 
@@ -143,7 +144,10 @@ export const recomputeMatchCache = internalMutation({
 
     const cityId = me.cityId;
 
-    const specialSet = await buildSpecialSet(ctx);
+    const specialSet =
+      specialNumbers !== undefined
+        ? new Set(specialNumbers)
+        : await buildSpecialSet(ctx);
 
     const myDupSorted = [...(me.duplicates ?? [])].sort((a, b) => a - b);
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
@@ -153,7 +157,9 @@ export const recomputeMatchCache = internalMutation({
 
     const page = await ctx.db
       .query("users")
-      .withIndex("by_city", (q) => q.eq("cityId", cityId))
+      .withIndex("by_sticker_setup", (q) =>
+        q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+      )
       .paginate({ numItems: PAGE_SIZE, cursor: cursor ?? null });
 
     for (const candidate of page.page) {
@@ -209,6 +215,7 @@ export const recomputeMatchCache = internalMutation({
       await ctx.scheduler.runAfter(0, internal.matches.recomputeMatchCache, {
         userId,
         cursor: page.continueCursor,
+        specialNumbers: [...specialSet],
       });
       return;
     }
@@ -305,7 +312,9 @@ export const batchRecomputeMatches = internalMutation({
     if (cityId !== undefined) {
       const page = await ctx.db
         .query("users")
-        .withIndex("by_city", (q) => q.eq("cityId", cityId))
+        .withIndex("by_sticker_setup", (q) =>
+          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+        )
         .paginate({ numItems: BATCH_RECOMPUTE_PAGE_SIZE, cursor: cursor ?? null });
 
       let scheduled = 0;
