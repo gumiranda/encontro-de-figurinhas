@@ -483,7 +483,7 @@ export const getRelated = query({
         q.eq("category", currentCategory).eq("status", "published")
       )
       .order("desc")
-      .take(maxResults + 8);
+      .take(maxResults + 1);
 
     const scored = candidates
       .filter((p) => p.slug !== slug)
