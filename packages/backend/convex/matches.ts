@@ -1021,34 +1021,90 @@ export const getFullStickerOverlap = query({
  * Internal: backfill denormalized user fields into precomputedMatches rows.
  * Run periodically (e.g. nightly cron) or after user profile changes.
  */
+async function syncDenormForUser(
+  ctx: MutationCtx,
+  userId: Id<"users">
+): Promise<{ updated: number }> {
+  const user = await ctx.db.get(userId);
+  if (!user || user.isBanned || user.isShadowBanned) return { updated: 0 };
+
+  const isVerified =
+    user.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
+    (user.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+
+  const rows = await ctx.db
+    .query("precomputedMatches")
+    .withIndex("by_matchedUser", (q) => q.eq("matchedUserId", userId))
+    .take(200);
+
+  for (const row of rows) {
+    await ctx.db.patch(row._id, {
+      matchedDisplayNickname: getUserDisplayName(user),
+      matchedAvatarSeed: userId,
+      matchedAlbumProgress: user.albumProgress ?? 0,
+      matchedTotalTrades: user.totalTrades ?? 0,
+      matchedReliabilityScore: user.reliabilityScore,
+      matchedIsVerified: isVerified,
+    });
+  }
+
+  return { updated: rows.length };
+}
+
 export const syncPrecomputedMatchesDenorm = internalMutation({
   args: {
     userId: v.id("users"),
   },
   handler: async (ctx, { userId }) => {
-    const user = await ctx.db.get(userId);
-    if (!user || user.isBanned || user.isShadowBanned) return { updated: 0 };
+    return syncDenormForUser(ctx, userId);
+  },
+});
 
-    const isVerified =
-      user.reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
-      (user.totalTrades ?? 0) >= VERIFIED_TRADES_THRESHOLD;
+const DENORM_BACKFILL_BATCH = 200;
+const DENORM_BACKFILL_MAX_CHUNKS = 100;
 
-    const rows = await ctx.db
-      .query("precomputedMatches")
-      .withIndex("by_matchedUser", (q) => q.eq("matchedUserId", userId))
-      .take(200);
+/**
+ * One-shot backfill: denormalize user fields into all precomputedMatches rows.
+ * Run with: npx convex run matches:backfillPrecomputedMatchesDenorm
+ */
+export const backfillPrecomputedMatchesDenorm = internalMutation({
+  args: {
+    cursor: v.optional(v.string()),
+    chunk: v.optional(v.number()),
+    totalUpdated: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor, chunk = 0, totalUpdated = 0 }) => {
+    const page = await ctx.db
+      .query("users")
+      .paginate({ numItems: DENORM_BACKFILL_BATCH, cursor: cursor ?? null });
 
-    for (const row of rows) {
-      await ctx.db.patch(row._id, {
-        matchedDisplayNickname: getUserDisplayName(user),
-        matchedAvatarSeed: userId,
-        matchedAlbumProgress: user.albumProgress ?? 0,
-        matchedTotalTrades: user.totalTrades ?? 0,
-        matchedReliabilityScore: user.reliabilityScore,
-        matchedIsVerified: isVerified,
-      });
+    let batchUpdated = 0;
+    for (const u of page.page) {
+      const res = await syncDenormForUser(ctx, u._id);
+      batchUpdated += res.updated;
     }
 
-    return { updated: rows.length };
+    const newTotal = totalUpdated + batchUpdated;
+
+    if (!page.isDone) {
+      const nextChunk = chunk + 1;
+      if (nextChunk >= DENORM_BACKFILL_MAX_CHUNKS) {
+        console.error("backfillPrecomputedMatchesDenorm: hit MAX_CHUNKS guard", {
+          chunk: nextChunk,
+        });
+        return { touched: batchUpdated, totalUpdated: newTotal, aborted: true };
+      }
+      await ctx.scheduler.runAfter(
+        0,
+        internal.matches.backfillPrecomputedMatchesDenorm,
+        {
+          cursor: page.continueCursor,
+          chunk: nextChunk,
+          totalUpdated: newTotal,
+        }
+      );
+    }
+
+    return { touched: batchUpdated, totalUpdated: newTotal, done: page.isDone };
   },
 });
