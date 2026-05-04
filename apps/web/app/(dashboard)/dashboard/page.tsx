@@ -4,6 +4,12 @@ import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@workspace/ui/components/card";
 import {
+  Banner,
+  BannerIcon,
+  BannerTitle,
+  BannerAction,
+} from "@workspace/ui/components/kibo-ui/banner";
+import {
   Book,
   ArrowLeftRight,
   MessageSquare,
@@ -12,7 +18,8 @@ import {
   Users,
   User,
   Settings,
-  Plus
+  Plus,
+  ListPlus,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -76,6 +83,8 @@ const shortcuts = [
 export default function DashboardPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
 
+  const hasNoDuplicates = (currentUser?.duplicates?.length ?? 0) === 0;
+
   return (
     <div className="space-y-6">
       <div>
@@ -84,6 +93,16 @@ export default function DashboardPage() {
           Bem-vindo{currentUser?.name ? `, ${currentUser.name}` : ""}!
         </p>
       </div>
+
+      {hasNoDuplicates && (
+        <Banner className="bg-amber-500 text-amber-950" inset>
+          <BannerIcon icon={ListPlus} className="border-amber-950/20 bg-amber-950/10" />
+          <BannerTitle>Você ainda não cadastrou figurinhas repetidas. Cadastre para começar a trocar!</BannerTitle>
+          <BannerAction asChild className="border-amber-950/30 text-amber-950 hover:bg-amber-950/10 hover:text-amber-950">
+            <Link href="/cadastrar-figurinhas/quick">Cadastrar figurinhas</Link>
+          </BannerAction>
+        </Banner>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {shortcuts.map((shortcut) => (
