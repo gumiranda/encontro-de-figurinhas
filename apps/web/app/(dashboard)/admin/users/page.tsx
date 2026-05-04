@@ -35,7 +35,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { Loader2, Users } from "lucide-react";
+import { Progress } from "@workspace/ui/components/progress";
+import { BookOpen, Loader2, MapPin, Users } from "lucide-react";
 import { toast } from "sonner";
 import { ROLES, SECTORS } from "@/lib/constants";
 import { RoleBadge } from "@/components/role-badge";
@@ -44,6 +45,14 @@ function getSectorName(sector: string | undefined) {
   if (!sector) return "-";
   const found = SECTORS.find((s) => s.id === sector);
   return found?.name ?? sector;
+}
+
+function getCityLabel(city: { name: string; state: string } | null) {
+  return city ? `${city.name} (${city.state})` : "Sem cidade";
+}
+
+function getAlbumPercent(value: number | undefined): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
 export default function AdminUsersPage() {
@@ -181,29 +190,71 @@ export default function AdminUsersPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Sector</TableHead>
+                    <TableHead>City</TableHead>
+                    <TableHead>Album</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell><RoleBadge role={user.role} /></TableCell>
-                      <TableCell>{getSectorName(user.sector)}</TableCell>
-                      <TableCell className="text-right">
-                        {canEditUser(user.role) &&
-                          user._id !== currentUser._id && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditUser(user)}
-                            >
-                              Edit
-                            </Button>
-                          )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {users.map((user) => {
+                    const albumPercent = getAlbumPercent(
+                      user.albumCompletionPct
+                    );
+                    const albumProgress = user.albumProgress ?? 0;
+
+                    return (
+                      <TableRow key={user._id}>
+                        <TableCell className="font-medium">
+                          {user.name}
+                        </TableCell>
+                        <TableCell>
+                          <RoleBadge role={user.role} />
+                        </TableCell>
+                        <TableCell>{getSectorName(user.sector)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm">
+                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            <span>{getCityLabel(user.city)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="min-w-48">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                              <span className="flex items-center gap-2 font-medium">
+                                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                                {albumPercent.toFixed(1)}%
+                              </span>
+                              <span className="text-muted-foreground">
+                                {albumProgress} completas
+                              </span>
+                            </div>
+                            <Progress value={albumPercent} className="h-2" />
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                              <span>{user.missingCount} faltando</span>
+                              <span>{user.duplicatesCount} repetidas</span>
+                              {!user.hasCompletedStickerSetup && (
+                                <span className="font-medium text-amber-600">
+                                  setup pendente
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {canEditUser(user.role) &&
+                            user._id !== currentUser._id && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditUser(user)}
+                              >
+                                Edit
+                              </Button>
+                            )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
               {usersStatus === "CanLoadMore" && (

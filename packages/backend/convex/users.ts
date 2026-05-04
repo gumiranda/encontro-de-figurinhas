@@ -113,7 +113,32 @@ export const getAllUsers = query({
     if (!isAdmin(currentUser.role)) {
       throw new Error("Admin access required");
     }
-    return await ctx.db.query("users").paginate(paginationOpts);
+
+    const usersPage = await ctx.db.query("users").paginate(paginationOpts);
+    const page = await Promise.all(
+      usersPage.page.map(async (user) => {
+        const city = user.cityId ? await ctx.db.get(user.cityId) : null;
+        const duplicatesCount = user.duplicates?.length ?? 0;
+        const missingCount = user.missing?.length ?? 0;
+
+        return {
+          ...user,
+          city: city
+            ? {
+                name: city.name,
+                state: city.state,
+              }
+            : null,
+          duplicatesCount,
+          missingCount,
+        };
+      })
+    );
+
+    return {
+      ...usersPage,
+      page,
+    };
   },
 });
 
