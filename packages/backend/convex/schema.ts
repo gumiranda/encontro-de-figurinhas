@@ -456,6 +456,11 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_status_publishedAt", ["status", "publishedAt"])
     .index("by_category_status", ["category", "status"])
+    .index("by_category_status_publishedAt", [
+      "category",
+      "status",
+      "publishedAt",
+    ])
     .index("by_series_episode", ["seriesId", "seriesEpisodeNumber"]),
 
   blogSeries: defineTable({

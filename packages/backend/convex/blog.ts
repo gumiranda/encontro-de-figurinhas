@@ -444,7 +444,12 @@ export const getTrending = query({
 });
 
 export const getRelated = query({
-  args: { slug: v.string(), limit: v.optional(v.number()) },
+  args: {
+    slug: v.string(),
+    category: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    limit: v.optional(v.number()),
+  },
   returns: v.array(
     v.object({
       _id: v.id("blogPosts"),
@@ -455,22 +460,30 @@ export const getRelated = query({
       publishedAt: v.optional(v.number()),
     })
   ),
-  handler: async (ctx, { slug, limit }) => {
-    const maxResults = limit ?? 3;
-    const current = await ctx.db
-      .query("blogPosts")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
-      .unique();
+  handler: async (ctx, { slug, category, tags, limit }) => {
+    const maxResults = Math.min(limit ?? 3, 6);
+    let currentCategory = category;
+    let currentTags = new Set((tags ?? []).map((t) => t.toLowerCase().trim()));
 
-    if (!current || current.status !== "published") return [];
+    if (!currentCategory) {
+      const current = await ctx.db
+        .query("blogPosts")
+        .withIndex("by_slug", (q) => q.eq("slug", slug))
+        .unique();
 
-    const currentTags = new Set(current.tags.map((t) => t.toLowerCase().trim()));
+      if (!current || current.status !== "published") return [];
+
+      currentCategory = current.category;
+      currentTags = new Set(current.tags.map((t) => t.toLowerCase().trim()));
+    }
 
     const candidates = await ctx.db
       .query("blogPosts")
-      .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
+      .withIndex("by_category_status_publishedAt", (q) =>
+        q.eq("category", currentCategory).eq("status", "published")
+      )
       .order("desc")
-      .take(50);
+      .take(maxResults + 8);
 
     const scored = candidates
       .filter((p) => p.slug !== slug)

@@ -47,11 +47,16 @@ async function loadPost(slug: string) {
   return convexServer.query(api.blog.getBySlug, { slug });
 }
 
-async function loadRelated(slug: string) {
+async function loadRelated(slug: string, category: string, tags: string[]) {
   "use cache";
   cacheTag(`blog:${slug}`);
   cacheLife("hours");
-  return convexServer.query(api.blog.getRelated, { slug, limit: 3 });
+  return convexServer.query(api.blog.getRelated, {
+    slug,
+    category,
+    tags,
+    limit: 3,
+  });
 }
 
 export async function generateStaticParams() {
@@ -177,7 +182,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const [relatedPosts, metrics] = await Promise.all([
-    loadRelated(slug),
+    loadRelated(slug, post.category, post.tags),
     loadMetrics(post._id),
   ]);
 
