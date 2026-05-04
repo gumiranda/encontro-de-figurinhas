@@ -89,13 +89,6 @@ export async function seedAlbumData(ctx: MutationCtx) {
     });
   }
 
-  // Update siteStats
-  const stats = await ensureSiteStats(ctx);
-  await ctx.db.patch(stats._id, {
-    totalStickers: albumData.totalStickers,
-    albumYear: albumData.year,
-  });
-
   // Seed stickerDetails inline
   const allStickers: Array<{
     sectionCode: string;
@@ -147,6 +140,17 @@ export async function seedAlbumData(ctx: MutationCtx) {
       });
     }
   }
+
+  // Update siteStats
+  const stats = await ensureSiteStats(ctx);
+  const specialNumbers = allStickers
+    .filter((s) => s.isGolden || s.isLegend || s.isExtra)
+    .map((s) => s.absoluteNum);
+  await ctx.db.patch(stats._id, {
+    totalStickers: albumData.totalStickers,
+    albumYear: albumData.year,
+    specialNumbers,
+  });
 
   for (const sticker of allStickers) {
     const existing = await ctx.db

@@ -28,6 +28,7 @@ export async function ensureSiteStats(ctx: MutationCtx) {
     lastReconcileAt: 0,
     totalStickers: undefined,
     albumYear: undefined,
+    specialNumbers: undefined,
   });
   const created = await ctx.db.get(id);
   if (!created) throw new Error("siteStats insert failed");
@@ -36,6 +37,13 @@ export async function ensureSiteStats(ctx: MutationCtx) {
 
 export async function readSiteStatsOrNull(ctx: QueryCtx) {
   return await ctx.db.query("siteStats").unique();
+}
+
+export async function readSpecialNumbersFromSiteStats(
+  ctx: QueryCtx
+): Promise<number[]> {
+  const stats = await readSiteStatsOrNull(ctx);
+  return stats?.specialNumbers ?? [];
 }
 
 export const initSiteStats = internalMutation({
@@ -49,6 +57,7 @@ export const initSiteStats = internalMutation({
       lastReconcileAt: 0,
       totalStickers: undefined,
       albumYear: undefined,
+      specialNumbers: undefined,
     });
     return { ok: true, created: true, id };
   },

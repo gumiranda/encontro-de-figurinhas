@@ -26,15 +26,4 @@ export function tradePointReportTargetKey(tradePointId: string): string {
   return `tradePoint:${tradePointId}`;
 }
 
-export async function countExtraStickersOwned(
-  ctx: { db: QueryCtx["db"] },
-  user: Doc<"users">
-): Promise<number> {
-  const all = await ctx.db.query("stickerDetail").collect();
-  const missing = new Set(user.missing ?? []);
-  let count = 0;
-  for (const s of all) {
-    if (s.isExtra && !missing.has(s.absoluteNum)) count++;
-  }
-  return count;
-}
+

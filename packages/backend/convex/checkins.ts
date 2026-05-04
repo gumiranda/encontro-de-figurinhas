@@ -232,7 +232,7 @@ export const listPresentAtMyPoints = query({
     const myMemberships = await ctx.db
       .query("userTradePoints")
       .withIndex("by_user", (q) => q.eq("userId", auth.user._id))
-      .take(100);
+      .take(20);
 
     const checkinsByPoint = await Promise.all(
       myMemberships.map((m) =>

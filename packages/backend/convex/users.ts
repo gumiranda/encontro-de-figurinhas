@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
 import { Role, isValidRole, isValidSector } from "./lib/types";
 import { getAuthenticatedUser, isAdmin, requireAuth } from "./lib/auth";
 import { haversine, isInBrazil } from "./lib/geo";
@@ -117,25 +118,28 @@ export const getAllUsers = query({
     }
 
     const usersPage = await ctx.db.query("users").paginate(paginationOpts);
-    const page = await Promise.all(
-      usersPage.page.map(async (user) => {
-        const city = user.cityId ? await ctx.db.get(user.cityId) : null;
-        const duplicatesCount = user.duplicates?.length ?? 0;
-        const missingCount = user.missing?.length ?? 0;
-
-        return {
-          ...user,
-          city: city
-            ? {
-                name: city.name,
-                state: city.state,
-              }
-            : null,
-          duplicatesCount,
-          missingCount,
-        };
-      })
+    const cityIds = [
+      ...new Set(usersPage.page.map((u) => u.cityId).filter(Boolean)),
+    ] as Id<"cities">[];
+    const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));
+    const cityById = new Map(
+      cities.filter((c): c is Doc<"cities"> => c !== null).map((c) => [c._id, c])
     );
+
+    const page = usersPage.page.map((user) => {
+      const city = user.cityId ? cityById.get(user.cityId) ?? null : null;
+      return {
+        ...user,
+        city: city
+          ? {
+              name: city.name,
+              state: city.state,
+            }
+          : null,
+        duplicatesCount: user.duplicates?.length ?? 0,
+        missingCount: user.missing?.length ?? 0,
+      };
+    });
 
     return {
       ...usersPage,

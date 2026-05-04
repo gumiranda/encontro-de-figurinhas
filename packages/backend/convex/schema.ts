@@ -317,7 +317,8 @@ export default defineSchema({
     .index("by_absolute", ["absoluteNum"])
     .index("by_slug", ["slug"])
     .index("by_name_normalized", ["nameNormalized"])
-    .index("by_variant", ["variant"]),
+    .index("by_variant", ["variant"])
+    .searchIndex("search_name", { searchField: "name" }),
 
   userMatchCache: defineTable({
     userId: v.id("users"),
@@ -525,6 +526,7 @@ export default defineSchema({
     lastReconcileAt: v.optional(v.number()),
     totalStickers: v.optional(v.number()),
     albumYear: v.optional(v.number()),
+    specialNumbers: v.optional(v.array(v.number())),
   }),
 
   postMetrics: defineTable({

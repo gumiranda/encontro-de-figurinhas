@@ -8,6 +8,7 @@ import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
 import { computeStickerOverlap } from "./lib/stickerOverlap";
 import { getUserDisplayName } from "./lib/userDisplay";
+import { readSpecialNumbersFromSiteStats } from "./siteStats";
 
 const PAGE_SIZE = 500;
 const TOP_N = 50;
@@ -53,15 +54,9 @@ function scoreOf(ihave: number, ineed: number): number {
   return Math.min(ihave, ineed) * 2 + Math.max(ihave, ineed);
 }
 
-async function buildSpecialSet(ctx: { db: QueryCtx["db"] }): Promise<Set<number>> {
-  const all = await ctx.db.query("stickerDetail").collect();
-  const set = new Set<number>();
-  for (const s of all) {
-    if (s.isGolden || s.isLegend || s.isExtra) {
-      set.add(s.absoluteNum);
-    }
-  }
-  return set;
+async function buildSpecialSet(ctx: QueryCtx): Promise<Set<number>> {
+  const nums = await readSpecialNumbersFromSiteStats(ctx);
+  return new Set(nums);
 }
 
 async function persistCache(
@@ -436,18 +431,18 @@ export const listMyMatches = query({
             .withIndex("by_user_layer_bidirectional", (q) =>
               q.eq("userId", userId).eq("layer", layer).eq("isBidirectional", true)
             )
-            .take(500)
+            .take(100)
         : await ctx.db
             .query("precomputedMatches")
             .withIndex("by_user_layer", (q) => q.eq("userId", userId).eq("layer", layer))
-            .take(500);
+            .take(100);
       rows.push(...chunk);
     }
 
     const hiddenInteractions = await ctx.db
       .query("userMatchInteractions")
       .withIndex("by_user_hidden", (q) => q.eq("userId", userId).eq("isHidden", true))
-      .take(500);
+      .take(100);
     const hiddenSet = new Set(
       hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`)
     );

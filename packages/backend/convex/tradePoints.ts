@@ -188,7 +188,7 @@ export const getMapView = query({
     const rawPoints = await ctx.db
       .query("tradePoints")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
-      .collect();
+      .take(200);
 
     const points = rawPoints
       .map((p) => ({

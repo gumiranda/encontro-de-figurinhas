@@ -137,17 +137,7 @@ export const getAllStickerNumbers = query({
   },
 });
 
-export const listStickersForSitemap = query({
-  args: {},
-  handler: async (ctx) => {
-    const details = await ctx.db.query("stickerDetail").collect();
-    return details.map((d) => ({
-      number: d.absoluteNum,
-      teamCode: d.sectionCode,
-      isSpecial: (d.isGolden ?? false) || (d.isLegend ?? false) || (d.isExtra ?? false),
-    }));
-  },
-});
+export const ;
 
 export const getRelatedStickers = query({
   args: { number: v.number(), limit: v.optional(v.number()) },
@@ -167,7 +157,7 @@ export const getRelatedStickers = query({
     const allStickers = await ctx.db
       .query("stickerDetail")
       .withIndex("by_section_rel", (q) => q.eq("sectionCode", current.sectionCode))
-      .collect();
+      .take(50);
 
     const others = allStickers.filter((s) => s.absoluteNum !== number);
 
@@ -225,18 +215,12 @@ export const searchStickersByName = query({
   handler: async (ctx, { searchQuery }) => {
     if (searchQuery.length < 2) return [];
 
-    const normalized = searchQuery
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "");
+    const results = await ctx.db
+      .query("stickerDetail")
+      .withSearchIndex("search_name", (q) => q.search("name", searchQuery))
+      .take(20);
 
-    // Full scan - Convex has no LIKE/contains. For production scale, use Meilisearch.
-    // ~1k docs is small enough for full scan + JS filter.
-    const all = await ctx.db.query("stickerDetail").collect();
-
-    return all
-      .filter((r) => r.nameNormalized.includes(normalized))
-      .slice(0, 20);
+    return results;
   },
 });
 
@@ -250,12 +234,7 @@ export const searchStickersByVariant = query({
   },
 });
 
-export const getAllStickerDetails = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("stickerDetail").collect();
-  },
-});
+export const ;
 
 export const getAllStickerDetailsForSitemap = query({
   args: {},
@@ -302,7 +281,7 @@ export const getTeamStickers = query({
     const stickers = await ctx.db
       .query("stickerDetail")
       .withIndex("by_section_rel", (q) => q.eq("sectionCode", sectionCode.toUpperCase()))
-      .collect();
+      .take(50);
 
     return stickers
       .sort((a, b) => a.relativeNum - b.relativeNum)
