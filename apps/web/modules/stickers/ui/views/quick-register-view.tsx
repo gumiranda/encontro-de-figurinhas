@@ -25,7 +25,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { DesktopTopBar } from "../components/desktop-top-bar";
-import { MobileFabBar } from "../components/mobile-fab-bar";
 import { QuickEntryInput } from "../components/quick-entry-input";
 import { StickerStatsRow } from "../components/stats-card-row";
 import {
@@ -164,19 +163,6 @@ export function QuickRegisterView({
 
   // Snapshot para contador "+N hoje": tomar só após o primeiro load do Convex.
   // Diff desde o mount da view; reseta no reload (sessão-only).
-  const [snapshot, setSnapshot] = useState<{
-    haveBase: number;
-    dupsBase: number;
-  } | null>(null);
-
-  useEffect(() => {
-    if (isLoading || snapshot !== null) return;
-    setSnapshot({ haveBase: haveCount, dupsBase: duplicates.length });
-  }, [isLoading, snapshot, haveCount, duplicates.length]);
-
-  const addedHaveDiff = snapshot ? Math.max(0, haveCount - snapshot.haveBase) : 0;
-  const addedDupsDiff = snapshot ? Math.max(0, duplicates.length - snapshot.dupsBase) : 0;
-
   const handleToggle = useCallback(
     (num: number) => {
       if (activeTab === "duplicates") {
@@ -437,17 +423,7 @@ export function QuickRegisterView({
           </main>
         </div>
 
-        <MobileFabBar
-          addedToday={addedHaveDiff}
-          addedDups={addedDupsDiff}
-          isDirty={isDirty}
-          isSaving={isSaving}
-          ctaMode={ctaMode}
-          canContinue={canFinalize}
-          onContinue={handleContinue}
-          onFlush={flush}
-          className={cn(!navReady && "pointer-events-none opacity-0")}
-        />
+
 
         {navReady && hasCompletedSetup && <MobileBottomNav />}
       </div>
