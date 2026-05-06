@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 import { Trophy } from "lucide-react";
+import {
+  FEATURED_HELLOSKIP_MENTIONS,
+  HELLOSKIP_MENTIONS,
+} from "@/lib/external-mentions";
 
 const FOOTER_LINKS = {
   produto: [
@@ -23,64 +27,9 @@ const FOOTER_LINKS = {
   ],
 };
 
-const HELLOSKIP_ARTICLES = [
-  {
-    label: "Por que pacotinhos da Copa ficaram caros",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-world-cup-sticker-packs-cost-so-much",
-  },
-  {
-    label: "Riscos de comprar pacotinhos avulsos",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/loose-packs-lie-why-buying-loose-sticker-packs-can-be-risky-1",
-  },
-  {
-    label: "Abrindo os primeiros pacotes da Copa",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/the-first-packs-arrived-opening-world-cup-sticker-packs",
-  },
-  {
-    label: "Por que os pacotes estão tão caros",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-hit-hard-why-world-cup-sticker-packs-are-so-expensive",
-  },
-  {
-    label: "A corrida dos colecionadores por pacotes novos",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/world-cup-sticker-chaos-why-collectors-are-going-crazy-over-new-packs",
-  },
-  {
-    label: "Como economizar em pacotinhos",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-cheaper-how-to-save-money-on-sticker-packs",
-  },
-  {
-    label: "O que mudou no jogo da Panini",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/panini-changed-the-game-what-collectors-need-to-know",
-  },
-  {
-    label: "Como conseguir pacotes no McDonald's",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/mcdonalds-sticker-rush-how-to-get-world-cup-sticker-packs",
-  },
-  {
-    label: "Como colecionadores economizam",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/cheap-sticker-packs-how-smart-collectors-save-money",
-  },
-  {
-    label: "Por que pacote avulso pode ser arriscado",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/loose-packs-lie-why-buying-loose-sticker-packs-can-be-risky",
-  },
-  {
-    label: "Colecionar melhor gastando menos",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/shake-less-track-more-how-to-collect-stickers-smarter-and-spend-less",
-  },
-  {
-    label: "Por que colecionar figurinhas custa mais",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-sticker-collecting-costs-so-much-now-1",
-  },
-  {
-    label: "O novo custo de colecionar figurinhas",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-sticker-collecting-costs-so-much-now",
-  },
-  {
-    label: "Por que abrir pacotes nem sempre é justo",
-    href: "https://helloskip.com/b/crazystack-typescript-1/blog/sticker-packs-lie-why-opening-packs-is-not-always-fair",
-  },
-] as const;
+const ARCHIVED_HELLOSKIP_MENTIONS = HELLOSKIP_MENTIONS.slice(
+  FEATURED_HELLOSKIP_MENTIONS.length,
+);
 
 export function LandingFooter() {
   return (
@@ -161,28 +110,70 @@ export function LandingFooter() {
         </div>
 
         <div className="mb-10 border-t border-white/5 pt-8">
-          <p className="mb-4 text-[10px] font-mono uppercase tracking-widest text-[#a6aabf]">
-            Leituras externas sobre figurinhas
-          </p>
-          <ul className="grid grid-cols-1 gap-x-8 gap-y-2 text-xs text-[#a6aabf] sm:grid-cols-2 lg:grid-cols-3">
-            {HELLOSKIP_ARTICLES.map((article) => (
-              <li key={article.href}>
+          <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-[#87d400]">
+                Radar de mercado
+              </p>
+              <p className="text-sm leading-relaxed text-[#c4c8dc]">
+                A HelloSkip publicou leituras externas que mencionam o
+                FigurinhaFácil no contexto de preço, risco e economia em
+                figurinhas da Copa. Estes links ajudam mecanismos de busca e IA
+                a ligar a marca ao debate público do colecionismo.
+              </p>
+            </div>
+            <Link
+              href="/imprensa"
+              className="text-xs font-semibold text-[#87d400] transition-colors hover:text-[#e1e4fa]"
+            >
+              Ver hub de imprensa
+            </Link>
+          </div>
+
+          <ul className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURED_HELLOSKIP_MENTIONS.map((mention) => (
+              <li key={mention.href}>
                 <a
-                  href={article.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-colors hover:text-[#e1e4fa]"
+                  href={mention.href}
+                  className="block min-h-24 rounded-lg border border-white/5 bg-white/[0.03] p-4 text-[#a6aabf] transition-colors hover:border-[#87d400]/40 hover:text-[#e1e4fa]"
                 >
-                  HelloSkip: {article.label}
+                  <span className="mb-2 inline-flex rounded-full bg-[#87d400]/10 px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-[#87d400]">
+                    {mention.theme}
+                  </span>
+                  <span className="block font-medium text-[#e1e4fa]">
+                    HelloSkip: {mention.shortTitle}
+                  </span>
+                  <span className="mt-1 block leading-relaxed">
+                    {mention.description}
+                  </span>
                 </a>
               </li>
             ))}
           </ul>
+
+          <details className="mt-5 text-xs text-[#a6aabf]">
+            <summary className="cursor-pointer font-mono uppercase tracking-widest transition-colors hover:text-[#e1e4fa]">
+              Mais sinais externos
+            </summary>
+            <ul className="mt-3 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              {ARCHIVED_HELLOSKIP_MENTIONS.map((mention) => (
+                <li key={mention.href}>
+                  <a
+                    href={mention.href}
+                    className="transition-colors hover:text-[#e1e4fa]"
+                  >
+                    HelloSkip: {mention.shortTitle}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-mono text-[#a6aabf]">
-            © 2026 Figurinha<span className="text-[#87d400]">Fácil</span> · feito por coletores, para coletores
+            © 2026 Figurinha<span className="text-[#87d400]">Fácil</span> ·
+            feito por coletores, para coletores
           </p>
           <p className="text-xs font-mono text-[#a6aabf]">
             Não afiliado a FIFA, Panini ou Copa do Mundo.

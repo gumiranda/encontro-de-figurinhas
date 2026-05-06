@@ -91,7 +91,7 @@ async function loadBlogForSitemap() {
       api.blog.listForSitemap,
       {
         paginationOpts: { numItems: 1000, cursor },
-      }
+      },
     );
     all.push(...result.page);
     if (result.isDone) break;
@@ -152,6 +152,12 @@ export function getStaticSitemap(now = new Date()): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/imprensa`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
     {
       url: `${BASE_URL}/termos`,
@@ -223,7 +229,7 @@ export function getStaticSitemap(now = new Date()): MetadataRoute.Sitemap {
 }
 
 export async function getCitySitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const cities = await loadCitiesForSitemap();
   return cities.map((c) => ({
@@ -245,7 +251,7 @@ export async function getTradePointSitemap(): Promise<MetadataRoute.Sitemap> {
 }
 
 export async function getStateSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const states = await loadStatesForSitemap();
   return states.map((s) => ({
@@ -257,7 +263,7 @@ export async function getStateSitemap(
 }
 
 export async function getStickerSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const stickers = await loadStickersForSitemap();
   return stickers.map((s) => ({
@@ -269,7 +275,7 @@ export async function getStickerSitemap(
 }
 
 export async function getTeamSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const teams = await loadTeamsForSitemap();
   return teams.map((slug) => ({
@@ -281,7 +287,7 @@ export async function getTeamSitemap(
 }
 
 export async function getRareSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const teams = await loadTeamsForSitemap();
   return teams.map((slug) => ({
@@ -293,7 +299,7 @@ export async function getRareSitemap(
 }
 
 export async function getBlogSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const blogPosts = await loadBlogForSitemap();
   return uniqueByUrl([
@@ -325,7 +331,7 @@ export async function getBlogSitemap(
 }
 
 export function getBlogCategorySitemap(
-  now = new Date()
+  now = new Date(),
 ): MetadataRoute.Sitemap {
   return BLOG_CATEGORY_SLUGS.map((slug) => ({
     url: `${BASE_URL}/blog/categoria/${slug}`,
@@ -336,7 +342,7 @@ export function getBlogCategorySitemap(
 }
 
 export async function getBoringGameSitemap(
-  now = new Date()
+  now = new Date(),
 ): Promise<MetadataRoute.Sitemap> {
   const [boringRounds, boringMatches] = await Promise.all([
     loadBoringRoundsForSitemap(),
