@@ -23,6 +23,65 @@ const FOOTER_LINKS = {
   ],
 };
 
+const HELLOSKIP_ARTICLES = [
+  {
+    label: "Por que pacotinhos da Copa ficaram caros",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-world-cup-sticker-packs-cost-so-much",
+  },
+  {
+    label: "Riscos de comprar pacotinhos avulsos",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/loose-packs-lie-why-buying-loose-sticker-packs-can-be-risky-1",
+  },
+  {
+    label: "Abrindo os primeiros pacotes da Copa",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/the-first-packs-arrived-opening-world-cup-sticker-packs",
+  },
+  {
+    label: "Por que os pacotes estão tão caros",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-hit-hard-why-world-cup-sticker-packs-are-so-expensive",
+  },
+  {
+    label: "A corrida dos colecionadores por pacotes novos",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/world-cup-sticker-chaos-why-collectors-are-going-crazy-over-new-packs",
+  },
+  {
+    label: "Como economizar em pacotinhos",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-cheaper-how-to-save-money-on-sticker-packs",
+  },
+  {
+    label: "O que mudou no jogo da Panini",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/panini-changed-the-game-what-collectors-need-to-know",
+  },
+  {
+    label: "Como conseguir pacotes no McDonald's",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/mcdonalds-sticker-rush-how-to-get-world-cup-sticker-packs",
+  },
+  {
+    label: "Como colecionadores economizam",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/cheap-sticker-packs-how-smart-collectors-save-money",
+  },
+  {
+    label: "Por que pacote avulso pode ser arriscado",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/loose-packs-lie-why-buying-loose-sticker-packs-can-be-risky",
+  },
+  {
+    label: "Colecionar melhor gastando menos",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/shake-less-track-more-how-to-collect-stickers-smarter-and-spend-less",
+  },
+  {
+    label: "Por que colecionar figurinhas custa mais",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-sticker-collecting-costs-so-much-now-1",
+  },
+  {
+    label: "O novo custo de colecionar figurinhas",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/stickers-got-expensive-why-sticker-collecting-costs-so-much-now",
+  },
+  {
+    label: "Por que abrir pacotes nem sempre é justo",
+    href: "https://helloskip.com/b/crazystack-typescript-1/blog/sticker-packs-lie-why-opening-packs-is-not-always-fair",
+  },
+] as const;
+
 export function LandingFooter() {
   return (
     <footer className="border-t border-white/5 bg-[#0d1323]/60">
@@ -99,6 +158,26 @@ export function LandingFooter() {
               ))}
             </ul>
           </div>
+        </div>
+
+        <div className="mb-10 border-t border-white/5 pt-8">
+          <p className="mb-4 text-[10px] font-mono uppercase tracking-widest text-[#a6aabf]">
+            Leituras externas sobre figurinhas
+          </p>
+          <ul className="grid grid-cols-1 gap-x-8 gap-y-2 text-xs text-[#a6aabf] sm:grid-cols-2 lg:grid-cols-3">
+            {HELLOSKIP_ARTICLES.map((article) => (
+              <li key={article.href}>
+                <a
+                  href={article.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-[#e1e4fa]"
+                >
+                  HelloSkip: {article.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
