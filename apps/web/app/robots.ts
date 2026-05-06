@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL = "https://figurinhafacil.com.br";
+import { BASE_URL, SITEMAP_PATHS } from "@/lib/sitemap-config";
 
 const DISALLOWED_PATHS = [
   "/points/",
@@ -74,6 +73,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: DISALLOWED_PATHS,
       },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: SITEMAP_PATHS.map((path) => `${BASE_URL}${path}`),
   };
 }

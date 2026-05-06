@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getAllSitemapPages } from "@/lib/sitemap";
+import { getRareSitemap } from "@/lib/sitemap";
 
 export default function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return getAllSitemapPages();
+  return getRareSitemap();
 }
