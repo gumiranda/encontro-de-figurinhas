@@ -18,6 +18,7 @@ import {
   generateItemListSchema,
   generateCombinedSchema,
   generateSportsEventSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -39,10 +40,22 @@ export default async function StatesHubPage() {
       name: s.name,
       url: `${BASE_URL}/estado/${s.slug}`,
       description: `Cidades e pontos de troca em ${s.name}`,
-    }))
+    })),
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/estados`,
+    name: "Estados com Troca de Figurinhas | Figurinha Fácil",
+    description:
+      "Troque figurinhas da Copa 2026 em todos os estados brasileiros, com colecionadores e pontos de troca no seu estado.",
+  });
+
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    itemListSchema,
+    generateSportsEventSchema(),
+  ]);
 
   return (
     <>

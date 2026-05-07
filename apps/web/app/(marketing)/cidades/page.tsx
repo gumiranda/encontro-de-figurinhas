@@ -12,6 +12,7 @@ import {
   generateItemListSchema,
   generateCombinedSchema,
   generateSportsEventSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -40,20 +41,32 @@ export default async function CitiesHubPage() {
       name: `${c.name}, ${s.state}`,
       url: `${BASE_URL}/cidade/${c.slug}`,
       description: `Pontos de troca de figurinhas em ${c.name}`,
-    }))
+    })),
   );
 
   const itemListSchema = generateItemListSchema(
     "Cidades com Troca de Figurinhas da Copa 2026",
     "Lista de cidades brasileiras com pontos de troca de figurinhas e colecionadores ativos.",
-    allCities.slice(0, 100)
+    allCities.slice(0, 100),
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/cidades`,
+    name: "Cidades com Troca de Figurinhas | Figurinha Fácil",
+    description:
+      "Encontre colecionadores de figurinhas da Copa 2026 em cidades brasileiras e veja onde trocar figurinhas perto de você.",
+  });
+
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    itemListSchema,
+    generateSportsEventSchema(),
+  ]);
 
   const totalCities = citiesByState.reduce(
     (acc, s) => acc + s.cities.length,
-    0
+    0,
   );
 
   return (
@@ -73,7 +86,8 @@ export default async function CitiesHubPage() {
 
               <p className="text-lg md:text-xl text-muted-foreground">
                 Encontre colecionadores de figurinhas da Copa do Mundo 2026 em
-                todas as regiões do Brasil. Selecione sua cidade e comece a trocar.
+                todas as regiões do Brasil. Selecione sua cidade e comece a
+                trocar.
               </p>
             </div>
           </div>
@@ -91,9 +105,9 @@ export default async function CitiesHubPage() {
               Sua cidade não está na lista?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Cadastre-se e seja o primeiro colecionador da sua cidade. Você ajuda
-              a expandir a rede e será notificado quando houver colecionadores
-              próximos.
+              Cadastre-se e seja o primeiro colecionador da sua cidade. Você
+              ajuda a expandir a rede e será notificado quando houver
+              colecionadores próximos.
             </p>
             <Button size="lg" asChild>
               <Link href="/sign-up">

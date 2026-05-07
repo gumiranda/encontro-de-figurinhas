@@ -26,6 +26,7 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateBreadcrumbSchema,
   generateFAQSchema,
+  generateWebPageSchema,
   BASE_URL,
   SITE_NAME,
 } from "@/lib/seo";
@@ -138,9 +139,15 @@ export default async function WhereToBuyPage() {
     },
   ];
   const faqSchema = generateFAQSchema(faqs);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/onde-comprar-figurinhas-copa-2026`,
+    name: TITLE,
+    description: DESCRIPTION,
+  });
 
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={faqSchema} />
       <LandingHeader />
@@ -173,8 +180,8 @@ export default async function WhereToBuyPage() {
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
                 Pacotes Panini, bancas, online e troca P2P grátis. Compare as
-                opções, veja preços médios e descubra como economizar fechando
-                o álbum de {totalStickers} figurinhas.
+                opções, veja preços médios e descubra como economizar fechando o
+                álbum de {totalStickers} figurinhas.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild>
@@ -201,8 +208,8 @@ export default async function WhereToBuyPage() {
                 Comparativo: 4 formas de conseguir figurinhas
               </h2>
               <p className="text-muted-foreground mb-10">
-                Cada caminho serve para um momento diferente do álbum. O ideal
-                é combinar.
+                Cada caminho serve para um momento diferente do álbum. O ideal é
+                combinar.
               </p>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="border-primary/30">

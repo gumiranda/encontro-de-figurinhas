@@ -19,6 +19,7 @@ import {
   generateItemListSchema,
   generateCombinedSchema,
   generateSportsEventSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -47,10 +48,22 @@ export default async function TeamsHubPage() {
       name: `${t.flagEmoji} ${t.name}`,
       url: `${BASE_URL}/selecao/${t.slug}`,
       description: `${t.stickerCount} figurinhas da seleção ${t.name}`,
-    }))
+    })),
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/selecoes`,
+    name: "Seleções da Copa 2026 - Todas as Figurinhas | Figurinha Fácil",
+    description:
+      "Veja todas as seleções do álbum da Copa do Mundo 2026, com figurinhas douradas, lendas e listas para completar sua coleção.",
+  });
+
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    itemListSchema,
+    generateSportsEventSchema(),
+  ]);
 
   return (
     <>

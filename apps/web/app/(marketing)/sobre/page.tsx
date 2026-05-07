@@ -7,6 +7,7 @@ import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
   generateBreadcrumbSchema,
   generateOrganizationSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -38,6 +39,13 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 
 const organizationSchema = generateOrganizationSchema();
 
+const webPageSchema = generateWebPageSchema({
+  url: `${BASE_URL}/sobre`,
+  name: "Sobre Nós | Figurinha Fácil",
+  description:
+    "Conheça o Figurinha Fácil, a plataforma brasileira que conecta colecionadores para trocar figurinhas e completar álbuns.",
+});
+
 const values = [
   {
     icon: Heart,
@@ -68,6 +76,7 @@ const values = [
 export default function SobrePage() {
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={organizationSchema} />
       <LandingHeader />
@@ -93,9 +102,9 @@ export default function SobrePage() {
                 <span className="text-primary">Brasil</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
-                O Figurinha <span className="text-[#87d400]">Fácil</span> nasceu da paixão por colecionar e da vontade
-                de facilitar a vida de quem, assim como nós, adora completar
-                álbuns de figurinhas.
+                O Figurinha <span className="text-[#87d400]">Fácil</span> nasceu
+                da paixão por colecionar e da vontade de facilitar a vida de
+                quem, assim como nós, adora completar álbuns de figurinhas.
               </p>
             </div>
           </div>
@@ -124,7 +133,8 @@ export default function SobrePage() {
                   Nossa plataforma foi desenvolvida para tornar esse processo
                   mais fácil, seguro e divertido. Aqui você encontra
                   colecionadores perto de você, descobre pontos de troca
-                  confiáveis e consegue as figurinhas que faltam sem complicação.
+                  confiáveis e consegue as figurinhas que faltam sem
+                  complicação.
                 </p>
               </div>
             </div>
@@ -146,7 +156,9 @@ export default function SobrePage() {
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Icon className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
+                    <h3 className="font-semibold text-lg mb-2">
+                      {value.title}
+                    </h3>
                     <p className="text-muted-foreground">{value.description}</p>
                   </div>
                 );
@@ -164,9 +176,10 @@ export default function SobrePage() {
               </h2>
               <div className="prose prose-lg dark:prose-invert">
                 <p>
-                  O Figurinha <span className="text-[#87d400]">Fácil</span> surgiu de uma frustração comum a todo
-                  colecionador: a dificuldade de encontrar as últimas figurinhas
-                  para completar o álbum.
+                  O Figurinha <span className="text-[#87d400]">Fácil</span>{" "}
+                  surgiu de uma frustração comum a todo colecionador: a
+                  dificuldade de encontrar as últimas figurinhas para completar
+                  o álbum.
                 </p>
                 <p>
                   Percebemos que, em um país do tamanho do Brasil, existem
@@ -177,8 +190,9 @@ export default function SobrePage() {
                 </p>
                 <p>
                   Foi assim que criamos uma plataforma simples e eficiente, onde
-                  você cadastra suas figurinhas repetidas e as que precisa, e nós
-                  fazemos o trabalho de encontrar o match perfeito perto de você.
+                  você cadastra suas figurinhas repetidas e as que precisa, e
+                  nós fazemos o trabalho de encontrar o match perfeito perto de
+                  você.
                 </p>
                 <p>
                   Desde então, temos ajudado milhares de colecionadores a

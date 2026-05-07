@@ -16,6 +16,7 @@ import { convexServer, api } from "@/lib/convex-server";
 import {
   generateBreadcrumbSchema,
   generateFAQSchema,
+  generateWebPageSchema,
   BASE_URL,
   SITE_NAME,
 } from "@/lib/seo";
@@ -64,15 +65,15 @@ export default async function RareHubPage() {
 
   const totalLegends = sections.reduce(
     (acc, s) => acc + s.legendNumbers.length,
-    0
+    0,
   );
   const totalGolden = sections.reduce(
     (acc, s) => acc + s.goldenNumbers.length,
-    0
+    0,
   );
   const totalRare = totalLegends + totalGolden;
   const teamsWithLegends = sections.filter(
-    (s) => s.legendNumbers.length > 0
+    (s) => s.legendNumbers.length > 0,
   ).length;
 
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -103,9 +104,15 @@ export default async function RareHubPage() {
     },
   ];
   const faqSchema = generateFAQSchema(faqs);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/raras`,
+    name: TITLE,
+    description: DESCRIPTION,
+  });
 
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={faqSchema} />
       <LandingHeader />
@@ -139,9 +146,8 @@ export default async function RareHubPage() {
                 <span className="text-primary">Copa do Mundo 2026</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                Lendas e douradas de cada seleção do álbum oficial. Veja
-                quantas raras cada seleção tem e quais são as mais difíceis de
-                achar.
+                Lendas e douradas de cada seleção do álbum oficial. Veja quantas
+                raras cada seleção tem e quais são as mais difíceis de achar.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild>

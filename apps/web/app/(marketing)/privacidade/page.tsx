@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { generateBreadcrumbSchema, BASE_URL } from "@/lib/seo";
+import {
+  generateBreadcrumbSchema,
+  generateWebPageSchema,
+  BASE_URL,
+} from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
@@ -23,9 +27,17 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: "Política de Privacidade" },
 ]);
 
+const webPageSchema = generateWebPageSchema({
+  url: `${BASE_URL}/privacidade`,
+  name: "Política de Privacidade | Figurinha Fácil",
+  description:
+    "Política de privacidade do Figurinha Fácil: como coletamos, usamos e protegemos dados pessoais na plataforma.",
+});
+
 export default function PrivacidadePage() {
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
@@ -47,12 +59,11 @@ export default function PrivacidadePage() {
 
             <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">
               <h1>Política de Privacidade</h1>
-              <p className="lead">
-                Última atualização: 20 de abril de 2026
-              </p>
+              <p className="lead">Última atualização: 20 de abril de 2026</p>
 
               <p>
-                Esta Política de Privacidade descreve como o Figurinha <span className="text-[#87d400]">Fácil</span>
+                Esta Política de Privacidade descreve como o Figurinha{" "}
+                <span className="text-[#87d400]">Fácil</span>
                 coleta, usa e protege suas informações pessoais em conformidade
                 com a Lei Geral de Proteção de Dados (LGPD).
               </p>
@@ -86,9 +97,7 @@ export default function PrivacidadePage() {
               </ul>
 
               <h2>3. Compartilhamento de Dados</h2>
-              <p>
-                Compartilhamos seus dados apenas nas seguintes situações:
-              </p>
+              <p>Compartilhamos seus dados apenas nas seguintes situações:</p>
               <ul>
                 <li>
                   <strong>Com outros usuários:</strong> Seu apelido e cidade são
@@ -167,7 +176,8 @@ export default function PrivacidadePage() {
               </p>
 
               <p>
-                <strong>Encarregado de Dados (DPO):</strong> privacidade@figurinhafacil.com.br
+                <strong>Encarregado de Dados (DPO):</strong>{" "}
+                privacidade@figurinhafacil.com.br
               </p>
             </div>
           </div>

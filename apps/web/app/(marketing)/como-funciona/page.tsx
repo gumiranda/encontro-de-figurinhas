@@ -3,6 +3,7 @@ import {
   BASE_URL,
   generateBreadcrumbSchema,
   generateFAQSchema,
+  generateWebPageSchema,
   GEO_OPTIMIZED_FAQS,
 } from "@/lib/seo";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
@@ -15,7 +16,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { ArrowRight, CheckCircle, MapPin, RefreshCw, Shield, Users } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle,
+  MapPin,
+  RefreshCw,
+  Shield,
+  Users,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -49,6 +57,13 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 ]);
 
 const faqSchema = generateFAQSchema(GEO_OPTIMIZED_FAQS);
+
+const webPageSchema = generateWebPageSchema({
+  url: `${BASE_URL}/como-funciona`,
+  name: "Como Funciona | Troque Figurinhas da Copa 2026",
+  description:
+    "Saiba como trocar figurinhas da Copa 2026 no Figurinha Fácil: cadastre repetidas, encontre colecionadores próximos e combine trocas presenciais.",
+});
 
 const steps = [
   {
@@ -103,6 +118,7 @@ const benefits = [
 export default function ComoFuncionaPage() {
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={faqSchema} />
       <LandingHeader />
@@ -124,11 +140,12 @@ export default function ComoFuncionaPage() {
 
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
-                Como funciona o Figurinha <span className="text-[#87d400]">Fácil</span>
+                Como funciona o Figurinha{" "}
+                <span className="text-[#87d400]">Fácil</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                Trocar figurinhas nunca foi tão fácil. Em poucos passos você encontra
-                colecionadores perto de você e completa seu álbum.
+                Trocar figurinhas nunca foi tão fácil. Em poucos passos você
+                encontra colecionadores perto de você e completa seu álbum.
               </p>
             </div>
           </div>
@@ -171,7 +188,8 @@ export default function ComoFuncionaPage() {
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-headline font-bold mb-12 text-center">
-              Por que usar o Figurinha <span className="text-[#87d400]">Fácil</span>?
+              Por que usar o Figurinha{" "}
+              <span className="text-[#87d400]">Fácil</span>?
             </h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -183,7 +201,9 @@ export default function ComoFuncionaPage() {
                   <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">{benefit.title}</h3>
-                    <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {benefit.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -204,26 +224,27 @@ export default function ComoFuncionaPage() {
 
               <div className="prose prose-lg dark:prose-invert">
                 <p>
-                  Para garantir uma experiência segura ao trocar figurinhas, siga estas
-                  recomendações:
+                  Para garantir uma experiência segura ao trocar figurinhas,
+                  siga estas recomendações:
                 </p>
                 <ul>
                   <li>
-                    <strong>Escolha locais públicos:</strong> Prefira realizar trocas em
-                    locais movimentados como shoppings, praças ou pontos de troca
-                    conhecidos.
+                    <strong>Escolha locais públicos:</strong> Prefira realizar
+                    trocas em locais movimentados como shoppings, praças ou
+                    pontos de troca conhecidos.
                   </li>
                   <li>
-                    <strong>Verifique as figurinhas:</strong> Antes de confirmar a troca,
-                    verifique se as figurinhas estão em bom estado.
+                    <strong>Verifique as figurinhas:</strong> Antes de confirmar
+                    a troca, verifique se as figurinhas estão em bom estado.
                   </li>
                   <li>
-                    <strong>Confira a quantidade:</strong> Conte as figurinhas antes de
-                    finalizar a troca para garantir que tudo está correto.
+                    <strong>Confira a quantidade:</strong> Conte as figurinhas
+                    antes de finalizar a troca para garantir que tudo está
+                    correto.
                   </li>
                   <li>
-                    <strong>Vá acompanhado:</strong> Quando possível, leve um amigo ou
-                    familiar, especialmente em primeiras trocas.
+                    <strong>Vá acompanhado:</strong> Quando possível, leve um
+                    amigo ou familiar, especialmente em primeiras trocas.
                   </li>
                 </ul>
               </div>
@@ -240,8 +261,13 @@ export default function ComoFuncionaPage() {
 
             <div className="max-w-3xl mx-auto space-y-6">
               {GEO_OPTIMIZED_FAQS.map((item) => (
-                <div key={item.question} className="bg-background rounded-lg p-6">
-                  <h3 className="font-semibold text-lg mb-2">{item.question}</h3>
+                <div
+                  key={item.question}
+                  className="bg-background rounded-lg p-6"
+                >
+                  <h3 className="font-semibold text-lg mb-2">
+                    {item.question}
+                  </h3>
                   <p className="text-muted-foreground">{item.answer}</p>
                 </div>
               ))}

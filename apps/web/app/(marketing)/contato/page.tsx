@@ -10,14 +10,22 @@ import {
 } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { generateBreadcrumbSchema, BASE_URL } from "@/lib/seo";
+import {
+  generateBreadcrumbSchema,
+  generateWebPageSchema,
+  BASE_URL,
+} from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
   title: "Contato",
   description:
     "Entre em contato com o Figurinha Fácil. Tire suas dúvidas, envie sugestões ou reporte problemas.",
-  keywords: ["contato figurinha fácil", "suporte figurinhas", "ajuda troca figurinhas"],
+  keywords: [
+    "contato figurinha fácil",
+    "suporte figurinhas",
+    "ajuda troca figurinhas",
+  ],
   openGraph: {
     title: "Contato | Figurinha Fácil",
     description: "Entre em contato com o Figurinha Fácil.",
@@ -32,6 +40,13 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: "Início", url: BASE_URL },
   { name: "Contato" },
 ]);
+
+const webPageSchema = generateWebPageSchema({
+  url: `${BASE_URL}/contato`,
+  name: "Contato | Figurinha Fácil",
+  description:
+    "Entre em contato com o Figurinha Fácil para suporte, sugestões, dúvidas e parcerias sobre troca de figurinhas.",
+});
 
 const contactOptions = [
   {
@@ -60,6 +75,7 @@ const contactOptions = [
 export default function ContatoPage() {
   return (
     <>
+      <JsonLd data={webPageSchema} />
       <JsonLd data={breadcrumbSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
@@ -145,12 +161,11 @@ export default function ContatoPage() {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl font-semibold mb-4">
-                Tempo de Resposta
-              </h2>
+              <h2 className="text-xl font-semibold mb-4">Tempo de Resposta</h2>
               <p className="text-muted-foreground">
                 Respondemos a maioria dos emails em até 48 horas úteis. Para
-                questões urgentes, indique &ldquo;URGENTE&rdquo; no assunto do email.
+                questões urgentes, indique &ldquo;URGENTE&rdquo; no assunto do
+                email.
               </p>
             </div>
           </div>

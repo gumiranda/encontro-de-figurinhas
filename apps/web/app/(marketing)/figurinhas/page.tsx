@@ -13,6 +13,7 @@ import {
   generateItemListSchema,
   generateCombinedSchema,
   generateSportsEventSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -43,14 +44,29 @@ export default async function StickersHubPage() {
       name: `Figurinhas ${t.name} ${t.flagEmoji}`,
       url: `${BASE_URL}/selecao/${t.slug}`,
       description: `${t.stickerCount} figurinhas, ${t.goldenNumbers.length} douradas`,
-    }))
+    })),
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema, generateSportsEventSchema()]);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/figurinhas`,
+    name: "Todas as 980 Figurinhas da Copa 2026 | Figurinha Fácil",
+    description:
+      "Lista completa das figurinhas do álbum Copa do Mundo 2026, com figurinhas douradas, lendas, raras e links por seleção.",
+  });
+
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    itemListSchema,
+    generateSportsEventSchema(),
+  ]);
 
   const totalStickers = teams.reduce((acc, t) => acc + t.stickerCount, 0);
   const totalGolden = teams.reduce((acc, t) => acc + t.goldenNumbers.length, 0);
-  const totalLegends = teams.reduce((acc, t) => acc + t.legendNumbers.length, 0);
+  const totalLegends = teams.reduce(
+    (acc, t) => acc + t.legendNumbers.length,
+    0,
+  );
 
   return (
     <>

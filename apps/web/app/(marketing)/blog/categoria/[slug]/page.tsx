@@ -14,7 +14,11 @@ import {
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { convexServer, api } from "@/lib/convex-server";
-import { BASE_URL } from "@/lib/seo";
+import {
+  BASE_URL,
+  generateCombinedSchema,
+  generateWebPageSchema,
+} from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { LoadMorePosts } from "@/modules/blog/ui/load-more-posts";
 import "@/modules/blog/ui/blog-home.css";
@@ -32,7 +36,13 @@ function categorySlug(category: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-const VALID_CATEGORY_SLUGS = ["guias", "guia", "historia", "raridades", "copa-2026"] as const;
+const VALID_CATEGORY_SLUGS = [
+  "guias",
+  "guia",
+  "historia",
+  "raridades",
+  "copa-2026",
+] as const;
 type ValidCategorySlug = (typeof VALID_CATEGORY_SLUGS)[number];
 
 function isValidCategorySlug(slug: string): slug is ValidCategorySlug {
@@ -171,6 +181,16 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
     ],
   };
 
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/blog/categoria/${slug}`,
+    name: `${label} | Blog Figurinha Fácil`,
+    description: meta.desc,
+  });
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+  ]);
+
   // SSR renders 12 posts (1 featured + 11 grid) so LoadMorePosts skips them
   // cleanly. Total visible matches LoadMorePosts SSR_INITIAL_COUNT=12.
   const featured = posts[0]!;
@@ -178,7 +198,7 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={combinedSchema} />
       <LandingHeader />
       <main className="min-h-screen bg-background pt-24">
         {/* Hero */}
@@ -263,7 +283,9 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
                 <h3>{featured.title}</h3>
                 <p className="bh-excerpt">{featured.excerpt}</p>
                 <div className="mt-auto flex items-center gap-2.5 text-xs text-muted-foreground">
-                  <div className="bh-avatar">{initials(featured.author.name)}</div>
+                  <div className="bh-avatar">
+                    {initials(featured.author.name)}
+                  </div>
                   <span>{featured.author.name}</span>
                   <span className="opacity-40">·</span>
                   <span>{featured.readingTime} min</span>
@@ -299,7 +321,9 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
                   <h3>{post.title}</h3>
                   <p className="bh-excerpt">{post.excerpt}</p>
                   <div className="bh-meta">
-                    <div className="bh-avatar">{initials(post.author.name)}</div>
+                    <div className="bh-avatar">
+                      {initials(post.author.name)}
+                    </div>
                     <span>{post.author.name}</span>
                     <span className="bh-read-time">
                       <Clock className="h-3.5 w-3.5" />
@@ -314,10 +338,7 @@ export default async function BlogCategoryPage({ params }: CategoryPageProps) {
         </section>
 
         <section className="container mx-auto mt-16 px-4 pb-16">
-          <Link
-            href="/blog"
-            className="bh-section-link"
-          >
+          <Link href="/blog" className="bh-section-link">
             Ver todas as categorias
             <ArrowRight className="h-4 w-4" />
           </Link>

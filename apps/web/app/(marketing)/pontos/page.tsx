@@ -18,6 +18,7 @@ import {
   generateBreadcrumbSchema,
   generateItemListSchema,
   generateCombinedSchema,
+  generateWebPageSchema,
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
@@ -52,16 +53,27 @@ export default async function TradePointsHubPage() {
           name: p.name,
           url: `${BASE_URL}/ponto/${p.slug}`,
           description: `Ponto de troca em ${g.cityName}, ${g.state}`,
-        }))
+        })),
       )
-      .slice(0, 100)
+      .slice(0, 100),
   );
 
-  const combinedSchema = generateCombinedSchema([breadcrumbSchema, itemListSchema]);
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/pontos`,
+    name: "Pontos de Troca de Figurinhas | Figurinha Fácil",
+    description:
+      "Encontre pontos de troca de figurinhas da Copa 2026 perto de você, incluindo shoppings, praças, escolas e eventos.",
+  });
+
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    itemListSchema,
+  ]);
 
   const totalPoints = groupedPoints.reduce(
     (acc, g) => acc + g.points.length,
-    0
+    0,
   );
 
   const pointsByState = groupedPoints.reduce<
@@ -133,7 +145,7 @@ export default async function TradePointsHubPage() {
                         <Badge variant="secondary" className="ml-2">
                           {pointsByState[state]!.reduce(
                             (acc, g) => acc + g.points.length,
-                            0
+                            0,
                           )}{" "}
                           pontos
                         </Badge>
