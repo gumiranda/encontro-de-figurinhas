@@ -29,7 +29,6 @@ import {
   generateBreadcrumbSchema,
   generateCombinedSchema,
   generateFAQSchema,
-  generateArticleSchema,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 
@@ -124,7 +123,9 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 
 const faqSchema = generateFAQSchema(FAQS);
 
-const articleSchema = generateArticleSchema({
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
   headline:
     "Onde Trocar Figurinhas da Copa 2026: Guia com Pontos de Troca Perto de Você",
   description:
@@ -132,12 +133,30 @@ const articleSchema = generateArticleSchema({
   image: `${BASE_URL}/opengraph-image`,
   datePublished: PUBLISHED_AT,
   dateModified: MODIFIED_AT,
+  author: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: BASE_URL,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}/logo.svg`,
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": ARTICLE_URL,
+  },
   keywords: [
     "onde trocar figurinhas copa 2026",
     "como trocar figurinhas",
     "pontos de troca",
   ],
-});
+  inLanguage: "pt-BR",
+};
 
 const combinedSchema = generateCombinedSchema([
   articleSchema,
@@ -527,7 +546,7 @@ export default function OndeTracarFigurinhasCopaPage() {
                   </h3>
                   <p className="text-sm text-[var(--on-surface-variant)] mb-2">
                     Comunidades locais onde colecionadores organizam encontros
-                    presenciais. Busque "{sua-cidade} figurinhas copa 2026".
+                    presenciais. Busque &quot;[sua-cidade] figurinhas copa 2026&quot;.
                   </p>
                   <ul className="text-xs text-[var(--on-surface-variant)] space-y-1">
                     <li>✓ Comunidade local ativa</li>
