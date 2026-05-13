@@ -134,6 +134,7 @@ export function QuickRegisterView({
 
   const {
     duplicates,
+    duplicateCounts,
     missing,
     sections,
     totalStickers,
@@ -146,6 +147,7 @@ export function QuickRegisterView({
     addMissing,
     removeDuplicate,
     removeMissing,
+    incrementDuplicate,
     markAllInSection,
     clearSection,
     invertSection,
@@ -166,11 +168,8 @@ export function QuickRegisterView({
   const handleToggle = useCallback(
     (num: number) => {
       if (activeTab === "duplicates") {
-        if (duplicatesSet.has(num)) removeDuplicate(num);
-        else {
-          if (missingSet.has(num)) removeMissing(num);
-          addDuplicates([num]);
-        }
+        if (missingSet.has(num)) removeMissing(num);
+        incrementDuplicate(num);
       } else {
         if (missingSet.has(num)) removeMissing(num);
         else {
@@ -183,7 +182,7 @@ export function QuickRegisterView({
       activeTab,
       duplicatesSet,
       missingSet,
-      addDuplicates,
+      incrementDuplicate,
       addMissing,
       removeDuplicate,
       removeMissing,
@@ -419,6 +418,7 @@ export function QuickRegisterView({
                     mode={activeTab}
                     duplicatesSet={duplicatesSet}
                     missingSet={missingSet}
+                    duplicateCounts={duplicateCounts}
                     variant="mobile"
                     onToggle={handleToggle}
                     onBulkAction={(action) => handleBulkAction(section.code, action)}

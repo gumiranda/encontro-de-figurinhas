@@ -184,6 +184,7 @@ interface StickerSectionGroupProps {
   mode: ListKind;
   duplicatesSet: Set<number>;
   missingSet: Set<number>;
+  duplicateCounts?: Map<number, number>;
   variant?: "mobile" | "desktop";
   onToggle: (num: number) => void;
   onBulkAction?: (action: "all" | "none" | "invert") => void;
@@ -194,6 +195,7 @@ function StickerSectionGroupBase({
   mode,
   duplicatesSet,
   missingSet,
+  duplicateCounts,
   variant = "mobile",
   onToggle,
   onBulkAction,
@@ -389,6 +391,7 @@ function StickerSectionGroupBase({
                     else if (isInMiss) state = "need";
 
                     const isActive = state === "have" || state === "need";
+                    const dupCount = duplicateCounts?.get(num);
 
                     return (
                       <button
@@ -424,6 +427,16 @@ function StickerSectionGroupBase({
                         >
                           {extInfo?.playerShort}
                         </span>
+
+                        {/* Duplicate count badge */}
+                        {state === "have" && dupCount && dupCount > 1 && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-white"
+                          >
+                            {dupCount}
+                          </span>
+                        )}
 
                         {/* Sparkle decorations */}
                         <span className="absolute top-2 right-1.5 text-[6px] opacity-60">
@@ -489,6 +502,7 @@ function StickerSectionGroupBase({
               const labelTitle = cc
                 ? `${cc.full} — ${section.code}-${relLabel}`
                 : `${section.code}-${relLabel}`;
+              const dupCount = duplicateCounts?.get(num);
 
               return (
                 <button
@@ -520,6 +534,15 @@ function StickerSectionGroupBase({
                           )
                   )}
                 >
+                  {/* Duplicate count badge */}
+                  {state === "have" && dupCount && dupCount > 1 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-white z-10"
+                    >
+                      {dupCount}
+                    </span>
+                  )}
                   <span
                     className="pointer-events-none absolute right-1.5 top-1 text-[5px] text-red-500/50"
                     aria-hidden
@@ -596,6 +619,7 @@ function StickerSectionGroupBase({
                 relativeNum={relativeNum}
                 sectionCode={section.code}
                 state={state}
+                dupCount={duplicateCounts?.get(num)}
                 playerName={playerInfo?.name}
                 shortName={playerInfo?.short}
                 onClick={handleTileClick}

@@ -72,6 +72,22 @@ function listsEqual(a: number[], b: number[]): boolean {
   return a.length === b.length && a.every((n, i) => n === b[i]);
 }
 
+function duplicateCountsToArray(counts: Map<number, number>): number[] {
+  const result: number[] = [];
+  for (const [num, count] of counts) {
+    for (let i = 0; i < count; i++) result.push(num);
+  }
+  return result.sort((a, b) => a - b);
+}
+
+function arrayToDuplicateCounts(arr: number[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const num of arr) {
+    counts.set(num, (counts.get(num) ?? 0) + 1);
+  }
+  return counts;
+}
+
 type StickersUiState = {
   isDirty: boolean;
   isSaving: boolean;
@@ -117,6 +133,7 @@ export function useStickers(debounceMs = 300) {
 
   const [localDuplicates, setLocalDuplicates] = useState<number[]>([]);
   const [localMissing, setLocalMissing] = useState<number[]>([]);
+  const [localDuplicateCounts, setLocalDuplicateCounts] = useState<Map<number, number>>(new Map());
   const [{ isDirty, isSaving, error }, dispatch] = useReducer(
     stickersUiReducer,
     initialStickersUi
@@ -152,6 +169,7 @@ export function useStickers(debounceMs = 300) {
     if (!isLoading && !isDirty) {
       setLocalDuplicates(serverDuplicates);
       setLocalMissing(serverMissing);
+      setLocalDuplicateCounts(arrayToDuplicateCounts(serverDuplicates));
       dupsRef.current = serverDuplicates;
       missRef.current = serverMissing;
     }
@@ -297,6 +315,29 @@ export function useStickers(debounceMs = 300) {
   const setMissing = useCallback(
     (numbers: number[]) => setList("missing", numbers),
     [setList]
+  );
+
+  const incrementDuplicate = useCallback(
+    (num: number) => {
+      if (!Number.isInteger(num) || num < 0 || num >= totalStickers) return;
+
+      const currentCount = localDuplicateCounts.get(num) ?? 0;
+      const nextCount = currentCount >= 3 ? 0 : currentCount + 1;
+
+      const newCounts = new Map(localDuplicateCounts);
+      if (nextCount === 0) {
+        newCounts.delete(num);
+      } else {
+        newCounts.set(num, nextCount);
+      }
+      setLocalDuplicateCounts(newCounts);
+
+      const newDupsArray = duplicateCountsToArray(newCounts);
+      dupsRef.current = newDupsArray;
+      setLocalDuplicates(Array.from(newCounts.keys()).sort((a, b) => a - b));
+      saveWithDebounce();
+    },
+    [localDuplicateCounts, totalStickers, saveWithDebounce]
   );
 
   const finalize = useCallback(async () => {
@@ -451,6 +492,7 @@ export function useStickers(debounceMs = 300) {
 
   return {
     duplicates: localDuplicates,
+    duplicateCounts: localDuplicateCounts,
     missing: localMissing,
     sections,
     totalStickers,
@@ -462,6 +504,7 @@ export function useStickers(debounceMs = 300) {
 
     addDuplicates,
     removeDuplicate,
+    incrementDuplicate,
     addMissing,
     removeMissing,
     finalize,
