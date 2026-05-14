@@ -23,6 +23,7 @@ import {
   ArrowLeftRight,
   Bell,
   ChevronRight,
+  ClipboardList,
   HelpCircle,
   ListPlus,
   MapPinPlus,
@@ -44,6 +45,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/ajustes": "Ajustes",
   "/meus-pontos": "Meus pontos",
   "/cadastrar-figurinhas/quick": "Adicionar figurinhas",
+  "/cadastrar-figurinhas/troca": "Lista de faltantes",
 };
 
 function titleCase(segment: string): string {
@@ -180,6 +182,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/cadastrar-figurinhas/troca">
+                      <ClipboardList className="mr-2 size-4" />
+                      Lista de faltantes
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/cadastrar-figurinhas/quick">
                       <ListPlus className="mr-2 size-4" />
