@@ -1,6 +1,6 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { Role, isValidRole, isValidSector } from "./lib/types";
 import { getAuthenticatedUser, isAdmin, requireAuth } from "./lib/auth";
@@ -407,6 +407,120 @@ export const MAX_FAVORITE_TRADE_POINTS = 50;
 // --- Public Profile (unauthenticated) ---
 
 const NICKNAME_PUBLIC_REGEX = /^[a-zA-Z0-9_-]{3,20}$/;
+const PROFILE_DUPLICATE_SAMPLE_LIMIT = 18;
+const PROFILE_MISSING_SAMPLE_LIMIT = 12;
+
+type StickerEntry = {
+  absoluteNum: number;
+  quantity: number;
+};
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
+
+function aggregateStickerNumbers(numbers: number[], limit: number): StickerEntry[] {
+  const counts = new Map<number, number>();
+  for (const absoluteNum of numbers) {
+    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort(([a], [b]) => a - b)
+    .slice(0, limit)
+    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
+}
+
+async function getStickerSummaries(ctx: QueryCtx, entries: StickerEntry[]) {
+  const details = await Promise.all(
+    entries.map(({ absoluteNum }) =>
+      ctx.db
+        .query("stickerDetail")
+        .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum))
+        .first()
+    )
+  );
+
+  return details
+    .map((detail, index) => {
+      const entry = entries[index];
+      if (!detail || !entry) return null;
+      const { absoluteNum, quantity } = entry;
+      return {
+        absoluteNum,
+        displayCode:
+          detail.displayCode ?? `${detail.sectionCode}-${detail.relativeNum}`,
+        flagEmoji: detail.flagEmoji,
+        name: detail.name,
+        isGolden: detail.isGolden ?? false,
+        isLegend: detail.isLegend ?? false,
+        quantity,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+}
+
+async function getCitySummary(ctx: QueryCtx, cityId?: Id<"cities">) {
+  if (!cityId) return null;
+  const city = await ctx.db.get(cityId);
+  if (!city) return null;
+  return {
+    name: city.name,
+    state: city.state,
+  };
+}
+
+async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
+  const duplicates = user.duplicates ?? [];
+  const missing = user.missing ?? [];
+  const duplicateEntries = aggregateStickerNumbers(
+    duplicates,
+    PROFILE_DUPLICATE_SAMPLE_LIMIT
+  );
+  const missingEntries = aggregateStickerNumbers(
+    missing,
+    PROFILE_MISSING_SAMPLE_LIMIT
+  );
+
+  const [stats, city, duplicatesSample, missingSample] = await Promise.all([
+    readSiteStatsOrNull(ctx),
+    getCitySummary(ctx, user.cityId),
+    getStickerSummaries(ctx, duplicateEntries),
+    getStickerSummaries(ctx, missingEntries),
+  ]);
+
+  const albumTotal = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+  const inferredOwnedCount =
+    user.hasCompletedStickerSetup === true
+      ? Math.max(0, albumTotal - missing.length)
+      : 0;
+  const albumOwnedCount = Math.min(
+    albumTotal,
+    Math.max(0, user.totalStickersOwned ?? inferredOwnedCount)
+  );
+  const albumCompletionPct = clampPercent(
+    user.albumCompletionPct ??
+      (albumTotal > 0 ? (albumOwnedCount / albumTotal) * 100 : 0)
+  );
+
+  return {
+    city,
+    createdAt: user.createdAt ?? user._creationTime,
+    isVerified: user.isVerified ?? false,
+    albumCompletionPct,
+    albumProgress: albumCompletionPct,
+    albumOwnedCount,
+    albumTotal,
+    totalTrades: user.totalTrades ?? 0,
+    ratingAvg: user.ratingAvg,
+    ratingCount: user.ratingCount ?? 0,
+    duplicatesCount: duplicates.length,
+    missingCount: missing.length,
+    duplicatesSample,
+    missingSample,
+  };
+}
 
 export const getPublicProfile = query({
   args: { nickname: v.string() },
@@ -430,36 +544,15 @@ export const getPublicProfile = query({
     if (!user.hasCompletedStickerSetup) return null;
     if (user.isProfilePublic !== true) return null;
 
-    // Parallel queries (index by_absolute existe em schema.ts)
-    const dupSample = (user.duplicates ?? []).slice(0, 12);
-    const dupDetails = await Promise.all(
-      dupSample.map((n) =>
-        ctx.db
-          .query("stickerDetail")
-          .withIndex("by_absolute", (q) => q.eq("absoluteNum", n))
-          .first()
-      )
-    );
-
-    const duplicatesSample = dupDetails
-      .filter(Boolean)
-      .map((d) => ({
-        displayCode: d!.displayCode ?? `${d!.sectionCode}-${d!.relativeNum}`,
-        flagEmoji: d!.flagEmoji,
-      }));
+    const profileSummary = await buildProfileSummary(ctx, user);
 
     return {
-      nickname: user.nickname,
-      displayNickname: (user.displayNickname ?? user.nickname ?? "?").slice(0, 12) || "?",
+      nickname: user.nickname ?? normalized,
+      displayNickname:
+        (user.displayNickname ?? user.nickname ?? "?").slice(0, 24) || "?",
       avatarSeed: user._id,
-      albumCompletionPct: user.albumCompletionPct ?? 0,
-      albumProgress: user.albumProgress ?? 0,
-      totalTrades: user.totalTrades ?? 0,
-      ratingAvg: user.ratingAvg,
-      ratingCount: user.ratingCount ?? 0,
-      duplicatesCount: (user.duplicates ?? []).length,
-      missingCount: (user.missing ?? []).length,
-      duplicatesSample,
+      acceptsMail: user.acceptsMail ?? false,
+      ...profileSummary,
     };
   },
 });
@@ -500,17 +593,14 @@ export const getProfileSettings = query({
     if (!user) return null;
 
     return {
-      nickname: user.nickname,
+      nickname: user.nickname ?? "",
       displayNickname: user.displayNickname,
+      avatarSeed: user._id,
       avatarUrl: user.avatarUrl,
       isProfilePublic: user.isProfilePublic ?? false,
       acceptsMail: user.acceptsMail ?? false,
       hasCompletedStickerSetup: user.hasCompletedStickerSetup ?? false,
-      albumCompletionPct: user.albumCompletionPct ?? 0,
-      totalTrades: user.totalTrades ?? 0,
-      ratingAvg: user.ratingAvg,
-      ratingCount: user.ratingCount ?? 0,
-      duplicatesCount: (user.duplicates ?? []).length,
+      ...(await buildProfileSummary(ctx, user)),
     };
   },
 });

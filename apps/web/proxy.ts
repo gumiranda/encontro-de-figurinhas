@@ -39,6 +39,7 @@ const isPublicRoute = createRouteMatcher([
   "/figurinha(.*)",
   "/figurinhas",
   "/raras(.*)",
+  "/u(.*)",
   "/jogo-mais-chato(.*)",
   "/onde-comprar-figurinhas-copa-2026",
   "/pontos-de-troca-figurinhas-copa-2026",
