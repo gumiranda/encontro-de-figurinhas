@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import {
   ArrowLeftRight,
   BadgeCheck,
@@ -33,8 +33,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Label } from "@workspace/ui/components/label";
+import { Switch } from "@workspace/ui/components/switch";
 import { Progress } from "@workspace/ui/components/progress";
 import { QRCode } from "@workspace/ui/components/kibo-ui/qr-code";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -45,6 +45,14 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
+
+import {
+  AchievementsModule,
+  deriveAchievements,
+} from "./achievements-module";
+import { HeroVariantSelector } from "./hero-variant-selector";
+import { ProfileHero, type HeroVariant } from "./profile-hero";
+import { TopNationsModule, type NationProgress } from "./top-nations-module";
 
 export type ProfileStickerItem = {
   absoluteNum: number;
@@ -80,6 +88,10 @@ export type ProfileSettingsV2 = {
   missingCount: number;
   duplicatesSample: ProfileStickerItem[];
   missingSample: ProfileStickerItem[];
+  topNations?: NationProgress[];
+  cardCode?: string;
+  cardNumber?: string;
+  flag?: string;
 };
 
 export type PublicProfileV2 = Omit<
@@ -770,32 +782,33 @@ function ProfileSettingsCard({
         <CardDescription>Controle visibilidade e logística</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <Label htmlFor="public-profile">Perfil público</Label>
             <p className="text-sm text-muted-foreground">
               Permite que outros colecionadores vejam suas listas por link.
             </p>
           </div>
-          <Checkbox
+          <Switch
             id="public-profile"
             checked={isPublic}
             disabled={isUpdating}
-            onCheckedChange={(checked) => void onTogglePublic(checked === true)}
+            onCheckedChange={(checked) => void onTogglePublic(checked)}
           />
         </div>
-        <div className="flex items-start justify-between gap-4">
+        <div className="border-t border-outline-variant" />
+        <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <Label htmlFor="accepts-mail">Aceito trocas por correio</Label>
             <p className="text-sm text-muted-foreground">
               Sinaliza disponibilidade fora da sua cidade.
             </p>
           </div>
-          <Checkbox
+          <Switch
             id="accepts-mail"
             checked={acceptsMail}
             disabled={isUpdating}
-            onCheckedChange={(checked) => void onToggleMail(checked === true)}
+            onCheckedChange={(checked) => void onToggleMail(checked)}
           />
         </div>
       </CardContent>
@@ -938,6 +951,26 @@ function PublicCtaCard({
   );
 }
 
+const HERO_VARIANT_KEY = "profile-hero-variant";
+
+function useHeroVariant(): [HeroVariant, (v: HeroVariant) => void] {
+  const [variant, setVariant] = useState<HeroVariant>("trading-card");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(HERO_VARIANT_KEY);
+    if (stored === "banner" || stored === "credential" || stored === "trading-card") {
+      setVariant(stored);
+    }
+  }, []);
+
+  const setAndStore = (v: HeroVariant) => {
+    setVariant(v);
+    localStorage.setItem(HERO_VARIANT_KEY, v);
+  };
+
+  return [variant, setAndStore];
+}
+
 export function PrivateProfileView({
   profile,
   trades,
@@ -960,15 +993,68 @@ export function PrivateProfileView({
   onShare: () => void;
 }) {
   const name = displayName(profile);
+  const [heroVariant, setHeroVariant] = useHeroVariant();
+
+  const achievements = deriveAchievements({
+    totalTrades: profile.totalTrades,
+    albumCompletionPct: profile.albumCompletionPct,
+    ratingCount: profile.ratingCount,
+    ratingAvg: profile.ratingAvg,
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
-      <PrivateHero
-        profile={profile}
+      <ProfileHero
+        variant={heroVariant}
+        nickname={profile.nickname}
+        displayNickname={profile.displayNickname}
+        avatarSeed={profile.avatarSeed ?? profile.nickname}
+        flag={profile.flag ?? "🇧🇷"}
+        cardCode={profile.cardCode ?? "BRA-10"}
+        cardNumber={profile.cardNumber ?? "001"}
+        city={profile.city}
+        joinedAt={profile.createdAt}
+        ratingAvg={profile.ratingAvg}
+        ratingCount={profile.ratingCount}
+        totalTrades={profile.totalTrades}
+        isVerified={profile.isVerified}
         profileUrl={profileUrl}
-        onCopyLink={onCopyLink}
-        onShare={onShare}
       />
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          className="flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={onShare}
+          disabled={!profile.isProfilePublic}
+        >
+          <Share2 className="size-4" />
+          Compartilhar
+        </Button>
+        <Button
+          variant="outline"
+          className="gap-2 border-white/10 bg-white/5"
+          onClick={onCopyLink}
+          disabled={!profile.isProfilePublic}
+        >
+          <Copy className="size-4" />
+          Copiar link
+        </Button>
+        <Button
+          variant="outline"
+          className="gap-2 border-white/10 bg-white/5"
+          asChild
+          aria-disabled={!profile.isProfilePublic}
+        >
+          <a
+            href={profile.isProfilePublic ? profileUrl : "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink className="size-4" />
+            Abrir
+          </a>
+        </Button>
+      </div>
 
       <ProfileProgressCard
         albumCompletionPct={profile.albumCompletionPct}
@@ -977,6 +1063,12 @@ export function PrivateProfileView({
         duplicatesCount={profile.duplicatesCount}
         missingCount={profile.missingCount}
       />
+
+      {profile.topNations && profile.topNations.length > 0 && (
+        <TopNationsModule nations={profile.topNations} />
+      )}
+
+      <AchievementsModule achievements={achievements} />
 
       <Tabs defaultValue="duplicates" className="gap-4">
         <TabsList className="w-full justify-start overflow-x-auto rounded-full bg-surface-container p-1">
@@ -1026,7 +1118,8 @@ export function PrivateProfileView({
         </TabsContent>
       </Tabs>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <HeroVariantSelector value={heroVariant} onChange={setHeroVariant} />
         <ProfileSettingsCard
           isPublic={profile.isProfilePublic}
           acceptsMail={profile.acceptsMail}
@@ -1034,28 +1127,29 @@ export function PrivateProfileView({
           onTogglePublic={onTogglePublic}
           onToggleMail={onToggleMail}
         />
-        {profile.isProfilePublic ? (
-          <ProfileLinkCard
-            profileUrl={profileUrl}
-            displayNickname={name}
-            duplicatesCount={profile.duplicatesCount}
-            albumCompletionPct={profile.albumCompletionPct}
-            showOpenButton
-          />
-        ) : (
-          <Card className="border-white/10 bg-surface-container">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-headline text-base">
-                <Lock className="size-5" />
-                Link público desativado
-              </CardTitle>
-              <CardDescription>
-                Ative perfil público para liberar QR code e compartilhamento.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
       </div>
+
+      {profile.isProfilePublic ? (
+        <ProfileLinkCard
+          profileUrl={profileUrl}
+          displayNickname={name}
+          duplicatesCount={profile.duplicatesCount}
+          albumCompletionPct={profile.albumCompletionPct}
+          showOpenButton
+        />
+      ) : (
+        <Card className="border-white/10 bg-surface-container">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-headline text-base">
+              <Lock className="size-5" />
+              Link público desativado
+            </CardTitle>
+            <CardDescription>
+              Ative perfil público para liberar QR code e compartilhamento.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
     </div>
   );
 }
