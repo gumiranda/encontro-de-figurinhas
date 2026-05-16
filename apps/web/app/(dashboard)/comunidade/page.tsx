@@ -1,17 +1,7 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Comunidade",
-  robots: { index: false, follow: false },
-};
+import { FeedScreen } from "@/modules/comunidade/ui/components/feed-screen";
 
 export default function ComunidadePage() {
-  return (
-    <div className="space-y-2">
-      <h1 className="font-headline text-3xl font-extrabold tracking-tight">
-        Comunidade
-      </h1>
-      <p className="text-on-surface-variant">Em breve.</p>
-    </div>
-  );
+  return <FeedScreen />;
 }

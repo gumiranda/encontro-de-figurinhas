@@ -15,6 +15,7 @@ import type * as blog from "../blog.js";
 import type * as boringGame from "../boringGame.js";
 import type * as checkins from "../checkins.js";
 import type * as cities from "../cities.js";
+import type * as communityPosts from "../communityPosts.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
@@ -81,6 +82,7 @@ declare const fullApi: ApiFromModules<{
   boringGame: typeof boringGame;
   checkins: typeof checkins;
   cities: typeof cities;
+  communityPosts: typeof communityPosts;
   crons: typeof crons;
   http: typeof http;
   "lib/auth": typeof lib_auth;

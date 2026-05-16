@@ -12,7 +12,7 @@ export const listByCityPaginated = query({
   handler: async (ctx, { paginationOpts }) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user?.cityId) {
-      return { page: [], continueCursor: null, isDone: true };
+      return { page: [], continueCursor: "", isDone: true };
     }
 
     const result = await ctx.db
