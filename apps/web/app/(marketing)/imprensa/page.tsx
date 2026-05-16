@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  Building2,
   Newspaper,
   PiggyBank,
   ShieldAlert,
@@ -18,6 +19,7 @@ import {
 } from "@workspace/ui/components/card";
 import { JsonLd } from "@/components/json-ld";
 import { HELLOSKIP_MENTIONS } from "@/lib/external-mentions";
+import { LOCAL_LINK_TARGETS } from "@/lib/seo-campaigns";
 import {
   BASE_URL,
   generateBreadcrumbSchema,
@@ -104,8 +106,11 @@ const pageSchema = {
   name: "FigurinhaFacil na midia",
   url: `${BASE_URL}/imprensa`,
   description:
-    "Hub de citacoes externas que conectam FigurinhaFacil a temas como preco, risco e economia nas figurinhas da Copa.",
-  citation: HELLOSKIP_MENTIONS.map((mention) => mention.href),
+    "Hub de citacoes externas, pauta de imprensa e oportunidades locais que conectam FigurinhaFacil a preco, risco, economia e pontos de troca da Copa.",
+  citation: [
+    ...HELLOSKIP_MENTIONS.map((mention) => mention.href),
+    ...LOCAL_LINK_TARGETS.map((target) => target.href),
+  ],
 };
 
 export default function ImprensaPage() {
@@ -155,6 +160,11 @@ export default function ImprensaPage() {
                 <Button variant="secondary" asChild>
                   <Link href="/calculadora-figurinhas">
                     Calcular custo do album
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/pontos-de-troca-figurinhas-copa-2026">
+                    Pauta pontos de troca
                   </Link>
                 </Button>
               </div>
@@ -211,6 +221,64 @@ export default function ImprensaPage() {
                   </Card>
                 ),
               )}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-muted/30 py-16 md:py-24">
+          <div className="container mx-auto px-4">
+            <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+              <div>
+                <Badge className="mb-4">Pauta para imprensa local</Badge>
+                <h2 className="mb-4 font-headline text-3xl font-bold">
+                  Cadastre seu ponto de troca gratis
+                </h2>
+                <p className="mb-6 max-w-3xl text-muted-foreground">
+                  Shoppings, bancas, escolas e eventos podem aparecer no guia de
+                  pontos de troca da Copa 2026. A pauta serve para blogs locais
+                  incluirem um servico util ao leitor: onde trocar, quando ir e
+                  como cadastrar novos encontros.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild>
+                    <Link href="/ponto/solicitar">
+                      Cadastrar ponto
+                      <Building2 className="ml-2 size-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="secondary">
+                    <Link href="/pontos-de-troca-figurinhas-copa-2026">
+                      Ver guia por cidade
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Alvos de outreach</CardTitle>
+                  <CardDescription>
+                    Materias sobre pontos de troca que podem receber link de
+                    servico.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {LOCAL_LINK_TARGETS.map((target) => (
+                    <a
+                      key={target.href}
+                      href={target.href}
+                      className="block rounded-lg border p-3 text-sm transition-colors hover:border-primary/50"
+                    >
+                      <span className="block font-medium text-foreground">
+                        {target.name}
+                      </span>
+                      <span className="mt-1 block text-muted-foreground">
+                        {target.city}: {target.angle}
+                      </span>
+                    </a>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
@@ -85,10 +85,18 @@ export default async function CitiesHubPage() {
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground">
-                Encontre colecionadores de figurinhas da Copa do Mundo 2026 em
-                todas as regiões do Brasil. Selecione sua cidade e comece a
-                trocar.
+                Encontre pontos de troca de figurinhas da Copa do Mundo 2026 por
+                cidade, veja colecionadores ativos e cadastre novos encontros
+                locais para completar o álbum.
               </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button asChild>
+                  <Link href="/pontos-de-troca-figurinhas-copa-2026">
+                    Guia de pontos por cidade
+                    <MapPin className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -109,12 +117,17 @@ export default async function CitiesHubPage() {
               ajuda a expandir a rede e será notificado quando houver
               colecionadores próximos.
             </p>
-            <Button size="lg" asChild>
-              <Link href="/sign-up">
-                Criar conta grátis
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button size="lg" asChild>
+                <Link href="/sign-up">
+                  Criar conta grátis
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/ponto/solicitar">Cadastrar ponto de troca</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>

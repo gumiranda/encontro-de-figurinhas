@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   TrendingDown,
-  Calculator,
   Zap,
   DollarSign,
   Target,
@@ -55,8 +54,7 @@ export const metadata: Metadata = {
     "inversão album copa 2026",
   ],
   openGraph: {
-    title:
-      "Quanto Custa Completar o Álbum da Copa 2026? Guia de Economia",
+    title: "Quanto Custa Completar o Álbum da Copa 2026? Guia de Economia",
     description:
       "Saiba o custo real do álbum Copa 2026, estimativas de gasto total e estratégias para economizar trocando figurinhas.",
     url: ARTICLE_URL,
@@ -64,18 +62,11 @@ export const metadata: Metadata = {
     publishedTime: PUBLISHED_AT,
     modifiedTime: MODIFIED_AT,
     authors: [SITE_NAME],
-    tags: [
-      "Copa 2026",
-      "Álbum de figurinhas",
-      "Custo",
-      "Economia",
-      "Panini",
-    ],
+    tags: ["Copa 2026", "Álbum de figurinhas", "Custo", "Economia", "Panini"],
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Quanto Custa Completar o Álbum da Copa 2026? Guia Completo",
+    title: "Quanto Custa Completar o Álbum da Copa 2026? Guia Completo",
     description:
       "Descubra o custo total do álbum Copa 2026 e como economizar trocando figurinhas.",
   },
@@ -194,26 +185,48 @@ const costComparison = [
   },
 ];
 
+const studyFindings = [
+  {
+    metric: "Compra sem troca",
+    value: "R$ 2.500 - R$ 5.000",
+    note: "Faixa realista quando repetidas se acumulam e as ultimas figurinhas ficam raras.",
+  },
+  {
+    metric: "Compra com troca ativa",
+    value: "R$ 500 - R$ 1.500",
+    note: "Cenario com cadastro de repetidas, faltantes e trocas recorrentes por cidade.",
+  },
+  {
+    metric: "Economia potencial",
+    value: "ate R$ 3.500+",
+    note: "Diferenca entre insistir em pacotinhos e transformar repetidas em trocas.",
+  },
+] as const;
+
 const monthlyBudget = [
   {
     month: "Mês 1 (Lançamento)",
     investment: "R$ 150 - R$ 300",
-    actions: "Compre o álbum brochura + 20 a 40 pacotinhos, comece a cadastrar no Figurinha Fácil",
+    actions:
+      "Compre o álbum brochura + 20 a 40 pacotinhos, comece a cadastrar no Figurinha Fácil",
   },
   {
     month: "Mês 2",
     investment: "R$ 100 - R$ 200",
-    actions: "Compre menos pacotinhos, faça trocas regularmente com a comunidade",
+    actions:
+      "Compre menos pacotinhos, faça trocas regularmente com a comunidade",
   },
   {
     month: "Mês 3",
     investment: "R$ 50 - R$ 100",
-    actions: "Apenas pacotinhos ocasionais, foco total em trocas de figurinhas faltantes",
+    actions:
+      "Apenas pacotinhos ocasionais, foco total em trocas de figurinhas faltantes",
   },
   {
     month: "Mês 4+",
     investment: "R$ 0 - R$ 50",
-    actions: "Apenas trocas, muito poucas compras. Procure figurinhas especiais faltantes",
+    actions:
+      "Apenas trocas, muito poucas compras. Procure figurinhas especiais faltantes",
   },
 ];
 
@@ -300,7 +313,11 @@ export default function CustoAlbumCopa2026Page() {
             </h1>
 
             <p className="text-lg md:text-xl text-[var(--on-surface-variant)] max-w-3xl leading-relaxed">
-              Descubra o <strong>custo real</strong> para completar o álbum Copa 2026 com 980 figurinhas. Comparamos estratégias de compra versus trocas, apresentamos <strong>orçamentos realistas</strong> e ensinamos como <strong>economizar mais de R$ 5 mil</strong> usando a comunidade de colecionadores.
+              Descubra o <strong>custo real</strong> para completar o álbum Copa
+              2026 com 980 figurinhas. Comparamos estratégias de compra versus
+              trocas, apresentamos <strong>orçamentos realistas</strong> e
+              ensinamos como <strong>economizar mais de R$ 5 mil</strong> usando
+              a comunidade de colecionadores.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-[var(--outline)]">
@@ -321,7 +338,9 @@ export default function CustoAlbumCopa2026Page() {
                 Comparativo: Qual estratégia é mais barata?
               </h2>
               <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
-                O custo para completar o álbum Copa 2026 varia drasticamente conforme a estratégia. Veja quanto você pode gastar em cada cenário:
+                O custo para completar o álbum Copa 2026 varia drasticamente
+                conforme a estratégia. Veja quanto você pode gastar em cada
+                cenário:
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -353,6 +372,40 @@ export default function CustoAlbumCopa2026Page() {
           </div>
         </section>
 
+        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+          <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-6 md:p-8">
+            <Badge className="mb-4">Estudo para citacao</Badge>
+            <h2 className="mb-4 font-[var(--font-headline)] text-2xl font-bold md:text-3xl">
+              Quanto custa completar o album sem trocar vs trocando?
+            </h2>
+            <p className="mb-6 max-w-3xl text-[var(--on-surface-variant)]">
+              Este resumo foi criado para materias, blogs e posts que precisam
+              citar a diferenca entre comprar pacotinhos ate fechar o album e
+              usar trocas para reduzir repetidas paradas.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              {studyFindings.map((finding) => (
+                <Card
+                  key={finding.metric}
+                  className="bg-[var(--surface-container)] border-[var(--outline-variant)]/10"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      {finding.metric}
+                    </CardTitle>
+                    <CardDescription>{finding.note}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold text-[var(--primary)]">
+                      {finding.value}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Intro */}
         <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
           <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
@@ -360,16 +413,30 @@ export default function CustoAlbumCopa2026Page() {
           </h2>
           <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
             <p>
-              Vamos à matemática básica: você precisa de <strong>980 figurinhas</strong> para completar o álbum. Com pacotinhos de <strong>7 figurinhas</strong> a <strong>R$ 7 cada</strong>, você pagaria <strong>R$ 1 por figurinha</strong>.
+              Vamos à matemática básica: você precisa de{" "}
+              <strong>980 figurinhas</strong> para completar o álbum. Com
+              pacotinhos de <strong>7 figurinhas</strong> a{" "}
+              <strong>R$ 7 cada</strong>, você pagaria{" "}
+              <strong>R$ 1 por figurinha</strong>.
             </p>
             <p>
-              Matematicamente, <strong>980 ÷ 7 × 7 = R$ 980</strong> em figurinhas, mais <strong>R$ 24,90</strong> do álbum brochura = <strong>R$ 1.004,90</strong> de investimento teórico.
+              Matematicamente, <strong>980 ÷ 7 × 7 = R$ 980</strong> em
+              figurinhas, mais <strong>R$ 24,90</strong> do álbum brochura ={" "}
+              <strong>R$ 1.004,90</strong> de investimento teórico.
             </p>
             <p>
-              Porém, <strong>essa conta não funciona na prática</strong>. Você receberá muitas figurinhas repetidas. As últimas 50-100 figurinhas que faltam têm probabilidade de aparição tão baixa que você precisará comprar centenas de pacotinhos adicionais até consegui-las.
+              Porém, <strong>essa conta não funciona na prática</strong>. Você
+              receberá muitas figurinhas repetidas. As últimas 50-100 figurinhas
+              que faltam têm probabilidade de aparição tão baixa que você
+              precisará comprar centenas de pacotinhos adicionais até
+              consegui-las.
             </p>
             <p>
-              Este fenômeno é chamado de <strong>"problema dos colecionadores"</strong> ou <strong>"coupon collector problem"</strong>. Para uma coleção de 980 itens, o custo esperado é aproximadamente <strong>R$ 2.500 a R$ 5.000</strong>.
+              Este fenômeno é chamado de{" "}
+              <strong>"problema dos colecionadores"</strong> ou{" "}
+              <strong>"coupon collector problem"</strong>. Para uma coleção de
+              980 itens, o custo esperado é aproximadamente{" "}
+              <strong>R$ 2.500 a R$ 5.000</strong>.
             </p>
           </div>
         </section>
@@ -386,7 +453,9 @@ export default function CustoAlbumCopa2026Page() {
               </CardHeader>
               <CardContent className="space-y-2 text-[var(--on-surface-variant)]">
                 <p>
-                  João comprou apenas pacotinhos até completar o álbum. Gastou <strong>R$ 3.200</strong> em figurinhas + R$ 24,90 em álbum = <strong>R$ 3.224,90 total</strong>. Demorou 3 meses.
+                  João comprou apenas pacotinhos até completar o álbum. Gastou{" "}
+                  <strong>R$ 3.200</strong> em figurinhas + R$ 24,90 em álbum ={" "}
+                  <strong>R$ 3.224,90 total</strong>. Demorou 3 meses.
                 </p>
               </CardContent>
             </Card>
@@ -397,7 +466,11 @@ export default function CustoAlbumCopa2026Page() {
               </CardHeader>
               <CardContent className="space-y-2 text-[var(--on-surface-variant)]">
                 <p>
-                  Maria começou com R$ 800 em compras iniciais, mas fez muitas trocas no Figurinha Fácil. Economizou <strong>R$ 2.000</strong> em comparação com compras sem trocas. Custo final: <strong>R$ 1.200</strong>. Também demorou 3 meses.
+                  Maria começou com R$ 800 em compras iniciais, mas fez muitas
+                  trocas no Figurinha Fácil. Economizou{" "}
+                  <strong>R$ 2.000</strong> em comparação com compras sem
+                  trocas. Custo final: <strong>R$ 1.200</strong>. Também demorou
+                  3 meses.
                 </p>
               </CardContent>
             </Card>
@@ -408,7 +481,10 @@ export default function CustoAlbumCopa2026Page() {
               </CardHeader>
               <CardContent className="space-y-2 text-[var(--on-surface-variant)]">
                 <p>
-                  Pedro investiu R$ 600 e passava muito tempo trocando com vizinhos e na comunidade. Completou por <strong>R$ 700 total</strong> em 4 meses, economizando mais de <strong>R$ 2.500</strong>.
+                  Pedro investiu R$ 600 e passava muito tempo trocando com
+                  vizinhos e na comunidade. Completou por{" "}
+                  <strong>R$ 700 total</strong> em 4 meses, economizando mais de{" "}
+                  <strong>R$ 2.500</strong>.
                 </p>
               </CardContent>
             </Card>
@@ -421,7 +497,8 @@ export default function CustoAlbumCopa2026Page() {
             Plano de orçamento mensal recomendado
           </h2>
           <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8">
-            Sugerimos espalhar o investimento ao longo de 4 meses, combinando compras com trocas:
+            Sugerimos espalhar o investimento ao longo de 4 meses, combinando
+            compras com trocas:
           </p>
           <div className="space-y-3">
             {monthlyBudget.map((month) => (
@@ -446,7 +523,8 @@ export default function CustoAlbumCopa2026Page() {
             ))}
           </div>
           <p className="text-sm text-[var(--outline)] mt-6">
-            <strong>Investimento total recomendado: R$ 300 a R$ 650</strong> ao longo de 4 meses = Álbum completo por menos de R$ 1.500.
+            <strong>Investimento total recomendado: R$ 300 a R$ 650</strong> ao
+            longo de 4 meses = Álbum completo por menos de R$ 1.500.
           </p>
         </section>
 
@@ -575,7 +653,10 @@ export default function CustoAlbumCopa2026Page() {
               </h2>
             </div>
             <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-6">
-              No <strong>Figurinha Fácil</strong>, você encontra colecionadores perto de você com figurinhas que faltam no seu álbum. Sem pagar nada por troca. É a forma mais econômica de completar a coleção Copa 2026.
+              No <strong>Figurinha Fácil</strong>, você encontra colecionadores
+              perto de você com figurinhas que faltam no seu álbum. Sem pagar
+              nada por troca. É a forma mais econômica de completar a coleção
+              Copa 2026.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -650,7 +731,8 @@ export default function CustoAlbumCopa2026Page() {
               Economize até R$ 5 mil ao completar o álbum Copa 2026
             </h2>
             <p className="text-[var(--on-surface-variant)] text-base md:text-lg max-w-2xl mx-auto">
-              Combine compras estratégicas com trocas no Figurinha Fácil para completar seu álbum pelo preço mais justo do mercado.
+              Combine compras estratégicas com trocas no Figurinha Fácil para
+              completar seu álbum pelo preço mais justo do mercado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button

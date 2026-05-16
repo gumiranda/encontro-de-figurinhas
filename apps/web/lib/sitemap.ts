@@ -214,6 +214,30 @@ export function getStaticSitemap(now = new Date()): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE_URL}/pontos-de-troca-figurinhas-copa-2026`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/comparativos/figurinha-facil-vs-planilha`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/comparativos/figurinha-facil-vs-grupo-whatsapp`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: `${BASE_URL}/comparativos/melhores-apps-controlar-figurinhas-copa-2026`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/custo-album-copa-2026`,
       lastModified: now,
       changeFrequency: "monthly",
