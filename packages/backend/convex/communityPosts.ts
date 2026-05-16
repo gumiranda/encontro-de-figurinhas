@@ -1,13 +1,11 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAuth, getAuthenticatedUser } from "./lib/auth";
 
 export const listByCityPaginated = query({
   args: {
-    paginationOpts: v.object({
-      numItems: v.number(),
-      cursor: v.union(v.string(), v.null()),
-    }),
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, { paginationOpts }) => {
     const user = await getAuthenticatedUser(ctx);
