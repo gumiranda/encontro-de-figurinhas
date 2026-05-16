@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Identidade Visual — FigurinhaFácil</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Cores extraídas do logo do usuário */
+    --navy-900: #0a2a5e;        /* azul marinho profundo (deeper) */
+    --navy-800: #103e85;        /* AZUL PRIMÁRIO — fundo do logo */
+    --navy-700: #1a52a8;        /* hover/secondary */
+    --navy-600: #2a6ec7;        /* support */
+    --navy-100: #c9dcf0;        /* superfície clara */
+    --navy-50:  #eef4fb;        /* superfície papel */
+
+    --lime-700: #4d8a1e;        /* lime escuro (legibilidade em branco) */
+    --lime-600: #5fa826;        /* lime médio */
+    --lime-500: #7ed635;        /* LIME PRIMÁRIO — "fácil" no logo */
+    --lime-400: #9ae457;
+    --lime-100: #e6f6d6;        /* lime tint */
+
+    --cyan-500: #2cb1e6;        /* azul-ciano da figurinha esquerda */
+    --cyan-100: #d6eef9;
+
+    --ink:      #0a1530;        /* texto sobre branco */
+    --ink-60:   #5b6480;
+    --ink-30:   #a4abc1;
+    --paper:    #f5f3ec;        /* off-white tipo papel de álbum */
+    --paper-2:  #ebe7d7;        /* mais escuro */
+    --white:    #ffffff;
+  }
+
+  body { font-family: "Inter", sans-serif; color: var(--ink); background: #ddd6c4; }
+  .ff-display { font-family: "Poppins", sans-serif; font-weight: 800; letter-spacing: -0.04em; }
+  .ff-body    { font-family: "Inter", sans-serif; }
+  .ff-mono    { font-family: "JetBrains Mono", monospace; }
+
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'opsz' 24; vertical-align: middle; }
+  .icon-fill { font-variation-settings: 'FILL' 1,'wght' 600,'opsz' 24; }
+
+  /* Backgrounds */
+  .bg-paper  { background: var(--paper); }
+  .bg-paper2 { background: var(--paper-2); }
+  .bg-navy   { background: var(--navy-800); color: var(--white); }
+  .bg-lime   { background: var(--lime-500); color: var(--navy-900); }
+  .bg-ink    { background: var(--ink); color: var(--white); }
+
+  /* Hairline grid for canvas */
+  .grid-hairline {
+    background-image:
+      linear-gradient(rgba(10,21,48,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10,21,48,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .grid-hairline-dark {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Eyebrow chip */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 9999px;
+    background: var(--navy-100);
+    border: 1px solid rgba(16,62,133,0.15);
+    color: var(--navy-800);
+    font-family: "Inter", sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .eyebrow.lime  { background: var(--lime-100); border-color: rgba(126,214,53,0.3); color: var(--lime-700); }
+  .eyebrow.dark  { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); color: var(--white); }
+
+  /* Spec card */
+  .spec {
+    border: 1px solid rgba(10,21,48,0.08);
+    border-radius: 16px;
+    background: var(--white);
+    padding: 20px;
+  }
+
+  /* Color chip — large stripe with hex info */
+  .chip {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(10,21,48,0.08);
+    background: var(--white);
+  }
+  .chip .swatch {
+    height: 130px;
+    display: flex; align-items: flex-end; padding: 16px;
+  }
+  .chip .meta {
+    padding: 14px 16px; border-top: 1px solid rgba(10,21,48,0.06);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+
+  /* The mark — recreated faithfully from the user's logo so we can present
+     it clean at any size and on any background. Two parallelogram stickers
+     tilted toward each other with a center swap dot.
+     Built as inline SVG below; this just hosts spacing tokens. */
+
+  /* Wordmark proportions (matches user's logo: poppins black, lowercase, navy + lime split) */
+  .wordmark {
+    display: inline-flex; align-items: baseline; line-height: 0.85;
+    font-family: "Poppins", sans-serif; font-weight: 800; letter-spacing: -0.045em;
+  }
+  .wordmark .figurinha { color: var(--white); }
+  .wordmark .facil     { color: var(--lime-500); }
+  .wordmark.on-paper .figurinha { color: var(--navy-800); }
+
+  /* Sticker tile — derived primitive of the brand */
+  .ff-tile {
+    position: relative;
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px -10px rgba(10,21,48,0.4);
+    border: 3px solid var(--white);
+  }
+  .ff-tile.cyan { background: linear-gradient(160deg, var(--cyan-500) 0%, #1a90c9 100%); }
+  .ff-tile.lime { background: linear-gradient(160deg, var(--lime-500) 0%, var(--lime-700) 100%); }
+  .ff-tile.navy { background: linear-gradient(160deg, var(--navy-700) 0%, var(--navy-900) 100%); }
+
+  /* Pattern derived from logo: stickers floating */
+  .pattern-stickers {
+    position: relative; overflow: hidden;
+  }
+
+  /* Voice card — quoted */
+  .voice-card {
+    border: 1.5px dashed rgba(10,21,48,0.18);
+    border-radius: 14px;
+    padding: 18px;
+    background: var(--paper);
+  }
+  .voice-card.do  { border-color: rgba(126,214,53,0.5); background: var(--lime-100); }
+  .voice-card.dont { border-color: rgba(217,52,52,0.4); background: #fceeee; }
+
+  /* Sticker code badge style */
+  .code-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 6px;
+    background: var(--navy-100);
+    color: var(--navy-800);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+  }
+
+  /* Section number ribbon */
+  .ribbon-num {
+    font-family: "Poppins", sans-serif; font-weight: 800;
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--lime-700);
+    display: inline-flex; align-items: center; gap: 8px;
+    text-transform: uppercase;
+  }
+  .ribbon-num::before {
+    content: ""; width: 24px; height: 1.5px; background: var(--lime-700);
+  }
+
+  /* Button style derived from brand */
+  .btn-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px; border-radius: 9999px;
+    font-family: "Poppins", sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 0.02em;
+    border: none; cursor: pointer;
+  }
+  .btn-pill.primary {
+    background: var(--lime-500); color: var(--navy-900);
+    box-shadow: 0 0 0 4px rgba(126,214,53,0.18);
+  }
+  .btn-pill.secondary {
+    background: var(--white); color: var(--navy-800);
+    border: 2px solid var(--navy-800);
+  }
+  .btn-pill.ghost {
+    background: transparent; color: var(--white);
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+
+  /* Rotating ribbon */
+  .rotate-tape {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--lime-500); color: var(--navy-900);
+    padding: 8px 24px; transform: rotate(-2deg);
+    font-family: "Poppins", sans-serif; font-weight: 800;
+    letter-spacing: 0.1em; text-transform: uppercase; font-size: 14px;
+    box-shadow: 0 4px 0 var(--navy-800);
+  }
+
+  /* Full-bleed hero */
+  .hero-bleed {
+    background: var(--navy-800);
+    background-image:
+      radial-gradient(ellipse 60% 60% at 80% 30%, rgba(126,214,53,0.18), transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(44,177,230,0.12), transparent 60%);
+  }
+
+  /* Subtle stitch border (sticker die-cut feel) */
+  .stitch {
+    border: 2px dashed rgba(255,255,255,0.4);
+    border-radius: 8px;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 280px; aspect-ratio: 9/19;
+    background: var(--ink); border-radius: 36px;
+    padding: 10px;
+    box-shadow: 0 30px 60px -20px rgba(10,21,48,0.5), 0 0 0 1px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  .phone-screen {
+    width: 100%; height: 100%; border-radius: 28px;
+    overflow: hidden; position: relative;
+    background: var(--navy-800);
+  }
+  .phone::before {
+    content:""; position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:80px; height:24px; background:#000; border-radius:14px; z-index:2;
+  }
+
+  /* Helper for SVG placement */
+  .mark-svg { display: block; }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="brand-mark.jsx"></script>
+<script type="text/babel" src="brand-pages.jsx"></script>
+<script type="text/babel" src="brand-app.jsx"></script>
+
+<div id="root"></div>
+</body>
+</html>
