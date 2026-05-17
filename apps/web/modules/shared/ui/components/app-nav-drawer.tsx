@@ -36,6 +36,7 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   badgeCount?: number;
+  isFeatured?: boolean;
 }
 
 export interface NavGroup {
@@ -66,6 +67,12 @@ export function useAppNavGroups(): RenderedNavGroup[] {
       {
         title: "Principal",
         items: [
+          {
+            label: "Modo troca",
+            href: "/cadastrar-figurinhas/troca",
+            icon: ListChecks,
+            isFeatured: true,
+          },
           { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
           { label: "Meu Álbum", href: "/album", icon: StickyNote },
           {
@@ -73,11 +80,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             href: "/cadastrar-figurinhas/quick",
             icon: ListPlus,
           },
-          {
-            label: "Minhas faltantes",
-            href: "/cadastrar-figurinhas/troca",
-            icon: ListChecks,
-          },
+
           { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
           {
             label: "Propostas",
@@ -117,10 +120,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         ariaDisabled: false,
       })),
     }));
-  }, [
-    navContext?.role,
-    navContext?.pendingProposalsCount,
-  ]);
+  }, [navContext?.role, navContext?.pendingProposalsCount]);
 }
 
 interface SidebarContentProps {
@@ -156,7 +156,11 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
 
               const baseClass = cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : item.isFeatured
+                    ? "bg-tertiary/10 font-semibold text-tertiary hover:bg-tertiary/15"
+                    : "hover:bg-muted"
               );
 
               const badge =
