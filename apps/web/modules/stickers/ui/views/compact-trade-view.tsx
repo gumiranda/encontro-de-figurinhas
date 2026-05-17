@@ -107,10 +107,10 @@ export function CompactTradeView() {
         </Button>
         <div className="flex-1">
           <h1 className="font-headline text-base font-black uppercase tracking-tight">
-            Minhas Faltantes
+            Modo Troca
           </h1>
           <p className="text-xs text-muted-foreground">
-            {missing.length} figurinhas · Toque para marcar como obtida
+            {missing.length} faltantes · visão rápida para marcar no ponto
           </p>
         </div>
       </header>
@@ -122,7 +122,7 @@ export function CompactTradeView() {
               Nenhuma figurinha faltante!
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Cadastre suas faltantes na tela principal.
+              Quando chegar no ponto de troca, suas faltantes aparecem aqui.
             </p>
           </div>
         ) : (

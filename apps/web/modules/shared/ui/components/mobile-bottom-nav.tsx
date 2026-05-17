@@ -1,19 +1,35 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowLeftRight,
   LayoutDashboard,
+  ListChecks,
   Map as MapIcon,
   MapPin,
   StickyNote,
+  type LucideIcon,
 } from "lucide-react";
-import { cn } from "@workspace/ui/lib/utils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
+type MobileNavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  isFeatured?: boolean;
+};
+
+const NAV_ITEMS: MobileNavItem[] = [
+  {
+    href: "/cadastrar-figurinhas/troca",
+    label: "Faltantes",
+    icon: ListChecks,
+    isFeatured: true,
+  },
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
   { href: "/album", label: "Álbum", icon: StickyNote },
+
   { href: "/matches", label: "Trocas", icon: ArrowLeftRight },
   { href: "/map", label: "Mapa", icon: MapIcon },
   { href: "/meus-pontos", label: "Pontos", icon: MapPin },
@@ -30,8 +46,7 @@ export function MobileBottomNav() {
       <ul className="mx-auto flex max-w-screen-sm items-stretch justify-between px-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <li key={item.href} className="flex-1">
               <Link
@@ -41,14 +56,17 @@ export function MobileBottomNav() {
                   "flex h-[var(--mobile-nav-height)] flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
                   active
                     ? "text-primary"
-                    : "text-on-surface-variant hover:text-foreground",
+                    : item.isFeatured
+                      ? "text-tertiary"
+                      : "text-on-surface-variant hover:text-foreground"
                 )}
               >
                 <Icon
                   aria-hidden="true"
                   className={cn(
                     "size-6 transition-transform",
-                    active && "drop-shadow-[0_0_6px_color-mix(in_srgb,var(--primary)_55%,transparent)]",
+                    active &&
+                      "drop-shadow-[0_0_6px_color-mix(in_srgb,var(--primary)_55%,transparent)]"
                   )}
                   strokeWidth={active ? 2.25 : 1.75}
                 />
