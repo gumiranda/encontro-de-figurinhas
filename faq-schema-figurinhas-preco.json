@@ -1,0 +1,54 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Qual vai ser o valor das figurinhas da Copa 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "O pacote de figurinhas da Copa 2026 custa R$ 7,00 e contém 7 figurinhas. O álbum capa mole custa R$ 14,90 e a versão capa dura sai por R$ 79,90. Kits com álbum e pacotes variam de R$ 108,90 a R$ 359,90."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qual a figurinha mais rara do álbum da Copa 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As figurinhas mais raras são as Legends, que trazem jogadores históricos como Pelé, Maradona, Zidane e Ronaldo Fenômeno. Essas figurinhas podem valer de R$ 50 a R$ 300 dependendo do jogador e do estado de conservação."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quais são as figurinhas Legends Copa 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As figurinhas Legends da Copa 2026 incluem grandes craques da história do futebol: Pelé (Brasil), Maradona (Argentina), Zidane (França), Ronaldo Fenômeno (Brasil), Beckenbauer (Alemanha), Cruyff (Holanda), entre outros ícones que marcaram as Copas do Mundo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quanto custa 1 pacote de figurinhas da Copa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Um pacote oficial da Panini para a Copa 2026 custa R$ 7,00 e contém 7 figurinhas. Em algumas lojas, como Magazine Luiza e Americanas, você pode encontrar por R$ 6,90 em promoções."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quantas figurinhas tem o álbum da Copa 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "O álbum da Copa do Mundo 2026 tem 980 cromos no total, sendo a maior coleção da história das Copas. Isso inclui figurinhas de todas as seleções participantes, figurinhas especiais, Legends e paralelas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Como completar o álbum da Copa 2026 gastando menos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Para economizar: compre pacotes em caixa fechada (50 unidades), aproveite promoções de cashback, troque figurinhas repetidas em apps como Figurinha Fácil, e compre figurinhas avulsas apenas quando faltar poucas para completar."
+      }
+    }
+  ]
+}
