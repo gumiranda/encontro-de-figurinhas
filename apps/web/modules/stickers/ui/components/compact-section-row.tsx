@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@workspace/ui/lib/utils";
 import { memo, useCallback, type MouseEvent } from "react";
+import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface CompactSectionRowProps {
   sectionCode: string;
@@ -27,41 +28,49 @@ function CompactSectionRowBase({
         onRemove(num);
       }
     },
-    [onRemove]
+    [onRemove],
   );
 
   if (missingNumbers.length === 0) return null;
 
   return (
-    <div className="border-b border-outline-variant/30 py-2">
-      <div className="mb-1.5 flex items-center gap-2">
-        {emoji && <span className="text-sm">{emoji}</span>}
-        <span className="font-headline text-xs font-bold uppercase tracking-wide text-on-surface-variant">
+    <div className="flex w-fit max-w-full items-start gap-2 border-b border-outline-variant/30 pb-1.5">
+      <div className="flex h-7 shrink-0 items-center gap-1">
+        {emoji && (
+          <span className="shrink-0 text-sm" aria-hidden="true">
+            {emoji}
+          </span>
+        )}
+        <span className="font-headline text-xs font-bold uppercase leading-none tracking-wide text-on-surface-variant">
           {sectionCode}
         </span>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-[10px] leading-none text-muted-foreground">
           ({missingNumbers.length})
         </span>
       </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex min-w-0 flex-wrap gap-1">
         {missingNumbers.map((num) => {
           const relNum = num - startNumber + relStart;
           const label = relNum === 0 ? "00" : String(relNum).padStart(2, "0");
           return (
-            <button
+            <Button
               key={num}
               type="button"
+              variant="outline"
+              size="sm"
               data-num={num}
               onClick={handleChipClick}
+              aria-label={`Figurinha ${sectionCode}-${label}, marcar como obtida`}
+              title={`${sectionCode}-${label}`}
               className={cn(
-                "min-w-[32px] rounded-md border border-tertiary/40 bg-tertiary/10 px-1.5 py-0.5",
-                "font-mono text-xs font-semibold text-tertiary",
-                "transition-all hover:bg-tertiary/20 hover:scale-105",
-                "active:scale-95 active:bg-tertiary/30"
+                "h-7 w-8 min-w-8 shrink-0 rounded-md border-tertiary/40 bg-tertiary/10 px-1",
+                "font-mono text-xs font-semibold text-tertiary shadow-none",
+                "transition-transform duration-150 hover:scale-[1.02] hover:bg-tertiary/20 hover:text-tertiary",
+                "active:scale-[0.98] active:bg-tertiary/30",
               )}
             >
               {label}
-            </button>
+            </Button>
           );
         })}
       </div>

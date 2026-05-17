@@ -613,4 +613,16 @@ export default defineSchema({
     roundId: v.id("worldCupRounds"),
     reasons: v.array(boringReason),
   }).index("by_match_user", ["matchId", "userId"]),
+
+  communityPosts: defineTable({
+    userId: v.id("users"),
+    cityId: v.id("cities"),
+    type: v.union(v.literal("need"), v.literal("have")),
+    stickers: v.array(v.number()),
+    message: v.optional(v.string()),
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  })
+    .index("by_city_created", ["cityId", "createdAt"])
+    .index("by_user", ["userId"]),
 });

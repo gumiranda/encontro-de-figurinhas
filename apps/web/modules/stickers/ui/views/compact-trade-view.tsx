@@ -126,7 +126,7 @@ export function CompactTradeView() {
             </p>
           </div>
         ) : (
-          <div className="space-y-0">
+          <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
             {sectionsWithMissing.map((section) => (
               <CompactSectionRow
                 key={`${section.code}-${section.startNumber}`}

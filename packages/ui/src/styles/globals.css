@@ -829,6 +829,19 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+@keyframes shimmer-foil {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(280%) skewX(-20deg);
+  }
+}
+
+.animate-shimmer-foil {
+  animation: shimmer-foil 4.5s ease-in-out infinite;
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;
