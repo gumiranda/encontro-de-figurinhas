@@ -3,12 +3,12 @@
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
-import { MapPin, MessageCircle, MoreHorizontal, Share2, Swords, Trash2 } from "lucide-react";
+import { Check, MessageCircle, MoreHorizontal, Share2, Star, Swords, Trash2 } from "lucide-react";
 import { PostStickersGrid } from "./post-stickers-grid";
 import { ReactionRow } from "./reaction-row";
-import { CommentsThread, type Comment } from "./comments-thread";
+import { CommentsThread } from "./comments-thread";
+import { FeedAvatar } from "./feed-avatar";
 
-import { MatchDicebearAvatar } from "@/modules/matches/ui/components/match-dicebear-avatar";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -36,6 +36,7 @@ type PostAuthor = {
   nickname: string;
   displayNickname: string;
   avatarSeed: string;
+  rating?: number;
 };
 
 export type CommunityPost = {
@@ -61,12 +62,10 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
     locale: ptBR,
   });
 
-  const mockComments: Comment[] = [];
-
   return (
     <Card className="border-white/10 bg-surface-container">
       <CardHeader className="flex-row items-start gap-3 space-y-0 pb-3">
-        <MatchDicebearAvatar
+        <FeedAvatar
           seed={post.author?.avatarSeed ?? "anon"}
           size={40}
           fallbackInitials={post.author?.displayNickname?.slice(0, 2).toUpperCase() ?? "??"}
@@ -76,6 +75,12 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
             <span className="truncate font-semibold text-[13px]">
               @{post.author?.displayNickname ?? "Anônimo"}
             </span>
+            {post.author?.rating !== undefined && post.author.rating > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
+                <Star className="size-3 fill-tertiary text-tertiary" />
+                {post.author.rating.toFixed(1)}
+              </span>
+            )}
             {post.isOwn && (
               <span className="px-1.5 py-0.5 rounded bg-primary/15 text-primary font-headline text-[8px] font-bold tracking-widest">
                 VOCÊ
@@ -83,19 +88,26 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
             )}
             <Badge
               className={cn(
-                "text-[9px] px-2 py-0.5 font-headline font-bold tracking-wider",
+                "text-[9px] px-2 py-0.5 font-headline font-bold tracking-wider inline-flex items-center gap-1",
                 post.type === "have"
                   ? "bg-secondary/12 text-secondary border-secondary/30"
                   : "bg-primary/12 text-primary border-primary/30"
               )}
             >
-              {post.type === "have" ? "TENHO" : "PRECISO"}
+              {post.type === "have" ? (
+                <>
+                  <Check className="size-2.5" />
+                  TENHO
+                </>
+              ) : (
+                <>
+                  <Star className="size-2.5" />
+                  PRECISO
+                </>
+              )}
             </Badge>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
-            <MapPin className="size-2.5" />
-            <span>{post.author?.displayNickname ? "São Paulo, SP" : "—"}</span>
-            <span className="size-1 rounded-full bg-white/20" />
             <span>{timeAgo}</span>
           </div>
         </div>
@@ -131,7 +143,7 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
         />
 
         <div className="flex items-center justify-between pt-2.5 border-t border-white/10 gap-2 flex-wrap">
-          <ReactionRow />
+          <ReactionRow postId={post._id} />
 
           <div className="flex items-center gap-1.5">
             <button
@@ -140,7 +152,6 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
               className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
             >
               <MessageCircle className="size-3.5" />
-              {mockComments.length || 0}
             </button>
 
             <button
@@ -150,14 +161,14 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
               <Share2 className="size-3.5" />
             </button>
 
-            {!post.isOwn && (
+            {!post.isOwn && post.type === "need" && (
               <Button
                 variant="secondary"
                 size="sm"
                 className="h-7 px-2.5 text-[11px] gap-1.5"
                 onClick={onTrade}
               >
-                <Swords className="size-3" />
+                <Check className="size-3" />
                 Eu tenho!
               </Button>
             )}
@@ -175,11 +186,7 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
         </div>
 
         {showComments && (
-          <CommentsThread
-            comments={mockComments}
-            currentUserNick={post.author?.displayNickname ?? "user"}
-            onReply={(text) => console.log("Reply:", text)}
-          />
+          <CommentsThread postId={post._id} />
         )}
       </CardContent>
     </Card>

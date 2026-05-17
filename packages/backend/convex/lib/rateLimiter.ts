@@ -158,4 +158,28 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 600,
     shards: 4,
   },
+
+  // communityPosts feed listing — per user
+  communityFeed: {
+    kind: "token bucket",
+    rate: 120,
+    period: MINUTE,
+    capacity: 240,
+  },
+
+  // postReactions toggle — per user
+  communityReactions: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 60,
+  },
+
+  // postComments add — per user
+  communityComments: {
+    kind: "token bucket",
+    rate: 10,
+    period: MINUTE,
+    capacity: 20,
+  },
 });

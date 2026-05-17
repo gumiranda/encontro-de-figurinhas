@@ -1,163 +1,149 @@
 "use client";
 
+import { useMutation, usePaginatedQuery } from "convex/react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Star } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@workspace/ui/lib/utils";
-import { Star, Check } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
-import { MatchDicebearAvatar } from "@/modules/matches/ui/components/match-dicebear-avatar";
+import { toast } from "sonner";
 
-export interface Comment {
-  id: string;
-  nick: string;
-  text: string;
-  when: string;
-  rating?: number;
-  online?: boolean;
-  hasMatch?: boolean;
-  isMe?: boolean;
-}
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
+import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
+import { FeedAvatar } from "./feed-avatar";
 
 interface CommentsThreadProps {
-  comments: Comment[];
-  currentUserNick: string;
-  currentUserAvatar?: string;
-  onReply?: (text: string) => void;
+  postId: string;
 }
 
-function CommentItem({ comment }: { comment: Comment }) {
+interface CommentData {
+  _id: Id<"postComments">;
+  message: string;
+  createdAt: number;
+  author: {
+    _id: Id<"users">;
+    nickname: string;
+    avatarSeed: string;
+    rating: number;
+  } | null;
+}
+
+function CommentItem({ comment }: { comment: CommentData }) {
+  const timeAgo = formatDistanceToNow(comment.createdAt, {
+    addSuffix: true,
+    locale: ptBR,
+  });
+
   return (
     <div className="flex gap-2 pt-2.5">
-      <div className="relative flex-shrink-0">
-        <MatchDicebearAvatar
-          seed={comment.nick}
+      <div className="flex-shrink-0">
+        <FeedAvatar
+          seed={comment.author?.avatarSeed ?? "anon"}
           size={26}
-          fallbackInitials={comment.nick.slice(0, 2).toUpperCase()}
+          fallbackInitials={comment.author?.nickname?.slice(0, 2).toUpperCase() ?? "??"}
+          showRing={false}
         />
-        {comment.online && (
-          <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full bg-secondary border-2 border-surface-container" />
-        )}
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] font-bold">@{comment.nick}</span>
+          <span className="text-[11px] font-bold">
+            @{comment.author?.nickname ?? "Anônimo"}
+          </span>
 
-          {comment.isMe && (
-            <span className="px-1 py-px rounded bg-primary/15 text-primary font-headline text-[7px] font-bold tracking-widest">
-              VOCÊ
-            </span>
-          )}
-
-          {comment.rating && (
+          {comment.author?.rating !== undefined && comment.author.rating > 0 && (
             <span className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5">
               <Star className="size-2.5 fill-tertiary text-tertiary" />
-              {comment.rating}
-            </span>
-          )}
-
-          {comment.hasMatch && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-full bg-secondary/10 text-secondary font-headline text-[8px] font-bold tracking-widest">
-              <Check className="size-2" /> MATCH
+              {comment.author.rating.toFixed(1)}
             </span>
           )}
 
           <span className="text-[10px] text-muted-foreground ml-auto">
-            {comment.when}
+            {timeAgo}
           </span>
         </div>
 
         <p className="text-xs text-foreground mt-0.5 leading-relaxed">
-          {comment.text}
+          {comment.message}
         </p>
-
-        <div className="flex gap-3 mt-1">
-          <button
-            type="button"
-            className="text-[10px] font-semibold text-muted-foreground hover:text-foreground"
-          >
-            Responder
-          </button>
-          {!comment.isMe && (
-            <button
-              type="button"
-              className="text-[10px] font-semibold text-primary hover:text-primary/80"
-            >
-              Mensagem privada
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
 }
 
-export function CommentsThread({
-  comments,
-  currentUserNick,
-  currentUserAvatar,
-  onReply,
-}: CommentsThreadProps) {
-  const [expanded, setExpanded] = useState(false);
+export function CommentsThread({ postId }: CommentsThreadProps) {
   const [replyText, setReplyText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (comments.length === 0 && !expanded) return null;
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.postComments.listComments,
+    { postId: postId as Id<"communityPosts"> },
+    { initialNumItems: 3 }
+  );
 
-  const visible = expanded ? comments : comments.slice(0, 2);
-  const hiddenCount = comments.length - 2;
+  const addComment = useMutation(api.postComments.addComment);
 
-  const handleSubmit = () => {
-    if (!replyText.trim()) return;
-    onReply?.(replyText.trim());
-    setReplyText("");
+  const comments = (results ?? []) as CommentData[];
+
+  const handleSubmit = async () => {
+    if (!replyText.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await addComment({
+        postId: postId as Id<"communityPosts">,
+        message: replyText.trim(),
+      });
+      setReplyText("");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao comentar");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="mt-2.5 pt-1 border-t border-dashed border-white/10">
-      {visible.map((c) => (
-        <CommentItem key={c.id} comment={c} />
+      {comments.map((c) => (
+        <CommentItem key={c._id} comment={c} />
       ))}
 
-      {!expanded && hiddenCount > 0 && (
+      {status === "CanLoadMore" && (
         <button
           type="button"
-          onClick={() => setExpanded(true)}
+          onClick={() => loadMore(5)}
           className="text-primary text-[11px] font-semibold pt-2 pl-8 hover:underline"
         >
-          Ver mais {hiddenCount} comentário{hiddenCount > 1 ? "s" : ""} →
+          Ver mais comentários →
         </button>
       )}
 
-      {expanded && (
-        <div className="flex gap-2 mt-3 pt-2.5 border-t border-white/10">
-          <MatchDicebearAvatar
-            seed={currentUserAvatar || currentUserNick}
-            size={26}
-            fallbackInitials={currentUserNick.slice(0, 2).toUpperCase()}
+      <div className="flex gap-2 mt-3 pt-2.5 border-t border-white/10">
+        <div className="flex-1 flex gap-1.5">
+          <input
+            type="text"
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Comente ou ofereça uma troca..."
+            maxLength={300}
+            className={cn(
+              "flex-1 bg-surface-container-high border border-white/10 rounded-full",
+              "px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground",
+              "focus:outline-none focus:border-primary/50"
+            )}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           />
-          <div className="flex-1 flex gap-1.5">
-            <input
-              type="text"
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Comente ou ofereça uma troca..."
-              className={cn(
-                "flex-1 bg-surface-container-high border border-white/10 rounded-full",
-                "px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground",
-                "focus:outline-none focus:border-primary/50"
-              )}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            />
-            <Button
-              size="sm"
-              disabled={!replyText.trim()}
-              onClick={handleSubmit}
-              className="h-7 px-3 text-[11px]"
-            >
-              Enviar
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            disabled={!replyText.trim() || isSubmitting}
+            onClick={handleSubmit}
+            className="h-7 px-3 text-[11px]"
+          >
+            {isSubmitting ? "..." : "Enviar"}
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

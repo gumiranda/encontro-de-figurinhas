@@ -1,19 +1,15 @@
 "use client";
 
+import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
+import { api } from "@workspace/backend/_generated/api";
 import { cn } from "@workspace/ui/lib/utils";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 
 type ReactionType = "love" | "fire" | "hand";
 
-interface ReactionCounts {
-  love: number;
-  fire: number;
-  hand: number;
-}
-
 interface ReactionRowProps {
-  counts?: ReactionCounts;
-  onReact?: (type: ReactionType) => void;
+  postId: string;
 }
 
 const REACTIONS: { id: ReactionType; emoji: string; label: string }[] = [
@@ -22,20 +18,51 @@ const REACTIONS: { id: ReactionType; emoji: string; label: string }[] = [
   { id: "hand", emoji: "🤝", label: "tenho!" },
 ];
 
-export function ReactionRow({ counts = { love: 0, fire: 0, hand: 0 }, onReact }: ReactionRowProps) {
-  const [myReaction, setMyReaction] = useState<ReactionType | null>(null);
+export function ReactionRow({ postId }: ReactionRowProps) {
+  const counts = useQuery(api.postReactions.getReactionCounts, {
+    postId: postId as Id<"communityPosts">,
+  });
+  const userReaction = useQuery(api.postReactions.getUserReaction, {
+    postId: postId as Id<"communityPosts">,
+  });
+  const toggleReaction = useMutation(api.postReactions.toggleReaction);
 
-  const handleReact = (type: ReactionType) => {
-    const newReaction = myReaction === type ? null : type;
-    setMyReaction(newReaction);
-    onReact?.(type);
+  const [optimisticCounts, setOptimisticCounts] = useState<Record<string, number> | null>(null);
+  const [optimisticType, setOptimisticType] = useState<ReactionType | null | undefined>(undefined);
+
+  const handleReact = async (type: ReactionType) => {
+    const prevType = optimisticType !== undefined ? optimisticType : userReaction;
+    const baseCounts = optimisticCounts ?? counts ?? { love: 0, fire: 0, hand: 0 };
+    const newCounts = { ...baseCounts };
+
+    if (prevType === type) {
+      newCounts[type] = Math.max(0, (newCounts[type] ?? 0) - 1);
+      setOptimisticType(null);
+    } else {
+      if (prevType) {
+        newCounts[prevType] = Math.max(0, (newCounts[prevType] ?? 0) - 1);
+      }
+      newCounts[type] = (newCounts[type] ?? 0) + 1;
+      setOptimisticType(type);
+    }
+    setOptimisticCounts(newCounts);
+
+    try {
+      await toggleReaction({ postId: postId as Id<"communityPosts">, type });
+    } catch {
+      setOptimisticCounts(null);
+      setOptimisticType(undefined);
+    }
   };
+
+  const displayCounts = optimisticCounts ?? counts ?? { love: 0, fire: 0, hand: 0 };
+  const activeType = optimisticType !== undefined ? optimisticType : userReaction;
 
   return (
     <div className="flex gap-1.5">
       {REACTIONS.map((r) => {
-        const isActive = myReaction === r.id;
-        const count = (counts[r.id] || 0) + (isActive ? 1 : 0);
+        const isActive = activeType === r.id;
+        const count = displayCounts[r.id] ?? 0;
 
         return (
           <button

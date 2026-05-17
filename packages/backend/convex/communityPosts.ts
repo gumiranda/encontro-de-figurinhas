@@ -2,6 +2,7 @@ import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAuth, getAuthenticatedUser } from "./lib/auth";
+import { rateLimiter } from "./lib/rateLimiter";
 
 export const listByCityPaginated = query({
   args: {
@@ -10,8 +11,15 @@ export const listByCityPaginated = query({
   handler: async (ctx, { paginationOpts }) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user?.cityId) {
-      return { page: [], continueCursor: "", isDone: true };
+      return { page: [], cityName: null, continueCursor: "", isDone: true };
     }
+
+    const status = await rateLimiter.check(ctx, "communityFeed", { key: user._id });
+    if (!status.ok) {
+      return { page: [], cityName: null, continueCursor: "", isDone: true };
+    }
+
+    const city = await ctx.db.get(user.cityId);
 
     const result = await ctx.db
       .query("communityPosts")
@@ -56,6 +64,7 @@ export const listByCityPaginated = query({
               nickname: author.nickname ?? author.name,
               displayNickname: author.displayNickname ?? author.nickname ?? author.name,
               avatarSeed: author.avatarUrl ?? author.nickname ?? author.name,
+              rating: author.ratingAvg ?? 0,
             }
           : null,
         isOwn: post.userId === user._id,
@@ -64,6 +73,7 @@ export const listByCityPaginated = query({
 
     return {
       page,
+      cityName: city?.name ?? null,
       continueCursor: result.continueCursor,
       isDone: result.isDone,
     };
