@@ -25,6 +25,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { DesktopTopBar } from "../components/desktop-top-bar";
+import { MissingListShortcut } from "../components/missing-list-shortcut";
 import { QuickEntryInput } from "../components/quick-entry-input";
 import { StickerStatsRow } from "../components/stats-card-row";
 import {
@@ -382,6 +383,11 @@ export function QuickRegisterView({
                   variant="mobile"
                 />
               </div>
+
+              <MissingListShortcut
+                missingCount={needCount}
+                className="md:w-fit md:min-w-64"
+              />
 
               {error && (
                 <div

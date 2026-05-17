@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useStickers, type ListKind } from "../../lib/use-stickers";
 import { GlobalCheckbox } from "../components/global-checkbox";
+import { MissingListShortcut } from "../components/missing-list-shortcut";
 import { SectionAccordion } from "../components/section-accordion";
 import { StickerQuickInput } from "../components/sticker-quick-input";
 import { TabToggle } from "../components/tab-toggle";
@@ -217,6 +218,8 @@ export function VeryQuickRegisterView({
         <section className="mb-10">
           <StickerQuickInput mode={activeTab} sections={sections} onAdd={current.add} />
         </section>
+
+        <MissingListShortcut missingCount={missing.length} className="mb-6" />
 
         {error && (
           <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">

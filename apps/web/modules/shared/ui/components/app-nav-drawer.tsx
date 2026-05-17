@@ -15,6 +15,7 @@ import {
   BookOpen,
   Inbox,
   LayoutDashboard,
+  ListChecks,
   ListPlus,
   Map as MapIcon,
   MapPin,
@@ -71,6 +72,11 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             label: "Cadastrar figurinhas",
             href: "/cadastrar-figurinhas/quick",
             icon: ListPlus,
+          },
+          {
+            label: "Minhas faltantes",
+            href: "/cadastrar-figurinhas/troca",
+            icon: ListChecks,
           },
           { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
           {
