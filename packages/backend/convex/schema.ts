@@ -151,7 +151,8 @@ export default defineSchema({
     .index("by_city", ["cityId"])
     .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"])
     .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"])
-    .index("by_avatar_storage", ["avatarStorageId"]),
+    .index("by_avatar_storage", ["avatarStorageId"])
+    .index("by_deletion_pending", ["deletionPending", "cleanupStatus", "deletionRequestedAt"]),
 
   cities: defineTable({
     name: v.string(),
