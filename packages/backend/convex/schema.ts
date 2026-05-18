@@ -625,4 +625,21 @@ export default defineSchema({
   })
     .index("by_city_created", ["cityId", "createdAt"])
     .index("by_user", ["userId"]),
+
+  postReactions: defineTable({
+    postId: v.id("communityPosts"),
+    userId: v.id("users"),
+    type: v.union(v.literal("love"), v.literal("fire"), v.literal("hand")),
+    createdAt: v.number(),
+  })
+    .index("by_post_user", ["postId", "userId"])
+    .index("by_post_type", ["postId", "type"]),
+
+  postComments: defineTable({
+    postId: v.id("communityPosts"),
+    userId: v.id("users"),
+    message: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_post_created", ["postId", "createdAt"]),
 });
