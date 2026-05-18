@@ -87,4 +87,11 @@ crons.cron(
   {}
 );
 
+crons.interval(
+  "process LGPD deletions",
+  { hours: 1 },
+  internal.lgpd.processPendingDeletions,
+  {}
+);
+
 export default crons;

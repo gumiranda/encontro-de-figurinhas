@@ -135,20 +135,59 @@ export default function PrivacidadePage() {
                 <li>Solicitar a portabilidade dos dados</li>
                 <li>Obter informações sobre compartilhamento de dados</li>
               </ul>
+              <p>
+                <strong>Como exercer seus direitos:</strong> Acesse{" "}
+                <Link href="/ajustes" className="text-primary">
+                  Ajustes
+                </Link>{" "}
+                para exportar seus dados em formato JSON ou solicitar a exclusão
+                da sua conta. A exportação inclui todos os dados que temos sobre
+                você: perfil, trocas, posts, comentários e check-ins.
+              </p>
 
               <h2>6. Cookies</h2>
               <p>
                 Utilizamos cookies essenciais para o funcionamento da plataforma
-                e cookies de análise para entender como você usa nossos
-                serviços. Você pode gerenciar suas preferências de cookies nas
-                configurações do navegador.
+                e cookies de análise (Vercel Analytics) para entender como você
+                usa nossos serviços.
+              </p>
+              <p>
+                Ao acessar o site pela primeira vez, você verá um{" "}
+                <strong>banner de consentimento</strong> que permite aceitar ou
+                recusar cookies de análise. Cookies de análise só são ativados
+                após seu consentimento explícito. Você pode alterar sua
+                preferência a qualquer momento em{" "}
+                <Link href="/ajustes" className="text-primary">
+                  Ajustes
+                </Link>
+                .
               </p>
 
               <h2>7. Retenção de Dados</h2>
               <p>
-                Mantemos seus dados enquanto sua conta estiver ativa. Após a
-                exclusão da conta, seus dados serão removidos em até 30 dias,
-                exceto quando houver obrigação legal de retenção.
+                Mantemos seus dados enquanto sua conta estiver ativa. Ao
+                solicitar a exclusão da conta:
+              </p>
+              <ul>
+                <li>
+                  Você terá um <strong>período de carência de 7 dias</strong>{" "}
+                  durante o qual pode cancelar a solicitação
+                </li>
+                <li>
+                  Após o período de carência, seus dados serão removidos em até
+                  30 dias
+                </li>
+                <li>
+                  Seu histórico de trocas será anonimizado (nome substituído por
+                  &quot;[excluído]&quot;) para preservar o histórico de outros usuários
+                </li>
+                <li>
+                  Posts, comentários e check-ins serão permanentemente excluídos
+                </li>
+              </ul>
+              <p>
+                Dados podem ser retidos por mais tempo quando houver obrigação
+                legal de retenção.
               </p>
 
               <h2>8. Menores de Idade</h2>

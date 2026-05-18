@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SettingsPage } from "@/modules/settings/ui/components/settings-page";
 
 export const metadata: Metadata = {
   title: "Ajustes",
@@ -6,12 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AjustesPage() {
-  return (
-    <div className="space-y-2">
-      <h1 className="font-headline text-3xl font-extrabold tracking-tight">
-        Ajustes
-      </h1>
-      <p className="text-on-surface-variant">Em breve.</p>
-    </div>
-  );
+  return <SettingsPage />;
 }
