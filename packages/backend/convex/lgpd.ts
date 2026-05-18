@@ -1,12 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import {
-  internalMutation,
-  mutation,
-  query,
-  type MutationCtx,
-} from "./_generated/server";
+import { internalMutation, mutation, query, type MutationCtx } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { requireAuth } from "./lib/auth";
 import { rateLimiter } from "./lib/rateLimiter";
@@ -46,9 +41,7 @@ export const exportMyData = query({
 
     const tradesAsCounterparty = await ctx.db
       .query("trades")
-      .withIndex("by_counterparty_status", (q) =>
-        q.eq("counterpartyId", user._id)
-      )
+      .withIndex("by_counterparty_status", (q) => q.eq("counterpartyId", user._id))
       .collect();
 
     const posts = await ctx.db
@@ -222,14 +215,13 @@ export const processPendingDeletions = internalMutation({
 
     const ready = await ctx.db
       .query("users")
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("deletionPending"), true),
-          q.eq(q.field("cleanupStatus"), "pending"),
-          q.lt(q.field("deletionRequestedAt"), cutoff)
-        )
+      .withIndex("by_deletion_pending", (q) =>
+        q
+          .eq("deletionPending", true)
+          .eq("cleanupStatus", "pending")
+          .lt("deletionRequestedAt", cutoff)
       )
-      .take(5);
+      .take(10);
 
     for (const user of ready) {
       await ctx.scheduler.runAfter(0, internal.lgpd.runDeletionCleanup, {
@@ -252,10 +244,7 @@ async function acquireCleanupLease(
   if (!user.deletionPending) return false;
 
   const now = Date.now();
-  if (
-    user.cleanupInProgressAt &&
-    now - user.cleanupInProgressAt < CLEANUP_LEASE_MS
-  ) {
+  if (user.cleanupInProgressAt && now - user.cleanupInProgressAt < CLEANUP_LEASE_MS) {
     return false;
   }
 
@@ -362,9 +351,7 @@ export const runDeletionCleanup = internalMutation({
     if (phase === "trades_counterparty") {
       const batch = await ctx.db
         .query("trades")
-        .withIndex("by_counterparty_status", (q) =>
-          q.eq("counterpartyId", userId)
-        )
+        .withIndex("by_counterparty_status", (q) => q.eq("counterpartyId", userId))
         .take(CLEANUP_BATCH);
 
       for (const trade of batch) {
