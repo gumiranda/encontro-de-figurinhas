@@ -18,6 +18,7 @@ import type * as cities from "../cities.js";
 import type * as communityPosts from "../communityPosts.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as lgpd from "../lgpd.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_checkinHelpers from "../lib/checkinHelpers.js";
 import type * as lib_confidence_status from "../lib/confidence_status.js";
@@ -88,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   communityPosts: typeof communityPosts;
   crons: typeof crons;
   http: typeof http;
+  lgpd: typeof lgpd;
   "lib/auth": typeof lib_auth;
   "lib/checkinHelpers": typeof lib_checkinHelpers;
   "lib/confidence_status": typeof lib_confidence_status;

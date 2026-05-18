@@ -1,4 +1,6 @@
 import { RateLimiter, MINUTE, HOUR } from "@convex-dev/rate-limiter";
+
+const DAY = 24 * HOUR;
 import { components } from "../_generated/api";
 
 /**
@@ -181,5 +183,29 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     rate: 10,
     period: MINUTE,
     capacity: 20,
+  },
+
+  // LGPD data export — per user, 1/hour
+  lgpdExport: {
+    kind: "token bucket",
+    rate: 1,
+    period: HOUR,
+    capacity: 1,
+  },
+
+  // LGPD deletion request — per user, 1/day
+  lgpdDeleteRequest: {
+    kind: "token bucket",
+    rate: 1,
+    period: DAY,
+    capacity: 1,
+  },
+
+  // LGPD cancel deletion — per user, 1/day (prevents request/cancel loop DOS)
+  lgpdCancelDeletion: {
+    kind: "token bucket",
+    rate: 1,
+    period: DAY,
+    capacity: 1,
   },
 });

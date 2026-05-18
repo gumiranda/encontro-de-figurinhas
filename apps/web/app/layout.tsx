@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk, Manrope } from "next/font/google";
 
-import { Analytics } from "@vercel/analytics/next";
 import "@workspace/ui/globals.css";
+import { CookieConsentProvider } from "@/components/cookie-consent-provider";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { ConditionalAnalytics } from "@/components/conditional-analytics";
 import { Toaster } from "@workspace/ui/components/sonner";
 
 const fontSans = Geist({
@@ -123,9 +125,12 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontHeadline.variable} ${fontBody.variable} font-body antialiased`}
       >
-        <Toaster />
-        {children}
-        <Analytics />
+        <CookieConsentProvider>
+          <Toaster />
+          {children}
+          <CookieConsentBanner />
+          <ConditionalAnalytics />
+        </CookieConsentProvider>
       </body>
     </html>
   );

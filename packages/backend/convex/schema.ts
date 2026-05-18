@@ -92,6 +92,7 @@ export default defineSchema({
       ),
     ),
     cleanupInProgressAt: v.optional(v.number()),
+    deletionRequestedAt: v.optional(v.number()),
 
     // Minor protection fields (PRD seguranca.md:23-25, arquitetura-tecnica.md:63-71)
     ageGroup: v.optional(
@@ -633,7 +634,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_post_user", ["postId", "userId"])
-    .index("by_post_type", ["postId", "type"]),
+    .index("by_post_type", ["postId", "type"])
+    .index("by_user", ["userId"]),
 
   postComments: defineTable({
     postId: v.id("communityPosts"),
@@ -641,5 +643,6 @@ export default defineSchema({
     message: v.string(),
     createdAt: v.number(),
   })
-    .index("by_post_created", ["postId", "createdAt"]),
+    .index("by_post_created", ["postId", "createdAt"])
+    .index("by_user", ["userId"]),
 });
