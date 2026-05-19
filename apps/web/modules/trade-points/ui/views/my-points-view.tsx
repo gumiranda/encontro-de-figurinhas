@@ -104,7 +104,7 @@ export function MyPointsView() {
   const hasActiveFilters = tab !== "all" || qDebounced.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden" style={{ maxWidth: "min(100vw - 48px, 64rem)" }}>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-headline text-3xl font-bold tracking-tight md:text-4xl">
@@ -194,7 +194,7 @@ function PointsGrid({
       className={cn(
         "grid gap-4",
         layout === "grid"
-          ? "[grid-template-columns:repeat(auto-fill,minmax(420px,1fr))]"
+          ? "grid-cols-1 md:[grid-template-columns:repeat(auto-fill,minmax(420px,1fr))]"
           : "grid-cols-1"
       )}
     >
@@ -225,7 +225,7 @@ function PointsGrid({
 
 function SkeletonGrid() {
   return (
-    <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(420px,1fr))]">
+    <div className="grid gap-4 grid-cols-1 md:[grid-template-columns:repeat(auto-fill,minmax(420px,1fr))]">
       {[0, 1, 2, 3].map((i) => (
         <MyPointCardSkeleton key={i} />
       ))}

@@ -471,6 +471,50 @@ async function getCitySummary(ctx: QueryCtx, cityId?: Id<"cities">) {
   };
 }
 
+type NationProgress = {
+  flag: string;
+  name: string;
+  code: string;
+  got: number;
+  total: number;
+};
+
+async function computeTopNations(
+  ctx: QueryCtx,
+  missing: number[]
+): Promise<NationProgress[]> {
+  const sections = await ctx.db.query("albumSections").collect();
+  const mainSections = sections.filter((s) => !s.isExtra);
+
+  const missingSet = new Set(missing);
+
+  const progress = mainSections.map((section) => {
+    const total = section.endNumber - section.startNumber + 1;
+    let missingInSection = 0;
+    for (let num = section.startNumber; num <= section.endNumber; num++) {
+      if (missingSet.has(num)) missingInSection++;
+    }
+    const got = total - missingInSection;
+    return {
+      flag: section.flagEmoji ?? "🏳️",
+      name: section.name,
+      code: section.code,
+      got,
+      total,
+    };
+  });
+
+  return progress
+    .filter((p) => p.got > 0)
+    .sort((a, b) => {
+      const pctA = a.got / a.total;
+      const pctB = b.got / b.total;
+      if (pctB !== pctA) return pctB - pctA;
+      return b.got - a.got;
+    })
+    .slice(0, 5);
+}
+
 async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
   const duplicates = user.duplicates ?? [];
   const missing = user.missing ?? [];
@@ -483,11 +527,12 @@ async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
     PROFILE_MISSING_SAMPLE_LIMIT
   );
 
-  const [stats, city, duplicatesSample, missingSample] = await Promise.all([
+  const [stats, city, duplicatesSample, missingSample, topNations] = await Promise.all([
     readSiteStatsOrNull(ctx),
     getCitySummary(ctx, user.cityId),
     getStickerSummaries(ctx, duplicateEntries),
     getStickerSummaries(ctx, missingEntries),
+    computeTopNations(ctx, missing),
   ]);
 
   const albumTotal = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
@@ -519,6 +564,7 @@ async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
     missingCount: missing.length,
     duplicatesSample,
     missingSample,
+    topNations,
   };
 }
 

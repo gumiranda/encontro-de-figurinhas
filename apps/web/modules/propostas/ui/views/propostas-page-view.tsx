@@ -264,7 +264,7 @@ export function PropostasPageView() {
 
   return (
     <SectionLookupProvider sections={sections ?? []}>
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden" style={{ maxWidth: "min(100vw - 48px, 64rem)" }}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-headline text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -449,7 +449,7 @@ function Section({
 
 function PropostasPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true">
+    <div className="space-y-6 overflow-hidden" style={{ maxWidth: "min(100vw - 48px, 64rem)" }} aria-busy="true">
       <div>
         <Skeleton className="h-9 w-48" />
         <Skeleton className="mt-2 h-5 w-80" />
