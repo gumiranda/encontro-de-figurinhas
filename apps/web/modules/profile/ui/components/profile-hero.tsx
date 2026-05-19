@@ -99,8 +99,8 @@ export function ProfileHero(props: ProfileHeroProps) {
         }}
       />
 
-      {/* Shimmer animation overlay */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+      {/* Shimmer animation overlay - hidden on mobile to prevent overflow */}
+      <div className="absolute inset-0 -z-10 overflow-hidden hidden sm:block">
         <div
           className="absolute top-[-20%] left-0 w-[30%] h-[140%] animate-shimmer-foil"
           style={{
