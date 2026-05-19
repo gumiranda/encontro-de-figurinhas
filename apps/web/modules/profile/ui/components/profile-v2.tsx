@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import {
   ArrowLeftRight,
   BadgeCheck,
@@ -50,8 +50,7 @@ import {
   AchievementsModule,
   deriveAchievements,
 } from "./achievements-module";
-import { HeroVariantSelector } from "./hero-variant-selector";
-import { ProfileHero, type HeroVariant } from "./profile-hero";
+import { ProfileHero } from "./profile-hero";
 import { TopNationsModule, type NationProgress } from "./top-nations-module";
 
 export type ProfileStickerItem = {
@@ -951,26 +950,6 @@ function PublicCtaCard({
   );
 }
 
-const HERO_VARIANT_KEY = "profile-hero-variant";
-
-function useHeroVariant(): [HeroVariant, (v: HeroVariant) => void] {
-  const [variant, setVariant] = useState<HeroVariant>("trading-card");
-
-  useEffect(() => {
-    const stored = localStorage.getItem(HERO_VARIANT_KEY);
-    if (stored === "banner" || stored === "credential" || stored === "trading-card") {
-      setVariant(stored);
-    }
-  }, []);
-
-  const setAndStore = (v: HeroVariant) => {
-    setVariant(v);
-    localStorage.setItem(HERO_VARIANT_KEY, v);
-  };
-
-  return [variant, setAndStore];
-}
-
 export function PrivateProfileView({
   profile,
   trades,
@@ -993,7 +972,6 @@ export function PrivateProfileView({
   onShare: () => void;
 }) {
   const name = displayName(profile);
-  const [heroVariant, setHeroVariant] = useHeroVariant();
 
   const achievements = deriveAchievements({
     totalTrades: profile.totalTrades,
@@ -1005,7 +983,6 @@ export function PrivateProfileView({
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
       <ProfileHero
-        variant={heroVariant}
         nickname={profile.nickname}
         displayNickname={profile.displayNickname}
         avatarSeed={profile.avatarSeed ?? profile.nickname}
@@ -1017,44 +994,12 @@ export function PrivateProfileView({
         ratingAvg={profile.ratingAvg}
         ratingCount={profile.ratingCount}
         totalTrades={profile.totalTrades}
+        albumCompletionPct={profile.albumCompletionPct}
         isVerified={profile.isVerified}
         profileUrl={profileUrl}
+        isPublic={profile.isProfilePublic}
+        onShare={onShare}
       />
-
-      <div className="flex flex-wrap gap-2">
-        <Button
-          className="flex-1 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={onShare}
-          disabled={!profile.isProfilePublic}
-        >
-          <Share2 className="size-4" />
-          Compartilhar
-        </Button>
-        <Button
-          variant="outline"
-          className="gap-2 border-white/10 bg-white/5"
-          onClick={onCopyLink}
-          disabled={!profile.isProfilePublic}
-        >
-          <Copy className="size-4" />
-          Copiar link
-        </Button>
-        <Button
-          variant="outline"
-          className="gap-2 border-white/10 bg-white/5"
-          asChild
-          aria-disabled={!profile.isProfilePublic}
-        >
-          <a
-            href={profile.isProfilePublic ? profileUrl : "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLink className="size-4" />
-            Abrir
-          </a>
-        </Button>
-      </div>
 
       <ProfileProgressCard
         albumCompletionPct={profile.albumCompletionPct}
@@ -1118,16 +1063,13 @@ export function PrivateProfileView({
         </TabsContent>
       </Tabs>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <HeroVariantSelector value={heroVariant} onChange={setHeroVariant} />
-        <ProfileSettingsCard
-          isPublic={profile.isProfilePublic}
-          acceptsMail={profile.acceptsMail}
-          isUpdating={isUpdating}
-          onTogglePublic={onTogglePublic}
-          onToggleMail={onToggleMail}
-        />
-      </div>
+      <ProfileSettingsCard
+        isPublic={profile.isProfilePublic}
+        acceptsMail={profile.acceptsMail}
+        isUpdating={isUpdating}
+        onTogglePublic={onTogglePublic}
+        onToggleMail={onToggleMail}
+      />
 
       {profile.isProfilePublic ? (
         <ProfileLinkCard

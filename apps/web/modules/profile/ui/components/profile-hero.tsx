@@ -1,16 +1,12 @@
 "use client";
 
-import { CalendarDays, MapPin, Star } from "lucide-react";
+import Link from "next/link";
+import { CalendarDays, MapPin, Pencil, Share2, Star } from "lucide-react";
 
 import { MatchDicebearAvatar } from "@/modules/matches/ui/components/match-dicebear-avatar";
-import { Badge } from "@workspace/ui/components/badge";
-import { QRCode } from "@workspace/ui/components/kibo-ui/qr-code";
-import { cn } from "@workspace/ui/lib/utils";
-
-export type HeroVariant = "trading-card" | "banner" | "credential";
+import { Button } from "@workspace/ui/components/button";
 
 type ProfileHeroProps = {
-  variant: HeroVariant;
   nickname: string;
   displayNickname?: string;
   avatarSeed: string;
@@ -22,18 +18,22 @@ type ProfileHeroProps = {
   ratingAvg?: number;
   ratingCount: number;
   totalTrades: number;
+  albumCompletionPct: number;
   isVerified?: boolean;
   profileUrl?: string;
+  isPublic?: boolean;
+  onShare?: () => void;
 };
 
 function formatJoinedAt(timestamp: number | undefined) {
   if (!timestamp) return null;
-  return new Intl.DateTimeFormat("pt-BR", {
+  const formatted = new Intl.DateTimeFormat("pt-BR", {
     month: "short",
-    year: "numeric",
+    year: "2-digit",
   })
     .format(new Date(timestamp))
     .replace(".", "");
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
 function displayName(profile: { displayNickname?: string; nickname: string }) {
@@ -48,60 +48,16 @@ function initialsFromName(name: string) {
   return (parts[0]?.[0] ?? "?").concat(parts[1]?.[0] ?? "").toUpperCase();
 }
 
-function HeroMeta({
-  city,
-  joinedAt,
-}: {
-  city?: { name: string; state: string } | null;
-  joinedAt?: number;
-}) {
-  const joined = formatJoinedAt(joinedAt);
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-      {city && (
-        <span className="inline-flex items-center gap-1">
-          <MapPin className="size-3.5" />
-          {city.name}, {city.state}
-        </span>
-      )}
-      {joined && (
-        <span className="inline-flex items-center gap-1">
-          <CalendarDays className="size-3.5" />
-          desde {joined}
-        </span>
-      )}
-    </div>
-  );
+function formatPercent(value: number) {
+  return `${value.toFixed(value % 1 === 0 ? 0 : 1)}%`;
 }
 
-function RatingBadge({
-  ratingAvg,
-  ratingCount,
-}: {
-  ratingAvg?: number;
-  ratingCount: number;
-}) {
-  if (ratingAvg === undefined || ratingCount <= 0) {
-    return (
-      <Badge variant="outline" className="border-white/10 text-muted-foreground">
-        Sem avaliações
-      </Badge>
-    );
-  }
-  return (
-    <Badge className="gap-1 border-tertiary/30 bg-tertiary/15 text-tertiary">
-      <Star className="size-3 fill-current" />
-      {ratingAvg.toFixed(1)}
-      <span className="text-tertiary/75">· {ratingCount}</span>
-    </Badge>
-  );
-}
-
-function HeroTradingCard(props: ProfileHeroProps) {
+export function ProfileHero(props: ProfileHeroProps) {
   const name = displayName(props);
+  const joinedAt = formatJoinedAt(props.joinedAt);
 
   return (
-    <div className="relative overflow-hidden rounded-[22px] isolate">
+    <div className="relative rounded-[22px] isolate w-full overflow-hidden" style={{ maxWidth: "calc(100vw - 48px)" }}>
       {/* Gradient background */}
       <div
         className="absolute inset-0 -z-10"
@@ -153,168 +109,121 @@ function HeroTradingCard(props: ProfileHeroProps) {
         />
       </div>
 
-      <div className="p-5">
+      <div className="px-3 py-4 sm:p-5">
         {/* Top row: code + number */}
-        <div className="flex justify-between items-start gap-2 mb-4">
+        <div className="flex justify-between items-start gap-2 mb-4 sm:mb-6">
           <div className="min-w-0">
-            <div className="font-mono text-xs font-semibold uppercase tracking-wider text-tertiary">
+            <div className="font-mono text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-tertiary">
               COPA 2026
             </div>
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-xl">{props.flag}</span>
-              <span className="font-mono text-lg font-semibold tracking-wider text-foreground">
+            <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
+              <span className="text-lg sm:text-xl">{props.flag}</span>
+              <span className="font-mono text-base sm:text-lg font-semibold tracking-wider text-foreground">
                 {props.cardCode}
               </span>
             </div>
           </div>
-          <div className="text-right flex-shrink-0">
-            <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">N°</div>
-            <div className="font-headline text-3xl font-bold text-tertiary leading-none mt-0.5">
+          <div className="text-right shrink-0">
+            <div className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">N°</div>
+            <div className="font-headline text-2xl sm:text-3xl font-bold text-tertiary leading-none mt-0.5">
               {props.cardNumber}
             </div>
           </div>
         </div>
 
-        {/* Avatar + name */}
-        <div className="flex items-center gap-4 mb-4">
+        {/* Centered avatar */}
+        <div className="flex flex-col items-center text-center mb-4 sm:mb-6">
           <div
-            className="shrink-0 rounded-full p-[3px] shadow-[0_0_32px_rgba(149,170,255,0.25)]"
+            className="shrink-0 rounded-full p-[3px] sm:p-[4px] shadow-[0_0_32px_rgba(79,243,37,0.25)] sm:shadow-[0_0_40px_rgba(79,243,37,0.3)]"
             style={{
-              background: "radial-gradient(circle, #95aaff 0%, #3766ff 100%)",
+              background: "conic-gradient(from 180deg, #4ff325 0deg, #ffc965 180deg, #4ff325 360deg)",
             }}
           >
             <MatchDicebearAvatar
               seed={props.avatarSeed}
-              size={72}
+              size={88}
               fallbackInitials={initialsFromName(name)}
-              className="border-2 border-[#0d1323]"
-            />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="font-headline text-xl font-bold truncate">@{name}</h2>
-            <HeroMeta city={props.city} joinedAt={props.joinedAt} />
-          </div>
-        </div>
-
-        {/* Badges row */}
-        <div className="flex flex-wrap items-center gap-2">
-          <RatingBadge ratingAvg={props.ratingAvg} ratingCount={props.ratingCount} />
-          <Badge variant="outline" className="border-white/10">
-            {props.totalTrades} trocas
-          </Badge>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HeroBannerSocial(props: ProfileHeroProps) {
-  const name = displayName(props);
-
-  return (
-    <div className="relative overflow-hidden rounded-2xl bg-surface-container-high border border-white/10 p-5">
-      <div className="flex items-center gap-4">
-        <div
-          className="shrink-0 rounded-full p-[3px] shadow-[0_0_24px_rgba(79,243,37,0.2)]"
-          style={{
-            background: "radial-gradient(circle, #4ff325 0%, #3ee40c 100%)",
-          }}
-        >
-          <MatchDicebearAvatar
-            seed={props.avatarSeed}
-            size={80}
-            fallbackInitials={initialsFromName(name)}
-            className="border-2 border-background"
-          />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-headline text-2xl font-bold truncate">@{name}</h2>
-            <span className="text-xl">{props.flag}</span>
-          </div>
-          <HeroMeta city={props.city} joinedAt={props.joinedAt} />
-          <div className="flex flex-wrap items-center gap-2 mt-3">
-            <RatingBadge ratingAvg={props.ratingAvg} ratingCount={props.ratingCount} />
-            <Badge variant="outline" className="border-white/10">
-              {props.totalTrades} trocas
-            </Badge>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HeroCredential(props: ProfileHeroProps) {
-  const name = displayName(props);
-  const qrUrl = props.profileUrl || `https://figurinhafacil.com.br/u/${props.nickname}`;
-
-  return (
-    <div className="relative overflow-hidden rounded-2xl bg-surface-container-high border border-white/10">
-      {/* Top accent bar */}
-      <div
-        className="h-2"
-        style={{
-          background: "linear-gradient(90deg, #95aaff, #4ff325, #ffc965)",
-        }}
-      />
-
-      <div className="p-5">
-        <div className="flex items-start gap-4">
-          {/* QR Code */}
-          <div className="shrink-0 rounded-xl bg-white p-3">
-            <QRCode
-              data={qrUrl}
-              foreground="#0d1323"
-              background="#ffffff"
-              robustness="M"
+              className="border-[3px] border-[#0d1323] sm:size-[100px]"
             />
           </div>
 
-          {/* Profile info */}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xl">{props.flag}</span>
-              <span className="font-mono text-sm font-semibold text-tertiary">
-                {props.cardCode}
+          {/* Username */}
+          <h2 className="font-headline text-xl sm:text-2xl font-bold mt-3 sm:mt-4 truncate max-w-full px-2">
+            @{name}
+          </h2>
+
+          {/* Location + joined date */}
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:text-sm text-muted-foreground mt-1">
+            {props.city && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="size-3 sm:size-3.5" />
+                {props.city.name}, {props.city.state}
               </span>
-            </div>
-
-            <div
-              className="shrink-0 rounded-full p-[2px] w-fit mb-2"
-              style={{
-                background: "radial-gradient(circle, #ffc965 0%, #ecaa00 100%)",
-              }}
-            >
-              <MatchDicebearAvatar
-                seed={props.avatarSeed}
-                size={48}
-                fallbackInitials={initialsFromName(name)}
-                className="border-2 border-background"
-              />
-            </div>
-
-            <h2 className="font-headline text-lg font-bold truncate">@{name}</h2>
-            <HeroMeta city={props.city} joinedAt={props.joinedAt} />
-
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <RatingBadge ratingAvg={props.ratingAvg} ratingCount={props.ratingCount} />
-            </div>
+            )}
+            {props.city && joinedAt && (
+              <span className="text-muted-foreground/50">•</span>
+            )}
+            {joinedAt && (
+              <span className="inline-flex items-center gap-1">
+                <CalendarDays className="size-3 sm:size-3.5" />
+                Desde {joinedAt}
+              </span>
+            )}
           </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-3 rounded-lg border border-white/10 bg-surface-container/50 overflow-hidden">
+          <div className="py-2.5 text-center border-r border-white/10">
+            <p className="font-headline text-lg font-bold text-primary">
+              {formatPercent(props.albumCompletionPct)}
+            </p>
+            <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground mt-0.5">
+              Álbum
+            </p>
+          </div>
+          <div className="py-2.5 text-center border-r border-white/10">
+            <p className="font-headline text-lg font-bold text-secondary">
+              {props.totalTrades}
+            </p>
+            <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground mt-0.5">
+              Trocas
+            </p>
+          </div>
+          <div className="py-2.5 text-center">
+            <p className="font-headline text-lg font-bold text-tertiary flex items-center justify-center gap-0.5">
+              <Star className="size-3 fill-current" />
+              {props.ratingAvg?.toFixed(1) ?? "—"}
+            </p>
+            <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground mt-0.5">
+              Reputação
+            </p>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-2 mt-4">
+          <Button
+            className="flex-1 gap-2 bg-primary/90 text-primary-foreground hover:bg-primary text-sm sm:text-base"
+            onClick={props.onShare}
+            disabled={!props.isPublic}
+          >
+            <Share2 className="size-4 shrink-0" />
+            <span className="truncate">Compartilhar perfil</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="border-white/10 bg-white/5 hover:bg-white/10"
+            asChild
+          >
+            <Link href="/perfil/editar">
+              <Pencil className="size-4" />
+              <span className="sr-only">Editar perfil</span>
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
   );
-}
-
-export function ProfileHero(props: ProfileHeroProps) {
-  switch (props.variant) {
-    case "banner":
-      return <HeroBannerSocial {...props} />;
-    case "credential":
-      return <HeroCredential {...props} />;
-    default:
-      return <HeroTradingCard {...props} />;
-  }
 }
