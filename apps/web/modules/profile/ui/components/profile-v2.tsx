@@ -981,7 +981,7 @@ export function PrivateProfileView({
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 overflow-hidden" style={{ maxWidth: "min(100vw - 48px, 64rem)" }}>
       <ProfileHero
         nickname={profile.nickname}
         displayNickname={profile.displayNickname}

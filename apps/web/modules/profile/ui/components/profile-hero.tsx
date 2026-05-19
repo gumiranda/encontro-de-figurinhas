@@ -57,7 +57,7 @@ export function ProfileHero(props: ProfileHeroProps) {
   const joinedAt = formatJoinedAt(props.joinedAt);
 
   return (
-    <div className="relative rounded-[22px] isolate w-full overflow-hidden" style={{ maxWidth: "calc(100vw - 48px)" }}>
+    <div className="relative rounded-[22px] isolate w-full overflow-hidden">
       {/* Gradient background */}
       <div
         className="absolute inset-0 -z-10"
