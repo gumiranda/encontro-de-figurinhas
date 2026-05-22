@@ -1127,4 +1127,105 @@ export function generateSoftwareApplicationSchema() {
   };
 }
 
+// ============ GEPETO AI OPPONENT SEO ============
+
+export function generateGepetoMatchMetadata(
+  homeTeam: string,
+  awayTeam: string,
+  matchId: string,
+  prediction?: "home" | "draw" | "away"
+): Metadata {
+  const predictionText = prediction
+    ? prediction === "home"
+      ? homeTeam
+      : prediction === "away"
+        ? awayTeam
+        : "Empate"
+    : "em breve";
+
+  const title = `Gepeto prevê: ${homeTeam} x ${awayTeam} | ${SITE_NAME}`;
+  const description = `A IA Gepeto previu ${predictionText} para ${homeTeam} x ${awayTeam}. Faça seu palpite e ganhe o badge "Bati a IA"!`;
+
+  return {
+    title: { absolute: title },
+    description,
+    keywords: [
+      `palpite ${homeTeam} x ${awayTeam}`,
+      "previsão IA copa 2026",
+      "gepeto figurinha facil",
+      "bati a ia copa",
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/gepeto/matches/${matchId}`,
+      type: "website",
+    },
+    alternates: {
+      canonical: `${BASE_URL}/gepeto/matches/${matchId}`,
+    },
+  };
+}
+
+export function generateGepetoClaimSchema(
+  match: {
+    homeTeamName: string;
+    awayTeamName: string;
+    kickoffAt: number;
+    venue?: string;
+  },
+  prediction: {
+    prediction: string;
+    exactScore: { home: number; away: number };
+    confidence: number;
+  }
+) {
+  return {
+    "@type": "Claim",
+    claimant: {
+      "@type": "SoftwareApplication",
+      name: "Gepeto",
+      description: "IA de palpites da Copa 2026 do Figurinha Fácil",
+    },
+    text: `${match.homeTeamName} ${prediction.exactScore.home} x ${prediction.exactScore.away} ${match.awayTeamName}`,
+    confidence: prediction.confidence,
+    dateCreated: new Date().toISOString(),
+    appearance: {
+      "@type": "SportsEvent",
+      name: `${match.homeTeamName} vs ${match.awayTeamName}`,
+      startDate: new Date(match.kickoffAt).toISOString(),
+      location: match.venue,
+      eventStatus: "https://schema.org/EventScheduled",
+    },
+  };
+}
+
+export function generateGepetoWeeklyMetadata(
+  weekNumber: number,
+  year: number,
+  narrative?: { gepetoScore: number; communityScore: number; narrative: string }
+): Metadata {
+  const title = narrative
+    ? `Semana ${weekNumber}: Gepeto ${narrative.gepetoScore} x ${narrative.communityScore} Comunidade | ${SITE_NAME}`
+    : `Semana ${weekNumber}: Gepeto vs Comunidade | ${SITE_NAME}`;
+
+  const description = narrative
+    ? narrative.narrative.slice(0, 155) + "..."
+    : `Veja o confronto semanal entre a IA Gepeto e a comunidade na Copa 2026.`;
+
+  return {
+    title: { absolute: title },
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/gepeto/semana-${weekNumber}`,
+      type: "article",
+    },
+    alternates: {
+      canonical: `${BASE_URL}/gepeto/semana-${weekNumber}`,
+    },
+  };
+}
+
 

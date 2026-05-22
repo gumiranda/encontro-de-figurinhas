@@ -143,6 +143,22 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 60,
   },
 
+  // gepeto.recordUserPrediction — per-user throttle
+  gepetoPrediction: {
+    kind: "token bucket",
+    rate: 10,
+    period: HOUR,
+    capacity: 10,
+  },
+
+  // gepeto.updateMatchScore — per-admin throttle
+  gepetoScoreUpdate: {
+    kind: "token bucket",
+    rate: 10,
+    period: MINUTE,
+    capacity: 10,
+  },
+
   // publicProfile — global bucket (não por nickname pra evitar user enumeration)
   publicProfile: {
     kind: "token bucket",

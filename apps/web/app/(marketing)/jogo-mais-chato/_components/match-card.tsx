@@ -11,6 +11,8 @@ type MatchCardProps = {
   awayTeamFlag: string;
   awayTeamName: string;
   awayTeamCode: string;
+  homeScore?: number;
+  awayScore?: number;
   totalVotes: number;
   roundTotalVotes: number;
   highlighted?: boolean;
@@ -25,12 +27,16 @@ export function MatchCard({
   awayTeamFlag,
   awayTeamName,
   awayTeamCode,
+  homeScore,
+  awayScore,
   totalVotes,
   roundTotalVotes,
   highlighted,
   rank,
 }: MatchCardProps) {
-  const pct = roundTotalVotes > 0 ? Math.round((totalVotes / roundTotalVotes) * 100) : 0;
+  const pct =
+    roundTotalVotes > 0 ? Math.round((totalVotes / roundTotalVotes) * 100) : 0;
+  const hasScore = homeScore !== undefined && awayScore !== undefined;
 
   return (
     <Link href={href} className="block">
@@ -49,17 +55,23 @@ export function MatchCard({
             </div>
             <div>
               <div className="font-semibold text-sm">{homeTeamName}</div>
-              <div className="text-xs text-muted-foreground">{homeTeamCode}</div>
+              <div className="text-xs text-muted-foreground">
+                {homeTeamCode}
+              </div>
             </div>
           </div>
-          <div className={styles.matchScore}>×</div>
+          <div className={styles.matchScore}>
+            {hasScore ? `${homeScore} × ${awayScore}` : "×"}
+          </div>
           <div className="flex items-center gap-3 flex-row-reverse">
             <div className={styles.flag} aria-hidden="true">
               {awayTeamFlag}
             </div>
             <div className="text-right">
               <div className="font-semibold text-sm">{awayTeamName}</div>
-              <div className="text-xs text-muted-foreground">{awayTeamCode}</div>
+              <div className="text-xs text-muted-foreground">
+                {awayTeamCode}
+              </div>
             </div>
           </div>
         </div>
@@ -68,7 +80,9 @@ export function MatchCard({
           <div className={styles.barTrack + " flex-1 max-w-[140px]"}>
             <div className={styles.barFill} style={{ width: `${pct}%` }} />
           </div>
-          <span className={`${styles.ffDisplay} text-base ${highlighted ? styles.heroAccent : ""}`}>
+          <span
+            className={`${styles.ffDisplay} text-base ${highlighted ? styles.heroAccent : ""}`}
+          >
             {pct}%
           </span>
         </div>

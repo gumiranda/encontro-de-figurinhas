@@ -94,4 +94,11 @@ crons.interval(
   {}
 );
 
+crons.cron(
+  "generate weekly Gepeto narrative",
+  "0 20 * * 0", // Sunday 20:00 UTC
+  internal.gepeto.generateWeeklyNarrativeScheduled,
+  {}
+);
+
 export default crons;

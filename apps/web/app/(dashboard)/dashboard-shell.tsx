@@ -46,6 +46,8 @@ const ROUTE_LABELS: Record<string, string> = {
   "/meus-pontos": "Meus pontos",
   "/cadastrar-figurinhas/quick": "Adicionar figurinhas",
   "/cadastrar-figurinhas/troca": "Lista de faltantes",
+  "/admin/matches": "Gepeto",
+  "/admin/jogo-mais-chato": "Jogo Mais Chato",
 };
 
 function titleCase(segment: string): string {
@@ -59,7 +61,8 @@ function titleCase(segment: string): string {
 function TopbarBreadcrumb({ pathname }: { pathname: string }) {
   const isRoot = pathname === "/dashboard";
   const label =
-    ROUTE_LABELS[pathname] ?? titleCase(pathname.split("/").filter(Boolean).at(-1) ?? "");
+    ROUTE_LABELS[pathname] ??
+    titleCase(pathname.split("/").filter(Boolean).at(-1) ?? "");
 
   return (
     <nav aria-label="Breadcrumb" className="hidden text-sm md:block">
@@ -94,7 +97,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
-  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isAuthenticated ? {} : "skip",
+  );
 
   const onboardingGateRef = useRef({
     isAuthenticated,
@@ -138,7 +144,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const isFullyOnboarded =
     currentUser?.hasCompletedOnboarding && currentUser?.locationSource;
 
-  const isLoading = authLoading || !isAuthenticated || currentUser === undefined;
+  const isLoading =
+    authLoading || !isAuthenticated || currentUser === undefined;
   if (isLoading || !currentUser || !isFullyOnboarded) {
     return <FullPageLoader />;
   }
@@ -176,7 +183,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden gap-2 md:flex">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden gap-2 md:flex"
+                  >
                     <Menu className="size-4" />
                     Ações rápidas
                   </Button>

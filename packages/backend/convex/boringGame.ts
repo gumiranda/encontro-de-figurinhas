@@ -1,15 +1,15 @@
 import { ConvexError, v } from "convex/values";
 import {
   httpAction,
-  internalAction,
   internalMutation,
+  mutation,
   query,
 } from "./_generated/server";
 import { internal } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import { boringReason } from "./schema";
 import { rateLimiter } from "./lib/rateLimiter";
-import { getAuthenticatedUser } from "./lib/auth";
+import { getAuthenticatedUser, requireAdmin } from "./lib/auth";
 
 const REASON_KEYS = [
   "sem_chances",
@@ -53,7 +53,7 @@ export const getRoundBySlug = query({
       .query("worldCupRounds")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .unique();
-    if (!round) return null;
+    if (!round || !round.isActive) return null;
     // isFinished derivado server-side — usado em /resultado pra gating noindex
     // sem precisar de Date.now() no Server Component (Next 16 cacheComponents
     // proíbe). Server-side Date.now() é OK porque é inside Convex query.
@@ -66,15 +66,88 @@ export const listRounds = query({
   handler: async (ctx) => {
     return await ctx.db
       .query("worldCupRounds")
+      .withIndex("by_isActive_order", (q) => q.eq("isActive", true))
+      .order("asc")
+      .take(64);
+  },
+});
+
+export const listRoundsForAdmin = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+
+    const rounds = await ctx.db
+      .query("worldCupRounds")
       .withIndex("by_order")
       .order("asc")
       .take(64);
+    const matches = await ctx.db.query("worldCupMatches").take(1000);
+    const matchesByRound = new Map<string, Doc<"worldCupMatches">[]>();
+
+    for (const match of matches) {
+      const key = String(match.roundId);
+      const group = matchesByRound.get(key) ?? [];
+      group.push(match);
+      matchesByRound.set(key, group);
+    }
+
+    return rounds.map((round) => ({
+      ...round,
+      matches: (matchesByRound.get(String(round._id)) ?? []).sort(
+        (a, b) => a.kickoffAt - b.kickoffAt,
+      ),
+    }));
+  },
+});
+
+export const setRoundActive = mutation({
+  args: { roundId: v.id("worldCupRounds"), isActive: v.boolean() },
+  handler: async (ctx, { roundId, isActive }) => {
+    await requireAdmin(ctx);
+
+    const round = await ctx.db.get(roundId);
+    if (!round) throw new ConvexError("Round not found");
+
+    await ctx.db.patch(roundId, { isActive });
+
+    return { _id: roundId, slug: round.slug, isActive };
+  },
+});
+
+export const setMatchScore = mutation({
+  args: {
+    matchId: v.id("worldCupMatches"),
+    homeScore: v.number(),
+    awayScore: v.number(),
+  },
+  handler: async (ctx, { matchId, homeScore, awayScore }) => {
+    await requireAdmin(ctx);
+
+    if (
+      !Number.isInteger(homeScore) ||
+      !Number.isInteger(awayScore) ||
+      homeScore < 0 ||
+      awayScore < 0
+    ) {
+      throw new ConvexError("Score must be non-negative integers");
+    }
+
+    const match = await ctx.db.get(matchId);
+    if (!match) throw new ConvexError("Match not found");
+
+    await ctx.db.patch(matchId, { homeScore, awayScore });
+
+    return { _id: matchId, homeScore, awayScore };
   },
 });
 
 export const listMatchesByRound = query({
   args: { roundId: v.id("worldCupRounds") },
   handler: async (ctx, { roundId }) => {
+    const round = await ctx.db.get(roundId);
+    if (!round?.isActive) return [];
+
     return await ctx.db
       .query("worldCupMatches")
       .withIndex("by_round_kickoff", (q) => q.eq("roundId", roundId))
@@ -92,13 +165,24 @@ export const getMatchBySlug = query({
     if (!match) return null;
     const round = await ctx.db.get(match.roundId);
     if (!round) throw new ConvexError("Round not found");
+    if (!round.isActive) return null;
     return { match, round };
+  },
+});
+
+export const getMatch = query({
+  args: { matchId: v.id("worldCupMatches") },
+  handler: async (ctx, { matchId }) => {
+    return ctx.db.get(matchId);
   },
 });
 
 export const getRoundResult = query({
   args: { roundId: v.id("worldCupRounds") },
   handler: async (ctx, { roundId }) => {
+    const round = await ctx.db.get(roundId);
+    if (!round?.isActive) return [];
+
     const matches = await ctx.db
       .query("worldCupMatches")
       .withIndex("by_round_totalVotes", (q) => q.eq("roundId", roundId))
@@ -119,18 +203,21 @@ export const getAllTimeRanking = query({
       .query("worldCupMatches")
       .withIndex("by_totalVotes")
       .order("desc")
-      .take(max);
-    const ordered = matches.sort((a, b) => {
-      if (b.totalVotes !== a.totalVotes) return b.totalVotes - a.totalVotes;
-      return (b.lastVoteAt ?? 0) - (a.lastVoteAt ?? 0);
-    });
-    const roundIds = [...new Set(ordered.map((m) => m.roundId))];
+      .take(1000);
+    const roundIds = [...new Set(matches.map((m) => m.roundId))];
     const rounds = await Promise.all(roundIds.map((id) => ctx.db.get(id)));
     const roundMap = new Map(
       rounds
-        .filter((r): r is NonNullable<typeof r> => r !== null)
+        .filter((r): r is NonNullable<typeof r> => r !== null && r.isActive)
         .map((r) => [r._id as string, r]),
     );
+    const ordered = matches
+      .filter((m) => roundMap.has(m.roundId as string))
+      .sort((a, b) => {
+        if (b.totalVotes !== a.totalVotes) return b.totalVotes - a.totalVotes;
+        return (b.lastVoteAt ?? 0) - (a.lastVoteAt ?? 0);
+      })
+      .slice(0, max);
     return ordered.map((m) => ({
       ...m,
       round: roundMap.get(m.roundId as string) ?? null,
@@ -156,7 +243,10 @@ export const getUserVoteForMatch = query({
 export const listRoundsForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const rounds = await ctx.db.query("worldCupRounds").take(64);
+    const rounds = await ctx.db
+      .query("worldCupRounds")
+      .withIndex("by_isActive_order", (q) => q.eq("isActive", true))
+      .take(64);
     // Single fetch for all matches to avoid N+1 per round.
     const allMatches = await ctx.db.query("worldCupMatches").take(1000);
     const matchesByRound = new Map<string, typeof allMatches>();
@@ -196,7 +286,7 @@ export const listMatchesForSitemap = query({
     const rounds = await Promise.all(roundIds.map((id) => ctx.db.get(id)));
     const roundMap = new Map(
       rounds
-        .filter((r): r is NonNullable<typeof r> => r !== null)
+        .filter((r): r is NonNullable<typeof r> => r !== null && r.isActive)
         .map((r) => [r._id as string, r.slug]),
     );
     return matches
@@ -249,6 +339,11 @@ export const castVoteInternal = internalMutation({
     }
     const match = await ctx.db.get(matchId);
     if (!match) throw new ConvexError("Match not found");
+    const round = await ctx.db.get(match.roundId);
+    if (!round?.isActive) throw new ConvexError("Round inactive");
+    if (match.homeScore === undefined || match.awayScore === undefined) {
+      throw new ConvexError("Score not defined");
+    }
 
     // Rate-limit DEPOIS de validar matchId/reasons — user não perde tentativa
     // por payload inválido. Token só é consumido em vote real.
@@ -270,7 +365,6 @@ export const castVoteInternal = internalMutation({
 
     const now = Date.now();
 
-    const round = await ctx.db.get(match.roundId);
     const roundSlug = round?.slug;
 
     let totalVotes = match.totalVotes;
@@ -301,78 +395,7 @@ export const castVoteInternal = internalMutation({
       await ctx.db.patch(matchId, { reasonCounts: counts, lastVoteAt: now });
     }
 
-    // Fire-and-forget revalidation no Next.js. Tags granulares — só wipa
-    // cache do match votado + sua rodada + ranking + sitemap.
-    const tags = [`match:${match.slug}`, "ranking", "boring-game:sitemap"];
-    if (roundSlug) tags.push(`round:${roundSlug}`);
-    await ctx.scheduler.runAfter(0, internal.boringGame.notifyRevalidate, {
-      tags,
-    });
-
     return { totalVotes, reasons: dedup };
-  },
-});
-
-const REVALIDATE_MAX_ATTEMPTS = 4;
-const REVALIDATE_BACKOFF_MS = [0, 2_000, 10_000, 60_000]; // 0, 2s, 10s, 1min
-
-export const notifyRevalidate = internalAction({
-  args: { tags: v.array(v.string()), attempt: v.optional(v.number()) },
-  handler: async (ctx, { tags, attempt }) => {
-    const url = process.env.NEXT_REVALIDATE_URL;
-    const secret = process.env.REVALIDATE_SECRET;
-    if (!url || !secret) {
-      // Não logar URL completa nem secret — apenas presence flags
-      console.warn(
-        "[boringGame.notifyRevalidate] missing-env",
-        { hasUrl: !!url, hasSecret: !!secret },
-      );
-      return;
-    }
-
-    const tryNumber = attempt ?? 0;
-    let ok = false;
-    let status = 0;
-    try {
-      const res = await fetch(`${url}?v=1`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${secret}`,
-        },
-        body: JSON.stringify({ tags }),
-        // Timeout explícito — sem ele Convex action pode travar em Next slow.
-        signal: AbortSignal.timeout(5_000),
-      });
-      status = res.status;
-      ok = res.ok;
-    } catch {
-      // Não logar `err` — pode conter URL com query/secret se headers ecoados
-      ok = false;
-    }
-
-    if (ok) return;
-
-    const next = tryNumber + 1;
-    if (next < REVALIDATE_MAX_ATTEMPTS) {
-      const delay = REVALIDATE_BACKOFF_MS[next] ?? 60_000;
-      console.warn("[boringGame.notifyRevalidate] retry", {
-        attempt: next,
-        status,
-        delayMs: delay,
-      });
-      await ctx.scheduler.runAfter(
-        delay,
-        internal.boringGame.notifyRevalidate,
-        { tags, attempt: next },
-      );
-    } else {
-      console.error("[boringGame.notifyRevalidate] gave-up", {
-        attempts: REVALIDATE_MAX_ATTEMPTS,
-        status,
-        tags,
-      });
-    }
   },
 });
 
@@ -449,10 +472,13 @@ export const castVoteHttp = httpAction(async (ctx, request) => {
   }
 
   if (!body.matchId || !Array.isArray(body.reasons)) {
-    return new Response(JSON.stringify({ error: "Missing matchId or reasons" }), {
-      status: 400,
-      headers,
-    });
+    return new Response(
+      JSON.stringify({ error: "Missing matchId or reasons" }),
+      {
+        status: 400,
+        headers,
+      },
+    );
   }
 
   try {
@@ -491,6 +517,8 @@ export const castVoteHttp = httpAction(async (ctx, request) => {
       "Invalid JSON",
       "Missing matchId or reasons",
       "Origin not allowed",
+      "Round inactive",
+      "Score not defined",
     ];
     const status =
       msg === "user-not-found" || msg === "needs-auth"

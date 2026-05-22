@@ -7,7 +7,7 @@ const distanceBucketValidator = v.union(
   v.literal("close"),
   v.literal("mid"),
   v.literal("far"),
-  v.literal("unknown")
+  v.literal("unknown"),
 );
 
 export const boringReason = v.union(
@@ -24,14 +24,14 @@ export const stickerTypeValidator = v.union(
   v.literal("escudo"),
   v.literal("player"),
   v.literal("team_photo"),
-  v.literal("special")
+  v.literal("special"),
 );
 
 export const variantValidator = v.union(
   v.literal("base"),
   v.literal("bronze"),
   v.literal("prata"),
-  v.literal("ouro")
+  v.literal("ouro"),
 );
 
 const stickerDetailInSectionValidator = v.object({
@@ -100,8 +100,8 @@ export default defineSchema({
         v.literal("child"),
         v.literal("teen"),
         v.literal("young"),
-        v.literal("adult")
-      )
+        v.literal("adult"),
+      ),
     ),
     parentalConsentAt: v.optional(v.number()),
     guardianName: v.optional(v.string()),
@@ -136,7 +136,12 @@ export default defineSchema({
     coverUploadTimestamps: v.optional(v.array(v.number())),
 
     locationSource: v.optional(
-      v.union(v.literal("gps"), v.literal("manual"), v.literal("ip"), v.literal("skipped"))
+      v.union(
+        v.literal("gps"),
+        v.literal("manual"),
+        v.literal("ip"),
+        v.literal("skipped"),
+      ),
     ),
     lat: v.optional(v.float64()),
     lng: v.optional(v.float64()),
@@ -152,7 +157,11 @@ export default defineSchema({
     .index("by_sticker_setup", ["hasCompletedStickerSetup", "cityId"])
     .index("by_city_not_shadowbanned", ["cityId", "isShadowBanned"])
     .index("by_avatar_storage", ["avatarStorageId"])
-    .index("by_deletion_pending", ["deletionPending", "cleanupStatus", "deletionRequestedAt"]),
+    .index("by_deletion_pending", [
+      "deletionPending",
+      "cleanupStatus",
+      "deletionRequestedAt",
+    ]),
 
   cities: defineTable({
     name: v.string(),
@@ -177,7 +186,7 @@ export default defineSchema({
     whatsappLinkStatus: v.union(
       v.literal("active"),
       v.literal("reported"),
-      v.literal("invalid")
+      v.literal("invalid"),
     ),
     suggestedHours: v.optional(v.string()),
     description: v.optional(v.string()),
@@ -187,7 +196,7 @@ export default defineSchema({
       v.literal("suspended"),
       v.literal("inactive"),
       v.literal("expired"),
-      v.literal("cancelled")
+      v.literal("cancelled"),
     ),
     cancelledAt: v.optional(v.number()),
     suspendedFromReportsAt: v.optional(v.number()),
@@ -206,7 +215,7 @@ export default defineSchema({
 
     acceptsMail: v.optional(v.boolean()),
     pointType: v.optional(
-      v.union(v.literal("fixed"), v.literal("event"), v.literal("mail"))
+      v.union(v.literal("fixed"), v.literal("event"), v.literal("mail")),
     ),
     coverImageStorageId: v.optional(v.id("_storage")),
     coverImageUrl: v.optional(v.string()),
@@ -290,7 +299,7 @@ export default defineSchema({
     relStart: v.optional(v.number()),
     goldenNumbers: v.optional(v.array(v.number())),
     legendNumbers: v.optional(
-      v.array(v.object({ number: v.number(), name: v.string() }))
+      v.array(v.object({ number: v.number(), name: v.string() })),
     ),
   })
     .index("by_code", ["code"])
@@ -301,7 +310,7 @@ export default defineSchema({
   stickerDetail: defineTable({
     sectionCode: v.string(),
     sectionName: v.string(), // denormalized for breadcrumbs
-    flagEmoji: v.string(),   // denormalized for UI
+    flagEmoji: v.string(), // denormalized for UI
     relativeNum: v.number(),
     absoluteNum: v.number(),
     name: v.string(),
@@ -355,7 +364,11 @@ export default defineSchema({
     matchedIsVerified: v.optional(v.boolean()),
   })
     .index("by_user_layer", ["userId", "layer"])
-    .index("by_user_layer_bidirectional", ["userId", "layer", "isBidirectional"])
+    .index("by_user_layer_bidirectional", [
+      "userId",
+      "layer",
+      "isBidirectional",
+    ])
     .index("by_user_point", ["userId", "tradePointId"])
     .index("by_user_matched_point", ["userId", "matchedUserId", "tradePointId"])
     .index("by_matchedUser", ["matchedUserId"]),
@@ -373,7 +386,7 @@ export default defineSchema({
       v.literal("cancelled"),
       v.literal("declined"),
       v.literal("disputed"),
-      v.literal("expired")
+      v.literal("expired"),
     ),
     createdAt: v.number(),
     confirmedAt: v.optional(v.number()),
@@ -452,16 +465,16 @@ export default defineSchema({
           description: v.optional(v.string()),
           url: v.optional(v.string()),
           availability: v.optional(v.string()),
-        })
-      )
+        }),
+      ),
     ),
     faqs: v.optional(
       v.array(
         v.object({
           question: v.string(),
           answer: v.string(),
-        })
-      )
+        }),
+      ),
     ),
   })
     .index("by_slug", ["slug"])
@@ -512,7 +525,7 @@ export default defineSchema({
       v.literal("open"),
       v.literal("reviewing"),
       v.literal("resolved"),
-      v.literal("dismissed")
+      v.literal("dismissed"),
     ),
     isResolved: v.boolean(),
     resolvedAt: v.optional(v.number()),
@@ -549,7 +562,6 @@ export default defineSchema({
   })
     .index("by_post", ["postId"])
     .index("by_views", ["views"]),
-
 
   postViewIdempotency: defineTable({
     postId: v.id("blogPosts"),
@@ -603,11 +615,25 @@ export default defineSchema({
       meme_potencial: v.number(),
     }),
     lastVoteAt: v.optional(v.number()),
+    // Gepeto: Match results (admin input)
+    homeScore: v.optional(v.number()),
+    awayScore: v.optional(v.number()),
+    status: v.optional(
+      v.union(
+        v.literal("scheduled"),
+        v.literal("live"),
+        v.literal("aet"),
+        v.literal("penalties"),
+        v.literal("finished"),
+      ),
+    ),
+    finishedAt: v.optional(v.number()),
   })
     .index("by_round_kickoff", ["roundId", "kickoffAt"])
     .index("by_slug", ["slug"])
     .index("by_round_totalVotes", ["roundId", "totalVotes"])
-    .index("by_totalVotes", ["totalVotes"]),
+    .index("by_totalVotes", ["totalVotes"])
+    .index("by_status", ["status"]),
 
   boringGameVotes: defineTable({
     matchId: v.id("worldCupMatches"),
@@ -615,6 +641,98 @@ export default defineSchema({
     roundId: v.id("worldCupRounds"),
     reasons: v.array(boringReason),
   }).index("by_match_user", ["matchId", "userId"]),
+
+  // ============ GEPETO AI OPPONENT TABLES ============
+
+  aiPredictions: defineTable({
+    matchId: v.id("worldCupMatches"),
+    prediction: v.union(
+      v.literal("home"),
+      v.literal("draw"),
+      v.literal("away"),
+    ),
+    exactScore: v.object({
+      home: v.number(),
+      away: v.number(),
+    }),
+    confidence: v.number(),
+    reasoning: v.array(v.string()),
+    trashTalk: v.optional(v.string()),
+    generatedAt: v.number(),
+    modelVersion: v.string(),
+  }).index("by_match", ["matchId"]),
+
+  userPredictions: defineTable({
+    userId: v.id("users"),
+    matchId: v.id("worldCupMatches"),
+    prediction: v.union(
+      v.literal("home"),
+      v.literal("draw"),
+      v.literal("away"),
+    ),
+    exactScore: v.optional(
+      v.object({
+        home: v.number(),
+        away: v.number(),
+      }),
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_match", ["userId", "matchId"])
+    .index("by_match", ["matchId"])
+    .index("by_user", ["userId"]),
+
+  userAiBadges: defineTable({
+    userId: v.id("users"),
+    matchId: v.id("worldCupMatches"),
+    awardedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_match", ["userId", "matchId"])
+    .index("by_match", ["matchId"]),
+
+  userAiMatchResults: defineTable({
+    userId: v.id("users"),
+    matchId: v.id("worldCupMatches"),
+    outcome: v.union(v.literal("win"), v.literal("loss"), v.literal("tie")),
+    awardedBadge: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_user_match", ["userId", "matchId"])
+    .index("by_match", ["matchId"])
+    .index("by_user", ["userId"]),
+
+  userAiStats: defineTable({
+    userId: v.id("users"),
+    winCount: v.number(),
+    lossCount: v.number(),
+    tieCount: v.number(),
+    totalMatches: v.number(),
+    lastUpdated: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_wins", ["winCount"]),
+
+  aiWeeklyNarratives: defineTable({
+    weekNumber: v.number(),
+    year: v.number(),
+    narrative: v.string(),
+    gepetoScore: v.number(),
+    communityScore: v.number(),
+    generatedAt: v.number(),
+  }).index("by_week_year", ["year", "weekNumber"]),
+
+  scoreAuditLog: defineTable({
+    matchId: v.id("worldCupMatches"),
+    adminUserId: v.id("users"),
+    previousScore: v.optional(v.object({ home: v.number(), away: v.number() })),
+    newScore: v.object({ home: v.number(), away: v.number() }),
+    previousStatus: v.optional(v.string()),
+    newStatus: v.string(),
+    changedAt: v.number(),
+    reason: v.optional(v.string()),
+  }).index("by_match", ["matchId"]),
 
   communityPosts: defineTable({
     userId: v.id("users"),

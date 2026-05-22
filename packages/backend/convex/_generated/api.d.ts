@@ -17,6 +17,7 @@ import type * as checkins from "../checkins.js";
 import type * as cities from "../cities.js";
 import type * as communityPosts from "../communityPosts.js";
 import type * as crons from "../crons.js";
+import type * as gepeto from "../gepeto.js";
 import type * as http from "../http.js";
 import type * as lgpd from "../lgpd.js";
 import type * as lib_auth from "../lib/auth.js";
@@ -88,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   cities: typeof cities;
   communityPosts: typeof communityPosts;
   crons: typeof crons;
+  gepeto: typeof gepeto;
   http: typeof http;
   lgpd: typeof lgpd;
   "lib/auth": typeof lib_auth;

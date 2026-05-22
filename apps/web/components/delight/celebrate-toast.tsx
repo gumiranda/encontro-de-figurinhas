@@ -87,6 +87,11 @@ export const celebrationMessages = {
     description: "Agora é só combinar as trocas.",
     level: "small" as const,
   },
+  beatAI: {
+    title: "Você venceu o Gepeto!",
+    description: "Seu palpite foi melhor que a IA. Badge conquistado!",
+    level: "big" as const,
+  },
 };
 
 export function celebrateMilestone(

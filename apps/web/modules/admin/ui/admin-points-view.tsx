@@ -22,6 +22,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowLeftRight,
   Ban,
+  Bot,
   CheckCircle2,
   Gavel,
   Inbox,
@@ -186,7 +187,7 @@ export function AdminPointsView() {
       className={cn(
         "min-h-screen bg-[#090e1c] text-[#e1e4fa]",
         "[--ap-primary:#95aaff] [--ap-secondary:#4ff325] [--ap-on-secondary:#105500]",
-        "[--ap-surface-low:#0d1323] [--ap-outline:#434759] [--ap-muted:#a6aabf]"
+        "[--ap-surface-low:#0d1323] [--ap-outline:#434759] [--ap-muted:#a6aabf]",
       )}
     >
       <div
@@ -229,11 +230,25 @@ export function AdminPointsView() {
               <Gavel className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               <span>Usuários</span>
             </Link>
+            <Link
+              href="/admin/matches"
+              className="group flex items-center gap-4 px-4 py-3 text-sm font-semibold text-[var(--ap-muted)] transition-all duration-200 hover:bg-[#13192b] hover:text-[var(--ap-primary)]"
+            >
+              <Bot className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <span>Gepeto</span>
+            </Link>
+            <Link
+              href="/admin/jogo-mais-chato"
+              className="group flex items-center gap-4 px-4 py-3 text-sm font-semibold text-[var(--ap-muted)] transition-all duration-200 hover:bg-[#13192b] hover:text-[var(--ap-primary)]"
+            >
+              <Trophy className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <span>Jogo Mais Chato</span>
+            </Link>
           </nav>
         </div>
         <div className="mt-auto border-t border-[var(--ap-outline)]/10 p-6">
           <p className="text-[10px] uppercase tracking-widest text-[var(--ap-muted)]">
-Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
+            Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
           </p>
         </div>
       </aside>
@@ -292,7 +307,7 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
                     "rounded-lg px-5 py-2.5 text-sm font-bold tracking-wide transition-all",
                     tab === k
                       ? "bg-[var(--ap-primary)] text-[#00247e] shadow-lg"
-                      : "text-[var(--ap-muted)] hover:text-[#e1e4fa]"
+                      : "text-[var(--ap-muted)] hover:text-[#e1e4fa]",
                   )}
                 >
                   {label}
@@ -375,7 +390,9 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
                   <h3 className="font-[family-name:var(--font-headline)] text-lg font-bold text-[#e1e4fa]">
                     {row.name}
                   </h3>
-                  <p className="mt-1 text-sm text-[var(--ap-muted)]">{row.address}</p>
+                  <p className="mt-1 text-sm text-[var(--ap-muted)]">
+                    {row.address}
+                  </p>
                   <p className="mt-2 text-xs text-[var(--ap-muted)]">
                     {row.cityName}
                     {row.cityState ? ` · ${row.cityState}` : ""}
@@ -420,7 +437,10 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
         </span>
       </nav>
 
-      <Dialog open={!!approveOpen} onOpenChange={(o) => !o && setApproveOpen(null)}>
+      <Dialog
+        open={!!approveOpen}
+        onOpenChange={(o) => !o && setApproveOpen(null)}
+      >
         <DialogContent className="border-[var(--ap-outline)]/20 bg-[#13192b] text-[#e1e4fa] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-[family-name:var(--font-headline)]">
@@ -428,7 +448,9 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
             </DialogTitle>
             <DialogDescription className="text-[var(--ap-muted)]">
               Cole o link do grupo do WhatsApp (convite{" "}
-              <code className="text-[var(--ap-primary)]">chat.whatsapp.com</code>
+              <code className="text-[var(--ap-primary)]">
+                chat.whatsapp.com
+              </code>
               ).
             </DialogDescription>
           </DialogHeader>
@@ -451,7 +473,11 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
               disabled={busyId !== null}
               onClick={() => void onApprove()}
             >
-              {busyId ? <Loader2 className="h-4 w-4 animate-spin" /> : "Aprovar"}
+              {busyId ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Aprovar"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -465,7 +491,10 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
         busy={busyId !== null}
       />
 
-      <Dialog open={!!rejectOpen} onOpenChange={(o) => !o && setRejectOpen(null)}>
+      <Dialog
+        open={!!rejectOpen}
+        onOpenChange={(o) => !o && setRejectOpen(null)}
+      >
         <DialogContent className="border-[var(--ap-outline)]/20 bg-[#13192b] text-[#e1e4fa] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-[family-name:var(--font-headline)]">
@@ -495,7 +524,11 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
               disabled={busyId !== null}
               onClick={() => void onReject()}
             >
-              {busyId ? <Loader2 className="h-4 w-4 animate-spin" /> : "Recusar"}
+              {busyId ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Recusar"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -507,7 +540,7 @@ Figurinha <span className="text-[#87d400]">Fácil</span> · moderação
 function PendingHeroImage({ row }: { row: Row }) {
   const mapSrc = staticMapUrl(row.lat, row.lng);
   const [mode, setMode] = useState<"cover" | "map" | "none">(
-    row.coverImageUrl ? "cover" : "map"
+    row.coverImageUrl ? "cover" : "map",
   );
 
   useEffect(() => {
@@ -535,7 +568,10 @@ function PendingHeroImage({ row }: { row: Row }) {
         />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#13192b] px-6 text-center">
-          <MapPin className="h-10 w-10 text-[var(--ap-primary)]/50" aria-hidden />
+          <MapPin
+            className="h-10 w-10 text-[var(--ap-primary)]/50"
+            aria-hidden
+          />
           <p className="text-xs text-[var(--ap-muted)]">
             Mapa estático indisponível. Abra a localização no mapa externo.
           </p>
@@ -603,7 +639,9 @@ function PendingFeaturedCard({
                 Confiabilidade
               </span>
               <div className="flex items-center justify-end gap-1 font-[family-name:var(--font-headline)] font-black text-[var(--ap-secondary)]">
-                <span className="text-xl">{row.reliabilityScore.toFixed(1)}</span>
+                <span className="text-xl">
+                  {row.reliabilityScore.toFixed(1)}
+                </span>
               </div>
             </div>
           </div>

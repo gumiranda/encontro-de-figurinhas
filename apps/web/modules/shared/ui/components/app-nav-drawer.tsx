@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeftRight,
+  Bot,
   BookOpen,
   Inbox,
   LayoutDashboard,
@@ -23,6 +24,7 @@ import {
   Menu,
   ShieldCheck,
   StickyNote,
+  Trophy,
   User,
   UserCog,
   type LucideIcon,
@@ -55,7 +57,10 @@ interface RenderedNavGroup {
 
 export function useAppNavGroups(): RenderedNavGroup[] {
   const { isAuthenticated } = useConvexAuth();
-  const navContext = useQuery(api.users.getNavContext, isAuthenticated ? {} : "skip");
+  const navContext = useQuery(
+    api.users.getNavContext,
+    isAuthenticated ? {} : "skip",
+  );
 
   return useMemo<RenderedNavGroup[]>(() => {
     const isSuperadminOrCeo =
@@ -96,7 +101,11 @@ export function useAppNavGroups(): RenderedNavGroup[] {
         items: [
           { label: "Perfil", href: "/perfil", icon: User },
           { label: "Meus pontos", href: "/meus-pontos", icon: MapPin },
-          { label: "Sugerir ponto", href: "/ponto/solicitar", icon: MapPinPlus },
+          {
+            label: "Sugerir ponto",
+            href: "/ponto/solicitar",
+            icon: MapPinPlus,
+          },
         ],
       },
       ...(isSuperadminOrCeo
@@ -104,7 +113,17 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             {
               title: "Admin",
               items: [
-                { label: "Aprovar pontos", href: "/admin/points", icon: ShieldCheck },
+                {
+                  label: "Aprovar pontos",
+                  href: "/admin/points",
+                  icon: ShieldCheck,
+                },
+                { label: "Gepeto", href: "/admin/matches", icon: Bot },
+                {
+                  label: "Jogo Mais Chato",
+                  href: "/admin/jogo-mais-chato",
+                  icon: Trophy,
+                },
                 { label: "Usuários", href: "/admin/users", icon: UserCog },
                 { label: "Blog", href: "/admin/blog", icon: BookOpen },
               ],
@@ -129,7 +148,11 @@ interface SidebarContentProps {
   onNavigate?: () => void;
 }
 
-export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarContentProps) {
+export function AppSidebarContent({
+  groups,
+  pathname,
+  onNavigate,
+}: SidebarContentProps) {
   return (
     <>
       <div className="flex items-center gap-2 px-6 py-5">
@@ -160,7 +183,7 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
                   ? "bg-primary text-primary-foreground"
                   : item.isFeatured
                     ? "bg-tertiary/10 font-semibold text-tertiary hover:bg-tertiary/15"
-                    : "hover:bg-muted"
+                    : "hover:bg-muted",
               );
 
               const badge =
@@ -171,7 +194,7 @@ export function AppSidebarContent({ groups, pathname, onNavigate }: SidebarConte
                       "ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 font-mono text-[10px] font-bold tabular-nums",
                       isActive
                         ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-tertiary text-tertiary-foreground"
+                        : "bg-tertiary text-tertiary-foreground",
                     )}
                   >
                     {item.badgeCount > 99 ? "99+" : item.badgeCount}

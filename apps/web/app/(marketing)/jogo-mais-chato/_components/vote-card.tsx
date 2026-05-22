@@ -111,14 +111,13 @@ export function VoteCard({ matchId, matchSlug, initialReasons }: Props) {
           return;
         }
         toast.success("Voto registrado!");
-        router.refresh();
       } catch (err) {
         toast.error("Falha de rede");
       } finally {
         setSubmitting(false);
       }
     },
-    [getToken, matchId, router],
+    [getToken, matchId],
   );
 
   // Pós-login: ler intent, auto-submit, limpar.
