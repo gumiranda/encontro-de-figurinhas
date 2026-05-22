@@ -60,7 +60,7 @@ export function MatchCard({
               </div>
             </div>
           </div>
-          <div className={styles.matchScore}>
+          <div className={styles.matchScoreCard}>
             {hasScore ? `${homeScore} × ${awayScore}` : "×"}
           </div>
           <div className="flex items-center gap-3 flex-row-reverse">

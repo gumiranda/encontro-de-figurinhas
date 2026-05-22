@@ -46,6 +46,17 @@
   color: rgb(148 163 184);
 }
 
+.matchScoreCard {
+  font-family: var(--font-display), "Bungee", system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4.5vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: rgb(248 250 252);
+  text-align: center;
+  min-width: 5.5rem;
+  padding-inline: 0.25rem;
+}
+
 .matchScoreHero {
   font-family: var(--font-display), "Bungee", system-ui, sans-serif;
   font-size: clamp(2.75rem, 10vw, 4.5rem);
