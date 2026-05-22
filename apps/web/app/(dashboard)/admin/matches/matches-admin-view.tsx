@@ -38,6 +38,7 @@ import {
   type StatusProps,
 } from "@workspace/ui/components/kibo-ui/status";
 import { toast } from "sonner";
+import { ConfidenceMeter, ReasoningCard } from "@/modules/gepeto";
 
 type MatchStatus = "scheduled" | "live" | "aet" | "penalties" | "finished";
 
@@ -118,14 +119,34 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Erro ao atualizar placar";
 }
 
-function formatGepetoPrediction(prediction: Doc<"aiPredictions">): string {
+function GepetoPredictionDetail({
+  match,
+  prediction,
+}: {
+  match: Doc<"worldCupMatches">;
+  prediction: Doc<"aiPredictions">;
+}) {
   const outcome =
     prediction.prediction === "home"
-      ? "Mandante"
+      ? match.homeTeamName
       : prediction.prediction === "away"
-        ? "Visitante"
+        ? match.awayTeamName
         : "Empate";
-  return `${outcome} · ${prediction.exactScore.home} x ${prediction.exactScore.away} (${prediction.confidence}%)`;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium">
+        {outcome} · {prediction.exactScore.home} x {prediction.exactScore.away}
+      </p>
+      <ConfidenceMeter value={prediction.confidence} />
+      {prediction.trashTalk ? (
+        <p className="text-sm text-muted-foreground italic border-l-2 border-primary/30 pl-3">
+          &ldquo;{prediction.trashTalk}&rdquo;
+        </p>
+      ) : null}
+      <ReasoningCard reasoning={prediction.reasoning} />
+    </div>
+  );
 }
 
 function getScore(scores: EditorState["scores"], matchId: MatchId): ScoreState {
@@ -335,9 +356,10 @@ export function MatchesAdminView() {
                     Palpite do Gepeto (IA)
                   </div>
                   {match.aiPrediction ? (
-                    <p className="text-sm font-medium">
-                      {formatGepetoPrediction(match.aiPrediction)}
-                    </p>
+                    <GepetoPredictionDetail
+                      match={match}
+                      prediction={match.aiPrediction}
+                    />
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       Nenhum palpite gerado ainda.
