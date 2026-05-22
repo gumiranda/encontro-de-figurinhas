@@ -307,9 +307,6 @@ export const setAIPredictionAdmin = mutation({
       home: v.number(),
       away: v.number(),
     }),
-    confidence: v.optional(v.number()),
-    reasoning: v.optional(v.array(v.string())),
-    trashTalk: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
@@ -317,19 +314,32 @@ export const setAIPredictionAdmin = mutation({
     const match = await ctx.db.get(args.matchId);
     if (!match) throw new ConvexError("Jogo não encontrado");
 
-    const confidence = args.confidence ?? MANUAL_PREDICTION_DEFAULTS.confidence;
-    const reasoning = args.reasoning ?? [...MANUAL_PREDICTION_DEFAULTS.reasoning];
+    const existing = await ctx.db
+      .query("aiPredictions")
+      .withIndex("by_match", (q) => q.eq("matchId", args.matchId))
+      .unique();
+
+    if (existing) {
+      validateAIPredictionPayload({
+        exactScore: args.exactScore,
+        confidence: existing.confidence,
+        reasoning: existing.reasoning,
+      });
+
+      await ctx.db.patch(existing._id, {
+        prediction: args.prediction,
+        exactScore: args.exactScore,
+      });
+      return;
+    }
+
+    const confidence = MANUAL_PREDICTION_DEFAULTS.confidence;
+    const reasoning = [...MANUAL_PREDICTION_DEFAULTS.reasoning];
     validateAIPredictionPayload({
       exactScore: args.exactScore,
       confidence,
       reasoning,
     });
-
-    const existing = await ctx.db
-      .query("aiPredictions")
-      .withIndex("by_match", (q) => q.eq("matchId", args.matchId))
-      .unique();
-    if (existing) await ctx.db.delete(existing._id);
 
     await ctx.db.insert("aiPredictions", {
       matchId: args.matchId,
@@ -337,7 +347,6 @@ export const setAIPredictionAdmin = mutation({
       exactScore: args.exactScore,
       confidence,
       reasoning,
-      trashTalk: args.trashTalk?.trim() || undefined,
       modelVersion: MANUAL_PREDICTION_DEFAULTS.modelVersion,
       generatedAt: Date.now(),
     });

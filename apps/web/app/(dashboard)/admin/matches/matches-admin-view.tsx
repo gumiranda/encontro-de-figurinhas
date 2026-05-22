@@ -155,7 +155,6 @@ function GepetoPredictionEditor({
         matchId: match._id,
         prediction,
         exactScore: { home: homeScore, away: awayScore },
-        trashTalk: existingPrediction?.trashTalk,
       });
       toast.success("Palpite salvo manualmente!");
       onSaved();
@@ -212,6 +211,11 @@ function GepetoPredictionEditor({
           onChange={(e) => setAwayScore(parseScoreValue(e.target.value))}
         />
       </div>
+      {existingPrediction ? (
+        <p className="text-xs text-muted-foreground">
+          Confiança, reasoning e trash talk da IA permanecem iguais.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           size="sm"
