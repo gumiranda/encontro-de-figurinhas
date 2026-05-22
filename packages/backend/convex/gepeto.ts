@@ -18,10 +18,7 @@ import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
 
 // ============ HELPERS ============
 
-function getMatchResult(
-  homeScore: number,
-  awayScore: number,
-): "home" | "draw" | "away" {
+function getMatchResult(homeScore: number, awayScore: number): "home" | "draw" | "away" {
   if (homeScore > awayScore) return "home";
   if (awayScore > homeScore) return "away";
   return "draw";
@@ -43,9 +40,7 @@ const predictionResponseSchema = z.object({
 type ParsedPredictionResponse = z.infer<typeof predictionResponseSchema>;
 
 function getISOWeekNumber(date: Date): number {
-  const d = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
-  );
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -55,7 +50,7 @@ function getISOWeekNumber(date: Date): number {
 async function fetchWithTimeout(
   url: string,
   options: RequestInit,
-  timeoutMs: number,
+  timeoutMs: number
 ): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -119,9 +114,7 @@ export const getUserPrediction = query({
 
     const prediction = await ctx.db
       .query("userPredictions")
-      .withIndex("by_user_match", (q) =>
-        q.eq("userId", user._id).eq("matchId", matchId),
-      )
+      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
       .unique();
 
     if (!prediction) return null;
@@ -129,9 +122,7 @@ export const getUserPrediction = query({
     const isRevealed = match.kickoffAt <= Date.now();
     const badge = await ctx.db
       .query("userAiBadges")
-      .withIndex("by_user_match", (q) =>
-        q.eq("userId", user._id).eq("matchId", matchId),
-      )
+      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
       .unique();
 
     return {
@@ -146,11 +137,7 @@ export const getUserPrediction = query({
 export const getLeaderboard = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit = 50 }) => {
-    return ctx.db
-      .query("userAiStats")
-      .withIndex("by_wins")
-      .order("desc")
-      .take(limit);
+    return ctx.db.query("userAiStats").withIndex("by_wins").order("desc").take(limit);
   },
 });
 
@@ -159,9 +146,7 @@ export const getWeeklyNarrative = query({
   handler: async (ctx, { weekNumber, year }) => {
     return ctx.db
       .query("aiWeeklyNarratives")
-      .withIndex("by_week_year", (q) =>
-        q.eq("year", year).eq("weekNumber", weekNumber),
-      )
+      .withIndex("by_week_year", (q) => q.eq("year", year).eq("weekNumber", weekNumber))
       .unique();
   },
 });
@@ -206,7 +191,7 @@ export const listMatchesForAdmin = query({
           .withIndex("by_match", (q) => q.eq("matchId", match._id))
           .unique();
         return { ...match, aiPrediction: aiPrediction ?? null };
-      }),
+      })
     );
   },
 });
@@ -230,16 +215,12 @@ export const assertAdmin = internalQuery({
 export const recordUserPrediction = mutation({
   args: {
     matchId: v.id("worldCupMatches"),
-    prediction: v.union(
-      v.literal("home"),
-      v.literal("draw"),
-      v.literal("away"),
-    ),
+    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
     exactScore: v.optional(
       v.object({
         home: v.number(),
         away: v.number(),
-      }),
+      })
     ),
   },
   handler: async (ctx, { matchId, prediction, exactScore }) => {
@@ -265,9 +246,7 @@ export const recordUserPrediction = mutation({
 
     const existing = await ctx.db
       .query("userPredictions")
-      .withIndex("by_user_match", (q) =>
-        q.eq("userId", user._id).eq("matchId", matchId),
-      )
+      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
       .unique();
 
     const now = Date.now();
@@ -290,6 +269,81 @@ export const recordUserPrediction = mutation({
   },
 });
 
+const MANUAL_PREDICTION_DEFAULTS = {
+  confidence: 70,
+  reasoning: [
+    "Palpite calculado friamente.",
+    "Baseado em dados irreais e confusos.",
+    "Confira o resultado no apito final.",
+  ],
+  modelVersion: "manual",
+} as const;
+
+function validateAIPredictionPayload(args: {
+  exactScore: { home: number; away: number };
+  confidence: number;
+  reasoning: string[];
+}) {
+  if (
+    !Number.isInteger(args.exactScore.home) ||
+    !Number.isInteger(args.exactScore.away) ||
+    args.exactScore.home < 0 ||
+    args.exactScore.away < 0 ||
+    !Number.isInteger(args.confidence) ||
+    args.confidence < 0 ||
+    args.confidence > 100 ||
+    args.reasoning.length !== 3 ||
+    args.reasoning.some((item) => item.trim().length === 0)
+  ) {
+    throw new ConvexError("Palpite inválido");
+  }
+}
+
+export const setAIPredictionAdmin = mutation({
+  args: {
+    matchId: v.id("worldCupMatches"),
+    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
+    exactScore: v.object({
+      home: v.number(),
+      away: v.number(),
+    }),
+    confidence: v.optional(v.number()),
+    reasoning: v.optional(v.array(v.string())),
+    trashTalk: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const match = await ctx.db.get(args.matchId);
+    if (!match) throw new ConvexError("Jogo não encontrado");
+
+    const confidence = args.confidence ?? MANUAL_PREDICTION_DEFAULTS.confidence;
+    const reasoning = args.reasoning ?? [...MANUAL_PREDICTION_DEFAULTS.reasoning];
+    validateAIPredictionPayload({
+      exactScore: args.exactScore,
+      confidence,
+      reasoning,
+    });
+
+    const existing = await ctx.db
+      .query("aiPredictions")
+      .withIndex("by_match", (q) => q.eq("matchId", args.matchId))
+      .unique();
+    if (existing) await ctx.db.delete(existing._id);
+
+    await ctx.db.insert("aiPredictions", {
+      matchId: args.matchId,
+      prediction: args.prediction,
+      exactScore: args.exactScore,
+      confidence,
+      reasoning,
+      trashTalk: args.trashTalk?.trim() || undefined,
+      modelVersion: MANUAL_PREDICTION_DEFAULTS.modelVersion,
+      generatedAt: Date.now(),
+    });
+  },
+});
+
 export const updateMatchScore = mutation({
   args: {
     matchId: v.id("worldCupMatches"),
@@ -300,7 +354,7 @@ export const updateMatchScore = mutation({
       v.literal("live"),
       v.literal("aet"),
       v.literal("penalties"),
-      v.literal("finished"),
+      v.literal("finished")
     ),
     reason: v.optional(v.string()),
   },
@@ -323,11 +377,7 @@ export const updateMatchScore = mutation({
 export const savePrediction = internalMutation({
   args: {
     matchId: v.id("worldCupMatches"),
-    prediction: v.union(
-      v.literal("home"),
-      v.literal("draw"),
-      v.literal("away"),
-    ),
+    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
     exactScore: v.object({ home: v.number(), away: v.number() }),
     confidence: v.number(),
     reasoning: v.array(v.string()),
@@ -335,19 +385,17 @@ export const savePrediction = internalMutation({
     modelVersion: v.string(),
   },
   handler: async (ctx, args) => {
-    if (
-      !Number.isInteger(args.exactScore.home) ||
-      !Number.isInteger(args.exactScore.away) ||
-      args.exactScore.home < 0 ||
-      args.exactScore.away < 0 ||
-      !Number.isInteger(args.confidence) ||
-      args.confidence < 0 ||
-      args.confidence > 100 ||
-      args.reasoning.length !== 3 ||
-      args.reasoning.some((item) => item.trim().length === 0)
-    ) {
-      throw new Error("Invalid AI prediction payload");
-    }
+    validateAIPredictionPayload({
+      exactScore: args.exactScore,
+      confidence: args.confidence,
+      reasoning: args.reasoning,
+    });
+
+    const existing = await ctx.db
+      .query("aiPredictions")
+      .withIndex("by_match", (q) => q.eq("matchId", args.matchId))
+      .unique();
+    if (existing) await ctx.db.delete(existing._id);
 
     await ctx.db.insert("aiPredictions", {
       ...args,
@@ -370,7 +418,7 @@ export const deleteAIPrediction = internalMutation({
 async function incrementUserAiStats(
   ctx: MutationCtx,
   userId: Id<"users">,
-  outcome: AiOutcome,
+  outcome: AiOutcome
 ) {
   const existing = await ctx.db
     .query("userAiStats")
@@ -432,17 +480,13 @@ export const awardBadgesForMatch = internalMutation({
       .query("userAiBadges")
       .withIndex("by_match", (q) => q.eq("matchId", matchId))
       .collect();
-    const existingBadgeUserIds = new Set(
-      existingBadges.map((badge) => badge.userId),
-    );
+    const existingBadgeUserIds = new Set(existingBadges.map((badge) => badge.userId));
 
     const existingResults = await ctx.db
       .query("userAiMatchResults")
       .withIndex("by_match", (q) => q.eq("matchId", matchId))
       .collect();
-    const processedUserIds = new Set(
-      existingResults.map((result) => result.userId),
-    );
+    const processedUserIds = new Set(existingResults.map((result) => result.userId));
 
     // Paginated processing - 100 at a time
     const BATCH_SIZE = 100;
@@ -529,16 +573,18 @@ export const generateAIPrediction = internalAction({
     force: v.optional(v.boolean()),
     adminOverride: v.optional(v.boolean()),
   },
-  handler: async (ctx, { matchId, force, adminOverride }): Promise<GeneratePredictionResult> => {
+  handler: async (
+    ctx,
+    { matchId, force, adminOverride }
+  ): Promise<GeneratePredictionResult> => {
     const match = await ctx.runQuery(internal.gepeto.getMatchForPrediction, {
       matchId,
     });
     if (!match) throw new Error("Match not found");
 
-    const existing = await ctx.runQuery(
-      internal.gepeto.getAIPredictionInternal,
-      { matchId },
-    );
+    const existing = await ctx.runQuery(internal.gepeto.getAIPredictionInternal, {
+      matchId,
+    });
     if (existing && !force) {
       return { skipped: true as const, reason: "already-exists" as const };
     }
@@ -622,7 +668,7 @@ export const generateAIPrediction = internalAction({
               },
             }),
           },
-          15_000,
+          15_000
         );
 
         if (!response.ok) {
@@ -638,10 +684,9 @@ export const generateAIPrediction = internalAction({
           modelVersion: "gpt-4o-mini",
         });
 
-        const saved = await ctx.runQuery(
-          internal.gepeto.getAIPredictionInternal,
-          { matchId },
-        );
+        const saved = await ctx.runQuery(internal.gepeto.getAIPredictionInternal, {
+          matchId,
+        });
         return { skipped: false as const, prediction: saved };
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e));

@@ -32,6 +32,7 @@ import {
   StickerSectionGroup,
   type SectionInfo,
 } from "../components/sticker-section-group";
+import { ExportDuplicatesWhatsAppButton } from "../components/export-duplicates-whatsapp-button";
 import { StickerTabs } from "../components/sticker-tabs";
 
 const SECTION_EMOJI: Record<string, string> = {
@@ -323,25 +324,34 @@ export function QuickRegisterView({
                     className="w-full"
                   />
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" disabled={isGenerating || isLoading}>
-                      <Printer className="h-4 w-4 mr-2" />
-                      {isGenerating ? "Gerando..." : "PDF"}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[140px]">
-                    <DropdownMenuItem onClick={() => handlePrint(false)}>
-                      Todas ({totalStickers})
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handlePrint(true)}
-                      disabled={missingSet.size === 0}
-                    >
-                      Faltantes ({missingSet.size})
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex shrink-0 items-center gap-2">
+                  {activeTab === "duplicates" && (
+                    <ExportDuplicatesWhatsAppButton
+                      sections={sections}
+                      duplicateCounts={duplicateCounts}
+                      disabled={isLoading}
+                    />
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" disabled={isGenerating || isLoading}>
+                        <Printer className="h-4 w-4 mr-2" />
+                        {isGenerating ? "Gerando..." : "PDF"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[140px]">
+                      <DropdownMenuItem onClick={() => handlePrint(false)}>
+                        Todas ({totalStickers})
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handlePrint(true)}
+                        disabled={missingSet.size === 0}
+                      >
+                        Faltantes ({missingSet.size})
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
 
               {/* Quick bar desktop */}

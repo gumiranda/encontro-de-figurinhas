@@ -2,7 +2,7 @@
 
 import { useReducer, useState } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
-import { Bot, GaugeIcon } from "lucide-react";
+import { Bot, GaugeIcon, Pencil } from "lucide-react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Doc, Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { ConfidenceMeter, ReasoningCard } from "@/modules/gepeto";
 
 type MatchStatus = "scheduled" | "live" | "aet" | "penalties" | "finished";
+type GepetoPrediction = "home" | "draw" | "away";
 
 type MatchId = Id<"worldCupMatches">;
 
@@ -117,6 +118,114 @@ function parseScoreValue(value: string): number {
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Erro ao atualizar placar";
+}
+
+function GepetoPredictionEditor({
+  match,
+  existingPrediction,
+  onCancel,
+  onSaved,
+}: {
+  match: Doc<"worldCupMatches">;
+  existingPrediction: Doc<"aiPredictions"> | null;
+  onCancel: () => void;
+  onSaved: () => void;
+}) {
+  const setPrediction = useMutation(api.gepeto.setAIPredictionAdmin);
+  const [prediction, setOutcome] = useState<GepetoPrediction | null>(
+    existingPrediction?.prediction ?? null,
+  );
+  const [homeScore, setHomeScore] = useState(
+    existingPrediction?.exactScore.home ?? 0,
+  );
+  const [awayScore, setAwayScore] = useState(
+    existingPrediction?.exactScore.away ?? 0,
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!prediction) {
+      toast.error("Selecione vitória ou empate");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await setPrediction({
+        matchId: match._id,
+        prediction,
+        exactScore: { home: homeScore, away: awayScore },
+        trashTalk: existingPrediction?.trashTalk,
+      });
+      toast.success("Palpite salvo manualmente!");
+      onSaved();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3 rounded-md border border-dashed p-3">
+      <p className="text-sm font-medium">Definir palpite manualmente</p>
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          type="button"
+          variant={prediction === "home" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOutcome("home")}
+        >
+          {match.homeTeamName}
+        </Button>
+        <Button
+          type="button"
+          variant={prediction === "draw" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOutcome("draw")}
+        >
+          Empate
+        </Button>
+        <Button
+          type="button"
+          variant={prediction === "away" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOutcome("away")}
+        >
+          {match.awayTeamName}
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          type="number"
+          min={0}
+          className="w-16"
+          value={homeScore}
+          onChange={(e) => setHomeScore(parseScoreValue(e.target.value))}
+        />
+        <span className="font-bold">x</span>
+        <Input
+          type="number"
+          min={0}
+          className="w-16"
+          value={awayScore}
+          onChange={(e) => setAwayScore(parseScoreValue(e.target.value))}
+        />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={isSaving || !prediction}
+        >
+          {isSaving ? "Salvando..." : "Salvar palpite"}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function GepetoPredictionDetail({
@@ -269,6 +378,9 @@ export function MatchesAdminView() {
   const updateScore = useMutation(api.gepeto.updateMatchScore);
   const generatePrediction = useAction(api.gepeto.generateAIPredictionAdmin);
   const [generatingId, setGeneratingId] = useState<MatchId | null>(null);
+  const [editingPredictionId, setEditingPredictionId] = useState<MatchId | null>(
+    null,
+  );
   const editor = useMatchScoreEditor();
 
   const handleGenerate = async (matchId: MatchId, force: boolean) => {
@@ -322,7 +434,8 @@ export function MatchesAdminView() {
       <h1 className="text-2xl font-bold mb-2">Gepeto: gerenciar jogos</h1>
       <p className="text-muted-foreground mb-6 max-w-2xl">
         <strong>Placar final</strong> = resultado real (mesmo dado do Jogo Mais
-        Chato). <strong>Palpite do Gepeto</strong> = previsão da IA.
+        Chato). <strong>Palpite do Gepeto</strong> = previsão da IA ou ajuste
+        manual do admin.
       </p>
 
       <Banner className="mb-6 bg-muted text-foreground" inset>
@@ -337,6 +450,7 @@ export function MatchesAdminView() {
         {matches.map((match) => {
           const score = editor.getScore(match._id);
           const isGenerating = generatingId === match._id;
+          const isEditingPrediction = editingPredictionId === match._id;
 
           return (
             <Card key={match._id}>
@@ -354,7 +468,14 @@ export function MatchesAdminView() {
                   <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Palpite do Gepeto (IA)
                   </div>
-                  {match.aiPrediction ? (
+                  {isEditingPrediction ? (
+                    <GepetoPredictionEditor
+                      match={match}
+                      existingPrediction={match.aiPrediction}
+                      onCancel={() => setEditingPredictionId(null)}
+                      onSaved={() => setEditingPredictionId(null)}
+                    />
+                  ) : match.aiPrediction ? (
                     <GepetoPredictionDetail
                       match={match}
                       prediction={match.aiPrediction}
@@ -364,23 +485,35 @@ export function MatchesAdminView() {
                       Nenhum palpite gerado ainda.
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      disabled={isGenerating}
-                      onClick={() =>
-                        handleGenerate(match._id, !!match.aiPrediction)
-                      }
-                    >
-                      <Bot className="mr-2 h-4 w-4" />
-                      {isGenerating
-                        ? "Gerando..."
-                        : match.aiPrediction
-                          ? "Regenerar palpite"
-                          : "Gerar palpite"}
-                    </Button>
-                  </div>
+                  {!isEditingPrediction ? (
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={isGenerating}
+                        onClick={() =>
+                          handleGenerate(match._id, !!match.aiPrediction)
+                        }
+                      >
+                        <Bot className="mr-2 h-4 w-4" />
+                        {isGenerating
+                          ? "Gerando..."
+                          : match.aiPrediction
+                            ? "Regenerar palpite"
+                            : "Gerar palpite"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingPredictionId(match._id)}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        {match.aiPrediction
+                          ? "Editar manualmente"
+                          : "Definir manualmente"}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="rounded-md border p-3 space-y-2">
