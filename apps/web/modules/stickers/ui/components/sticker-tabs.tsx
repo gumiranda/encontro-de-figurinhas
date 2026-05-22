@@ -7,7 +7,7 @@ import type { ListKind } from "../../lib/use-stickers";
 interface StickerTabsProps {
   active: ListKind;
   onChange: (tab: ListKind) => void;
-  counts: { have: number; need: number };
+  counts: { duplicates: number; need: number };
   variant?: "mobile" | "desktop-inline";
   className?: string;
 }
@@ -28,9 +28,9 @@ export function StickerTabs({
   }> = [
     {
       key: "duplicates",
-      label: "Tenho",
+      label: "Repetidas",
       icon: Check,
-      count: counts.have,
+      count: counts.duplicates,
       activeClass: "bg-secondary text-on-secondary",
     },
     {

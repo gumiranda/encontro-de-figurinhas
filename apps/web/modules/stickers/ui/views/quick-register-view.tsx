@@ -149,7 +149,6 @@ export function QuickRegisterView({
     addMissing,
     removeDuplicate,
     removeMissing,
-    incrementDuplicate,
     markAllInSection,
     clearSection,
     invertSection,
@@ -171,20 +170,20 @@ export function QuickRegisterView({
     (num: number) => {
       if (activeTab === "duplicates") {
         if (missingSet.has(num)) removeMissing(num);
-        incrementDuplicate(num);
+        if (duplicatesSet.has(num)) removeDuplicate(num);
+        else addDuplicates([num]);
+      } else if (missingSet.has(num)) {
+        removeMissing(num);
       } else {
-        if (missingSet.has(num)) removeMissing(num);
-        else {
-          if (duplicatesSet.has(num)) removeDuplicate(num);
-          addMissing([num]);
-        }
+        if (duplicatesSet.has(num)) removeDuplicate(num);
+        addMissing([num]);
       }
     },
     [
       activeTab,
       duplicatesSet,
       missingSet,
-      incrementDuplicate,
+      addDuplicates,
       addMissing,
       removeDuplicate,
       removeMissing,
@@ -359,7 +358,7 @@ export function QuickRegisterView({
                 <StickerTabs
                   active={activeTab}
                   onChange={setActiveTab}
-                  counts={{ have: haveCount, need: needCount }}
+                  counts={{ duplicates: duplicates.length, need: needCount }}
                   variant="desktop-inline"
                   className="w-fit"
                 />
@@ -378,7 +377,7 @@ export function QuickRegisterView({
               <StickerTabs
                 active={activeTab}
                 onChange={setActiveTab}
-                counts={{ have: haveCount, need: needCount }}
+                counts={{ duplicates: duplicates.length, need: needCount }}
                 variant="mobile"
                 className="md:hidden"
               />
