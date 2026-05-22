@@ -130,15 +130,21 @@ export default function AdminBoringGamePage() {
             <h1 className="text-2xl font-bold">Jogo Mais Chato</h1>
           </div>
           <p className="text-muted-foreground">
-            Controle quais rodadas aparecem abertas para votação.
+            Controle quais rodadas aparecem abertas para votação. O placar é
+            único — salvar aqui também atualiza Gepeto e libera votação.
           </p>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/jogo-mais-chato">
-            Ver feature
-            <ExternalLink className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link href="/admin/matches">Placar e status completos</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/jogo-mais-chato">
+              Ver feature
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4">

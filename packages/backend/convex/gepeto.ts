@@ -1,5 +1,4 @@
 import { ConvexError, v } from "convex/values";
-import xss from "xss";
 import { z } from "zod";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -15,6 +14,7 @@ import {
 import { getAuthenticatedUser, requireAdmin, requireAuth } from "./lib/auth";
 import { rateLimiter } from "./lib/rateLimiter";
 import { Role } from "./lib/types";
+import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
 
 // ============ HELPERS ============
 
@@ -41,19 +41,6 @@ const predictionResponseSchema = z.object({
 });
 
 type ParsedPredictionResponse = z.infer<typeof predictionResponseSchema>;
-
-function sanitizeReason(reason?: string): string | undefined {
-  const trimmed = reason?.trim();
-  if (!trimmed) return undefined;
-
-  const sanitized = xss(trimmed, {
-    whiteList: {},
-    stripIgnoreTag: true,
-    stripIgnoreTagBody: ["script", "style"],
-  }).trim();
-
-  return sanitized || undefined;
-}
 
 function getISOWeekNumber(date: Date): number {
   const d = new Date(
@@ -319,56 +306,14 @@ export const updateMatchScore = mutation({
   },
   handler: async (ctx, { matchId, homeScore, awayScore, status, reason }) => {
     const admin = await requireAdmin(ctx);
-    const match = await ctx.db.get(matchId);
-    if (!match) throw new ConvexError("Jogo não encontrado");
-
-    if (
-      !Number.isInteger(homeScore) ||
-      !Number.isInteger(awayScore) ||
-      homeScore < 0 ||
-      awayScore < 0
-    ) {
-      throw new ConvexError("Placar deve ser inteiro e não negativo");
-    }
-
-    const sanitizedReason = sanitizeReason(reason);
-    if (match.status === "finished" && !sanitizedReason) {
-      throw new ConvexError("Jogo já finalizado. Informe motivo da correção.");
-    }
-
-    await rateLimiter.limit(ctx, "gepetoScoreUpdate", {
-      key: admin._id,
-      throws: true,
-    });
-
-    const now = Date.now();
-
-    await ctx.db.insert("scoreAuditLog", {
-      matchId,
+    return updateWorldCupMatchScore(ctx, {
       adminUserId: admin._id,
-      previousScore:
-        match.homeScore !== undefined && match.awayScore !== undefined
-          ? { home: match.homeScore, away: match.awayScore }
-          : undefined,
-      newScore: { home: homeScore, away: awayScore },
-      previousStatus: match.status,
-      newStatus: status,
-      changedAt: now,
-      reason: sanitizedReason,
-    });
-
-    await ctx.db.patch(matchId, {
+      matchId,
       homeScore,
       awayScore,
       status,
-      finishedAt: status === "finished" ? now : undefined,
+      reason,
     });
-
-    if (status === "finished") {
-      await ctx.scheduler.runAfter(0, internal.gepeto.awardBadgesForMatch, {
-        matchId,
-      });
-    }
   },
 });
 

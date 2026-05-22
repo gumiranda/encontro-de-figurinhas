@@ -42,6 +42,7 @@ import type * as lib_tradeHelpers from "../lib/tradeHelpers.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_userDisplay from "../lib/userDisplay.js";
 import type * as lib_whatsapp from "../lib/whatsapp.js";
+import type * as lib_worldCupMatchScore from "../lib/worldCupMatchScore.js";
 import type * as matches from "../matches.js";
 import type * as newsletter from "../newsletter.js";
 import type * as permissions from "../permissions.js";
@@ -114,6 +115,7 @@ declare const fullApi: ApiFromModules<{
   "lib/types": typeof lib_types;
   "lib/userDisplay": typeof lib_userDisplay;
   "lib/whatsapp": typeof lib_whatsapp;
+  "lib/worldCupMatchScore": typeof lib_worldCupMatchScore;
   matches: typeof matches;
   newsletter: typeof newsletter;
   permissions: typeof permissions;

@@ -10,6 +10,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { boringReason } from "./schema";
 import { rateLimiter } from "./lib/rateLimiter";
 import { getAuthenticatedUser, requireAdmin } from "./lib/auth";
+import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
 
 const REASON_KEYS = [
   "sem_chances",
@@ -122,23 +123,21 @@ export const setMatchScore = mutation({
     awayScore: v.number(),
   },
   handler: async (ctx, { matchId, homeScore, awayScore }) => {
-    await requireAdmin(ctx);
-
-    if (
-      !Number.isInteger(homeScore) ||
-      !Number.isInteger(awayScore) ||
-      homeScore < 0 ||
-      awayScore < 0
-    ) {
-      throw new ConvexError("Score must be non-negative integers");
-    }
-
+    const admin = await requireAdmin(ctx);
     const match = await ctx.db.get(matchId);
     if (!match) throw new ConvexError("Match not found");
 
-    await ctx.db.patch(matchId, { homeScore, awayScore });
-
-    return { _id: matchId, homeScore, awayScore };
+    return updateWorldCupMatchScore(ctx, {
+      adminUserId: admin._id,
+      matchId,
+      homeScore,
+      awayScore,
+      status: "finished",
+      reason:
+        match.status === "finished"
+          ? "Correção via Jogo Mais Chato"
+          : undefined,
+    });
   },
 });
 

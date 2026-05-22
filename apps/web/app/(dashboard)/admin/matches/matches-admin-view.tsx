@@ -321,9 +321,8 @@ export function MatchesAdminView() {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-2">Gepeto: gerenciar jogos</h1>
       <p className="text-muted-foreground mb-6 max-w-2xl">
-        <strong>Placar final</strong> = resultado real do jogo (pós-partida).
-        <strong> Palpite do Gepeto</strong> = previsão da IA antes/durante — gere
-        manualmente com o botão abaixo.
+        <strong>Placar final</strong> = resultado real (mesmo dado do Jogo Mais
+        Chato). <strong>Palpite do Gepeto</strong> = previsão da IA.
       </p>
 
       <Banner className="mb-6 bg-muted text-foreground" inset>
