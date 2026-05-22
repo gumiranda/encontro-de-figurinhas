@@ -1,8 +1,8 @@
 "use client";
 
-import { useReducer } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { GaugeIcon } from "lucide-react";
+import { useReducer, useState } from "react";
+import { useQuery, useMutation, useAction } from "convex/react";
+import { Bot, GaugeIcon } from "lucide-react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Doc, Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -116,6 +116,16 @@ function parseScoreValue(value: string): number {
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Erro ao atualizar placar";
+}
+
+function formatGepetoPrediction(prediction: Doc<"aiPredictions">): string {
+  const outcome =
+    prediction.prediction === "home"
+      ? "Mandante"
+      : prediction.prediction === "away"
+        ? "Visitante"
+        : "Empate";
+  return `${outcome} · ${prediction.exactScore.home} x ${prediction.exactScore.away} (${prediction.confidence}%)`;
 }
 
 function getScore(scores: EditorState["scores"], matchId: MatchId): ScoreState {
@@ -236,7 +246,25 @@ function ScorePill({ match }: { match: Doc<"worldCupMatches"> }) {
 export function MatchesAdminView() {
   const matches = useQuery(api.gepeto.listMatchesForAdmin, {});
   const updateScore = useMutation(api.gepeto.updateMatchScore);
+  const generatePrediction = useAction(api.gepeto.generateAIPredictionAdmin);
+  const [generatingId, setGeneratingId] = useState<MatchId | null>(null);
   const editor = useMatchScoreEditor();
+
+  const handleGenerate = async (matchId: MatchId, force: boolean) => {
+    setGeneratingId(matchId);
+    try {
+      const result = await generatePrediction({ matchId, force });
+      if (result?.skipped && result.reason === "already-exists") {
+        toast.info("Palpite já existe. Use Regenerar para substituir.");
+        return;
+      }
+      toast.success(force ? "Palpite regenerado!" : "Palpite gerado!");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setGeneratingId(null);
+    }
+  };
 
   const handleSave = async (matchId: MatchId) => {
     const score = editor.getScore(matchId);
@@ -270,18 +298,25 @@ export function MatchesAdminView() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Gepeto: gerenciar placares</h1>
+      <h1 className="text-2xl font-bold mb-2">Gepeto: gerenciar jogos</h1>
+      <p className="text-muted-foreground mb-6 max-w-2xl">
+        <strong>Placar final</strong> = resultado real do jogo (pós-partida).
+        <strong> Palpite do Gepeto</strong> = previsão da IA antes/durante — gere
+        manualmente com o botão abaixo.
+      </p>
 
       <Banner className="mb-6 bg-muted text-foreground" inset>
         <BannerIcon icon={GaugeIcon} />
         <BannerTitle>
-          Atualizações de placar são limitadas a 10 por minuto por admin.
+          Placares: 10/min por admin. Palpite GPT: requer OPENAI_API_KEY no
+          Convex.
         </BannerTitle>
       </Banner>
 
       <div className="grid gap-4">
         {matches.map((match) => {
           const score = editor.getScore(match._id);
+          const isGenerating = generatingId === match._id;
 
           return (
             <Card key={match._id}>
@@ -294,7 +329,43 @@ export function MatchesAdminView() {
                   <span>{match.awayTeamFlag}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="rounded-md border p-3 space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Palpite do Gepeto (IA)
+                  </div>
+                  {match.aiPrediction ? (
+                    <p className="text-sm font-medium">
+                      {formatGepetoPrediction(match.aiPrediction)}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhum palpite gerado ainda.
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={isGenerating}
+                      onClick={() =>
+                        handleGenerate(match._id, !!match.aiPrediction)
+                      }
+                    >
+                      <Bot className="mr-2 h-4 w-4" />
+                      {isGenerating
+                        ? "Gerando..."
+                        : match.aiPrediction
+                          ? "Regenerar palpite"
+                          : "Gerar palpite"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="rounded-md border p-3 space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Placar final (resultado real)
+                  </div>
                 {editor.editingId === match._id ? (
                   <div className="flex flex-wrap gap-4 items-center">
                     <div className="flex items-center gap-2">
@@ -376,6 +447,7 @@ export function MatchesAdminView() {
                     </Button>
                   </div>
                 )}
+                </div>
               </CardContent>
             </Card>
           );

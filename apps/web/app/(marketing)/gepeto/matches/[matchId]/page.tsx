@@ -89,11 +89,7 @@ export default async function GepetoMatchPage({ params }: Props) {
           </p>
         </div>
 
-        <GepetoMatchClient
-          matchId={convexMatchId}
-          match={match}
-          aiPrediction={aiPrediction}
-        />
+        <GepetoMatchClient matchId={convexMatchId} match={match} />
       </main>
       <LandingFooter />
     </>

@@ -9,21 +9,19 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 interface GepetoMatchClientProps {
   matchId: Id<"worldCupMatches">;
   match: Doc<"worldCupMatches">;
-  aiPrediction: Doc<"aiPredictions"> | null;
 }
 
-export function GepetoMatchClient({
-  matchId,
-  match,
-  aiPrediction,
-}: GepetoMatchClientProps) {
+export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
+  const aiPrediction = useQuery(api.gepeto.getAIPrediction, { matchId });
   const userPrediction = useQuery(api.gepeto.getUserPrediction, { matchId });
 
   const isRevealed = match.kickoffAt <= Date.now();
 
   return (
     <div className="space-y-6">
-      {aiPrediction ? (
+      {aiPrediction === undefined ? (
+        <Skeleton className="h-48 w-full" />
+      ) : aiPrediction ? (
         <AICard
           homeTeam={match.homeTeamName}
           awayTeam={match.awayTeamName}

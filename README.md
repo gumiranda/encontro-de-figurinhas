@@ -224,6 +224,17 @@ pnpm setup
 | ------------------------- | ------------------------------------------ |
 | `CLERK_JWT_ISSUER_DOMAIN` | `https://sua-instancia.clerk.accounts.dev` |
 | `CLERK_SECRET_KEY`        | Sua Secret Key do Clerk                    |
+| `OPENAI_API_KEY`          | Chave da OpenAI (Gepeto — ver abaixo)      |
+
+#### Gepeto (palpite da IA)
+
+O admin gera palpites manualmente em `/admin/matches` (botão **Gerar palpite**). A action `gepeto.generateAIPredictionAdmin` chama a OpenAI no Convex — a key **só** precisa estar no **Convex Dashboard**, não no Next.js.
+
+```bash
+npx convex env set OPENAI_API_KEY "sk-..."
+```
+
+Obter em: [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
 ### 4. Configurar Variaveis de Ambiente
 

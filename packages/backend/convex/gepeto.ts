@@ -4,6 +4,7 @@ import { z } from "zod";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
+  action,
   internalAction,
   internalMutation,
   internalQuery,
@@ -13,6 +14,7 @@ import {
 } from "./_generated/server";
 import { getAuthenticatedUser, requireAdmin, requireAuth } from "./lib/auth";
 import { rateLimiter } from "./lib/rateLimiter";
+import { Role } from "./lib/types";
 
 // ============ HELPERS ============
 
@@ -196,21 +198,43 @@ export const getAIPredictionInternal = internalQuery({
   },
 });
 
-// Admin: List matches with scores
+// Admin: List matches with scores + Gepeto palpite
 export const listMatchesForAdmin = query({
   args: { roundId: v.optional(v.id("worldCupRounds")) },
   handler: async (ctx, { roundId }) => {
     await requireAdmin(ctx);
 
-    if (roundId) {
-      return ctx.db
-        .query("worldCupMatches")
-        .withIndex("by_round_kickoff", (q) => q.eq("roundId", roundId))
-        .order("desc")
-        .take(100);
-    }
+    const matches = roundId
+      ? await ctx.db
+          .query("worldCupMatches")
+          .withIndex("by_round_kickoff", (q) => q.eq("roundId", roundId))
+          .order("desc")
+          .take(100)
+      : await ctx.db.query("worldCupMatches").order("desc").take(100);
 
-    return ctx.db.query("worldCupMatches").order("desc").take(100);
+    return Promise.all(
+      matches.map(async (match) => {
+        const aiPrediction = await ctx.db
+          .query("aiPredictions")
+          .withIndex("by_match", (q) => q.eq("matchId", match._id))
+          .unique();
+        return { ...match, aiPrediction: aiPrediction ?? null };
+      }),
+    );
+  },
+});
+
+export const assertAdmin = internalQuery({
+  args: { clerkId: v.string() },
+  handler: async (ctx, { clerkId }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
+      .unique();
+    if (!user || (user.role !== Role.SUPERADMIN && user.role !== Role.CEO)) {
+      throw new ConvexError("Sem permissão");
+    }
+    return user._id;
   },
 });
 
@@ -345,24 +369,12 @@ export const updateMatchScore = mutation({
         matchId,
       });
     }
-
-    const round = await ctx.db.get(match.roundId);
-    if (round) {
-      await ctx.scheduler.runAfter(0, internal.revalidate.notifyBatch, {
-        tags: [
-          `match:${match.slug}`,
-          `round:${round.slug}`,
-          "ranking",
-          "boring-game:sitemap",
-        ],
-      });
-    }
   },
 });
 
 // ============ INTERNAL MUTATIONS ============
 
-// Save AI prediction
+// Save AI prediction (upsert — one per match)
 export const savePrediction = internalMutation({
   args: {
     matchId: v.id("worldCupMatches"),
@@ -396,6 +408,17 @@ export const savePrediction = internalMutation({
       ...args,
       generatedAt: Date.now(),
     });
+  },
+});
+
+export const deleteAIPrediction = internalMutation({
+  args: { matchId: v.id("worldCupMatches") },
+  handler: async (ctx, { matchId }) => {
+    const existing = await ctx.db
+      .query("aiPredictions")
+      .withIndex("by_match", (q) => q.eq("matchId", matchId))
+      .unique();
+    if (existing) await ctx.db.delete(existing._id);
   },
 });
 
@@ -551,9 +574,17 @@ export const saveWeeklyNarrative = internalMutation({
 
 // ============ INTERNAL ACTIONS ============
 
+type GeneratePredictionResult =
+  | { skipped: true; reason: "already-exists" | "match-started" }
+  | { skipped: false; prediction: Doc<"aiPredictions"> | null };
+
 export const generateAIPrediction = internalAction({
-  args: { matchId: v.id("worldCupMatches") },
-  handler: async (ctx, { matchId }) => {
+  args: {
+    matchId: v.id("worldCupMatches"),
+    force: v.optional(v.boolean()),
+    adminOverride: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { matchId, force, adminOverride }): Promise<GeneratePredictionResult> => {
     const match = await ctx.runQuery(internal.gepeto.getMatchForPrediction, {
       matchId,
     });
@@ -561,20 +592,26 @@ export const generateAIPrediction = internalAction({
 
     const existing = await ctx.runQuery(
       internal.gepeto.getAIPredictionInternal,
-      {
-        matchId,
-      },
+      { matchId },
     );
-    if (existing) return;
+    if (existing && !force) {
+      return { skipped: true as const, reason: "already-exists" as const };
+    }
+    if (existing && force) {
+      await ctx.runMutation(internal.gepeto.deleteAIPrediction, { matchId });
+    }
 
     const matchStatus = match.status ?? "scheduled";
-    if (match.kickoffAt <= Date.now() || matchStatus !== "scheduled") {
+    if (
+      !adminOverride &&
+      (match.kickoffAt <= Date.now() || matchStatus !== "scheduled")
+    ) {
       console.warn("Gepeto prediction skipped before OpenAI call", {
         matchId,
         kickoffAt: match.kickoffAt,
         status: matchStatus,
       });
-      return;
+      return { skipped: true as const, reason: "match-started" as const };
     }
 
     const prompt = buildPredictionPrompt(match);
@@ -656,7 +693,11 @@ export const generateAIPrediction = internalAction({
           modelVersion: "gpt-4o-mini",
         });
 
-        return;
+        const saved = await ctx.runQuery(
+          internal.gepeto.getAIPredictionInternal,
+          { matchId },
+        );
+        return { skipped: false as const, prediction: saved };
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e));
         lastError = error;
@@ -673,6 +714,27 @@ export const generateAIPrediction = internalAction({
     }
 
     throw lastError ?? new Error("OpenAI prediction failed");
+  },
+});
+
+export const generateAIPredictionAdmin = action({
+  args: {
+    matchId: v.id("worldCupMatches"),
+    force: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { matchId, force }): Promise<GeneratePredictionResult> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Não autenticado");
+
+    await ctx.runQuery(internal.gepeto.assertAdmin, {
+      clerkId: identity.subject,
+    });
+
+    return ctx.runAction(internal.gepeto.generateAIPrediction, {
+      matchId,
+      force: force ?? false,
+      adminOverride: true,
+    });
   },
 });
 
