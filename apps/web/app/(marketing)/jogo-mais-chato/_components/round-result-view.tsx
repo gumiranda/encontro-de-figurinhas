@@ -66,7 +66,7 @@ export function RoundResultView({ roundId, roundSlug, roundName }: Props) {
                     {winner.homeTeamName}
                   </div>
                 </div>
-                <div className={styles.matchScore}>
+                <div className={styles.matchScoreHero}>
                   {winner.homeScore !== undefined &&
                   winner.awayScore !== undefined
                     ? `${winner.homeScore} × ${winner.awayScore}`

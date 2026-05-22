@@ -83,7 +83,7 @@ export function MatchDetailView({ matchSlug, roundSlug }: Props) {
               {match.homeTeamCode}
             </div>
           </div>
-          <div className={`${styles.matchScore} text-2xl`}>
+          <div className={styles.matchScoreHero}>
             {hasScore ? `${match.homeScore} × ${match.awayScore}` : "×"}
           </div>
           <div className="flex flex-col items-center gap-2">
