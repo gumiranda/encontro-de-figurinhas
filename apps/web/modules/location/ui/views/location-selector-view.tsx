@@ -12,16 +12,11 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { useMutation, useQuery } from "convex/react";
-import {
-  AlertCircle,
-  Info,
-  RefreshCw,
-  Trophy,
-  X,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { AlertCircle, Info, RefreshCw, Trophy, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { getSafeInternalRedirect } from "@/lib/safe-redirect-path";
 import { CityAutocomplete } from "@/modules/auth/ui/components/city-autocomplete";
 import {
   SUGGESTED_CITY_KEYS,
@@ -51,6 +46,8 @@ export function LocationSelectorView({
   currentCityId,
 }: LocationSelectorViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = getSafeInternalRedirect(searchParams.get("redirect"));
   const setLocationMutation = useMutation(api.users.setLocation);
   const citiesLive = useQuery(api.cities.getAll);
 
@@ -63,7 +60,7 @@ export function LocationSelectorView({
   const suggestedCitiesResolved = useMemo((): CityWithCoords[] => {
     if (suggestedCities.length > 0) return suggestedCities;
     const map = new Map(
-      citiesForFlow.map((c) => [`${c.name}|${c.state}`, c] as const)
+      citiesForFlow.map((c) => [`${c.name}|${c.state}`, c] as const),
     );
     return SUGGESTED_CITY_KEYS.reduce<CityWithCoords[]>((acc, key) => {
       const found = map.get(`${key.name}|${key.state}`);
@@ -97,8 +94,8 @@ export function LocationSelectorView({
       await new Promise<void>((resolve) => {
         queueMicrotask(() => queueMicrotask(resolve));
       });
-      router.replace("/dashboard");
-    } catch (error) {
+      router.replace(redirectPath ?? "/dashboard");
+    } catch {
       toast.error("Erro ao pular seleção");
     } finally {
       setIsSubmitting(false);
@@ -106,13 +103,11 @@ export function LocationSelectorView({
   };
 
   const selectedCity = selectedCityId
-    ? citiesForFlow.find((c) => c._id === selectedCityId) ?? null
+    ? (citiesForFlow.find((c) => c._id === selectedCityId) ?? null)
     : null;
 
   const showEmptyCitiesBanner =
-    !citiesError &&
-    citiesForFlow.length === 0 &&
-    citiesLive !== undefined;
+    !citiesError && citiesForFlow.length === 0 && citiesLive !== undefined;
 
   const spec = stateCardSpec(selectedCity, locationSource, gpsStatus);
 
@@ -148,7 +143,7 @@ export function LocationSelectorView({
       await new Promise<void>((resolve) => {
         queueMicrotask(() => queueMicrotask(resolve));
       });
-      router.replace("/dashboard");
+      router.replace(redirectPath ?? "/dashboard");
     } catch (error) {
       toast.error(resolveSetLocationToastMessage(error));
     } finally {
@@ -156,7 +151,9 @@ export function LocationSelectorView({
     }
   };
 
-  const primaryAction = selectedCity ? handleConfirmLocation : requestPermission;
+  const primaryAction = selectedCity
+    ? handleConfirmLocation
+    : requestPermission;
 
   const primaryDisabled = spec.primaryDisabledByState || isSubmitting;
 
@@ -185,8 +182,8 @@ export function LocationSelectorView({
         >
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--on-surface-variant)]" />
           <p className="min-w-0 text-sm">
-            Ainda não há cidades na lista para sugestões automáticas. Use a busca
-            abaixo; se não aparecer resultado, tente novamente mais tarde.
+            Ainda não há cidades na lista para sugestões automáticas. Use a
+            busca abaixo; se não aparecer resultado, tente novamente mais tarde.
           </p>
         </div>
       )}
@@ -286,10 +283,7 @@ export function LocationSelectorView({
 
           <div className="space-y-3">
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-[var(--on-surface)]">
-              Onde você{" "}
-              <span className="text-primary">
-                troca?
-              </span>
+              Onde você <span className="text-primary">troca?</span>
             </h1>
             <p className="max-w-[440px] text-sm text-[var(--on-surface-variant)]">
               {SHARED_SUBTITLE}
@@ -312,7 +306,10 @@ export function LocationSelectorView({
 
           <OrDivider>ou busque outra</OrDivider>
 
-          <CityAutocomplete value={selectedCityId} onChange={selectCityManual} />
+          <CityAutocomplete
+            value={selectedCityId}
+            onChange={selectCityManual}
+          />
 
           <CityList
             cities={suggestedCitiesResolved}

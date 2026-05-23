@@ -4,8 +4,12 @@ import { useAuth } from "@clerk/nextjs";
 import { FullPageLoader } from "@/components/full-page-loader";
 import { api } from "@workspace/backend/_generated/api";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useLayoutEffect } from "react";
+import {
+  getSafeInternalRedirect,
+  withRedirectParam,
+} from "@/lib/safe-redirect-path";
 import { CompleteProfileForm } from "../components/complete-profile-form";
 import { OnboardingProgress } from "../components/onboarding-progress";
 import { OnboardingStepper } from "../components/onboarding-stepper";
@@ -16,13 +20,15 @@ const TOTAL_STEPS = 3;
 
 export function CompleteProfileView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = getSafeInternalRedirect(searchParams.get("redirect"));
   const { isLoaded: clerkLoaded, isSignedIn } = useAuth();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   // Clerk define sessão; a query pode retornar null enquanto o JWT Convex sincroniza.
   // Não usar `isAuthenticated` no skip — senão `undefined` + loader bloqueado por `authLoading`.
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    clerkLoaded && isSignedIn ? {} : "skip"
+    clerkLoaded && isSignedIn ? {} : "skip",
   );
   const createUser = useMutation(api.users.createUser);
 
@@ -56,11 +62,11 @@ export function CompleteProfileView() {
     if (!currentUser?.hasCompletedOnboarding) return;
 
     const next = !currentUser.locationSource
-      ? "/selecionar-localizacao"
-      : "/dashboard";
+      ? withRedirectParam("/selecionar-localizacao", redirectPath)
+      : (redirectPath ?? "/dashboard");
 
     router.replace(next);
-  }, [currentUser, router]);
+  }, [currentUser, redirectPath, router]);
 
   // Middleware handles auth redirect to /sign-in.
   // Não condicionar o loader a `useConvexAuth`: após router.back o token pode re-sync com
@@ -83,14 +89,21 @@ export function CompleteProfileView() {
       <div className="flex min-w-0 flex-col overflow-x-clip">
         <div className="mx-auto w-full max-w-[700px] px-6 pt-14 lg:px-20 lg:pt-20">
           <header className="flex items-center justify-between lg:justify-end">
-            <SignOutButton iconOnly className="lg:hidden" label="Sair da conta" />
+            <SignOutButton
+              iconOnly
+              className="lg:hidden"
+              label="Sair da conta"
+            />
             <span className="font-mono text-xs text-[var(--landing-on-surface-variant)] lg:hidden">
               {CURRENT_STEP} / {TOTAL_STEPS}
             </span>
           </header>
 
           <div className="mt-6">
-            <OnboardingProgress currentStep={CURRENT_STEP} totalSteps={TOTAL_STEPS} />
+            <OnboardingProgress
+              currentStep={CURRENT_STEP}
+              totalSteps={TOTAL_STEPS}
+            />
           </div>
 
           <div className="mb-8 mt-10 min-w-0">
@@ -101,8 +114,8 @@ export function CompleteProfileView() {
               </span>
             </h1>
             <p className="mt-3 break-words text-pretty text-[var(--on-surface-variant)]">
-              Escolha um apelido único e confirme sua idade. Ele aparece nas propostas de
-              troca combinadas com outros colecionadores.
+              Escolha um apelido único e confirme sua idade. Ele aparece nas
+              propostas de troca combinadas com outros colecionadores.
             </p>
           </div>
 

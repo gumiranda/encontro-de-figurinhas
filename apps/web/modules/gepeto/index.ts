@@ -35,6 +35,7 @@ export { FinalCTA } from "./ui/components/final-cta";
 // Dashboard views
 export {
   GepetoDashboardView,
+  GepetoInviteJoinView,
   GepetoMatchDashboardView,
   GepetoPoolDetailView,
 } from "./ui/views/gepeto-dashboard-view";

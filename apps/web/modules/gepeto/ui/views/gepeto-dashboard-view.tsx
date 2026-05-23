@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { SignInButton, useAuth } from "@clerk/nextjs";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { api } from "@workspace/backend/_generated/api";
@@ -128,6 +129,16 @@ const POOL_ACCENT_COLORS = [
 ];
 const POOL_KNOCKOUT_MULTIPLIERS = [1, 2, 3, 4, 5];
 const POOL_FINAL_MULTIPLIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function getPoolInvitePath(inviteCode: string) {
+  return `/gepeto/convite/${encodeURIComponent(inviteCode.trim().toUpperCase())}`;
+}
+
+function getPoolInviteUrl(inviteCode: string) {
+  const invitePath = getPoolInvitePath(inviteCode);
+  if (typeof window === "undefined") return invitePath;
+  return `${window.location.origin}${invitePath}`;
+}
 
 function pickTab(raw: string | null): TabKey {
   if (raw === "vs-ia") return "ranking";
@@ -553,12 +564,12 @@ function PoolsPanel({
           </Card>
           <DialogContent
             showCloseButton={false}
-            className="bottom-0 top-auto left-1/2 max-h-[calc(100dvh-1rem)] w-[min(100vw,860px)] max-w-[calc(100vw-1rem)] translate-x-[-50%] translate-y-0 gap-0 overflow-y-auto rounded-t-[32px] border-[#55607d] bg-[#12192e] p-0 text-[#dfe5ff] shadow-[0_-28px_80px_rgba(0,0,0,0.62)] sm:bottom-5 sm:rounded-[32px] md:max-w-[860px]"
+            className="bottom-0 top-auto left-1/2 max-h-[calc(100dvh-0.5rem)] w-[min(100vw,860px)] max-w-[calc(100vw-0.75rem)] translate-x-[-50%] translate-y-0 gap-0 overflow-y-auto rounded-t-[28px] border-[#55607d] bg-[#12192e] p-0 text-[#dfe5ff] shadow-[0_-28px_80px_rgba(0,0,0,0.62)] sm:bottom-5 sm:max-h-[calc(100dvh-1rem)] sm:max-w-[calc(100vw-1rem)] sm:rounded-[32px] md:max-w-[860px]"
           >
-            <div className="mx-auto mt-5 h-1.5 w-14 rounded-full bg-[#dfe5ff]/35" />
-            <div className="space-y-7 p-6 pt-8 sm:p-8 sm:pt-9">
+            <div className="mx-auto mt-4 h-1 w-12 rounded-full bg-[#dfe5ff]/35 sm:mt-5 sm:h-1.5 sm:w-14" />
+            <div className="space-y-5 p-4 pt-6 sm:space-y-7 sm:p-8 sm:pt-9">
               <div className="flex items-center justify-between gap-4">
-                <DialogTitle className="font-display text-3xl font-black tracking-normal text-[#dfe5ff]">
+                <DialogTitle className="font-display text-2xl font-black tracking-normal text-[#dfe5ff] sm:text-3xl">
                   Criar bolão
                 </DialogTitle>
                 <DialogDescription className="sr-only">
@@ -569,10 +580,10 @@ function PoolsPanel({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="size-11 rounded-full text-[#aeb4ca] hover:bg-[#202741] hover:text-[#dfe5ff]"
+                    className="size-10 rounded-full text-[#aeb4ca] hover:bg-[#202741] hover:text-[#dfe5ff] sm:size-11"
                     aria-label="Fechar criação de bolão"
                   >
-                    <X className="size-7" />
+                    <X className="size-6 sm:size-7" />
                   </Button>
                 </DialogClose>
               </div>
@@ -582,7 +593,7 @@ function PoolsPanel({
                   <div
                     key={step}
                     className={cn(
-                      "h-1.5 rounded-full bg-[#dfe5ff]/25",
+                      "h-1 rounded-full bg-[#dfe5ff]/25 sm:h-1.5",
                       step <= createStep && "bg-[#95aaff]",
                     )}
                   />
@@ -590,14 +601,14 @@ function PoolsPanel({
               </div>
 
               {createStep === 1 && (
-                <div className="space-y-5">
+                <div className="space-y-4 sm:space-y-5">
                   <div className="space-y-3">
-                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                       Identidade
                     </div>
-                    <div className="grid grid-cols-[112px_1fr] gap-4">
+                    <div className="grid grid-cols-[88px_1fr] gap-3 sm:grid-cols-[112px_1fr] sm:gap-4">
                       <div
-                        className="grid aspect-square place-items-center rounded-[28px] border-4 border-[#95aaff] bg-[#202741] text-5xl shadow-[0_0_0_1px_rgba(149,170,255,0.24)]"
+                        className="grid aspect-square place-items-center rounded-2xl border-4 border-[#95aaff] bg-[#202741] text-4xl shadow-[0_0_0_1px_rgba(149,170,255,0.24)] sm:rounded-[28px] sm:text-5xl"
                         style={{ borderColor: color }}
                       >
                         {emoji}
@@ -608,9 +619,9 @@ function PoolsPanel({
                           onChange={(event) => setName(event.target.value)}
                           placeholder="Nome do bolão"
                           maxLength={POOL_NAME_INPUT_MAX}
-                          className="h-[72px] rounded-2xl border-[#55607d] bg-[#172039] px-6 font-display text-2xl font-black text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                          className="h-14 rounded-2xl border-[#55607d] bg-[#172039] px-4 font-display text-lg font-black text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30 sm:h-[72px] sm:px-6 sm:text-2xl"
                         />
-                        <div className="mt-2 text-right font-mono text-sm font-bold text-[#aeb4ca]">
+                        <div className="mt-1.5 text-right font-mono text-xs font-bold text-[#aeb4ca] sm:mt-2 sm:text-sm">
                           {name.length}/{POOL_NAME_INPUT_MAX}
                         </div>
                       </div>
@@ -618,10 +629,10 @@ function PoolsPanel({
                   </div>
 
                   <div className="space-y-3">
-                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                       Emoji
                     </div>
-                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+                    <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2">
                       {POOL_EMOJI_OPTIONS.map((option) => (
                         <Button
                           key={option}
@@ -629,7 +640,7 @@ function PoolsPanel({
                           variant="outline"
                           onClick={() => setEmoji(option)}
                           className={cn(
-                            "aspect-square h-auto rounded-2xl border-[#55607d] bg-[#172039] p-0 text-3xl shadow-none hover:bg-[#202741]",
+                            "aspect-square h-auto rounded-xl border-[#55607d] bg-[#172039] p-0 text-2xl shadow-none hover:bg-[#202741] sm:rounded-2xl sm:text-3xl",
                             emoji === option &&
                               "border-[#95aaff] bg-[#202741] ring-2 ring-[#95aaff]/65",
                           )}
@@ -642,10 +653,10 @@ function PoolsPanel({
                   </div>
 
                   <div className="space-y-3">
-                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                       Cor de acento
                     </div>
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-3 sm:gap-4">
                       {POOL_ACCENT_COLORS.map((option) => (
                         <Button
                           key={option}
@@ -654,9 +665,9 @@ function PoolsPanel({
                           size="icon"
                           onClick={() => setColor(option)}
                           className={cn(
-                            "size-14 rounded-full p-0 hover:bg-transparent",
+                            "size-11 rounded-full p-0 hover:bg-transparent sm:size-14",
                             color === option &&
-                              "ring-4 ring-[#dfe5ff]/85 ring-offset-2 ring-offset-[#12192e]",
+                              "ring-2 ring-[#dfe5ff]/85 ring-offset-2 ring-offset-[#12192e] sm:ring-4",
                           )}
                           style={{ backgroundColor: option }}
                           aria-label={`Usar cor ${option}`}
@@ -666,7 +677,7 @@ function PoolsPanel({
                   </div>
 
                   <div className="space-y-3">
-                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                       Descrição (opcional)
                     </div>
                     <Textarea
@@ -674,19 +685,19 @@ function PoolsPanel({
                       onChange={(event) => setDescription(event.target.value)}
                       placeholder="Ex: Bolão do escritório, quem ganhar leva o churrasco da final"
                       maxLength={POOL_DESCRIPTION_INPUT_MAX}
-                      className="min-h-28 resize-none rounded-2xl border-[#55607d] bg-[#172039] px-5 py-5 text-lg text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                      className="min-h-24 resize-none rounded-2xl border-[#55607d] bg-[#172039] px-4 py-4 text-sm text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30 sm:min-h-28 sm:px-5 sm:py-5 sm:text-lg"
                     />
                   </div>
                 </div>
               )}
 
               {createStep === 2 && (
-                <div className="space-y-5">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                <div className="space-y-4 sm:space-y-5">
+                  <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                     Quem pode entrar
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5 sm:space-y-3">
                     {privacyOptions.map((option) => {
                       const Icon = option.icon;
                       const selected = privacy === option.value;
@@ -698,7 +709,7 @@ function PoolsPanel({
                           disabled={option.disabled}
                           onClick={() => setPrivacy(option.value)}
                           className={cn(
-                            "grid h-auto w-full grid-cols-[72px_1fr_auto] items-center gap-5 rounded-3xl border-[#55607d] bg-[#172039] p-5 text-left shadow-none hover:bg-[#202741]",
+                            "grid h-auto w-full grid-cols-[52px_minmax(0,1fr)_32px] items-center gap-3 whitespace-normal rounded-2xl border-[#55607d] bg-[#172039] p-3 text-left shadow-none hover:bg-[#202741] sm:grid-cols-[72px_1fr_auto] sm:gap-5 sm:rounded-3xl sm:p-5",
                             selected &&
                               "border-[#95aaff] bg-[#202741] ring-1 ring-[#95aaff]/70",
                             option.disabled && "opacity-45",
@@ -706,23 +717,23 @@ function PoolsPanel({
                         >
                           <span
                             className={cn(
-                              "grid size-[72px] place-items-center rounded-3xl bg-[#202741] text-[#aeb4ca]",
+                              "grid size-[52px] place-items-center rounded-2xl bg-[#202741] text-[#aeb4ca] sm:size-[72px] sm:rounded-3xl",
                               selected && "bg-[#95aaff] text-[#081433]",
                             )}
                           >
-                            <Icon className="size-8" />
+                            <Icon className="size-6 sm:size-8" />
                           </span>
                           <span className="min-w-0">
-                            <span className="block font-display text-xl font-black text-[#dfe5ff]">
+                            <span className="block font-display text-base font-black leading-tight text-[#dfe5ff] sm:text-xl">
                               {option.title}
                             </span>
-                            <span className="mt-1 block text-base leading-relaxed text-[#aeb4ca]">
+                            <span className="mt-1 block text-sm leading-snug text-[#aeb4ca] sm:text-base sm:leading-relaxed">
                               {option.description}
                             </span>
                           </span>
                           {selected && (
-                            <span className="grid size-10 place-items-center rounded-full bg-[#95aaff] text-[#081433]">
-                              <Check className="size-6" />
+                            <span className="grid size-8 place-items-center rounded-full bg-[#95aaff] text-[#081433] sm:size-10">
+                              <Check className="size-5 sm:size-6" />
                             </span>
                           )}
                         </Button>
@@ -730,15 +741,15 @@ function PoolsPanel({
                     })}
                   </div>
 
-                  <div className="grid grid-cols-[72px_1fr_auto] items-center gap-5 rounded-3xl border-2 border-[#ffc965] bg-[#252631] p-5">
-                    <span className="grid size-[72px] place-items-center rounded-3xl text-[#95aaff]">
-                      <Bot className="size-10" />
+                  <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border-2 border-[#ffc965] bg-[#252631] p-3 sm:grid-cols-[72px_1fr_auto] sm:gap-5 sm:rounded-3xl sm:p-5">
+                    <span className="grid size-[52px] place-items-center rounded-2xl text-[#95aaff] sm:size-[72px] sm:rounded-3xl">
+                      <Bot className="size-8 sm:size-10" />
                     </span>
                     <span className="min-w-0">
-                      <span className="block font-display text-xl font-black text-[#dfe5ff]">
+                      <span className="block font-display text-base font-black leading-tight text-[#dfe5ff] sm:text-xl">
                         Incluir o Gepeto
                       </span>
-                      <span className="mt-1 block text-base leading-relaxed text-[#aeb4ca]">
+                      <span className="mt-1 block text-sm leading-snug text-[#aeb4ca] sm:text-base sm:leading-relaxed">
                         Ele palpita em todos os jogos e provoca o grupo. Pode
                         ser desligado depois.
                       </span>
@@ -753,8 +764,8 @@ function PoolsPanel({
               )}
 
               {createStep === 3 && (
-                <div className="space-y-5">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                <div className="space-y-4 sm:space-y-5">
+                  <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] sm:text-[13px] sm:tracking-[0.28em]">
                     Pontuação & multiplicadores
                   </div>
 
@@ -766,21 +777,25 @@ function PoolsPanel({
                     ].map(([label, points]) => (
                       <Card
                         key={label}
-                        className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-2xl border-[#55607d] bg-[#172039] p-4 text-[#dfe5ff]"
+                        className="grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-xl border-[#55607d] bg-[#172039] p-3 text-[#dfe5ff] sm:gap-3 sm:rounded-2xl sm:p-4"
                       >
-                        <span className="text-lg font-medium">{label}</span>
-                        <span className="font-display text-lg font-black">
+                        <span className="text-sm font-medium sm:text-lg">
+                          {label}
+                        </span>
+                        <span className="font-display text-sm font-black sm:text-lg">
                           {points}
                         </span>
-                        <Lock className="size-5 text-[#aeb4ca]" />
+                        <Lock className="size-4 text-[#aeb4ca] sm:size-5" />
                       </Card>
                     ))}
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="text-lg font-medium">Mata-mata</div>
-                      <div className="font-display text-xl font-black text-[#95aaff]">
+                      <div className="text-base font-medium sm:text-lg">
+                        Mata-mata
+                      </div>
+                      <div className="font-display text-lg font-black text-[#95aaff] sm:text-xl">
                         {knockoutMultiplier}× pts
                       </div>
                     </div>
@@ -792,7 +807,7 @@ function PoolsPanel({
                           variant="outline"
                           onClick={() => setKnockoutMultiplier(value)}
                           className={cn(
-                            "h-14 rounded-xl border-[#55607d] bg-[#172039] font-display text-lg font-black shadow-none hover:bg-[#202741]",
+                            "h-11 rounded-xl border-[#55607d] bg-[#172039] font-display text-base font-black shadow-none hover:bg-[#202741] sm:h-14 sm:text-lg",
                             value <= knockoutMultiplier &&
                               "bg-[#95aaff] text-[#081433] hover:bg-[#a9baff]",
                           )}
@@ -805,8 +820,10 @@ function PoolsPanel({
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="text-lg font-medium">Final</div>
-                      <div className="font-display text-xl font-black text-[#95aaff]">
+                      <div className="text-base font-medium sm:text-lg">
+                        Final
+                      </div>
+                      <div className="font-display text-lg font-black text-[#95aaff] sm:text-xl">
                         {finalMultiplier}× pts
                       </div>
                     </div>
@@ -818,7 +835,7 @@ function PoolsPanel({
                           variant="outline"
                           onClick={() => setFinalMultiplier(value)}
                           className={cn(
-                            "h-14 rounded-xl border-[#55607d] bg-[#172039] font-display text-lg font-black shadow-none hover:bg-[#202741]",
+                            "h-11 rounded-xl border-[#55607d] bg-[#172039] font-display text-base font-black shadow-none hover:bg-[#202741] sm:h-14 sm:text-lg",
                             value <= finalMultiplier &&
                               "bg-[#95aaff] text-[#081433] hover:bg-[#a9baff]",
                           )}
@@ -829,7 +846,7 @@ function PoolsPanel({
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-dashed border-[#55607d] bg-[#172039] p-4 text-base text-[#aeb4ca]">
+                  <div className="rounded-2xl border border-dashed border-[#55607d] bg-[#172039] p-3 text-sm text-[#aeb4ca] sm:p-4 sm:text-base">
                     💡 Palpites só abrem no apito inicial. Ninguém vê o seu
                     antes.
                   </div>
@@ -838,8 +855,9 @@ function PoolsPanel({
 
               <div
                 className={cn(
-                  "grid gap-4",
-                  createStep > 1 && "grid-cols-[72px_1fr]",
+                  "grid gap-3 sm:gap-4",
+                  createStep > 1 &&
+                    "grid-cols-[56px_1fr] sm:grid-cols-[72px_1fr]",
                 )}
               >
                 {createStep > 1 && (
@@ -847,7 +865,7 @@ function PoolsPanel({
                     type="button"
                     variant="outline"
                     onClick={handleBack}
-                    className="h-16 rounded-3xl border-[#55607d] bg-[#172039] text-[#dfe5ff] hover:bg-[#202741]"
+                    className="h-14 rounded-2xl border-[#55607d] bg-[#172039] text-[#dfe5ff] hover:bg-[#202741] sm:h-16 sm:rounded-3xl"
                     aria-label="Voltar etapa"
                   >
                     <ChevronLeft className="size-6" />
@@ -857,7 +875,7 @@ function PoolsPanel({
                   type="button"
                   onClick={handlePrimaryAction}
                   disabled={isPrimaryDisabled}
-                  className="h-16 w-full rounded-3xl bg-[#95aaff] font-display text-xl font-black text-[#081433] hover:bg-[#a9baff]"
+                  className="h-14 w-full rounded-2xl bg-[#95aaff] font-display text-lg font-black text-[#081433] hover:bg-[#a9baff] sm:h-16 sm:rounded-3xl sm:text-xl"
                 >
                   {createStep === 3 && <Check className="size-5" />}
                   {primaryLabel}
@@ -2001,6 +2019,160 @@ export function GepetoMatchDashboardView({
   );
 }
 
+export function GepetoInviteJoinView({ inviteCode }: { inviteCode: string }) {
+  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    isAuthenticated ? {} : "skip",
+  );
+  const joinPool = useMutation(api.gepeto.joinPoolByCode);
+  const didJoinRef = useRef(false);
+  const normalizedInviteCode = inviteCode.trim().toUpperCase();
+  const invitePath = getPoolInvitePath(normalizedInviteCode);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    if (!normalizedInviteCode || !isLoaded || !isSignedIn || authLoading) {
+      return;
+    }
+
+    if (!isAuthenticated || currentUser === undefined) {
+      return;
+    }
+
+    if (currentUser === null || !currentUser.hasCompletedOnboarding) {
+      router.replace(
+        `/complete-profile?redirect=${encodeURIComponent(invitePath)}`,
+      );
+      return;
+    }
+
+    if (!currentUser.locationSource) {
+      router.replace(
+        `/selecionar-localizacao?redirect=${encodeURIComponent(invitePath)}`,
+      );
+      return;
+    }
+
+    if (didJoinRef.current) return;
+
+    didJoinRef.current = true;
+    setJoinError(null);
+
+    void joinPool({ inviteCode: normalizedInviteCode })
+      .then((result) => {
+        toast.success("Você entrou no bolão");
+        router.replace(`/dashboard/gepeto/boloes/${result.poolId}`);
+      })
+      .catch((error) => {
+        const message =
+          error instanceof Error ? error.message : "Erro ao entrar no bolão";
+        if (message.includes("Not authenticated")) {
+          router.replace(
+            `/complete-profile?redirect=${encodeURIComponent(invitePath)}`,
+          );
+          return;
+        }
+        didJoinRef.current = false;
+        setJoinError(message);
+      });
+  }, [
+    authLoading,
+    currentUser,
+    invitePath,
+    isAuthenticated,
+    isLoaded,
+    isSignedIn,
+    joinPool,
+    normalizedInviteCode,
+    retryKey,
+    router,
+  ]);
+
+  return (
+    <main className="dark min-h-screen bg-[#070b17] px-4 py-10 text-[#dfe5ff]">
+      <Card className="mx-auto flex min-h-[420px] max-w-md flex-col justify-between border-[#444b65] bg-[#12192e] p-6 text-[#dfe5ff] shadow-2xl shadow-black/35">
+        <div className="space-y-5">
+          <div className="flex items-center gap-3">
+            <div className="grid size-12 place-items-center rounded-2xl bg-[#95aaff]/18 text-2xl">
+              🏆
+            </div>
+            <div>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#95aaff]">
+                Convite Gepeto
+              </p>
+              <h1 className="font-display text-3xl font-black">
+                Entrar no bolão
+              </h1>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-[#444b65] bg-[#192137] p-4">
+            <p className="text-sm text-[#aeb4ca]">Código do convite</p>
+            <p className="mt-1 font-mono text-xl font-bold tracking-[0.18em] text-[#dfe5ff]">
+              {normalizedInviteCode || "INVÁLIDO"}
+            </p>
+          </div>
+
+          {!normalizedInviteCode ? (
+            <p className="text-sm text-[#ffb4c1]">Link de convite inválido.</p>
+          ) : !isLoaded ||
+            (isSignedIn &&
+              (authLoading ||
+                !isAuthenticated ||
+                currentUser === undefined)) ? (
+            <p className="text-sm text-[#aeb4ca]">Preparando seu acesso...</p>
+          ) : joinError ? (
+            <p className="text-sm text-[#ffb4c1]">{joinError}</p>
+          ) : isSignedIn ? (
+            <p className="text-sm text-[#aeb4ca]">
+              Entrando no bolão automaticamente...
+            </p>
+          ) : (
+            <p className="text-sm text-[#aeb4ca]">
+              Entre com sua conta para participar. Depois do login, você volta
+              para este convite.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3">
+          {!isSignedIn && isLoaded && normalizedInviteCode ? (
+            <SignInButton mode="redirect" forceRedirectUrl={invitePath}>
+              <Button className="h-12 gap-2 bg-[#95aaff] text-[#071235] hover:bg-[#a6b7ff]">
+                Entrar e participar
+                <ChevronRight className="size-4" />
+              </Button>
+            </SignInButton>
+          ) : null}
+
+          {joinError ? (
+            <Button
+              type="button"
+              className="h-12 gap-2 bg-[#95aaff] text-[#071235] hover:bg-[#a6b7ff]"
+              onClick={() => {
+                didJoinRef.current = false;
+                setJoinError(null);
+                setRetryKey((key) => key + 1);
+              }}
+            >
+              Tentar de novo
+              <ChevronRight className="size-4" />
+            </Button>
+          ) : null}
+
+          <Button asChild variant="outline" className="h-12 border-[#444b65]">
+            <Link href="/dashboard/gepeto?tab=boloes">Ver meus bolões</Link>
+          </Button>
+        </div>
+      </Card>
+    </main>
+  );
+}
+
 export function GepetoPoolDetailView({
   poolId,
 }: {
@@ -2016,10 +2188,11 @@ export function GepetoPoolDetailView({
     return <div className="h-80 animate-pulse rounded-xl bg-muted" />;
   }
   const detail = data;
+  const inviteUrl = getPoolInviteUrl(detail.pool.inviteCode);
 
   async function handleCopyInvite() {
-    await navigator.clipboard.writeText(detail.pool.inviteCode);
-    toast.success("Convite copiado");
+    await navigator.clipboard.writeText(inviteUrl);
+    toast.success("Link do bolão copiado");
   }
 
   async function handleComment() {
@@ -2074,7 +2247,7 @@ export function GepetoPoolDetailView({
               className="gap-2"
             >
               <Clipboard className="size-4" />
-              {detail.pool.inviteCode}
+              Copiar link
             </Button>
             {detail.nextMatch ? (
               <Button asChild className="gap-2">
