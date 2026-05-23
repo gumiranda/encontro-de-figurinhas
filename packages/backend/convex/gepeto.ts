@@ -1094,6 +1094,77 @@ export const updateMatchScore = mutation({
   },
 });
 
+// ============ TEAM MANAGEMENT (ADMIN) ============
+
+export const listAvailableTeams = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const matches = await ctx.db.query("worldCupMatches").collect();
+    const teamsMap = new Map<string, { code: string; name: string; flag: string }>();
+
+    for (const match of matches) {
+      if (!teamsMap.has(match.homeTeamCode)) {
+        teamsMap.set(match.homeTeamCode, {
+          code: match.homeTeamCode,
+          name: match.homeTeamName,
+          flag: match.homeTeamFlag,
+        });
+      }
+      if (!teamsMap.has(match.awayTeamCode)) {
+        teamsMap.set(match.awayTeamCode, {
+          code: match.awayTeamCode,
+          name: match.awayTeamName,
+          flag: match.awayTeamFlag,
+        });
+      }
+    }
+
+    return [...teamsMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
+
+export const updateMatchTeams = mutation({
+  args: {
+    matchId: v.id("worldCupMatches"),
+    homeTeam: v.object({
+      code: v.string(),
+      name: v.string(),
+      flag: v.string(),
+    }),
+    awayTeam: v.object({
+      code: v.string(),
+      name: v.string(),
+      flag: v.string(),
+    }),
+  },
+  handler: async (ctx, { matchId, homeTeam, awayTeam }) => {
+    await requireAdmin(ctx);
+
+    const match = await ctx.db.get(matchId);
+    if (!match) {
+      throw new ConvexError("Jogo não encontrado");
+    }
+
+    // Generate new slug
+    const slugify = (name: string) =>
+      name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "-");
+    const newSlug = `${slugify(homeTeam.name)}-vs-${slugify(awayTeam.name)}`;
+
+    await ctx.db.patch(matchId, {
+      homeTeamCode: homeTeam.code,
+      homeTeamName: homeTeam.name,
+      homeTeamFlag: homeTeam.flag,
+      awayTeamCode: awayTeam.code,
+      awayTeamName: awayTeam.name,
+      awayTeamFlag: awayTeam.flag,
+      slug: newSlug,
+    });
+
+    return { success: true };
+  },
+});
+
 // ============ INTERNAL MUTATIONS ============
 
 // Save AI prediction (upsert — one per match)

@@ -5,8 +5,6 @@ import {
   ArrowLeftRight,
   LayoutDashboard,
   ListChecks,
-  Map as MapIcon,
-  MapPin,
   StickyNote,
   type LucideIcon,
 } from "lucide-react";
@@ -31,8 +29,6 @@ const NAV_ITEMS: MobileNavItem[] = [
   { href: "/album", label: "Álbum", icon: StickyNote },
 
   { href: "/matches", label: "Trocas", icon: ArrowLeftRight },
-  { href: "/map", label: "Mapa", icon: MapIcon },
-  { href: "/meus-pontos", label: "Pontos", icon: MapPin },
 ] as const;
 
 export function MobileBottomNav() {

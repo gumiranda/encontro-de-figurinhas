@@ -2,7 +2,7 @@
 
 import { useReducer, useState } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
-import { Bot, GaugeIcon, Pencil } from "lucide-react";
+import { Bot, GaugeIcon, Pencil, Users } from "lucide-react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Doc, Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -262,6 +262,97 @@ function GepetoPredictionDetail({
   );
 }
 
+function TeamEditor({
+  match,
+  onCancel,
+  onSaved,
+}: {
+  match: Doc<"worldCupMatches">;
+  onCancel: () => void;
+  onSaved: () => void;
+}) {
+  const teams = useQuery(api.gepeto.listAvailableTeams, {});
+  const updateTeams = useMutation(api.gepeto.updateMatchTeams);
+  const [homeTeamCode, setHomeTeamCode] = useState(match.homeTeamCode);
+  const [awayTeamCode, setAwayTeamCode] = useState(match.awayTeamCode);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!teams) return;
+    const homeTeam = teams.find((t) => t.code === homeTeamCode);
+    const awayTeam = teams.find((t) => t.code === awayTeamCode);
+    if (!homeTeam || !awayTeam) {
+      toast.error("Selecione times válidos");
+      return;
+    }
+    if (homeTeamCode === awayTeamCode) {
+      toast.error("Times devem ser diferentes");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await updateTeams({ matchId: match._id, homeTeam, awayTeam });
+      toast.success("Times atualizados!");
+      onSaved();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!teams) {
+    return <div className="text-sm text-muted-foreground">Carregando times...</div>;
+  }
+
+  return (
+    <div className="space-y-3 rounded-md border border-dashed p-3">
+      <p className="text-sm font-medium">Editar times do confronto</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground">Mandante</label>
+          <Select value={homeTeamCode} onValueChange={setHomeTeamCode}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {teams.map((team) => (
+                <SelectItem key={team.code} value={team.code}>
+                  {team.flag} {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Visitante</label>
+          <Select value={awayTeamCode} onValueChange={setAwayTeamCode}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {teams.map((team) => (
+                <SelectItem key={team.code} value={team.code}>
+                  {team.flag} {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Salvando..." : "Salvar times"}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function getScore(scores: EditorState["scores"], matchId: MatchId): ScoreState {
   return scores[matchId] ?? DEFAULT_SCORE;
 }
@@ -385,6 +476,7 @@ export function MatchesAdminView() {
   const [editingPredictionId, setEditingPredictionId] = useState<MatchId | null>(
     null,
   );
+  const [editingTeamsId, setEditingTeamsId] = useState<MatchId | null>(null);
   const editor = useMatchScoreEditor();
 
   const handleGenerate = async (matchId: MatchId, force: boolean) => {
@@ -455,6 +547,7 @@ export function MatchesAdminView() {
           const score = editor.getScore(match._id);
           const isGenerating = generatingId === match._id;
           const isEditingPrediction = editingPredictionId === match._id;
+          const isEditingTeams = editingTeamsId === match._id;
 
           return (
             <Card key={match._id}>
@@ -465,7 +558,23 @@ export function MatchesAdminView() {
                   <span className="text-muted-foreground">vs</span>
                   <span>{match.awayTeamName}</span>
                   <span>{match.awayTeamFlag}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto"
+                    onClick={() => setEditingTeamsId(match._id)}
+                  >
+                    <Users className="mr-1 h-3 w-3" />
+                    Editar times
+                  </Button>
                 </CardTitle>
+                {isEditingTeams && (
+                  <TeamEditor
+                    match={match}
+                    onCancel={() => setEditingTeamsId(null)}
+                    onSaved={() => setEditingTeamsId(null)}
+                  />
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-md border p-3 space-y-2">
