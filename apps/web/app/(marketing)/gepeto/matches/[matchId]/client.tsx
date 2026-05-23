@@ -76,7 +76,7 @@ export function GepetoMatchClient({ matchId, match: initialMatch }: GepetoMatchC
   };
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-x-hidden">
       {/* Match Header */}
       <MatchHeader
         homeTeam={{

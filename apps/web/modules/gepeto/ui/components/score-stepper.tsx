@@ -39,7 +39,7 @@ export function ScoreStepper({
       >
         <ChevronUp className="size-4" />
       </Button>
-      <div className="font-display text-5xl font-bold tabular-nums leading-none">
+      <div className="font-display text-4xl font-bold tabular-nums leading-none sm:text-5xl">
         {value}
       </div>
       <Button

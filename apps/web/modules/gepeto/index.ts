@@ -16,6 +16,12 @@ export { StreakStrip } from "./ui/components/streak-strip";
 export { MatchHeader } from "./ui/components/match-header";
 export { WeeklyNarrative } from "./ui/components/weekly-narrative";
 
+// Hub components
+export { GepetoHubHeader } from "./ui/components/gepeto-hub-header";
+export { NextMatchCard } from "./ui/components/next-match-card";
+export { PoolsPreview } from "./ui/components/pools-preview";
+export { WeeklyPreview } from "./ui/components/weekly-preview";
+
 // Landing page components
 export { CountUp } from "./ui/components/count-up";
 export { HeroBoard } from "./ui/components/hero-board";

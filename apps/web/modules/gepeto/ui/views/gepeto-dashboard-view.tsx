@@ -45,6 +45,11 @@ import {
   VerdictBanner,
 } from "@/modules/gepeto";
 import { hasFinalScore, isPredictionRevealed } from "@/modules/gepeto/lib/match-state";
+import {
+  formatPhaseLabel,
+  formatRoundSectionLabel,
+  PHASE_ORDER,
+} from "@/modules/gepeto/lib/round-labels";
 
 type Choice = "home" | "draw" | "away";
 type TabKey = "hub" | "jogos" | "boloes" | "capitulo" | "ranking";
@@ -490,9 +495,17 @@ function groupFixturesByPhase(fixtures: DashboardFixtures) {
     rounds.push(round);
     map.set(round.phase, rounds);
   }
-  return [...map.entries()].map(([phase, rounds]) => ({
+
+  const knownPhases = new Set<string>(PHASE_ORDER);
+  const orderedPhases = [
+    ...PHASE_ORDER.filter((phase) => map.has(phase)),
+    ...[...map.keys()].filter((phase) => !knownPhases.has(phase)),
+  ];
+
+  return orderedPhases.map((phase) => ({
     phase,
-    rounds: rounds.sort((a, b) => a.order - b.order),
+    label: formatPhaseLabel(phase),
+    rounds: (map.get(phase) ?? []).sort((a, b) => a.order - b.order),
   }));
 }
 
@@ -535,37 +548,37 @@ function PhoneShell({
   const router = useRouter();
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-3.5rem)] bg-[#070b18] text-[#dfe5ff]">
-      <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-[430px] flex-col overflow-hidden rounded-[36px] border border-[#444b65] bg-[#090e1c] shadow-[0_24px_90px_rgba(0,0,0,0.5)] md:max-w-none md:rounded-none md:border-0 md:shadow-none">
+    <div className="-mx-6 -mb-6 w-[calc(100%+3rem)] min-h-[calc(100vh-3.5rem)] overflow-x-hidden bg-[#070b18] text-[#dfe5ff] md:-m-6 md:w-[calc(100%+3rem)]">
+      <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full min-w-0 max-w-full flex-col bg-[#090e1c] md:max-w-none">
         <div className="sticky top-0 z-20 shrink-0 border-b border-[#444b65] bg-[#090e1c]/95 px-4 py-4 backdrop-blur md:px-8 md:py-5">
-          <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-center md:mb-5">
+          <div className="mb-4 grid grid-cols-[auto_1fr_auto] items-center gap-2 md:mb-5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#aeb4ca]"
+              className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[#aeb4ca]"
             >
               <ArrowLeft className="size-4" />
-              Voltar
+              <span className="hidden sm:inline">Voltar</span>
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center justify-center gap-2">
               <GepetoAvatar size={30} mood="neutral" glow={false} />
-              <div className="leading-none">
-                <div className="font-display text-sm font-black md:text-base">Gepeto</div>
-                <div className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#aeb4ca] md:text-[10px]">
+              <div className="min-w-0 leading-none">
+                <div className="truncate font-display text-sm font-black md:text-base">Gepeto</div>
+                <div className="truncate font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#aeb4ca] md:text-[10px]">
                   Humano × IA
                 </div>
               </div>
             </div>
-            <div />
+            <div className="size-9 shrink-0" aria-hidden />
           </div>
-          <div className="grid grid-cols-5 rounded-2xl border border-[#444b65] bg-[#202741] p-1 md:mx-auto md:max-w-4xl">
+          <div className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-[#444b65] bg-[#202741] p-1 [-ms-overflow-style:none] [scrollbar-width:none] md:mx-auto md:grid md:max-w-4xl md:grid-cols-5 md:overflow-visible [&::-webkit-scrollbar]:hidden">
             {GEPETO_TABS.map((item) => (
               <button
                 key={item.value}
                 type="button"
                 onClick={() => onTabChange(item.value)}
                 className={cn(
-                  "h-11 rounded-xl text-[11px] font-bold text-[#aeb4ca] transition-colors md:h-12 md:text-sm",
+                  "h-11 shrink-0 rounded-xl px-3 text-[11px] font-bold whitespace-nowrap text-[#aeb4ca] transition-colors md:h-12 md:px-0 md:text-sm",
                   tab === item.value && "bg-[#dfe4fb] text-[#090e1c]",
                 )}
               >
@@ -574,7 +587,7 @@ function PhoneShell({
             ))}
           </div>
         </div>
-        <div className="flex-1 pb-8 md:pb-10">{children}</div>
+        <div className="min-w-0 flex-1 pb-8 md:pb-10">{children}</div>
       </div>
     </div>
   );
@@ -724,7 +737,7 @@ function HubPhoneScreen({
   onGoTo: (tab: TabKey) => void;
 }) {
   return (
-    <div className="space-y-4 p-4 md:p-8">
+    <div className="min-w-0 space-y-4 p-4 md:p-8">
       <NextDuelCard hub={hub} pools={pools} onGoTo={onGoTo} />
 
       <PhoneCard className="p-4">
@@ -854,7 +867,7 @@ function FixturePhoneRow({
     <Link
       href={`/dashboard/gepeto/matches/${match._id}`}
       className={cn(
-        "grid grid-cols-[64px_1fr_20px] items-center gap-3 rounded-2xl border bg-[#172039] p-3",
+        "grid w-full max-w-full min-w-0 grid-cols-[52px_minmax(0,1fr)_20px] items-center gap-2 overflow-hidden rounded-2xl border bg-[#172039] p-3 sm:gap-3",
         featured && "border-[#ffc965] bg-[linear-gradient(90deg,rgba(255,201,101,0.09),#172039)]",
         live && "border-[#ff6e84] bg-[linear-gradient(90deg,rgba(255,110,132,0.08),#172039)]",
         !featured && !live && "border-[#444b65]",
@@ -872,7 +885,7 @@ function FixturePhoneRow({
             <div className="mt-1 font-mono text-lg font-black">{match.status === "live" ? "56'" : "agora"}</div>
           </>
         ) : finished ? (
-          <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] [writing-mode:vertical-rl] rotate-180">
+          <div className="font-mono text-[9px] font-black uppercase leading-tight tracking-[0.18em] text-[#aeb4ca] sm:text-[10px] sm:tracking-[0.24em]">
             Final
           </div>
         ) : (
@@ -898,11 +911,11 @@ function FixturePhoneRow({
               </span>
             </div>
           </div>
-          <div className={cn("font-mono text-xl font-black", live && "text-[#ff6e84]")}>
+          <div className={cn("shrink-0 font-mono text-lg font-black sm:text-xl", live && "text-[#ff6e84]")}>
             {finished || live ? `${match.homeScore ?? 0} - ${match.awayScore ?? 0}` : "vs"}
           </div>
         </div>
-        <div className="mt-3 flex gap-2 border-t border-dashed border-[#444b65] pt-2">
+        <div className="mt-3 flex min-w-0 flex-wrap gap-2 border-t border-dashed border-[#444b65] pt-2">
           {gepetoScore ? (
             <span
               className={cn(
@@ -967,8 +980,8 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
   const matchCount = countMatchesInRounds(activePhase.rounds);
 
   return (
-    <div>
-      <div className="sticky top-[128px] z-10 flex gap-2 overflow-x-auto border-b border-[#444b65] bg-[#090e1c]/95 p-3 backdrop-blur md:top-[148px] md:px-8">
+    <div className="min-w-0">
+      <div className="flex max-w-full gap-2 overflow-x-auto border-b border-[#444b65] bg-[#090e1c] p-3 [-ms-overflow-style:none] [scrollbar-width:none] md:sticky md:top-[148px] md:z-10 md:bg-[#090e1c]/95 md:px-8 md:backdrop-blur [&::-webkit-scrollbar]:hidden">
         {phases.map((entry, index) => {
           const selected = phaseIndex === index;
           const accent = phaseAccent(entry.rounds[0] ?? fixtures[0]!);
@@ -979,23 +992,23 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
               type="button"
               onClick={() => setPhaseIndex(index)}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-black",
+                "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black whitespace-nowrap sm:px-4 sm:text-sm",
                 selected ? "bg-[#dfe4fb] text-[#090e1c]" : "bg-transparent text-[#aeb4ca]",
               )}
               style={{ borderColor: selected ? "#dfe4fb" : accent }}
             >
               {locked && <Lock className="size-3.5" style={{ color: accent }} />}
-              {entry.phase}
+              {entry.label}
             </button>
           );
         })}
       </div>
 
-      <div className="space-y-5 p-4 md:p-8">
+      <div className="space-y-5 p-4 md:p-8 min-w-0">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="font-display text-3xl font-black text-[#ffc965]">
-              {activePhase.phase}
+              {activePhase.label}
             </h2>
             <p className="mt-1 text-sm text-[#aeb4ca]">
               {teamCount} seleções · {matchCount} jogos
@@ -1012,16 +1025,22 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
         {activePhase.rounds.map((round) => (
           <section key={round._id} className="space-y-3">
             <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca]">
-              {round.name} · {roundStatusLabel(round)}
+              {formatRoundSectionLabel(round).toUpperCase()} · {roundStatusLabel(round)}
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {round.matches.map((match, index) => (
-                <FixturePhoneRow
-                  key={match._id}
-                  match={match}
-                  featured={index === 0 && matchState(match) !== "pos" && round.isActive}
-                />
-              ))}
+              {[...round.matches]
+                .sort((a, b) => {
+                  const aFinished = matchState(a) === "pos" ? 1 : 0;
+                  const bFinished = matchState(b) === "pos" ? 1 : 0;
+                  return aFinished - bFinished;
+                })
+                .map((match, index) => (
+                  <FixturePhoneRow
+                    key={match._id}
+                    match={match}
+                    featured={index === 0 && matchState(match) !== "pos" && round.isActive}
+                  />
+                ))}
             </div>
           </section>
         ))}
@@ -1044,7 +1063,7 @@ function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
 
 function ChapterPhoneScreen({ hub }: { hub: DashboardHub }) {
   return (
-    <div className="space-y-4 p-4 md:p-8">
+    <div className="min-w-0 space-y-4 p-4 md:p-8">
       <PhoneCard className="overflow-hidden p-0">
         <div className="bg-[linear-gradient(135deg,rgba(255,201,101,0.16),transparent_70%)] p-5">
           <div className="mb-4 flex items-center gap-3">
@@ -1091,7 +1110,7 @@ function RankingPhoneScreen({
   leaderboard: DashboardLeaderboard;
 }) {
   return (
-    <div className="space-y-4 p-4 md:p-8">
+    <div className="min-w-0 space-y-4 p-4 md:p-8">
       <PhoneCard className="overflow-hidden p-0">
         <div className="bg-[linear-gradient(135deg,rgba(149,170,255,0.18),transparent_70%)] p-5">
           <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#95aaff]">
@@ -1227,7 +1246,7 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
 
   return (
     <PhoneShell tab="jogos" onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
-      <div className="space-y-4 p-4 md:p-8">
+      <div className="min-w-0 space-y-4 p-4 md:p-8">
         <Link
           href="/dashboard/gepeto?tab=jogos"
           className="inline-flex items-center gap-2 text-sm font-bold text-[#aeb4ca]"

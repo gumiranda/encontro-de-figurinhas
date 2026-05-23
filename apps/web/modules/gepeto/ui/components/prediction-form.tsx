@@ -95,14 +95,14 @@ export function PredictionForm({
         <span className="font-medium">Seu palpite</span>
       </div>
 
-      <div className="flex items-center justify-center gap-5 px-4 py-6">
+      <div className="flex items-center justify-center gap-3 px-2 py-6 sm:gap-5 sm:px-4">
         <ScoreStepper
           value={homeScore}
           onChange={setHomeScore}
           disabled={!canPredict}
           className="text-[#dfe5ff]"
         />
-        <span className="font-display text-3xl text-[#aeb4ca]">×</span>
+        <span className="font-display text-2xl text-[#aeb4ca] sm:text-3xl">×</span>
         <ScoreStepper
           value={awayScore}
           onChange={setAwayScore}
@@ -114,7 +114,7 @@ export function PredictionForm({
       <div className="px-4 pb-4">
         {canPredict ? (
           <Button
-            className="h-12 w-full gap-2 rounded-2xl bg-[#95aaff] text-base font-black text-[#082054] hover:bg-[#a9baff]"
+            className="h-12 w-full gap-2 rounded-2xl bg-[#95aaff] px-3 text-sm font-black text-[#082054] hover:bg-[#a9baff] sm:text-base"
             onClick={handleSubmit}
             disabled={isSubmitting}
           >

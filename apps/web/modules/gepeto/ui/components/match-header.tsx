@@ -57,21 +57,21 @@ export function MatchHeader({
       </div>
 
       {/* Teams + Score */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 sm:gap-2">
         {/* Home Team */}
-        <div className="text-center">
-          <div className="text-[44px] leading-none">{homeTeam.flag}</div>
+        <div className="min-w-0 text-center">
+          <div className="text-4xl leading-none sm:text-[44px]">{homeTeam.flag}</div>
           <div
-            className="font-display text-base font-semibold mt-1.5"
+            className="mt-1.5 truncate font-display text-sm font-semibold sm:text-base"
             style={{ color: homeTeam.color }}
           >
             {homeTeam.code}
           </div>
-          <div className="text-[11px] text-muted-foreground">{homeTeam.name}</div>
+          <div className="truncate text-[10px] text-muted-foreground sm:text-[11px]">{homeTeam.name}</div>
         </div>
 
         {/* Center: Score or Countdown */}
-        <div className="text-center px-1 whitespace-nowrap">
+        <div className="shrink-0 px-1 text-center whitespace-nowrap">
           {isFinished && finalScore ? (
             <div className="font-display text-4xl font-bold tracking-wide">
               {finalScore.home}
@@ -100,23 +100,23 @@ export function MatchHeader({
         </div>
 
         {/* Away Team */}
-        <div className="text-center">
-          <div className="text-[44px] leading-none">{awayTeam.flag}</div>
+        <div className="min-w-0 text-center">
+          <div className="text-4xl leading-none sm:text-[44px]">{awayTeam.flag}</div>
           <div
-            className="font-display text-base font-semibold mt-1.5"
+            className="mt-1.5 truncate font-display text-sm font-semibold sm:text-base"
             style={{ color: awayTeam.color }}
           >
             {awayTeam.code}
           </div>
-          <div className="text-[11px] text-muted-foreground">{awayTeam.name}</div>
+          <div className="truncate text-[10px] text-muted-foreground sm:text-[11px]">{awayTeam.name}</div>
         </div>
       </div>
 
       {/* Stadium */}
       {stadium && (
-        <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] text-muted-foreground">
-          <MapPin className="h-3 w-3" />
-          {stadium}
+        <div className="mt-3 flex items-center justify-center gap-1.5 px-2 text-center text-[10px] text-muted-foreground sm:text-[11px]">
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="truncate">{stadium}</span>
         </div>
       )}
     </div>
