@@ -9,6 +9,7 @@ import {
   VerdictBanner,
   CommunityBar,
   StreakStrip,
+  MatchHeader,
 } from "@/modules/gepeto";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Card } from "@workspace/ui/components/card";
@@ -59,8 +60,49 @@ export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
   // Build streak data from recent results (simplified - shows last 7 days)
   const streakDays = buildStreakDays(userStats?.stats);
 
+  // Determine match state
+  const matchState = isFinished ? "postMatch" : isRevealed ? "live" : "preMatch";
+
+  // Calculate time to kickoff
+  const getTimeToKickoff = () => {
+    const diff = match.kickoffAt - Date.now();
+    if (diff <= 0) return "Agora";
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+    return `${hours}h ${minutes}min`;
+  };
+
   return (
     <div className="space-y-4">
+      {/* Match Header */}
+      <MatchHeader
+        homeTeam={{
+          name: match.homeTeamName,
+          code: match.homeTeamName.slice(0, 3).toUpperCase(),
+          flag: match.homeTeamFlag,
+        }}
+        awayTeam={{
+          name: match.awayTeamName,
+          code: match.awayTeamName.slice(0, 3).toUpperCase(),
+          flag: match.awayTeamFlag,
+        }}
+        phase={matchDetail.round?.name ?? "Copa 2026"}
+        date={new Date(match.kickoffAt).toLocaleDateString("pt-BR", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+        stadium={match.venue}
+        state={matchState}
+        timeToKickoff={getTimeToKickoff()}
+        finalScore={
+          hasResult ? { home: match.homeScore!, away: match.awayScore! } : undefined
+        }
+      />
+
       {/* Post-match verdict */}
       {showVerdict && (
         <VerdictBanner

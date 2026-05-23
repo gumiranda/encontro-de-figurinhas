@@ -11,6 +11,8 @@ export { PredictionForm } from "./ui/components/prediction-form";
 export { VerdictBanner } from "./ui/components/verdict-banner";
 export { CommunityBar } from "./ui/components/community-bar";
 export { StreakStrip } from "./ui/components/streak-strip";
+export { MatchHeader } from "./ui/components/match-header";
+export { WeeklyNarrative } from "./ui/components/weekly-narrative";
 
 // Landing page components
 export { CountUp } from "./ui/components/count-up";
