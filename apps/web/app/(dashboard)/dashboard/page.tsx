@@ -72,7 +72,7 @@ const secondaryShortcuts = [
     title: "Álbum",
   },
   {
-    href: "/matches",
+    href: "/cadastrar-figurinhas/troca",
     icon: ArrowLeftRight,
     title: "Trocas",
   },
@@ -393,7 +393,7 @@ export default function DashboardPage() {
               </Card>
             </Link>
 
-            <Link href="/matches" className="group block">
+            <Link href="/cadastrar-figurinhas/troca" className="group block">
               <Card className="h-full overflow-hidden border-secondary/45 bg-[radial-gradient(circle_at_68%_26%,color-mix(in_srgb,var(--secondary)_22%,transparent),transparent_40%),var(--surface-container-low)] py-0 shadow-none transition duration-200 ease-out group-hover:-translate-y-0.5">
                 <CardContent className="flex h-full min-h-80 flex-col justify-between p-7">
                   <div className="flex items-start justify-between">
