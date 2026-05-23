@@ -988,6 +988,39 @@ export const createPool = mutation({
   },
 });
 
+export const getPoolInvitePreview = query({
+  args: { inviteCode: v.string() },
+  handler: async (ctx, { inviteCode }) => {
+    const code = normalizeInviteCode(inviteCode);
+    if (!code) return null;
+
+    const pool = await ctx.db
+      .query("gepetoPools")
+      .withIndex("by_inviteCode", (q) => q.eq("inviteCode", code))
+      .unique();
+    if (!pool) return null;
+
+    const members = await ctx.db
+      .query("gepetoPoolMembers")
+      .withIndex("by_pool", (q) => q.eq("poolId", pool._id))
+      .collect();
+    const activeMembers = members.filter((member) => member.isActive);
+    const owner = await ctx.db.get(pool.ownerUserId);
+
+    return {
+      _id: pool._id,
+      name: pool.name,
+      emoji: pool.emoji,
+      color: pool.color,
+      description: pool.description ?? null,
+      privacy: pool.privacy,
+      includeGepeto: pool.includeGepeto,
+      activeMemberCount: activeMembers.length,
+      ownerName: owner ? publicUserSnapshot(owner).displayNickname : null,
+    };
+  },
+});
+
 export const joinPoolByCode = mutation({
   args: { inviteCode: v.string() },
   handler: async (ctx, { inviteCode }) => {

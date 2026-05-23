@@ -43,6 +43,7 @@ import {
   MessageCircle,
   Plus,
   Send,
+  ShieldCheck,
   Sparkles,
   Trophy,
   Users,
@@ -2031,11 +2032,24 @@ export function GepetoInviteJoinView({ inviteCode }: { inviteCode: string }) {
   const didJoinRef = useRef(false);
   const normalizedInviteCode = inviteCode.trim().toUpperCase();
   const invitePath = getPoolInvitePath(normalizedInviteCode);
+  const invitePreview = useQuery(
+    api.gepeto.getPoolInvitePreview,
+    normalizedInviteCode ? { inviteCode: normalizedInviteCode } : "skip",
+  );
   const [joinError, setJoinError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     if (!normalizedInviteCode || !isLoaded || !isSignedIn || authLoading) {
+      return;
+    }
+
+    if (invitePreview === undefined) return;
+
+    if (invitePreview === null) {
+      setJoinError(
+        "Convite não encontrado. Confira o link com quem te chamou.",
+      );
       return;
     }
 
@@ -2082,6 +2096,7 @@ export function GepetoInviteJoinView({ inviteCode }: { inviteCode: string }) {
   }, [
     authLoading,
     currentUser,
+    invitePreview,
     invitePath,
     isAuthenticated,
     isLoaded,
@@ -2092,83 +2107,216 @@ export function GepetoInviteJoinView({ inviteCode }: { inviteCode: string }) {
     router,
   ]);
 
+  const isInviteLoading =
+    normalizedInviteCode.length > 0 && invitePreview === undefined;
+  const isInviteMissing =
+    normalizedInviteCode.length === 0 || invitePreview === null;
+  const memberLabel =
+    invitePreview && invitePreview.activeMemberCount === 1
+      ? "1 participante"
+      : `${invitePreview?.activeMemberCount ?? 0} participantes`;
+  const privacyLabel =
+    invitePreview?.privacy === "open"
+      ? "Aberto para todos"
+      : invitePreview?.privacy === "city"
+        ? "Público na cidade"
+        : "Entrada por convite";
+
   return (
-    <main className="dark min-h-screen bg-[#070b17] px-4 py-10 text-[#dfe5ff]">
-      <Card className="mx-auto flex min-h-[420px] max-w-md flex-col justify-between border-[#444b65] bg-[#12192e] p-6 text-[#dfe5ff] shadow-2xl shadow-black/35">
-        <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <div className="grid size-12 place-items-center rounded-2xl bg-[#95aaff]/18 text-2xl">
-              🏆
+    <main className="dark min-h-screen overflow-hidden bg-[#070b17] px-4 py-6 text-[#dfe5ff] sm:px-6 sm:py-10">
+      <section className="mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center gap-8 lg:grid-cols-[1fr_440px]">
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#95aaff]/35 bg-[#95aaff]/10 px-3 py-1.5 text-sm font-semibold text-[#cbd5ff]">
+            <ShieldCheck className="size-4" />
+            Convite oficial do Gepeto
+          </div>
+
+          <div className="space-y-4">
+            <p className="font-mono text-xs font-bold uppercase tracking-[0.24em] text-[#95aaff]">
+              Figurinha Fácil
+            </p>
+            <h1 className="max-w-2xl font-display text-4xl font-black leading-[1.02] text-[#eef2ff] sm:text-5xl lg:text-6xl">
+              Seu bolão já está pronto para entrar.
+            </h1>
+            <p className="max-w-xl text-lg leading-8 text-[#aeb4ca]">
+              Você recebeu um link seguro. Entre com sua conta, confirme o
+              convite e comece a palpitar sem digitar código manualmente.
+            </p>
+          </div>
+
+          <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
+            {[
+              {
+                icon: ShieldCheck,
+                title: "Login seguro",
+                text: "Sessão protegida antes de entrar.",
+              },
+              {
+                icon: Lock,
+                title: "Palpites fechados",
+                text: "Ninguém vê antes do apito.",
+              },
+              {
+                icon: Bot,
+                title: "Gepeto na mesa",
+                text: "IA entra quando ativada.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-[#2a334b] bg-[#10172a] p-4"
+              >
+                <item.icon className="size-5 text-[#95aaff]" />
+                <div className="mt-3 font-semibold text-[#eef2ff]">
+                  {item.title}
+                </div>
+                <p className="mt-1 text-sm leading-5 text-[#aeb4ca]">
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Card className="border-[#444b65] bg-[#12192e] p-0 text-[#dfe5ff] shadow-2xl shadow-black/35">
+          <div className="border-b border-[#2a334b] p-5 sm:p-6">
+            <div className="flex items-start gap-4">
+              <div
+                className="grid size-16 shrink-0 place-items-center rounded-2xl text-3xl"
+                style={{
+                  backgroundColor: invitePreview
+                    ? `${invitePreview.color}22`
+                    : "#95aaff22",
+                }}
+              >
+                {invitePreview?.emoji ?? "🏆"}
+              </div>
+              <div className="min-w-0">
+                <Badge className="mb-2 border-[#95aaff]/35 bg-[#95aaff]/12 text-[#dfe5ff]">
+                  {isInviteLoading
+                    ? "Verificando convite"
+                    : isInviteMissing
+                      ? "Convite pendente"
+                      : "Convite verificado"}
+                </Badge>
+                <h2 className="break-words font-display text-3xl font-black leading-tight text-[#eef2ff]">
+                  {invitePreview?.name ??
+                    (isInviteLoading ? "Carregando bolão" : "Convite inválido")}
+                </h2>
+                {invitePreview?.ownerName ? (
+                  <p className="mt-2 text-sm text-[#aeb4ca]">
+                    Criado por {invitePreview.ownerName}
+                  </p>
+                ) : null}
+              </div>
             </div>
-            <div>
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#95aaff]">
-                Convite Gepeto
+
+            {invitePreview?.description ? (
+              <p className="mt-5 text-sm leading-6 text-[#c3c9dd]">
+                {invitePreview.description}
               </p>
-              <h1 className="font-display text-3xl font-black">
-                Entrar no bolão
-              </h1>
+            ) : null}
+          </div>
+
+          <div className="space-y-5 p-5 sm:p-6">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7f879f]">
+                  Participantes
+                </p>
+                <p className="mt-1 font-semibold text-[#eef2ff]">
+                  {isInviteLoading ? "..." : memberLabel}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7f879f]">
+                  Entrada
+                </p>
+                <p className="mt-1 font-semibold text-[#eef2ff]">
+                  {isInviteLoading ? "..." : privacyLabel}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-[#192137] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm text-[#aeb4ca]">Código do convite</p>
+                  <p className="mt-1 font-mono text-lg font-bold tracking-[0.18em] text-[#eef2ff]">
+                    {normalizedInviteCode || "INVÁLIDO"}
+                  </p>
+                </div>
+                <Check className="size-5 text-[#95aaff]" />
+              </div>
+            </div>
+
+            {!normalizedInviteCode ? (
+              <p className="text-sm text-[#ffb4c1]">
+                Link de convite inválido.
+              </p>
+            ) : invitePreview === null ? (
+              <p className="text-sm text-[#ffb4c1]">
+                Convite não encontrado. Confira o link com quem te chamou.
+              </p>
+            ) : !isLoaded ||
+              isInviteLoading ||
+              (isSignedIn &&
+                (authLoading ||
+                  !isAuthenticated ||
+                  currentUser === undefined)) ? (
+              <p className="text-sm text-[#aeb4ca]">Verificando acesso...</p>
+            ) : joinError ? (
+              <p className="text-sm text-[#ffb4c1]">{joinError}</p>
+            ) : isSignedIn ? (
+              <p className="text-sm text-[#aeb4ca]">
+                Entrando no bolão automaticamente...
+              </p>
+            ) : (
+              <p className="text-sm leading-6 text-[#aeb4ca]">
+                Use sua conta para confirmar identidade. O convite continua
+                aplicado depois do login.
+              </p>
+            )}
+
+            <div className="space-y-3 pt-1">
+              {!isSignedIn &&
+              isLoaded &&
+              normalizedInviteCode &&
+              invitePreview ? (
+                <SignInButton mode="redirect" forceRedirectUrl={invitePath}>
+                  <Button className="h-12 w-full gap-2 rounded-xl bg-[#95aaff] font-semibold text-[#071235] hover:bg-[#a6b7ff]">
+                    Entrar e participar
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </SignInButton>
+              ) : null}
+
+              {joinError && invitePreview ? (
+                <Button
+                  type="button"
+                  className="h-12 w-full gap-2 rounded-xl bg-[#95aaff] font-semibold text-[#071235] hover:bg-[#a6b7ff]"
+                  onClick={() => {
+                    didJoinRef.current = false;
+                    setJoinError(null);
+                    setRetryKey((key) => key + 1);
+                  }}
+                >
+                  Tentar de novo
+                  <ChevronRight className="size-4" />
+                </Button>
+              ) : null}
+
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 w-full rounded-xl border-[#444b65] bg-transparent text-[#dfe5ff] hover:bg-[#192137]"
+              >
+                <Link href="/dashboard/gepeto?tab=boloes">Ver meus bolões</Link>
+              </Button>
             </div>
           </div>
-
-          <div className="rounded-xl border border-[#444b65] bg-[#192137] p-4">
-            <p className="text-sm text-[#aeb4ca]">Código do convite</p>
-            <p className="mt-1 font-mono text-xl font-bold tracking-[0.18em] text-[#dfe5ff]">
-              {normalizedInviteCode || "INVÁLIDO"}
-            </p>
-          </div>
-
-          {!normalizedInviteCode ? (
-            <p className="text-sm text-[#ffb4c1]">Link de convite inválido.</p>
-          ) : !isLoaded ||
-            (isSignedIn &&
-              (authLoading ||
-                !isAuthenticated ||
-                currentUser === undefined)) ? (
-            <p className="text-sm text-[#aeb4ca]">Preparando seu acesso...</p>
-          ) : joinError ? (
-            <p className="text-sm text-[#ffb4c1]">{joinError}</p>
-          ) : isSignedIn ? (
-            <p className="text-sm text-[#aeb4ca]">
-              Entrando no bolão automaticamente...
-            </p>
-          ) : (
-            <p className="text-sm text-[#aeb4ca]">
-              Entre com sua conta para participar. Depois do login, você volta
-              para este convite.
-            </p>
-          )}
-        </div>
-
-        <div className="mt-6 flex flex-col gap-3">
-          {!isSignedIn && isLoaded && normalizedInviteCode ? (
-            <SignInButton mode="redirect" forceRedirectUrl={invitePath}>
-              <Button className="h-12 gap-2 bg-[#95aaff] text-[#071235] hover:bg-[#a6b7ff]">
-                Entrar e participar
-                <ChevronRight className="size-4" />
-              </Button>
-            </SignInButton>
-          ) : null}
-
-          {joinError ? (
-            <Button
-              type="button"
-              className="h-12 gap-2 bg-[#95aaff] text-[#071235] hover:bg-[#a6b7ff]"
-              onClick={() => {
-                didJoinRef.current = false;
-                setJoinError(null);
-                setRetryKey((key) => key + 1);
-              }}
-            >
-              Tentar de novo
-              <ChevronRight className="size-4" />
-            </Button>
-          ) : null}
-
-          <Button asChild variant="outline" className="h-12 border-[#444b65]">
-            <Link href="/dashboard/gepeto?tab=boloes">Ver meus bolões</Link>
-          </Button>
-        </div>
-      </Card>
+        </Card>
+      </section>
     </main>
   );
 }
