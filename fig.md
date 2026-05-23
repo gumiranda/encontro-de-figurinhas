@@ -1,103 +1,141 @@
 � Minhas figurinhas repetidas — Copa 2026
 
 � México
-MEX-15
+3MEX-15
+R$ 3
 
 � África do Sul
-RSA-2, RSA-3, RSA-4, RSA-5, RSA-7, RSA-8, RSA-12, RSA-19
+3RSA-2, 3RSA-3, 6RSA-4, 4RSA-5, 4RSA-7, 5RSA-8, 3RSA-12, 5RSA-19
+R$ 33
 
 � Coreia do Sul
-KOR-2, KOR-3, KOR-5
+3KOR-2, 4KOR-3, 3KOR-5
+R$ 10
 
 � República Tcheca
-CZE-6
+2CZE-6
+R$ 2
 
 � Canadá
-CAN-4, CAN-12, CAN-15, CAN-17
+2CAN-4, 2CAN-12, 3CAN-15, 2CAN-17
+R$ 9
 
 � Catar
-QAT-2, QAT-6, QAT-9, QAT-10, QAT-11, QAT-15, QAT-16
+3QAT-2, 3QAT-6, 2QAT-9, 6QAT-10, 4QAT-11, 2QAT-14, 5QAT-15, 4QAT-16
+R$ 29
 
 � Suíça
-SUI-2, SUI-4
+2SUI-2, 2SUI-4
+R$ 4
 
 � Brasil
-BRA-15
+2BRA-15
+R$ 2
 
 � Haiti
-HAI-4, HAI-11
+2HAI-4, 2HAI-11
+R$ 4
 
 � Escócia
-SCO-2, SCO-3, SCO-6, SCO-7, SCO-11, SCO-15, SCO-16
+4SCO-2, 3SCO-3, 2SCO-6, 5SCO-7, 2SCO-11, 2SCO-15, 2SCO-16
+R$ 20
 
 � Paraguai
-PAR-3, PAR-6, PAR-10
+2PAR-3, 2PAR-6, 2PAR-10
+R$ 6
 
 � Alemanha
-GER-4, GER-11, GER-16
+2GER-4, 2GER-11, 2GER-16
+R$ 6
 
 � Curaçao
-CUW-7, CUW-20
+2CUW-7, 2CUW-20
+R$ 4
 
 � Costa do Marfim
-CIV-2, CIV-3, CIV-4, CIV-5, CIV-6, CIV-11, CIV-15
+3CIV-2, 2CIV-3, 2CIV-4, 2CIV-5, 2CIV-6, 2CIV-11, 3CIV-15
+R$ 16
 
 � Equador
-ECU-5
+2ECU-5
+R$ 2
 
 � Holanda
-NED-8, NED-14, NED-20
+2NED-8, 2NED-14, 2NED-20
+R$ 6
 
 � Japão
-JPN-8, JPN-9, JPN-14
+3JPN-8, 5JPN-9, 3JPN-14
+R$ 11
 
 � Bélgica
-BEL-2, BEL-3, BEL-4, BEL-8, BEL-10
+3BEL-2, 2BEL-3, 4BEL-4, 4BEL-6,2BEL-8
+R$ 15
 
 � Egito
-EGY-14, EGY-18
+2EGY-14, 2EGY-18
+R$ 4
 
 � Irã
-IRN-2, IRN-9, IRN-18
+2IRN-2, 3IRN-9, 2IRN-18
+R$ 7
 
 � Nova Zelândia
 2NZL-2, 3NZL-6, 2NZL-10, 3NZL-15, 3NZL-17, 4NZL-19
+R$ 17
 
 � Cabo Verde
 3CPV-2, 2CPV-3, 3CPV-4, 3CPV-6, 2CPV-7, 3CPV-8, 2CPV-10, 2CPV-11, 5CPV-12, 2CPV-14, 2CPV-15, 2CPV-16, 2CPV-19, 5CPV-20
+R$ 38
+
 
 � Arábia Saudita
 2KSA-8, 4KSA-10, 6KSA-11, 4KSA-12, 3KSA-15, 2KSA-17
+R$ 21
 
 � França
 3FRA-3, 2FRA-15, 2FRA-19
+R$ 7
 
 � Senegal
 2SEN-4, 2SEN-5, 2SEN-6, 5SEN-15, 4SEN-16, 2SEN-17, 2SEN-18, 3SEN-19, 3SEN-20
+R$ 25
 
 � Noruega
 3NOR-4, 3NOR-5, 3NOR-8, 7NOR-9, 3NOR-12, 4NOR-14, 3NOR-17, 6NOR-18, 2NOR-19
+R$ 34
 
 � Argentina
 3ARG-4, 6ARG-5, 2ARG-6, 2ARG-19
+R$ 13
 
 � Argélia
 2ALG-4, 2ALG-8, 2ALG-11, 2ALG-17
+R$ 8
 
 � Áustria
 3AUT-8, 3AUT-10, 2AUT-12, 2AUT-15, 4AUT-17, 3AUT-18, 2AUT-19
+R$ 19
 
 � Portugal
 2POR-6, 2POR-8, 2POR-10
+R$ 6
 
 � Colômbia
 2COL-3, 3COL-8, 2COL-17, 4COL-19, 2COL-20
+R$ 13
 
 � Inglaterra
 2ENG-8
+R$ 2
 
 � Croácia
 2CRO-6, 2CRO-10, 2CRO-12, 2CRO-15
+R$ 8
 
 � Panamá
 3PAN-2 -
+R$ 3
+
+
+TOTAL: R$ 407
