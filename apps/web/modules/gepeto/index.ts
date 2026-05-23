@@ -7,6 +7,11 @@ export { ConfidenceMeter } from "./ui/components/confidence-meter";
 export { ReasoningCard } from "./ui/components/reasoning-card";
 export { PredictionForm } from "./ui/components/prediction-form";
 
+// Match experience components
+export { VerdictBanner } from "./ui/components/verdict-banner";
+export { CommunityBar } from "./ui/components/community-bar";
+export { StreakStrip } from "./ui/components/streak-strip";
+
 // Landing page components
 export { CountUp } from "./ui/components/count-up";
 export { HeroBoard } from "./ui/components/hero-board";
