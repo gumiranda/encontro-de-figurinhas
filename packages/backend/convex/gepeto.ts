@@ -20,13 +20,18 @@ import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
 
 // ============ HELPERS ============
 
-function getMatchResult(homeScore: number, awayScore: number): "home" | "draw" | "away" {
+function getMatchResult(
+  homeScore: number,
+  awayScore: number,
+): "home" | "draw" | "away" {
   if (homeScore > awayScore) return "home";
   if (awayScore > homeScore) return "away";
   return "draw";
 }
 
-function hasFinalScore(match: Pick<Doc<"worldCupMatches">, "homeScore" | "awayScore">) {
+function hasFinalScore(
+  match: Pick<Doc<"worldCupMatches">, "homeScore" | "awayScore">,
+) {
   return match.homeScore !== undefined && match.awayScore !== undefined;
 }
 
@@ -58,7 +63,9 @@ const predictionResponseSchema = z.object({
 type ParsedPredictionResponse = z.infer<typeof predictionResponseSchema>;
 
 function getISOWeekNumber(date: Date): number {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -68,7 +75,7 @@ function getISOWeekNumber(date: Date): number {
 async function fetchWithTimeout(
   url: string,
   options: RequestInit,
-  timeoutMs: number
+  timeoutMs: number,
 ): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -126,8 +133,12 @@ function publicUserSnapshot(user: Doc<"users">) {
   return {
     _id: user._id,
     nickname: user.nickname ?? null,
-    displayNickname:
-      (user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador").slice(0, 32),
+    displayNickname: (
+      user.displayNickname ??
+      user.nickname ??
+      user.name ??
+      "Colecionador"
+    ).slice(0, 32),
     avatarSeed: user._id,
     cityId: user.cityId ?? null,
   };
@@ -140,7 +151,11 @@ function sanitizeLimited(input: string | undefined, maxLength: number) {
 }
 
 function normalizeInviteCode(input: string) {
-  return input.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  return input
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 12);
 }
 
 function makeInviteCode() {
@@ -177,7 +192,10 @@ function validatePoolInput(args: {
   if (args.color && !/^#[0-9A-Fa-f]{6}$/.test(args.color)) {
     throw new ConvexError("Cor inválida");
   }
-  for (const value of [args.knockoutMultiplier ?? 2, args.finalMultiplier ?? 3]) {
+  for (const value of [
+    args.knockoutMultiplier ?? 3,
+    args.finalMultiplier ?? 5,
+  ]) {
     if (!Number.isFinite(value) || value < 1 || value > 10) {
       throw new ConvexError("Multiplicador inválido");
     }
@@ -191,7 +209,9 @@ async function assertPoolMember(
 ) {
   const membership = await ctx.db
     .query("gepetoPoolMembers")
-    .withIndex("by_pool_user", (q) => q.eq("poolId", poolId).eq("userId", userId))
+    .withIndex("by_pool_user", (q) =>
+      q.eq("poolId", poolId).eq("userId", userId),
+    )
     .unique();
   if (!membership || !membership.isActive) {
     throw new ConvexError("Você não participa deste bolão");
@@ -246,7 +266,10 @@ async function getCurrentMatch(ctx: QueryCtx) {
   return null;
 }
 
-async function getPoolSummary(ctx: QueryCtx, membership: Doc<"gepetoPoolMembers">) {
+async function getPoolSummary(
+  ctx: QueryCtx,
+  membership: Doc<"gepetoPoolMembers">,
+) {
   const pool = await ctx.db.get(membership.poolId);
   if (!pool) return null;
   const members = await ctx.db
@@ -258,7 +281,11 @@ async function getPoolSummary(ctx: QueryCtx, membership: Doc<"gepetoPoolMembers"
 }
 
 async function getLeaderboardRows(ctx: QueryCtx, limit: number) {
-  const rows = await ctx.db.query("userAiStats").withIndex("by_wins").order("desc").take(limit);
+  const rows = await ctx.db
+    .query("userAiStats")
+    .withIndex("by_wins")
+    .order("desc")
+    .take(limit);
   return Promise.all(
     rows.map(async (row, index) => {
       const user = await ctx.db.get(row.userId);
@@ -275,12 +302,24 @@ function getRoundMultiplier(
   pool: Doc<"gepetoPools">,
   round: Doc<"worldCupRounds"> | null,
 ) {
-  const phase = `${round?.phase ?? ""} ${round?.name ?? ""}`.toLowerCase();
-  if (phase.includes("final")) return pool.finalMultiplier;
+  const normalizeRoundText = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  const roundName = normalizeRoundText(round?.name ?? "");
+  const phase = normalizeRoundText(`${round?.phase ?? ""} ${roundName}`);
+  if (
+    /\bfinal\b/.test(roundName) &&
+    !/(semi|oitava|quarta|avos|terceiro|third)/.test(roundName)
+  ) {
+    return pool.finalMultiplier;
+  }
   if (
     phase.includes("oitava") ||
     phase.includes("quarta") ||
     phase.includes("semi") ||
+    phase.includes("avos") ||
     phase.includes("mata") ||
     phase.includes("knockout")
   ) {
@@ -305,14 +344,17 @@ function scorePredictionAgainstMatch(
     return 0;
   }
   const actual = getMatchResult(match.homeScore, match.awayScore);
-  let score = prediction.prediction === actual ? 3 : 0;
-  if (
+  const hasExactScore =
     prediction.exactScore &&
     prediction.exactScore.home === match.homeScore &&
-    prediction.exactScore.away === match.awayScore
-  ) {
-    score += 2;
-  }
+    prediction.exactScore.away === match.awayScore;
+  if (hasExactScore) return 25 * multiplier;
+  if (prediction.prediction === actual) return 10 * multiplier;
+  const hasOneTeamScore =
+    prediction.exactScore &&
+    (prediction.exactScore.home === match.homeScore ||
+      prediction.exactScore.away === match.awayScore);
+  const score = hasOneTeamScore ? 5 : 0;
   return score * multiplier;
 }
 
@@ -344,7 +386,11 @@ async function scorePoolMember(
     const multiplier = getRoundMultiplier(pool, round);
     const earned = scorePredictionAgainstMatch(row, match, multiplier);
     points += earned;
-    if (earned > 0 && row.prediction === getMatchResult(match.homeScore ?? 0, match.awayScore ?? 0)) {
+    if (
+      earned > 0 &&
+      row.prediction ===
+        getMatchResult(match.homeScore ?? 0, match.awayScore ?? 0)
+    ) {
       correctHits++;
     }
     if (
@@ -409,7 +455,9 @@ export const getUserPrediction = query({
 
     const prediction = await ctx.db
       .query("userPredictions")
-      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+      .withIndex("by_user_match", (q) =>
+        q.eq("userId", user._id).eq("matchId", matchId),
+      )
       .unique();
 
     if (!prediction) return null;
@@ -417,7 +465,9 @@ export const getUserPrediction = query({
     const isRevealed = isPredictionRevealed(match);
     const badge = await ctx.db
       .query("userAiBadges")
-      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+      .withIndex("by_user_match", (q) =>
+        q.eq("userId", user._id).eq("matchId", matchId),
+      )
       .unique();
 
     return {
@@ -432,7 +482,11 @@ export const getUserPrediction = query({
 export const getLeaderboard = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit = 50 }) => {
-    return ctx.db.query("userAiStats").withIndex("by_wins").order("desc").take(limit);
+    return ctx.db
+      .query("userAiStats")
+      .withIndex("by_wins")
+      .order("desc")
+      .take(limit);
   },
 });
 
@@ -441,7 +495,9 @@ export const getWeeklyNarrative = query({
   handler: async (ctx, { weekNumber, year }) => {
     return ctx.db
       .query("aiWeeklyNarratives")
-      .withIndex("by_week_year", (q) => q.eq("year", year).eq("weekNumber", weekNumber))
+      .withIndex("by_week_year", (q) =>
+        q.eq("year", year).eq("weekNumber", weekNumber),
+      )
       .unique();
   },
 });
@@ -454,24 +510,31 @@ export const getDashboardHub = query({
     const weekNumber = getISOWeekNumber(now);
     const year = now.getFullYear();
 
-    const [nextMatch, stats, narrative, memberships, leaderboard] = await Promise.all([
-      getCurrentMatch(ctx),
-      ctx.db
-        .query("userAiStats")
-        .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .unique(),
-      ctx.db
-        .query("aiWeeklyNarratives")
-        .withIndex("by_week_year", (q) => q.eq("year", year).eq("weekNumber", weekNumber))
-        .unique(),
-      ctx.db
-        .query("gepetoPoolMembers")
-        .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .take(6),
-      getLeaderboardRows(ctx, 6),
-    ]);
+    const [nextMatch, stats, narrative, memberships, leaderboard] =
+      await Promise.all([
+        getCurrentMatch(ctx),
+        ctx.db
+          .query("userAiStats")
+          .withIndex("by_user", (q) => q.eq("userId", user._id))
+          .unique(),
+        ctx.db
+          .query("aiWeeklyNarratives")
+          .withIndex("by_week_year", (q) =>
+            q.eq("year", year).eq("weekNumber", weekNumber),
+          )
+          .unique(),
+        ctx.db
+          .query("gepetoPoolMembers")
+          .withIndex("by_user", (q) => q.eq("userId", user._id))
+          .take(6),
+        getLeaderboardRows(ctx, 6),
+      ]);
 
-    const pools = (await Promise.all(memberships.map((member) => getPoolSummary(ctx, member))))
+    const pools = (
+      await Promise.all(
+        memberships.map((member) => getPoolSummary(ctx, member)),
+      )
+    )
       .filter((pool) => pool !== null)
       .filter((pool) => pool.membership.isActive);
 
@@ -517,7 +580,10 @@ export const listDashboardFixtures = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
-    const rounds = await ctx.db.query("worldCupRounds").withIndex("by_order").collect();
+    const rounds = await ctx.db
+      .query("worldCupRounds")
+      .withIndex("by_order")
+      .collect();
     const userPredictions = await ctx.db
       .query("userPredictions")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
@@ -546,7 +612,10 @@ export const listDashboardFixtures = query({
 
             return {
               ...match,
-              aiPrediction: maskAiPrediction(aiPrediction, isPredictionRevealed(match)),
+              aiPrediction: maskAiPrediction(
+                aiPrediction,
+                isPredictionRevealed(match),
+              ),
               userPrediction: (() => {
                 const prediction = userPredictionByMatch.get(match._id);
                 if (!prediction) return null;
@@ -586,15 +655,21 @@ export const getDashboardMatch = query({
           .unique(),
         ctx.db
           .query("userPredictions")
-          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .withIndex("by_user_match", (q) =>
+            q.eq("userId", user._id).eq("matchId", matchId),
+          )
           .unique(),
         ctx.db
           .query("userAiBadges")
-          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .withIndex("by_user_match", (q) =>
+            q.eq("userId", user._id).eq("matchId", matchId),
+          )
           .unique(),
         ctx.db
           .query("userAiMatchResults")
-          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .withIndex("by_user_match", (q) =>
+            q.eq("userId", user._id).eq("matchId", matchId),
+          )
           .unique(),
         ctx.db
           .query("userPredictions")
@@ -617,7 +692,9 @@ export const getDashboardMatch = query({
       userPrediction: userPrediction
         ? {
             ...userPrediction,
-            exactScore: isPredictionRevealed(match) ? userPrediction.exactScore : null,
+            exactScore: isPredictionRevealed(match)
+              ? userPrediction.exactScore
+              : null,
             isRevealed: isPredictionRevealed(match),
             hasBadge: !!badge,
           }
@@ -647,8 +724,12 @@ export const listMyPools = query({
       .query("gepetoPoolMembers")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
-    const pools = await Promise.all(memberships.map((member) => getPoolSummary(ctx, member)));
-    return pools.filter((pool) => pool !== null).filter((pool) => pool.membership.isActive);
+    const pools = await Promise.all(
+      memberships.map((member) => getPoolSummary(ctx, member)),
+    );
+    return pools
+      .filter((pool) => pool !== null)
+      .filter((pool) => pool.membership.isActive);
   },
 });
 
@@ -679,8 +760,12 @@ export const getPoolDetail = query({
     );
     const hydratedActivities = await Promise.all(
       activities.map(async (activity) => {
-        const actor = activity.userId ? await ctx.db.get(activity.userId) : null;
-        const target = activity.targetUserId ? await ctx.db.get(activity.targetUserId) : null;
+        const actor = activity.userId
+          ? await ctx.db.get(activity.userId)
+          : null;
+        const target = activity.targetUserId
+          ? await ctx.db.get(activity.targetUserId)
+          : null;
         return {
           ...activity,
           actor: actor ? publicUserSnapshot(actor) : null,
@@ -741,7 +826,7 @@ export const listMatchesForAdmin = query({
           .withIndex("by_match", (q) => q.eq("matchId", match._id))
           .unique();
         return { ...match, aiPrediction: aiPrediction ?? null };
-      })
+      }),
     );
   },
 });
@@ -765,12 +850,16 @@ export const assertAdmin = internalQuery({
 export const recordUserPrediction = mutation({
   args: {
     matchId: v.id("worldCupMatches"),
-    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
+    prediction: v.union(
+      v.literal("home"),
+      v.literal("draw"),
+      v.literal("away"),
+    ),
     exactScore: v.optional(
       v.object({
         home: v.number(),
         away: v.number(),
-      })
+      }),
     ),
   },
   handler: async (ctx, { matchId, prediction, exactScore }) => {
@@ -800,7 +889,9 @@ export const recordUserPrediction = mutation({
 
     const existing = await ctx.db
       .query("userPredictions")
-      .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+      .withIndex("by_user_match", (q) =>
+        q.eq("userId", user._id).eq("matchId", matchId),
+      )
       .unique();
 
     const now = Date.now();
@@ -852,8 +943,8 @@ export const createPool = mutation({
       cityId: args.privacy === "city" ? user.cityId : undefined,
       inviteCode,
       includeGepeto: args.includeGepeto ?? true,
-      knockoutMultiplier: args.knockoutMultiplier ?? 2,
-      finalMultiplier: args.finalMultiplier ?? 3,
+      knockoutMultiplier: args.knockoutMultiplier ?? 3,
+      finalMultiplier: args.finalMultiplier ?? 5,
       createdAt: now,
       updatedAt: now,
     });
@@ -915,7 +1006,9 @@ export const joinPoolByCode = mutation({
 
     const existing = await ctx.db
       .query("gepetoPoolMembers")
-      .withIndex("by_pool_user", (q) => q.eq("poolId", pool._id).eq("userId", user._id))
+      .withIndex("by_pool_user", (q) =>
+        q.eq("poolId", pool._id).eq("userId", user._id),
+      )
       .unique();
     const now = Date.now();
     const snapshot = publicUserSnapshot(user);
@@ -986,7 +1079,8 @@ export const pokePoolMember = mutation({
     if (!target || target.poolId !== poolId || !target.isActive) {
       throw new ConvexError("Membro não encontrado");
     }
-    if (target.userId === user._id) throw new ConvexError("Escolha outro membro");
+    if (target.userId === user._id)
+      throw new ConvexError("Escolha outro membro");
 
     const actor = publicUserSnapshot(user).displayNickname;
     await ctx.db.insert("gepetoPoolActivities", {
@@ -1033,7 +1127,11 @@ function validateAIPredictionPayload(args: {
 export const setAIPredictionAdmin = mutation({
   args: {
     matchId: v.id("worldCupMatches"),
-    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
+    prediction: v.union(
+      v.literal("home"),
+      v.literal("draw"),
+      v.literal("away"),
+    ),
     exactScore: v.object({
       home: v.number(),
       away: v.number(),
@@ -1094,7 +1192,7 @@ export const updateMatchScore = mutation({
       v.literal("live"),
       v.literal("aet"),
       v.literal("penalties"),
-      v.literal("finished")
+      v.literal("finished"),
     ),
     reason: v.optional(v.string()),
   },
@@ -1118,7 +1216,10 @@ export const listAvailableTeams = query({
   handler: async (ctx) => {
     await requireAdmin(ctx);
     const matches = await ctx.db.query("worldCupMatches").collect();
-    const teamsMap = new Map<string, { code: string; name: string; flag: string }>();
+    const teamsMap = new Map<
+      string,
+      { code: string; name: string; flag: string }
+    >();
 
     for (const match of matches) {
       if (!teamsMap.has(match.homeTeamCode)) {
@@ -1165,7 +1266,11 @@ export const updateMatchTeams = mutation({
 
     // Generate new slug
     const slugify = (name: string) =>
-      name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "-");
+      name
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/\s+/g, "-");
     const newSlug = `${slugify(homeTeam.name)}-vs-${slugify(awayTeam.name)}`;
 
     await ctx.db.patch(matchId, {
@@ -1188,7 +1293,11 @@ export const updateMatchTeams = mutation({
 export const savePrediction = internalMutation({
   args: {
     matchId: v.id("worldCupMatches"),
-    prediction: v.union(v.literal("home"), v.literal("draw"), v.literal("away")),
+    prediction: v.union(
+      v.literal("home"),
+      v.literal("draw"),
+      v.literal("away"),
+    ),
     exactScore: v.object({ home: v.number(), away: v.number() }),
     confidence: v.number(),
     reasoning: v.array(v.string()),
@@ -1229,7 +1338,7 @@ export const deleteAIPrediction = internalMutation({
 async function incrementUserAiStats(
   ctx: MutationCtx,
   userId: Id<"users">,
-  outcome: AiOutcome
+  outcome: AiOutcome,
 ) {
   const existing = await ctx.db
     .query("userAiStats")
@@ -1291,13 +1400,17 @@ export const awardBadgesForMatch = internalMutation({
       .query("userAiBadges")
       .withIndex("by_match", (q) => q.eq("matchId", matchId))
       .collect();
-    const existingBadgeUserIds = new Set(existingBadges.map((badge) => badge.userId));
+    const existingBadgeUserIds = new Set(
+      existingBadges.map((badge) => badge.userId),
+    );
 
     const existingResults = await ctx.db
       .query("userAiMatchResults")
       .withIndex("by_match", (q) => q.eq("matchId", matchId))
       .collect();
-    const processedUserIds = new Set(existingResults.map((result) => result.userId));
+    const processedUserIds = new Set(
+      existingResults.map((result) => result.userId),
+    );
 
     // Paginated processing - 100 at a time
     const BATCH_SIZE = 100;
@@ -1386,16 +1499,19 @@ export const generateAIPrediction = internalAction({
   },
   handler: async (
     ctx,
-    { matchId, force, adminOverride }
+    { matchId, force, adminOverride },
   ): Promise<GeneratePredictionResult> => {
     const match = await ctx.runQuery(internal.gepeto.getMatchForPrediction, {
       matchId,
     });
     if (!match) throw new Error("Match not found");
 
-    const existing = await ctx.runQuery(internal.gepeto.getAIPredictionInternal, {
-      matchId,
-    });
+    const existing = await ctx.runQuery(
+      internal.gepeto.getAIPredictionInternal,
+      {
+        matchId,
+      },
+    );
     if (existing && !force) {
       return { skipped: true as const, reason: "already-exists" as const };
     }
@@ -1479,7 +1595,7 @@ export const generateAIPrediction = internalAction({
               },
             }),
           },
-          15_000
+          15_000,
         );
 
         if (!response.ok) {
@@ -1495,9 +1611,12 @@ export const generateAIPrediction = internalAction({
           modelVersion: "gpt-4o-mini",
         });
 
-        const saved = await ctx.runQuery(internal.gepeto.getAIPredictionInternal, {
-          matchId,
-        });
+        const saved = await ctx.runQuery(
+          internal.gepeto.getAIPredictionInternal,
+          {
+            matchId,
+          },
+        );
         return { skipped: false as const, prediction: saved };
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e));
@@ -1523,7 +1642,10 @@ export const generateAIPredictionAdmin = action({
     matchId: v.id("worldCupMatches"),
     force: v.optional(v.boolean()),
   },
-  handler: async (ctx, { matchId, force }): Promise<GeneratePredictionResult> => {
+  handler: async (
+    ctx,
+    { matchId, force },
+  ): Promise<GeneratePredictionResult> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new ConvexError("Não autenticado");
 

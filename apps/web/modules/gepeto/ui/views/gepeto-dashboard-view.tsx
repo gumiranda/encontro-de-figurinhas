@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
+import { Switch } from "@workspace/ui/components/switch";
 import {
   Tabs,
   TabsContent,
@@ -29,12 +30,15 @@ import {
   ArrowLeft,
   Bot,
   CalendarDays,
+  Check,
+  ChevronLeft,
   ChevronRight,
   Clock,
   Clipboard,
   Crown,
   Flame,
   Lock,
+  MapPin,
   MessageCircle,
   Plus,
   Send,
@@ -68,6 +72,8 @@ import {
 
 type Choice = "home" | "draw" | "away";
 type TabKey = "hub" | "jogos" | "boloes" | "capitulo" | "ranking";
+type PoolCreateStep = 1 | 2 | 3;
+type PoolPrivacy = "private" | "city" | "open";
 type DashboardHub = FunctionReturnType<typeof api.gepeto.getDashboardHub>;
 type DashboardFixtures = FunctionReturnType<
   typeof api.gepeto.listDashboardFixtures
@@ -120,6 +126,8 @@ const POOL_ACCENT_COLORS = [
   "#A97AE6",
   "#5DD3CE",
 ];
+const POOL_KNOCKOUT_MULTIPLIERS = [1, 2, 3, 4, 5];
+const POOL_FINAL_MULTIPLIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 function pickTab(raw: string | null): TabKey {
   if (raw === "vs-ia") return "ranking";
@@ -395,6 +403,7 @@ function LeaderboardList({
 
 function PoolsPanel({
   pools,
+  userCityId,
 }: {
   pools: Array<{
     _id: Id<"gepetoPools">;
@@ -405,20 +414,74 @@ function PoolsPanel({
     activeMemberCount: number;
     privacy: string;
   }>;
+  userCityId: DashboardHub["user"]["cityId"];
 }) {
   const createPool = useMutation(api.gepeto.createPool);
   const joinPool = useMutation(api.gepeto.joinPoolByCode);
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createStep, setCreateStep] = useState<PoolCreateStep>(1);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState("🏆");
   const [color, setColor] = useState("#95AAFF");
+  const [privacy, setPrivacy] = useState<PoolPrivacy>("private");
+  const [includeGepeto, setIncludeGepeto] = useState(true);
+  const [knockoutMultiplier, setKnockoutMultiplier] = useState(3);
+  const [finalMultiplier, setFinalMultiplier] = useState(5);
   const [inviteCode, setInviteCode] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const trimmedName = name.trim();
   const canCreate =
     trimmedName.length >= 3 && trimmedName.length <= POOL_NAME_INPUT_MAX;
+  const privacyOptions = [
+    {
+      value: "private" as const,
+      title: "Só quem tem o código",
+      description:
+        "Você convida individualmente. Recomendado para amigos e família.",
+      icon: Lock,
+      disabled: false,
+    },
+    {
+      value: "city" as const,
+      title: "Público na minha cidade",
+      description: userCityId
+        ? "Aparece em sugestões pra quem está na sua cidade."
+        : "Complete sua cidade no perfil para liberar.",
+      icon: MapPin,
+      disabled: !userCityId,
+    },
+    {
+      value: "open" as const,
+      title: "Aberto para todos",
+      description:
+        "Qualquer um pode entrar. Indicado pra bolões grandes (50+).",
+      icon: Users,
+      disabled: false,
+    },
+  ];
+
+  function handleCreateOpenChange(open: boolean) {
+    setIsCreateOpen(open);
+    if (!open) setCreateStep(1);
+  }
+
+  function handleBack() {
+    setCreateStep((step) => (step > 1 ? ((step - 1) as PoolCreateStep) : 1));
+  }
+
+  function handlePrimaryAction() {
+    if (createStep === 1) {
+      if (canCreate) setCreateStep(2);
+      return;
+    }
+    if (createStep === 2) {
+      setCreateStep(3);
+      return;
+    }
+    void handleCreate();
+  }
 
   async function handleCreate() {
     setIsBusy(true);
@@ -428,13 +491,14 @@ function PoolsPanel({
         description,
         emoji,
         color,
-        privacy: "private",
-        includeGepeto: true,
-        knockoutMultiplier: 2,
-        finalMultiplier: 3,
+        privacy: privacy === "city" && !userCityId ? "private" : privacy,
+        includeGepeto,
+        knockoutMultiplier,
+        finalMultiplier,
       });
       toast.success(`Bolão criado: ${result.inviteCode}`);
       setIsCreateOpen(false);
+      setCreateStep(1);
       router.push(`/dashboard/gepeto/boloes/${result.poolId}`);
     } catch (error) {
       toast.error(
@@ -460,10 +524,13 @@ function PoolsPanel({
     }
   }
 
+  const primaryLabel = createStep === 3 ? "Criar bolão" : "Continuar";
+  const isPrimaryDisabled = isBusy || (createStep === 1 && !canCreate);
+
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
       <div className="space-y-4">
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <Dialog open={isCreateOpen} onOpenChange={handleCreateOpenChange}>
           <Card className="overflow-hidden border-[#444b65] bg-[#12192e] p-4 text-[#dfe5ff]">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -511,107 +578,290 @@ function PoolsPanel({
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <div className="h-1.5 rounded-full bg-[#95aaff]" />
-                <div className="h-1.5 rounded-full bg-[#dfe5ff]/25" />
-                <div className="h-1.5 rounded-full bg-[#dfe5ff]/25" />
+                {[1, 2, 3].map((step) => (
+                  <div
+                    key={step}
+                    className={cn(
+                      "h-1.5 rounded-full bg-[#dfe5ff]/25",
+                      step <= createStep && "bg-[#95aaff]",
+                    )}
+                  />
+                ))}
               </div>
 
-              <div className="space-y-5">
-                <div className="space-y-3">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
-                    Identidade
-                  </div>
-                  <div className="grid grid-cols-[112px_1fr] gap-4">
-                    <div
-                      className="grid aspect-square place-items-center rounded-[28px] border-4 border-[#95aaff] bg-[#202741] text-5xl shadow-[0_0_0_1px_rgba(149,170,255,0.24)]"
-                      style={{ borderColor: color }}
-                    >
-                      {emoji}
+              {createStep === 1 && (
+                <div className="space-y-5">
+                  <div className="space-y-3">
+                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                      Identidade
                     </div>
-                    <div className="min-w-0">
-                      <Input
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        placeholder="Nome do bolão"
-                        maxLength={POOL_NAME_INPUT_MAX}
-                        className="h-[72px] rounded-2xl border-[#55607d] bg-[#172039] px-6 font-display text-2xl font-black text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
-                      />
-                      <div className="mt-2 text-right font-mono text-sm font-bold text-[#aeb4ca]">
-                        {name.length}/{POOL_NAME_INPUT_MAX}
+                    <div className="grid grid-cols-[112px_1fr] gap-4">
+                      <div
+                        className="grid aspect-square place-items-center rounded-[28px] border-4 border-[#95aaff] bg-[#202741] text-5xl shadow-[0_0_0_1px_rgba(149,170,255,0.24)]"
+                        style={{ borderColor: color }}
+                      >
+                        {emoji}
+                      </div>
+                      <div className="min-w-0">
+                        <Input
+                          value={name}
+                          onChange={(event) => setName(event.target.value)}
+                          placeholder="Nome do bolão"
+                          maxLength={POOL_NAME_INPUT_MAX}
+                          className="h-[72px] rounded-2xl border-[#55607d] bg-[#172039] px-6 font-display text-2xl font-black text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                        />
+                        <div className="mt-2 text-right font-mono text-sm font-bold text-[#aeb4ca]">
+                          {name.length}/{POOL_NAME_INPUT_MAX}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-3">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
-                    Emoji
+                  <div className="space-y-3">
+                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                      Emoji
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+                      {POOL_EMOJI_OPTIONS.map((option) => (
+                        <Button
+                          key={option}
+                          type="button"
+                          variant="outline"
+                          onClick={() => setEmoji(option)}
+                          className={cn(
+                            "aspect-square h-auto rounded-2xl border-[#55607d] bg-[#172039] p-0 text-3xl shadow-none hover:bg-[#202741]",
+                            emoji === option &&
+                              "border-[#95aaff] bg-[#202741] ring-2 ring-[#95aaff]/65",
+                          )}
+                          aria-label={`Usar emoji ${option}`}
+                        >
+                          {option}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
-                    {POOL_EMOJI_OPTIONS.map((option) => (
-                      <Button
-                        key={option}
-                        type="button"
-                        variant="outline"
-                        onClick={() => setEmoji(option)}
-                        className={cn(
-                          "aspect-square h-auto rounded-2xl border-[#55607d] bg-[#172039] p-0 text-3xl shadow-none hover:bg-[#202741]",
-                          emoji === option &&
-                            "border-[#95aaff] bg-[#202741] ring-2 ring-[#95aaff]/65",
-                        )}
-                        aria-label={`Usar emoji ${option}`}
+
+                  <div className="space-y-3">
+                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                      Cor de acento
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {POOL_ACCENT_COLORS.map((option) => (
+                        <Button
+                          key={option}
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setColor(option)}
+                          className={cn(
+                            "size-14 rounded-full p-0 hover:bg-transparent",
+                            color === option &&
+                              "ring-4 ring-[#dfe5ff]/85 ring-offset-2 ring-offset-[#12192e]",
+                          )}
+                          style={{ backgroundColor: option }}
+                          aria-label={`Usar cor ${option}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                      Descrição (opcional)
+                    </div>
+                    <Textarea
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
+                      placeholder="Ex: Bolão do escritório, quem ganhar leva o churrasco da final"
+                      maxLength={POOL_DESCRIPTION_INPUT_MAX}
+                      className="min-h-28 resize-none rounded-2xl border-[#55607d] bg-[#172039] px-5 py-5 text-lg text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {createStep === 2 && (
+                <div className="space-y-5">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Quem pode entrar
+                  </div>
+
+                  <div className="space-y-3">
+                    {privacyOptions.map((option) => {
+                      const Icon = option.icon;
+                      const selected = privacy === option.value;
+                      return (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant="outline"
+                          disabled={option.disabled}
+                          onClick={() => setPrivacy(option.value)}
+                          className={cn(
+                            "grid h-auto w-full grid-cols-[72px_1fr_auto] items-center gap-5 rounded-3xl border-[#55607d] bg-[#172039] p-5 text-left shadow-none hover:bg-[#202741]",
+                            selected &&
+                              "border-[#95aaff] bg-[#202741] ring-1 ring-[#95aaff]/70",
+                            option.disabled && "opacity-45",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "grid size-[72px] place-items-center rounded-3xl bg-[#202741] text-[#aeb4ca]",
+                              selected && "bg-[#95aaff] text-[#081433]",
+                            )}
+                          >
+                            <Icon className="size-8" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block font-display text-xl font-black text-[#dfe5ff]">
+                              {option.title}
+                            </span>
+                            <span className="mt-1 block text-base leading-relaxed text-[#aeb4ca]">
+                              {option.description}
+                            </span>
+                          </span>
+                          {selected && (
+                            <span className="grid size-10 place-items-center rounded-full bg-[#95aaff] text-[#081433]">
+                              <Check className="size-6" />
+                            </span>
+                          )}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="grid grid-cols-[72px_1fr_auto] items-center gap-5 rounded-3xl border-2 border-[#ffc965] bg-[#252631] p-5">
+                    <span className="grid size-[72px] place-items-center rounded-3xl text-[#95aaff]">
+                      <Bot className="size-10" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-display text-xl font-black text-[#dfe5ff]">
+                        Incluir o Gepeto
+                      </span>
+                      <span className="mt-1 block text-base leading-relaxed text-[#aeb4ca]">
+                        Ele palpita em todos os jogos e provoca o grupo. Pode
+                        ser desligado depois.
+                      </span>
+                    </span>
+                    <Switch
+                      checked={includeGepeto}
+                      onCheckedChange={setIncludeGepeto}
+                      aria-label="Incluir o Gepeto"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {createStep === 3 && (
+                <div className="space-y-5">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Pontuação & multiplicadores
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      ["Placar exato", "+25 pts"],
+                      ["Acertou vencedor", "+10 pts"],
+                      ["Só placar de um time", "+5 pts"],
+                    ].map(([label, points]) => (
+                      <Card
+                        key={label}
+                        className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-2xl border-[#55607d] bg-[#172039] p-4 text-[#dfe5ff]"
                       >
-                        {option}
-                      </Button>
+                        <span className="text-lg font-medium">{label}</span>
+                        <span className="font-display text-lg font-black">
+                          {points}
+                        </span>
+                        <Lock className="size-5 text-[#aeb4ca]" />
+                      </Card>
                     ))}
                   </div>
-                </div>
 
-                <div className="space-y-3">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
-                    Cor de acento
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-lg font-medium">Mata-mata</div>
+                      <div className="font-display text-xl font-black text-[#95aaff]">
+                        {knockoutMultiplier}× pts
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-5 gap-2">
+                      {POOL_KNOCKOUT_MULTIPLIERS.map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          variant="outline"
+                          onClick={() => setKnockoutMultiplier(value)}
+                          className={cn(
+                            "h-14 rounded-xl border-[#55607d] bg-[#172039] font-display text-lg font-black shadow-none hover:bg-[#202741]",
+                            value <= knockoutMultiplier &&
+                              "bg-[#95aaff] text-[#081433] hover:bg-[#a9baff]",
+                          )}
+                        >
+                          {value}×
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-4">
-                    {POOL_ACCENT_COLORS.map((option) => (
-                      <Button
-                        key={option}
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setColor(option)}
-                        className={cn(
-                          "size-14 rounded-full p-0 hover:bg-transparent",
-                          color === option &&
-                            "ring-4 ring-[#dfe5ff]/85 ring-offset-2 ring-offset-[#12192e]",
-                        )}
-                        style={{ backgroundColor: option }}
-                        aria-label={`Usar cor ${option}`}
-                      />
-                    ))}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-lg font-medium">Final</div>
+                      <div className="font-display text-xl font-black text-[#95aaff]">
+                        {finalMultiplier}× pts
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+                      {POOL_FINAL_MULTIPLIERS.map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          variant="outline"
+                          onClick={() => setFinalMultiplier(value)}
+                          className={cn(
+                            "h-14 rounded-xl border-[#55607d] bg-[#172039] font-display text-lg font-black shadow-none hover:bg-[#202741]",
+                            value <= finalMultiplier &&
+                              "bg-[#95aaff] text-[#081433] hover:bg-[#a9baff]",
+                          )}
+                        >
+                          {value}×
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-dashed border-[#55607d] bg-[#172039] p-4 text-base text-[#aeb4ca]">
+                    💡 Palpites só abrem no apito inicial. Ninguém vê o seu
+                    antes.
                   </div>
                 </div>
+              )}
 
-                <div className="space-y-3">
-                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
-                    Descrição (opcional)
-                  </div>
-                  <Textarea
-                    value={description}
-                    onChange={(event) => setDescription(event.target.value)}
-                    placeholder="Ex: Bolão do escritório, quem ganhar leva o churrasco da final"
-                    maxLength={POOL_DESCRIPTION_INPUT_MAX}
-                    className="min-h-28 resize-none rounded-2xl border-[#55607d] bg-[#172039] px-5 py-5 text-lg text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
-                  />
-                </div>
-
+              <div
+                className={cn(
+                  "grid gap-4",
+                  createStep > 1 && "grid-cols-[72px_1fr]",
+                )}
+              >
+                {createStep > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBack}
+                    className="h-16 rounded-3xl border-[#55607d] bg-[#172039] text-[#dfe5ff] hover:bg-[#202741]"
+                    aria-label="Voltar etapa"
+                  >
+                    <ChevronLeft className="size-6" />
+                  </Button>
+                )}
                 <Button
                   type="button"
-                  onClick={handleCreate}
-                  disabled={isBusy || !canCreate}
+                  onClick={handlePrimaryAction}
+                  disabled={isPrimaryDisabled}
                   className="h-16 w-full rounded-3xl bg-[#95aaff] font-display text-xl font-black text-[#081433] hover:bg-[#a9baff]"
                 >
-                  Continuar
-                  <ChevronRight className="size-5" />
+                  {createStep === 3 && <Check className="size-5" />}
+                  {primaryLabel}
+                  {createStep !== 3 && <ChevronRight className="size-5" />}
                 </Button>
               </div>
             </div>
@@ -1365,7 +1615,13 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
   );
 }
 
-function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
+function PoolsPhoneScreen({
+  hub,
+  pools,
+}: {
+  hub: DashboardHub;
+  pools: DashboardPools;
+}) {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-4">
@@ -1374,7 +1630,7 @@ function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
           Bata seus amigos. E o Gepeto, claro.
         </p>
       </div>
-      <PoolsPanel pools={pools} />
+      <PoolsPanel pools={pools} userCityId={hub.user.cityId} />
     </div>
   );
 }
@@ -1560,7 +1816,7 @@ export function GepetoDashboardView() {
         />
       )}
       {selectedTab === "jogos" && <FixturesPhoneScreen fixtures={fixtures} />}
-      {selectedTab === "boloes" && <PoolsPhoneScreen pools={pools} />}
+      {selectedTab === "boloes" && <PoolsPhoneScreen hub={hub} pools={pools} />}
       {selectedTab === "capitulo" && <ChapterPhoneScreen hub={hub} />}
       {selectedTab === "ranking" && (
         <RankingPhoneScreen hub={hub} leaderboard={leaderboard} />
