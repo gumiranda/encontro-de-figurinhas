@@ -571,14 +571,14 @@ function PhoneShell({
             </div>
             <div className="size-9 shrink-0" aria-hidden />
           </div>
-          <div className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-[#444b65] bg-[#202741] p-1 [-ms-overflow-style:none] [scrollbar-width:none] md:mx-auto md:grid md:max-w-4xl md:grid-cols-5 md:overflow-visible [&::-webkit-scrollbar]:hidden">
+          <div className="grid max-w-full grid-cols-5 gap-1 rounded-2xl border border-[#444b65] bg-[#202741] p-1 md:mx-auto md:max-w-4xl">
             {GEPETO_TABS.map((item) => (
               <button
                 key={item.value}
                 type="button"
                 onClick={() => onTabChange(item.value)}
                 className={cn(
-                  "h-11 shrink-0 rounded-xl px-3 text-[11px] font-bold whitespace-nowrap text-[#aeb4ca] transition-colors md:h-12 md:px-0 md:text-sm",
+                  "h-11 rounded-xl px-1 text-[11px] font-bold whitespace-nowrap text-[#aeb4ca] transition-colors md:h-12 md:px-0 md:text-sm",
                   tab === item.value && "bg-[#dfe4fb] text-[#090e1c]",
                 )}
               >
