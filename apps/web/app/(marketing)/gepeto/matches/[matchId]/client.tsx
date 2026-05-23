@@ -4,7 +4,7 @@ import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id, Doc } from "@workspace/backend/_generated/dataModel";
 import {
-  AICard,
+  GepetoPredictionPanel,
   PredictionForm,
   VerdictBanner,
   CommunityBar,
@@ -12,7 +12,6 @@ import {
   MatchHeader,
 } from "@/modules/gepeto";
 import {
-  canRecordUserPrediction,
   hasFinalScore,
   isPredictionRevealed,
 } from "@/modules/gepeto/lib/match-state";
@@ -43,7 +42,6 @@ export function GepetoMatchClient({ matchId, match: initialMatch }: GepetoMatchC
 
   const hasResult = hasFinalScore(match);
   const isRevealed = isPredictionRevealed(match);
-  const canPredict = canRecordUserPrediction(match);
 
   const showVerdict =
     hasResult &&
@@ -125,50 +123,37 @@ export function GepetoMatchClient({ matchId, match: initialMatch }: GepetoMatchC
         />
       )}
 
-      {/* AI Prediction Card */}
-      {aiPrediction ? (
-        <AICard
-          homeTeam={match.homeTeamName}
-          awayTeam={match.awayTeamName}
-          prediction={aiPrediction.prediction}
-          exactScore={aiPrediction.exactScore}
-          confidence={aiPrediction.confidence}
-          reasoning={aiPrediction.reasoning}
-          trashTalk={aiPrediction.trashTalk}
-          hasBadge={userPrediction?.hasBadge}
-          matchId={matchId}
-          isRevealed={isRevealed}
-        />
-      ) : (
-        <Card className="p-6 text-center border-slate-700">
-          <p className="text-muted-foreground">
-            Gepeto ainda não analisou este jogo.
-          </p>
-        </Card>
-      )}
+      <PredictionForm
+        matchId={matchId}
+        homeTeam={match.homeTeamName}
+        awayTeam={match.awayTeamName}
+        kickoffAt={match.kickoffAt}
+        homeScore={match.homeScore}
+        awayScore={match.awayScore}
+        existingPrediction={
+          userPrediction
+            ? {
+                prediction: userPrediction.prediction,
+                exactScore: userPrediction.exactScore,
+              }
+            : undefined
+        }
+      />
 
-      {/* User prediction form */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3">
-          {canPredict ? "Faça seu palpite" : "Seu palpite"}
-        </h2>
-        <PredictionForm
-          matchId={matchId}
-          homeTeam={match.homeTeamName}
-          awayTeam={match.awayTeamName}
-          kickoffAt={match.kickoffAt}
-          homeScore={match.homeScore}
-          awayScore={match.awayScore}
-          existingPrediction={
-            userPrediction
-              ? {
-                  prediction: userPrediction.prediction,
-                  exactScore: userPrediction.exactScore,
-                }
-              : undefined
-          }
-        />
-      </div>
+      <GepetoPredictionPanel
+        matchId={matchId}
+        homeTeam={match.homeTeamName}
+        awayTeam={match.awayTeamName}
+        isRevealed={isRevealed}
+        hasPrediction={!!aiPrediction}
+        hasUserPrediction={!!userPrediction}
+        prediction={aiPrediction?.prediction ?? null}
+        exactScore={aiPrediction?.exactScore ?? null}
+        confidence={aiPrediction?.confidence}
+        reasoning={aiPrediction?.reasoning ?? []}
+        trashTalk={aiPrediction?.trashTalk}
+        generatedAt={aiPrediction?.generatedAt}
+      />
 
       {/* Community predictions bar */}
       {communityTotal > 0 && (

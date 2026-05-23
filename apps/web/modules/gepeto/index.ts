@@ -6,6 +6,8 @@ export { AIBadge } from "./ui/components/ai-badge";
 export { ConfidenceMeter } from "./ui/components/confidence-meter";
 export { ReasoningCard } from "./ui/components/reasoning-card";
 export { PredictionForm } from "./ui/components/prediction-form";
+export { ScoreStepper } from "./ui/components/score-stepper";
+export { GepetoPredictionPanel } from "./ui/components/gepeto-prediction-panel";
 
 // Match experience components
 export { VerdictBanner } from "./ui/components/verdict-banner";

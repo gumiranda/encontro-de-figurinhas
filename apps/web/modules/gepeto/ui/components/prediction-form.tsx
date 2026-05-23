@@ -5,15 +5,14 @@ import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
 import { Card } from "@workspace/ui/components/card";
-import { cn } from "@workspace/ui/lib/utils";
 import { toast } from "sonner";
-import { Target } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import {
   canRecordUserPrediction,
   getPredictionLockReason,
 } from "../../lib/match-state";
+import { ScoreStepper } from "./score-stepper";
 
 type Prediction = "home" | "draw" | "away";
 
@@ -31,6 +30,12 @@ interface PredictionFormProps {
   onSuccess?: () => void;
 }
 
+function derivePrediction(home: number, away: number): Prediction {
+  if (home > away) return "home";
+  if (away > home) return "away";
+  return "draw";
+}
+
 export function PredictionForm({
   matchId,
   homeTeam,
@@ -42,14 +47,11 @@ export function PredictionForm({
   onSuccess,
 }: PredictionFormProps) {
   const recordPrediction = useMutation(api.gepeto.recordUserPrediction);
-  const [prediction, setPrediction] = useState<Prediction | null>(
-    existingPrediction?.prediction ?? null
-  );
   const [homeScore, setHomeScore] = useState(
-    existingPrediction?.exactScore?.home ?? 0
+    existingPrediction?.exactScore?.home ?? 0,
   );
   const [awayScore, setAwayScore] = useState(
-    existingPrediction?.exactScore?.away ?? 0
+    existingPrediction?.exactScore?.away ?? 0,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,15 +62,11 @@ export function PredictionForm({
   };
   const canPredict = canRecordUserPrediction(match);
   const lockReason = getPredictionLockReason(match);
+  const prediction = derivePrediction(homeScore, awayScore);
 
   const handleSubmit = async () => {
     if (!canPredict) {
       toast.error(lockReason ?? "Palpites fechados.");
-      return;
-    }
-
-    if (!prediction) {
-      toast.error("Selecione um palpite");
       return;
     }
 
@@ -88,74 +86,62 @@ export function PredictionForm({
     }
   };
 
-  if (!canPredict) {
-    return (
-      <Card className="p-4 bg-muted/50">
-        <p className="text-sm text-muted-foreground text-center">
-          🔒 {lockReason}
-        </p>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="p-4 space-y-4">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Target className="h-4 w-4 text-primary" />
-        <span>Seu palpite</span>
+    <Card className="overflow-hidden rounded-xl border-border bg-card">
+      <div className="flex items-center gap-2 px-4 pt-4">
+        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
+          <User className="size-4 text-primary" />
+        </div>
+        <span className="font-medium">Seu palpite</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        <Button
-          variant={prediction === "home" ? "default" : "outline"}
-          className={cn(prediction === "home" && "ring-2 ring-primary")}
-          onClick={() => setPrediction("home")}
-        >
-          {homeTeam}
-        </Button>
-        <Button
-          variant={prediction === "draw" ? "default" : "outline"}
-          className={cn(prediction === "draw" && "ring-2 ring-primary")}
-          onClick={() => setPrediction("draw")}
-        >
-          Empate
-        </Button>
-        <Button
-          variant={prediction === "away" ? "default" : "outline"}
-          className={cn(prediction === "away" && "ring-2 ring-primary")}
-          onClick={() => setPrediction("away")}
-        >
-          {awayTeam}
-        </Button>
-      </div>
-
-      <div className="flex items-center justify-center gap-2">
-        <Input
-          type="number"
-          min={0}
-          max={20}
-          className="w-16 text-center"
+      <div className="flex items-center justify-center gap-5 px-4 py-6">
+        <ScoreStepper
           value={homeScore}
-          onChange={(e) => setHomeScore(Math.max(0, parseInt(e.target.value) || 0))}
+          onChange={setHomeScore}
+          disabled={!canPredict}
         />
-        <span className="font-bold">x</span>
-        <Input
-          type="number"
-          min={0}
-          max={20}
-          className="w-16 text-center"
+        <span className="font-display text-3xl text-muted-foreground">×</span>
+        <ScoreStepper
           value={awayScore}
-          onChange={(e) => setAwayScore(Math.max(0, parseInt(e.target.value) || 0))}
+          onChange={setAwayScore}
+          disabled={!canPredict}
         />
       </div>
 
-      <Button
-        className="w-full"
-        onClick={handleSubmit}
-        disabled={isSubmitting || !prediction}
-      >
-        {isSubmitting ? "Salvando..." : existingPrediction ? "Atualizar palpite" : "Registrar palpite"}
-      </Button>
+      <div className="px-4 pb-4">
+        {canPredict ? (
+          <Button
+            className="h-12 w-full gap-2 text-base font-semibold"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            <Lock className="size-4" />
+            {isSubmitting
+              ? "Salvando..."
+              : existingPrediction
+                ? "Atualizar e enfrentar o Gepeto"
+                : "Confirmar e enfrentar o Gepeto"}
+          </Button>
+        ) : (
+          <div className="rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-center text-sm text-muted-foreground">
+            🔒 {lockReason}
+          </div>
+        )}
+      </div>
+
+      {!canPredict && existingPrediction?.exactScore ? (
+        <p className="px-4 pb-4 text-center text-xs text-muted-foreground">
+          Você palpitou {existingPrediction.exactScore.home} ×{" "}
+          {existingPrediction.exactScore.away} (
+          {existingPrediction.prediction === "home"
+            ? homeTeam
+            : existingPrediction.prediction === "away"
+              ? awayTeam
+              : "Empate"}
+          )
+        </p>
+      ) : null}
     </Card>
   );
 }

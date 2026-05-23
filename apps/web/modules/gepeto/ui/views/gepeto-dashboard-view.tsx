@@ -37,10 +37,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   CommunityBar,
-  ConfidenceMeter,
   GepetoAvatar,
+  GepetoPredictionPanel,
+  MatchHeader,
   PredictionForm,
-  ReasoningCard,
   StreakStrip,
   VerdictBanner,
 } from "@/modules/gepeto";
@@ -1217,30 +1217,60 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
     return <div className="h-80 animate-pulse rounded-xl bg-muted" />;
   }
 
-  const { match, aiPrediction, userPrediction, community, result } = data;
+  const { match, round, aiPrediction, userPrediction, community, result } = data;
   const total = Math.max(community.total, 1);
   const hasResult = hasFinalScore(match);
   const gepetoRevealed = isPredictionRevealed(match);
   const userExactScore = userPrediction?.exactScore ?? null;
   const gepetoExactScore = aiPrediction?.exactScore ?? null;
+  const matchHeaderState = hasResult ? "postMatch" : gepetoRevealed ? "live" : "preMatch";
+
+  const getTimeToKickoff = () => {
+    const diff = match.kickoffAt - Date.now();
+    if (diff <= 0) return "Agora";
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+    return `${hours}h ${minutes}min`;
+  };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button asChild variant="outline">
-          <Link href="/dashboard/gepeto?tab=jogos">Voltar aos jogos</Link>
-        </Button>
-        <Badge variant="secondary" className="rounded-full">
-          {matchState(match)}
-        </Badge>
-      </div>
+    <div className="mx-auto max-w-lg space-y-4">
+      <Button asChild variant="ghost" size="sm" className="-ml-2 gap-2 px-2">
+        <Link href="/dashboard/gepeto?tab=jogos">
+          <ArrowLeft className="size-4" />
+          Todos os jogos
+        </Link>
+      </Button>
 
-      <section className="rounded-xl border border-border bg-card p-5 md:p-7">
-        <MatchScore match={match} />
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          {dateFormatter.format(match.kickoffAt)} {match.venue ? `· ${match.venue}` : ""}
-        </div>
-      </section>
+      <MatchHeader
+        homeTeam={{
+          name: match.homeTeamName,
+          code: match.homeTeamName.slice(0, 3).toUpperCase(),
+          flag: match.homeTeamFlag,
+        }}
+        awayTeam={{
+          name: match.awayTeamName,
+          code: match.awayTeamName.slice(0, 3).toUpperCase(),
+          flag: match.awayTeamFlag,
+        }}
+        phase={round?.name ?? "Copa 2026"}
+        date={new Date(match.kickoffAt).toLocaleDateString("pt-BR", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+        stadium={match.venue}
+        state={matchHeaderState}
+        timeToKickoff={getTimeToKickoff()}
+        finalScore={
+          hasResult
+            ? { home: match.homeScore ?? 0, away: match.awayScore ?? 0 }
+            : undefined
+        }
+      />
 
       {hasResult && userExactScore && gepetoExactScore ? (
         <VerdictBanner
@@ -1250,87 +1280,70 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
         />
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5">
-          <PredictionForm
-            matchId={match._id}
-            homeTeam={match.homeTeamName}
-            awayTeam={match.awayTeamName}
-            kickoffAt={match.kickoffAt}
-            homeScore={match.homeScore}
-            awayScore={match.awayScore}
-            existingPrediction={
-              userPrediction?.prediction
-                ? {
-                    prediction: userPrediction.prediction,
-                    exactScore: userPrediction.exactScore,
-                  }
-                : undefined
-            }
-          />
-          <CommunityBar
-            homeFlag={match.homeTeamFlag}
-            awayFlag={match.awayTeamFlag}
-            homePercent={toPercent(community.counts.home, total)}
-            drawPercent={toPercent(community.counts.draw, total)}
-            awayPercent={toPercent(community.counts.away, total)}
-            totalPredictions={community.total}
-          />
-        </div>
+      <PredictionForm
+        matchId={match._id}
+        homeTeam={match.homeTeamName}
+        awayTeam={match.awayTeamName}
+        kickoffAt={match.kickoffAt}
+        homeScore={match.homeScore}
+        awayScore={match.awayScore}
+        existingPrediction={
+          userPrediction?.prediction
+            ? {
+                prediction: userPrediction.prediction,
+                exactScore: userPrediction.exactScore,
+              }
+            : undefined
+        }
+      />
 
-        <div className="space-y-5">
-          <Card className="p-5">
-            <div className="flex items-center gap-3">
-              <GepetoAvatar size={64} mood={aiPrediction?.prediction ? "smug" : "thinking"} />
-              <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                  Palpite do Gepeto
-                </p>
-                <h2 className="font-display text-2xl font-black">
-                  {gepetoRevealed && aiPrediction?.prediction
-                    ? choiceLabel(match, aiPrediction.prediction)
-                    : "Lacrado até começar"}
-                </h2>
+      <GepetoPredictionPanel
+        matchId={match._id}
+        homeTeam={match.homeTeamName}
+        awayTeam={match.awayTeamName}
+        isRevealed={gepetoRevealed}
+        hasPrediction={!!aiPrediction}
+        hasUserPrediction={!!userPrediction}
+        prediction={aiPrediction?.prediction ?? null}
+        exactScore={aiPrediction?.exactScore ?? null}
+        confidence={aiPrediction?.confidence}
+        reasoning={aiPrediction?.reasoning ?? []}
+        trashTalk={aiPrediction?.trashTalk}
+        generatedAt={aiPrediction?.generatedAt}
+      />
+
+      {community.total > 0 ? (
+        <CommunityBar
+          homeFlag={match.homeTeamFlag}
+          awayFlag={match.awayTeamFlag}
+          homePercent={toPercent(community.counts.home, total)}
+          drawPercent={toPercent(community.counts.draw, total)}
+          awayPercent={toPercent(community.counts.away, total)}
+          totalPredictions={community.total}
+        />
+      ) : null}
+
+      {result ? (
+        <Card className={cn("p-5", result.outcome === "win" && "border-emerald-400/60 bg-emerald-400/5")}>
+          <div className="flex items-center gap-3">
+            <Trophy className="size-6 text-primary" />
+            <div>
+              <div className="font-display text-xl font-bold">
+                {result.outcome === "win"
+                  ? "Badge conquistado"
+                  : result.outcome === "tie"
+                    ? "Empate técnico"
+                    : "Gepeto levou essa"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {userPrediction?.hasBadge
+                  ? "Seu distintivo já está registrado."
+                  : "O resultado entra após o placar final."}
               </div>
             </div>
-            {gepetoRevealed && aiPrediction?.confidence ? (
-              <div className="mt-5">
-                <ConfidenceMeter value={aiPrediction.confidence} />
-              </div>
-            ) : null}
-            {gepetoRevealed && aiPrediction?.reasoning?.length ? (
-              <div className="mt-5">
-                <ReasoningCard reasoning={aiPrediction.reasoning} />
-              </div>
-            ) : (
-              <p className="mt-5 text-sm text-muted-foreground">
-                {gepetoRevealed
-                  ? "Gepeto ainda não analisou este jogo."
-                  : "Gepeto já decidiu, mas o placar fica escondido até o jogo abrir."}
-              </p>
-            )}
-          </Card>
-          <Card className={cn("p-5", result?.outcome === "win" && "border-emerald-400/60 bg-emerald-400/5")}>
-            <div className="flex items-center gap-3">
-              <Trophy className="size-6 text-primary" />
-              <div>
-                <div className="font-display text-xl font-bold">
-                  {result?.outcome === "win"
-                    ? "Badge conquistado"
-                    : result?.outcome === "tie"
-                      ? "Empate técnico"
-                      : result
-                        ? "Gepeto levou essa"
-                        : "Aguardando veredito"}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {userPrediction?.hasBadge ? "Seu distintivo já está registrado." : "O resultado entra após o placar final."}
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+          </div>
+        </Card>
+      ) : null}
     </div>
   );
 }
