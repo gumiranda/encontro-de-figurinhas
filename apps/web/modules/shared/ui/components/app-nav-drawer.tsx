@@ -86,7 +86,22 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             href: "/cadastrar-figurinhas/quick",
             icon: ListPlus,
           },
-
+          {
+            label: "Jogo Mais Chato",
+            href: "/jogo-mais-chato",
+            icon: Trophy,
+          },
+        ],
+      },
+      {
+        title: "Meus dados",
+        items: [
+          { label: "Perfil", href: "/perfil", icon: User },
+        ],
+      },
+      {
+        title: "Trocas",
+        items: [
           { label: "Encontrar trocas", href: "/matches", icon: ArrowLeftRight },
           {
             label: "Propostas",
@@ -95,12 +110,6 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             badgeCount: pendingProposalsCount,
           },
           { label: "Mapa da arena", href: "/map", icon: MapIcon },
-        ],
-      },
-      {
-        title: "Meus dados",
-        items: [
-          { label: "Perfil", href: "/perfil", icon: User },
           { label: "Meus pontos", href: "/meus-pontos", icon: MapPin },
           {
             label: "Sugerir ponto",
@@ -120,11 +129,6 @@ export function useAppNavGroups(): RenderedNavGroup[] {
                   icon: ShieldCheck,
                 },
                 { label: "Gepeto", href: "/admin/matches", icon: Bot },
-                {
-                  label: "Jogo Mais Chato",
-                  href: "/admin/jogo-mais-chato",
-                  icon: Trophy,
-                },
                 { label: "Usuários", href: "/admin/users", icon: UserCog },
                 { label: "Blog", href: "/admin/blog", icon: BookOpen },
               ],
@@ -155,8 +159,8 @@ export function AppSidebarContent({
   onNavigate,
 }: SidebarContentProps) {
   return (
-    <>
-      <div className="flex items-center gap-2 px-6 py-5">
+    <div className="flex h-full flex-col">
+      <div className="flex shrink-0 items-center gap-2 px-6 py-5">
         <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground font-headline text-sm font-black">
           FF
         </div>
@@ -164,7 +168,7 @@ export function AppSidebarContent({
           figurinha<span className="text-[#87d400]">fácil</span>
         </span>
       </div>
-      <nav className="space-y-6 px-4">
+      <nav className="flex-1 space-y-6 overflow-y-auto px-4 pb-6">
         {groups.map((group, groupIndex) => (
           <div key={group.title || `group-${groupIndex}`} className="space-y-1">
             {group.title && (
@@ -234,7 +238,7 @@ export function AppSidebarContent({
           </div>
         ))}
       </nav>
-    </>
+    </div>
   );
 }
 

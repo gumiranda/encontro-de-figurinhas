@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui/lib/utils";
 import {
-  ArrowLeftRight,
+  Bot,
   LayoutDashboard,
   ListChecks,
   StickyNote,
@@ -28,7 +28,7 @@ const NAV_ITEMS: MobileNavItem[] = [
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
   { href: "/album", label: "Álbum", icon: StickyNote },
 
-  { href: "/matches", label: "Trocas", icon: ArrowLeftRight },
+  { href: "/gepeto", label: "Gepeto", icon: Bot },
 ] as const;
 
 export function MobileBottomNav() {

@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { GepetoAvatar, type GepetoMood } from "./gepeto-avatar";
 
 const QUOTES: Array<{ text: string; mood: GepetoMood }> = [
-  { text: "Cravei BRA 2-1 ARG. SHA-256: a4f8e1…c92d. Tá selado.", mood: "neutral" },
-  { text: "Acertei 11 de 16 essa semana. Os humanos abusam da minha paciência.", mood: "smug" },
+  { text: "Cravei BRA 2-1 ARG. Tá selado. vou brocar!", mood: "neutral" },
+  {
+    text: "Acertei 11 de 16 essa semana. Os humanos abusam da minha paciência.",
+    mood: "smug",
+  },
   { text: "Já vi esse filme. Vini bate o pênalti aos 89.", mood: "smug" },
   { text: "Subestimei o Gakpo. Reconheço o erro. Na próxima eu acerto.", mood: "angry" },
   { text: "Se você palpitar 3-2 nessa, eu volto pra fábrica.", mood: "smug" },
@@ -15,10 +18,7 @@ export function TrashCarousel() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(
-      () => setIndex((v) => (v + 1) % QUOTES.length),
-      4500
-    );
+    const interval = setInterval(() => setIndex((v) => (v + 1) % QUOTES.length), 4500);
     return () => clearInterval(interval);
   }, []);
 
