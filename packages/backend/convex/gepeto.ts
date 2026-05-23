@@ -26,6 +26,22 @@ function getMatchResult(homeScore: number, awayScore: number): "home" | "draw" |
   return "draw";
 }
 
+function hasFinalScore(match: Pick<Doc<"worldCupMatches">, "homeScore" | "awayScore">) {
+  return match.homeScore !== undefined && match.awayScore !== undefined;
+}
+
+function isPredictionRevealed(
+  match: Pick<Doc<"worldCupMatches">, "kickoffAt" | "homeScore" | "awayScore">,
+) {
+  return match.kickoffAt <= Date.now() || hasFinalScore(match);
+}
+
+function canRecordUserPrediction(
+  match: Pick<Doc<"worldCupMatches">, "kickoffAt" | "homeScore" | "awayScore">,
+) {
+  return match.kickoffAt > Date.now() && !hasFinalScore(match);
+}
+
 type AiOutcome = "win" | "loss" | "tie";
 
 const predictionResponseSchema = z.object({
@@ -381,7 +397,7 @@ export const getUserPrediction = query({
 
     if (!prediction) return null;
 
-    const isRevealed = match.kickoffAt <= Date.now();
+    const isRevealed = isPredictionRevealed(match);
     const badge = await ctx.db
       .query("userAiBadges")
       .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
@@ -460,7 +476,10 @@ export const getDashboardHub = query({
     return {
       user: publicUserSnapshot(user),
       nextMatch,
-      aiPrediction: maskAiPrediction(aiPrediction, nextMatch ? nextMatch.kickoffAt <= Date.now() : false),
+      aiPrediction: maskAiPrediction(
+        aiPrediction,
+        nextMatch ? isPredictionRevealed(nextMatch) : false,
+      ),
       userPrediction,
       stats: stats ?? {
         userId: user._id,
@@ -510,7 +529,7 @@ export const listDashboardFixtures = query({
 
             return {
               ...match,
-              aiPrediction: maskAiPrediction(aiPrediction, match.kickoffAt <= Date.now()),
+              aiPrediction: maskAiPrediction(aiPrediction, isPredictionRevealed(match)),
               userPrediction: userPredictionByMatch.get(match._id) ?? null,
               communityCount: predictionCount.length,
             };
@@ -569,12 +588,12 @@ export const getDashboardMatch = query({
     return {
       match,
       round,
-      aiPrediction: maskAiPrediction(aiPrediction, match.kickoffAt <= Date.now()),
+      aiPrediction: maskAiPrediction(aiPrediction, isPredictionRevealed(match)),
       userPrediction: userPrediction
         ? {
             ...userPrediction,
-            exactScore: match.kickoffAt <= Date.now() ? userPrediction.exactScore : null,
-            isRevealed: match.kickoffAt <= Date.now(),
+            exactScore: isPredictionRevealed(match) ? userPrediction.exactScore : null,
+            isRevealed: isPredictionRevealed(match),
             hasBadge: !!badge,
           }
         : null,
@@ -734,8 +753,12 @@ export const recordUserPrediction = mutation({
     const match = await ctx.db.get(matchId);
 
     if (!match) throw new ConvexError("Jogo não encontrado");
-    if (match.kickoffAt <= Date.now()) {
-      throw new ConvexError("Jogo já começou. Palpites fechados.");
+    if (!canRecordUserPrediction(match)) {
+      throw new ConvexError(
+        hasFinalScore(match)
+          ? "Placar final definido. Palpites fechados."
+          : "Jogo já começou. Palpites fechados.",
+      );
     }
 
     // Validate exactScore bounds

@@ -11,6 +11,11 @@ import {
   StreakStrip,
   MatchHeader,
 } from "@/modules/gepeto";
+import {
+  canRecordUserPrediction,
+  hasFinalScore,
+  isPredictionRevealed,
+} from "@/modules/gepeto/lib/match-state";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Card } from "@workspace/ui/components/card";
 
@@ -19,14 +24,9 @@ interface GepetoMatchClientProps {
   match: Doc<"worldCupMatches">;
 }
 
-export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
+export function GepetoMatchClient({ matchId, match: initialMatch }: GepetoMatchClientProps) {
   const matchDetail = useQuery(api.gepeto.getDashboardMatch, { matchId });
   const userStats = useQuery(api.gepeto.getDashboardHub);
-
-  const isRevealed = match.kickoffAt <= Date.now();
-  const isFinished = match.status === "finished";
-  const hasResult =
-    match.homeScore !== undefined && match.awayScore !== undefined;
 
   if (matchDetail === undefined) {
     return (
@@ -38,10 +38,14 @@ export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
     );
   }
 
+  const match = matchDetail.match ?? initialMatch;
   const { aiPrediction, userPrediction, community } = matchDetail;
 
+  const hasResult = hasFinalScore(match);
+  const isRevealed = isPredictionRevealed(match);
+  const canPredict = canRecordUserPrediction(match);
+
   const showVerdict =
-    isFinished &&
     hasResult &&
     userPrediction?.exactScore &&
     aiPrediction?.exactScore;
@@ -61,7 +65,7 @@ export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
   const streakDays = buildStreakDays(userStats?.stats);
 
   // Determine match state
-  const matchState = isFinished ? "postMatch" : isRevealed ? "live" : "preMatch";
+  const matchState = hasResult ? "postMatch" : isRevealed ? "live" : "preMatch";
 
   // Calculate time to kickoff
   const getTimeToKickoff = () => {
@@ -144,25 +148,27 @@ export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
       )}
 
       {/* User prediction form */}
-      {!isFinished && (
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Faça seu palpite</h2>
-          <PredictionForm
-            matchId={matchId}
-            homeTeam={match.homeTeamName}
-            awayTeam={match.awayTeamName}
-            kickoffAt={match.kickoffAt}
-            existingPrediction={
-              userPrediction
-                ? {
-                    prediction: userPrediction.prediction,
-                    exactScore: userPrediction.exactScore,
-                  }
-                : undefined
-            }
-          />
-        </div>
-      )}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">
+          {canPredict ? "Faça seu palpite" : "Seu palpite"}
+        </h2>
+        <PredictionForm
+          matchId={matchId}
+          homeTeam={match.homeTeamName}
+          awayTeam={match.awayTeamName}
+          kickoffAt={match.kickoffAt}
+          homeScore={match.homeScore}
+          awayScore={match.awayScore}
+          existingPrediction={
+            userPrediction
+              ? {
+                  prediction: userPrediction.prediction,
+                  exactScore: userPrediction.exactScore,
+                }
+              : undefined
+          }
+        />
+      </div>
 
       {/* Community predictions bar */}
       {communityTotal > 0 && (
@@ -185,7 +191,7 @@ export function GepetoMatchClient({ matchId, match }: GepetoMatchClientProps) {
       )}
 
       {/* Final result display (when no verdict banner) */}
-      {isFinished && hasResult && !showVerdict && (
+      {hasResult && !showVerdict && (
         <Card className="p-4 text-center border-slate-700">
           <p className="text-sm text-muted-foreground mb-1">Resultado final</p>
           <p className="text-2xl font-bold">

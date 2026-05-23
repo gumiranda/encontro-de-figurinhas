@@ -44,6 +44,7 @@ import {
   StreakStrip,
   VerdictBanner,
 } from "@/modules/gepeto";
+import { hasFinalScore, isPredictionRevealed } from "@/modules/gepeto/lib/match-state";
 
 type Choice = "home" | "draw" | "away";
 type TabKey = "hub" | "jogos" | "boloes" | "capitulo" | "ranking";
@@ -1218,7 +1219,8 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
 
   const { match, aiPrediction, userPrediction, community, result } = data;
   const total = Math.max(community.total, 1);
-  const isFinished = match.status === "finished" && match.homeScore !== undefined && match.awayScore !== undefined;
+  const hasResult = hasFinalScore(match);
+  const gepetoRevealed = isPredictionRevealed(match);
   const userExactScore = userPrediction?.exactScore ?? null;
   const gepetoExactScore = aiPrediction?.exactScore ?? null;
 
@@ -1240,7 +1242,7 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
         </div>
       </section>
 
-      {isFinished && userExactScore && gepetoExactScore ? (
+      {hasResult && userExactScore && gepetoExactScore ? (
         <VerdictBanner
           userPrediction={userExactScore}
           gepetoPrediction={gepetoExactScore}
@@ -1255,6 +1257,8 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
             homeTeam={match.homeTeamName}
             awayTeam={match.awayTeamName}
             kickoffAt={match.kickoffAt}
+            homeScore={match.homeScore}
+            awayScore={match.awayScore}
             existingPrediction={
               userPrediction?.prediction
                 ? {
@@ -1283,22 +1287,26 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
                   Palpite do Gepeto
                 </p>
                 <h2 className="font-display text-2xl font-black">
-                  {aiPrediction?.prediction ? choiceLabel(match, aiPrediction.prediction) : "Lacrado até começar"}
+                  {gepetoRevealed && aiPrediction?.prediction
+                    ? choiceLabel(match, aiPrediction.prediction)
+                    : "Lacrado até começar"}
                 </h2>
               </div>
             </div>
-            {aiPrediction?.confidence ? (
+            {gepetoRevealed && aiPrediction?.confidence ? (
               <div className="mt-5">
                 <ConfidenceMeter value={aiPrediction.confidence} />
               </div>
             ) : null}
-            {aiPrediction?.reasoning?.length ? (
+            {gepetoRevealed && aiPrediction?.reasoning?.length ? (
               <div className="mt-5">
                 <ReasoningCard reasoning={aiPrediction.reasoning} />
               </div>
             ) : (
               <p className="mt-5 text-sm text-muted-foreground">
-                Gepeto já decidiu, mas o placar fica escondido até o jogo abrir.
+                {gepetoRevealed
+                  ? "Gepeto ainda não analisou este jogo."
+                  : "Gepeto já decidiu, mas o placar fica escondido até o jogo abrir."}
               </p>
             )}
           </Card>

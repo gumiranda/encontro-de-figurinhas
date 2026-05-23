@@ -10,6 +10,10 @@ import { Card } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 import { toast } from "sonner";
 import { Target } from "lucide-react";
+import {
+  canRecordUserPrediction,
+  getPredictionLockReason,
+} from "../../lib/match-state";
 
 type Prediction = "home" | "draw" | "away";
 
@@ -18,6 +22,8 @@ interface PredictionFormProps {
   homeTeam: string;
   awayTeam: string;
   kickoffAt: number;
+  homeScore?: number;
+  awayScore?: number;
   existingPrediction?: {
     prediction: Prediction;
     exactScore?: { home: number; away: number } | null;
@@ -30,6 +36,8 @@ export function PredictionForm({
   homeTeam,
   awayTeam,
   kickoffAt,
+  homeScore: matchHomeScore,
+  awayScore: matchAwayScore,
   existingPrediction,
   onSuccess,
 }: PredictionFormProps) {
@@ -45,9 +53,20 @@ export function PredictionForm({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isLocked = kickoffAt <= Date.now();
+  const match = {
+    kickoffAt,
+    homeScore: matchHomeScore,
+    awayScore: matchAwayScore,
+  };
+  const canPredict = canRecordUserPrediction(match);
+  const lockReason = getPredictionLockReason(match);
 
   const handleSubmit = async () => {
+    if (!canPredict) {
+      toast.error(lockReason ?? "Palpites fechados.");
+      return;
+    }
+
     if (!prediction) {
       toast.error("Selecione um palpite");
       return;
@@ -69,11 +88,11 @@ export function PredictionForm({
     }
   };
 
-  if (isLocked) {
+  if (!canPredict) {
     return (
       <Card className="p-4 bg-muted/50">
         <p className="text-sm text-muted-foreground text-center">
-          🔒 Palpites fechados - jogo em andamento
+          🔒 {lockReason}
         </p>
       </Card>
     );
