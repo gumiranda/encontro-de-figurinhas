@@ -74,7 +74,7 @@ const secondaryShortcuts = [
   {
     href: "/cadastrar-figurinhas/troca",
     icon: ArrowLeftRight,
-    title: "Trocas",
+    title: "Modo troca",
   },
   {
     href: "/comunidade",
@@ -396,16 +396,19 @@ export default function DashboardPage() {
             <Link href="/cadastrar-figurinhas/troca" className="group block">
               <Card className="h-full overflow-hidden border-secondary/45 bg-[radial-gradient(circle_at_68%_26%,color-mix(in_srgb,var(--secondary)_22%,transparent),transparent_40%),var(--surface-container-low)] py-0 shadow-none transition duration-200 ease-out group-hover:-translate-y-0.5">
                 <CardContent className="flex h-full min-h-80 flex-col justify-between p-7">
-                  <div className="flex items-start justify-between">
-                    <div className="font-mono text-[0.7rem] font-bold uppercase tracking-[0.32em] text-secondary">
-                      Repetidas
-                    </div>
-                    <ArrowUpRight className="size-6 text-secondary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="flex items-start justify-between gap-3">
+                    <Badge className="rounded-full border-secondary/40 bg-secondary/15 px-3 py-1 font-mono text-[0.68rem] font-bold uppercase tracking-[0.28em] text-secondary">
+                      Modo troca
+                    </Badge>
+                    <ArrowUpRight className="size-6 shrink-0 text-secondary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                   <div>
                     <div className="font-[var(--font-headline)] text-8xl font-bold leading-none text-secondary">
                       {duplicatesCount}
                     </div>
+                    <p className="mt-2 font-mono text-sm font-bold uppercase tracking-[0.22em] text-on-surface-variant">
+                      repetidas cadastradas
+                    </p>
                     <div className="mt-8 flex -space-x-5 pl-2">
                       {sampleDuplicates.map((sticker) => (
                         <StickerPreview key={sticker.code} {...sticker} />
@@ -414,7 +417,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2 font-[var(--font-headline)] text-2xl font-bold text-secondary">
                     <ArrowLeftRight className="size-6" />
-                    Pronto pra trocar
+                    Abrir modo troca
                   </div>
                 </CardContent>
               </Card>
