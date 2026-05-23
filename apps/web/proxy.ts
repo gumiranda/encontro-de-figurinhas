@@ -46,6 +46,7 @@ const isPublicRoute = createRouteMatcher([
   "/comparativos(.*)",
   "/ponto/id(.*)",
   "/pontos",
+  "/gepeto(.*)",
   // /ponto/[slug] público (SEO) exceto /ponto/solicitar (autenticado)
   /^\/ponto\/(?!solicitar(?:\/|$))[^/]+(?:\/.*)?$/,
 ]);
@@ -101,7 +102,7 @@ export const config = {
     // Autenticado: precisa passar pelo Clerk (auth() em server components).
     "/ponto/solicitar/:path*",
     // Excluir rotas públicas ISR (sem auth needs) + assets + endpoints metadata.
-    "/((?!_next|ponto|pontos-de-troca-figurinhas-copa-2026|comparativos|cidade|blog|sobre|como-funciona|termos|privacidade|contato|album-copa-do-mundo-2026|sitemap|robots|favicon|apple-icon|opengraph-image|twitter-image|icon|manifest\\.webmanifest|api/revalidate|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|ponto|pontos-de-troca-figurinhas-copa-2026|comparativos|cidade|blog|gepeto|sobre|como-funciona|termos|privacidade|contato|album-copa-do-mundo-2026|sitemap|robots|favicon|apple-icon|opengraph-image|twitter-image|icon|manifest\\.webmanifest|api/revalidate|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // API/trpc mantêm middleware Clerk, exceto /api/revalidate (secret-based).
     "/(api(?!/revalidate)|trpc)(.*)",
   ],

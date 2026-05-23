@@ -18,6 +18,7 @@ interface StickerTileProps {
   dupCount?: number;
   blockedReason?: string;
   displayLabel?: string; // Override for EXT stickers: "LM", "JD", etc.
+  displayCode?: string;
   playerName?: string;   // For tooltip
   shortName?: string;    // Short name to display inside card
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
@@ -49,13 +50,15 @@ function StickerTileBase({
   dupCount,
   blockedReason = "Já está na outra lista. Remova de lá primeiro.",
   displayLabel,
+  displayCode,
   playerName,
   shortName,
   onClick,
 }: StickerTileProps) {
   const isBlocked = state === "blocked";
   const relLabel = relativeNum === 0 ? "00" : String(relativeNum);
-  const label = displayLabel ?? relLabel;
+  const fullCode = displayCode ?? `${sectionCode}-${relLabel}`;
+  const label = displayLabel ?? fullCode;
 
   const stateLabel = STATE_LABELS[state];
   const button = (
@@ -65,14 +68,16 @@ function StickerTileBase({
       data-state={state}
       onClick={onClick}
       aria-pressed={state === "have" || state === "need" || undefined}
-      aria-label={`Figurinha ${playerName ?? `${sectionCode}-${relLabel}`}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
+      aria-label={`Figurinha ${playerName ?? fullCode} ${fullCode}, ${stateLabel}${dupCount && dupCount > 1 ? `, ${dupCount} repetidas` : ""}`}
       title={playerName}
       className={cn(
         "sticker-spring relative flex aspect-[3/4] w-full flex-col items-center justify-center rounded-lg border font-mono text-[10px] font-bold",
         STATE_CLASSES[state]
       )}
     >
-      <span>{label}</span>
+      <span className="max-w-full break-words px-0.5 text-center leading-tight">
+        {label}
+      </span>
       {shortName && (
         <span className="mt-0.5 max-w-full truncate px-0.5 text-[9px] font-medium opacity-80">
           {shortName}

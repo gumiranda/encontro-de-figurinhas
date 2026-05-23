@@ -9,10 +9,12 @@ import {
   internalQuery,
   mutation,
   type MutationCtx,
+  type QueryCtx,
   query,
 } from "./_generated/server";
 import { getAuthenticatedUser, requireAdmin, requireAuth } from "./lib/auth";
 import { rateLimiter } from "./lib/rateLimiter";
+import { sanitizeUserInput } from "./lib/sanitize";
 import { Role } from "./lib/types";
 import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
 
@@ -91,6 +93,266 @@ function parsePredictionResponse(content: string): ParsedPredictionResponse {
   return predictionResponseSchema.parse(json);
 }
 
+type PredictionChoice = "home" | "draw" | "away";
+type GepetoPoolPrivacy = "private" | "city" | "open";
+
+const POOL_NAME_MAX = 36;
+const POOL_DESCRIPTION_MAX = 140;
+const POOL_COMMENT_MAX = 300;
+
+const poolPrivacyValidator = v.union(
+  v.literal("private"),
+  v.literal("city"),
+  v.literal("open"),
+);
+
+function publicUserSnapshot(user: Doc<"users">) {
+  return {
+    _id: user._id,
+    nickname: user.nickname ?? null,
+    displayNickname:
+      (user.displayNickname ?? user.nickname ?? user.name ?? "Colecionador").slice(0, 32),
+    avatarSeed: user._id,
+    cityId: user.cityId ?? null,
+  };
+}
+
+function sanitizeLimited(input: string | undefined, maxLength: number) {
+  const trimmed = (input ?? "").trim();
+  if (!trimmed) return undefined;
+  return sanitizeUserInput(trimmed).slice(0, maxLength);
+}
+
+function normalizeInviteCode(input: string) {
+  return input.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+}
+
+function makeInviteCode() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+async function buildUniqueInviteCode(ctx: MutationCtx) {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const code = makeInviteCode();
+    const existing = await ctx.db
+      .query("gepetoPools")
+      .withIndex("by_inviteCode", (q) => q.eq("inviteCode", code))
+      .unique();
+    if (!existing) return code;
+  }
+  throw new ConvexError("Não foi possível gerar convite");
+}
+
+function validatePoolInput(args: {
+  name: string;
+  emoji?: string;
+  color?: string;
+  privacy: GepetoPoolPrivacy;
+  knockoutMultiplier?: number;
+  finalMultiplier?: number;
+}) {
+  const name = args.name.trim();
+  if (name.length < 3 || name.length > POOL_NAME_MAX) {
+    throw new ConvexError("Nome do bolão deve ter entre 3 e 36 caracteres");
+  }
+  if ((args.emoji ?? "⚽").trim().length > 8) {
+    throw new ConvexError("Emoji inválido");
+  }
+  if (args.color && !/^#[0-9A-Fa-f]{6}$/.test(args.color)) {
+    throw new ConvexError("Cor inválida");
+  }
+  for (const value of [args.knockoutMultiplier ?? 2, args.finalMultiplier ?? 3]) {
+    if (!Number.isFinite(value) || value < 1 || value > 10) {
+      throw new ConvexError("Multiplicador inválido");
+    }
+  }
+}
+
+async function assertPoolMember(
+  ctx: QueryCtx | MutationCtx,
+  poolId: Id<"gepetoPools">,
+  userId: Id<"users">,
+) {
+  const membership = await ctx.db
+    .query("gepetoPoolMembers")
+    .withIndex("by_pool_user", (q) => q.eq("poolId", poolId).eq("userId", userId))
+    .unique();
+  if (!membership || !membership.isActive) {
+    throw new ConvexError("Você não participa deste bolão");
+  }
+  return membership;
+}
+
+function maskAiPrediction<T extends Doc<"aiPredictions"> | null>(
+  prediction: T,
+  isRevealed: boolean,
+) {
+  if (!prediction) return null;
+  if (isRevealed) return prediction;
+  return {
+    ...prediction,
+    prediction: null,
+    exactScore: null,
+    reasoning: [],
+    trashTalk: undefined,
+  };
+}
+
+async function getCurrentMatch(ctx: QueryCtx) {
+  const now = Date.now();
+  const matches = await ctx.db.query("worldCupMatches").collect();
+  if (matches.length === 0) return null;
+  const live = matches
+    .filter((match) => (match.status ?? "scheduled") === "live")
+    .sort((a, b) => a.kickoffAt - b.kickoffAt)[0];
+  if (live) return live;
+  const upcoming = matches
+    .filter((match) => match.kickoffAt >= now && (match.status ?? "scheduled") !== "finished")
+    .sort((a, b) => a.kickoffAt - b.kickoffAt)[0];
+  if (upcoming) return upcoming;
+  return matches.sort((a, b) => b.kickoffAt - a.kickoffAt)[0];
+}
+
+async function getPoolSummary(ctx: QueryCtx, membership: Doc<"gepetoPoolMembers">) {
+  const pool = await ctx.db.get(membership.poolId);
+  if (!pool) return null;
+  const members = await ctx.db
+    .query("gepetoPoolMembers")
+    .withIndex("by_pool", (q) => q.eq("poolId", pool._id))
+    .collect();
+  const activeMemberCount = members.filter((member) => member.isActive).length;
+  return { ...pool, membership, activeMemberCount };
+}
+
+async function getLeaderboardRows(ctx: QueryCtx, limit: number) {
+  const rows = await ctx.db.query("userAiStats").withIndex("by_wins").order("desc").take(limit);
+  return Promise.all(
+    rows.map(async (row, index) => {
+      const user = await ctx.db.get(row.userId);
+      return {
+        rank: index + 1,
+        ...row,
+        user: user ? publicUserSnapshot(user) : null,
+      };
+    }),
+  );
+}
+
+function getRoundMultiplier(
+  pool: Doc<"gepetoPools">,
+  round: Doc<"worldCupRounds"> | null,
+) {
+  const phase = `${round?.phase ?? ""} ${round?.name ?? ""}`.toLowerCase();
+  if (phase.includes("final")) return pool.finalMultiplier;
+  if (
+    phase.includes("oitava") ||
+    phase.includes("quarta") ||
+    phase.includes("semi") ||
+    phase.includes("mata") ||
+    phase.includes("knockout")
+  ) {
+    return pool.knockoutMultiplier;
+  }
+  return 1;
+}
+
+function scorePredictionAgainstMatch(
+  prediction: {
+    prediction: PredictionChoice;
+    exactScore?: { home: number; away: number } | null;
+  },
+  match: Doc<"worldCupMatches">,
+  multiplier: number,
+) {
+  if (
+    match.status !== "finished" ||
+    match.homeScore === undefined ||
+    match.awayScore === undefined
+  ) {
+    return 0;
+  }
+  const actual = getMatchResult(match.homeScore, match.awayScore);
+  let score = prediction.prediction === actual ? 3 : 0;
+  if (
+    prediction.exactScore &&
+    prediction.exactScore.home === match.homeScore &&
+    prediction.exactScore.away === match.awayScore
+  ) {
+    score += 2;
+  }
+  return score * multiplier;
+}
+
+async function scorePoolMember(
+  ctx: QueryCtx,
+  pool: Doc<"gepetoPools">,
+  member: Doc<"gepetoPoolMembers">,
+) {
+  const rows = [];
+  if (member.role === "gepeto") {
+    rows.push(...(await ctx.db.query("aiPredictions").take(300)));
+  } else if (member.userId) {
+    const userId = member.userId;
+    rows.push(
+      ...(await ctx.db
+        .query("userPredictions")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .take(300)),
+    );
+  }
+
+  let points = 0;
+  let exactHits = 0;
+  let correctHits = 0;
+  for (const row of rows) {
+    const match = await ctx.db.get(row.matchId);
+    if (!match) continue;
+    const round = await ctx.db.get(match.roundId);
+    const multiplier = getRoundMultiplier(pool, round);
+    const earned = scorePredictionAgainstMatch(row, match, multiplier);
+    points += earned;
+    if (earned > 0 && row.prediction === getMatchResult(match.homeScore ?? 0, match.awayScore ?? 0)) {
+      correctHits++;
+    }
+    if (
+      match.status === "finished" &&
+      row.exactScore &&
+      row.exactScore.home === match.homeScore &&
+      row.exactScore.away === match.awayScore
+    ) {
+      exactHits++;
+    }
+  }
+
+  return { member, points, correctHits, exactHits };
+}
+
+async function insertPoolPredictionActivities(
+  ctx: MutationCtx,
+  user: Doc<"users">,
+  match: Doc<"worldCupMatches">,
+  now: number,
+) {
+  const memberships = await ctx.db
+    .query("gepetoPoolMembers")
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
+    .collect();
+
+  const display = publicUserSnapshot(user).displayNickname;
+  const message = `${display} lacrou palpite em ${match.homeTeamName} x ${match.awayTeamName}.`;
+  for (const membership of memberships) {
+    if (!membership.isActive) continue;
+    await ctx.db.insert("gepetoPoolActivities", {
+      poolId: membership.poolId,
+      userId: user._id,
+      type: "prediction",
+      matchId: match._id,
+      message,
+      createdAt: now,
+    });
+  }
+}
+
 // ============ QUERIES ============
 
 export const getAIPrediction = query({
@@ -148,6 +410,250 @@ export const getWeeklyNarrative = query({
       .query("aiWeeklyNarratives")
       .withIndex("by_week_year", (q) => q.eq("year", year).eq("weekNumber", weekNumber))
       .unique();
+  },
+});
+
+export const getDashboardHub = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+    const now = new Date();
+    const weekNumber = getISOWeekNumber(now);
+    const year = now.getFullYear();
+
+    const [nextMatch, stats, narrative, memberships, leaderboard] = await Promise.all([
+      getCurrentMatch(ctx),
+      ctx.db
+        .query("userAiStats")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .unique(),
+      ctx.db
+        .query("aiWeeklyNarratives")
+        .withIndex("by_week_year", (q) => q.eq("year", year).eq("weekNumber", weekNumber))
+        .unique(),
+      ctx.db
+        .query("gepetoPoolMembers")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .take(6),
+      getLeaderboardRows(ctx, 6),
+    ]);
+
+    const pools = (await Promise.all(memberships.map((member) => getPoolSummary(ctx, member))))
+      .filter((pool) => pool !== null)
+      .filter((pool) => pool.membership.isActive);
+
+    const aiPrediction = nextMatch
+      ? await ctx.db
+          .query("aiPredictions")
+          .withIndex("by_match", (q) => q.eq("matchId", nextMatch._id))
+          .unique()
+      : null;
+    const userPrediction = nextMatch
+      ? await ctx.db
+          .query("userPredictions")
+          .withIndex("by_user_match", (q) =>
+            q.eq("userId", user._id).eq("matchId", nextMatch._id),
+          )
+          .unique()
+      : null;
+
+    return {
+      user: publicUserSnapshot(user),
+      nextMatch,
+      aiPrediction: maskAiPrediction(aiPrediction, nextMatch ? nextMatch.kickoffAt <= Date.now() : false),
+      userPrediction,
+      stats: stats ?? {
+        userId: user._id,
+        winCount: 0,
+        lossCount: 0,
+        tieCount: 0,
+        totalMatches: 0,
+        lastUpdated: Date.now(),
+      },
+      narrative,
+      pools,
+      leaderboard,
+    };
+  },
+});
+
+export const listDashboardFixtures = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+    const rounds = await ctx.db.query("worldCupRounds").withIndex("by_order").collect();
+    const userPredictions = await ctx.db
+      .query("userPredictions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .take(300);
+    const userPredictionByMatch = new Map(
+      userPredictions.map((prediction) => [prediction.matchId, prediction]),
+    );
+
+    return Promise.all(
+      rounds.map(async (round) => {
+        const matches = await ctx.db
+          .query("worldCupMatches")
+          .withIndex("by_round_kickoff", (q) => q.eq("roundId", round._id))
+          .collect();
+
+        const hydratedMatches = await Promise.all(
+          matches.map(async (match) => {
+            const aiPrediction = await ctx.db
+              .query("aiPredictions")
+              .withIndex("by_match", (q) => q.eq("matchId", match._id))
+              .unique();
+            const predictionCount = await ctx.db
+              .query("userPredictions")
+              .withIndex("by_match", (q) => q.eq("matchId", match._id))
+              .take(200);
+
+            return {
+              ...match,
+              aiPrediction: maskAiPrediction(aiPrediction, match.kickoffAt <= Date.now()),
+              userPrediction: userPredictionByMatch.get(match._id) ?? null,
+              communityCount: predictionCount.length,
+            };
+          }),
+        );
+
+        return {
+          ...round,
+          matches: hydratedMatches.sort((a, b) => a.kickoffAt - b.kickoffAt),
+        };
+      }),
+    );
+  },
+});
+
+export const getDashboardMatch = query({
+  args: { matchId: v.id("worldCupMatches") },
+  handler: async (ctx, { matchId }) => {
+    const user = await requireAuth(ctx);
+    const match = await ctx.db.get(matchId);
+    if (!match) throw new ConvexError("Jogo não encontrado");
+
+    const [round, aiPrediction, userPrediction, badge, result, allPredictions] =
+      await Promise.all([
+        ctx.db.get(match.roundId),
+        ctx.db
+          .query("aiPredictions")
+          .withIndex("by_match", (q) => q.eq("matchId", matchId))
+          .unique(),
+        ctx.db
+          .query("userPredictions")
+          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .unique(),
+        ctx.db
+          .query("userAiBadges")
+          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .unique(),
+        ctx.db
+          .query("userAiMatchResults")
+          .withIndex("by_user_match", (q) => q.eq("userId", user._id).eq("matchId", matchId))
+          .unique(),
+        ctx.db
+          .query("userPredictions")
+          .withIndex("by_match", (q) => q.eq("matchId", matchId))
+          .take(500),
+      ]);
+
+    const community = allPredictions.reduce(
+      (acc, prediction) => {
+        acc[prediction.prediction] += 1;
+        return acc;
+      },
+      { home: 0, draw: 0, away: 0 } satisfies Record<PredictionChoice, number>,
+    );
+
+    return {
+      match,
+      round,
+      aiPrediction: maskAiPrediction(aiPrediction, match.kickoffAt <= Date.now()),
+      userPrediction: userPrediction
+        ? {
+            ...userPrediction,
+            exactScore: match.kickoffAt <= Date.now() ? userPrediction.exactScore : null,
+            isRevealed: match.kickoffAt <= Date.now(),
+            hasBadge: !!badge,
+          }
+        : null,
+      result,
+      community: {
+        total: allPredictions.length,
+        counts: community,
+      },
+    };
+  },
+});
+
+export const listLeaderboardWithUsers = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit = 50 }) => {
+    await requireAuth(ctx);
+    return getLeaderboardRows(ctx, Math.min(Math.max(limit, 1), 100));
+  },
+});
+
+export const listMyPools = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireAuth(ctx);
+    const memberships = await ctx.db
+      .query("gepetoPoolMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+    const pools = await Promise.all(memberships.map((member) => getPoolSummary(ctx, member)));
+    return pools.filter((pool) => pool !== null).filter((pool) => pool.membership.isActive);
+  },
+});
+
+export const getPoolDetail = query({
+  args: { poolId: v.id("gepetoPools") },
+  handler: async (ctx, { poolId }) => {
+    const user = await requireAuth(ctx);
+    const pool = await ctx.db.get(poolId);
+    if (!pool) throw new ConvexError("Bolão não encontrado");
+    await assertPoolMember(ctx, poolId, user._id);
+
+    const [members, activities, nextMatch] = await Promise.all([
+      ctx.db
+        .query("gepetoPoolMembers")
+        .withIndex("by_pool", (q) => q.eq("poolId", poolId))
+        .collect(),
+      ctx.db
+        .query("gepetoPoolActivities")
+        .withIndex("by_pool_created", (q) => q.eq("poolId", poolId))
+        .order("desc")
+        .take(60),
+      getCurrentMatch(ctx),
+    ]);
+
+    const activeMembers = members.filter((member) => member.isActive);
+    const rankings = await Promise.all(
+      activeMembers.map((member) => scorePoolMember(ctx, pool, member)),
+    );
+    const hydratedActivities = await Promise.all(
+      activities.map(async (activity) => {
+        const actor = activity.userId ? await ctx.db.get(activity.userId) : null;
+        const target = activity.targetUserId ? await ctx.db.get(activity.targetUserId) : null;
+        return {
+          ...activity,
+          actor: actor ? publicUserSnapshot(actor) : null,
+          target: target ? publicUserSnapshot(target) : null,
+        };
+      }),
+    );
+
+    return {
+      pool,
+      members: activeMembers,
+      activities: hydratedActivities,
+      nextMatch,
+      ranking: rankings
+        .sort((a, b) => b.points - a.points)
+        .map((row, index) => ({ ...row, rank: index + 1 })),
+    };
   },
 });
 
@@ -266,6 +772,183 @@ export const recordUserPrediction = mutation({
         updatedAt: now,
       });
     }
+    await insertPoolPredictionActivities(ctx, user, match, now);
+  },
+});
+
+export const createPool = mutation({
+  args: {
+    name: v.string(),
+    emoji: v.optional(v.string()),
+    color: v.optional(v.string()),
+    description: v.optional(v.string()),
+    privacy: poolPrivacyValidator,
+    includeGepeto: v.optional(v.boolean()),
+    knockoutMultiplier: v.optional(v.number()),
+    finalMultiplier: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireAuth(ctx);
+    validatePoolInput(args);
+
+    const now = Date.now();
+    const inviteCode = await buildUniqueInviteCode(ctx);
+    const snapshot = publicUserSnapshot(user);
+    const poolId = await ctx.db.insert("gepetoPools", {
+      ownerUserId: user._id,
+      name: sanitizeUserInput(args.name.trim()).slice(0, POOL_NAME_MAX),
+      emoji: (args.emoji ?? "⚽").trim().slice(0, 8),
+      color: args.color ?? "#95AAFF",
+      description: sanitizeLimited(args.description, POOL_DESCRIPTION_MAX),
+      privacy: args.privacy,
+      cityId: args.privacy === "city" ? user.cityId : undefined,
+      inviteCode,
+      includeGepeto: args.includeGepeto ?? true,
+      knockoutMultiplier: args.knockoutMultiplier ?? 2,
+      finalMultiplier: args.finalMultiplier ?? 3,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await ctx.db.insert("gepetoPoolMembers", {
+      poolId,
+      userId: user._id,
+      role: "owner",
+      displayNickname: snapshot.displayNickname,
+      avatarSeed: snapshot.avatarSeed,
+      joinedAt: now,
+      isActive: true,
+    });
+
+    if (args.includeGepeto ?? true) {
+      await ctx.db.insert("gepetoPoolMembers", {
+        poolId,
+        role: "gepeto",
+        displayNickname: "Gepeto",
+        avatarSeed: "gepeto",
+        joinedAt: now,
+        isActive: true,
+      });
+      await ctx.db.insert("gepetoPoolActivities", {
+        poolId,
+        type: "gepeto",
+        message: "Gepeto entrou no bolão para provocar a mesa.",
+        createdAt: now,
+      });
+    }
+
+    await ctx.db.insert("gepetoPoolActivities", {
+      poolId,
+      userId: user._id,
+      type: "join",
+      message: `${snapshot.displayNickname} criou o bolão.`,
+      createdAt: now,
+    });
+
+    return { poolId, inviteCode };
+  },
+});
+
+export const joinPoolByCode = mutation({
+  args: { inviteCode: v.string() },
+  handler: async (ctx, { inviteCode }) => {
+    const user = await requireAuth(ctx);
+    const code = normalizeInviteCode(inviteCode);
+    if (!code) throw new ConvexError("Código inválido");
+
+    const pool = await ctx.db
+      .query("gepetoPools")
+      .withIndex("by_inviteCode", (q) => q.eq("inviteCode", code))
+      .unique();
+    if (!pool) throw new ConvexError("Bolão não encontrado");
+    if (pool.privacy === "city" && pool.cityId && user.cityId !== pool.cityId) {
+      throw new ConvexError("Este bolão é da cidade do dono");
+    }
+
+    const existing = await ctx.db
+      .query("gepetoPoolMembers")
+      .withIndex("by_pool_user", (q) => q.eq("poolId", pool._id).eq("userId", user._id))
+      .unique();
+    const now = Date.now();
+    const snapshot = publicUserSnapshot(user);
+
+    if (existing) {
+      if (!existing.isActive) {
+        await ctx.db.patch(existing._id, {
+          isActive: true,
+          displayNickname: snapshot.displayNickname,
+          avatarSeed: snapshot.avatarSeed,
+          joinedAt: now,
+        });
+      }
+    } else {
+      await ctx.db.insert("gepetoPoolMembers", {
+        poolId: pool._id,
+        userId: user._id,
+        role: "member",
+        displayNickname: snapshot.displayNickname,
+        avatarSeed: snapshot.avatarSeed,
+        joinedAt: now,
+        isActive: true,
+      });
+    }
+
+    await ctx.db.insert("gepetoPoolActivities", {
+      poolId: pool._id,
+      userId: user._id,
+      type: "join",
+      message: `${snapshot.displayNickname} entrou pelo convite ${pool.inviteCode}.`,
+      createdAt: now,
+    });
+
+    return { poolId: pool._id };
+  },
+});
+
+export const postPoolComment = mutation({
+  args: {
+    poolId: v.id("gepetoPools"),
+    message: v.string(),
+  },
+  handler: async (ctx, { poolId, message }) => {
+    const user = await requireAuth(ctx);
+    await assertPoolMember(ctx, poolId, user._id);
+    const cleaned = sanitizeLimited(message, POOL_COMMENT_MAX);
+    if (!cleaned) throw new ConvexError("Comentário vazio");
+
+    await ctx.db.insert("gepetoPoolActivities", {
+      poolId,
+      userId: user._id,
+      type: "comment",
+      message: cleaned,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const pokePoolMember = mutation({
+  args: {
+    poolId: v.id("gepetoPools"),
+    targetMemberId: v.id("gepetoPoolMembers"),
+  },
+  handler: async (ctx, { poolId, targetMemberId }) => {
+    const user = await requireAuth(ctx);
+    await assertPoolMember(ctx, poolId, user._id);
+    const target = await ctx.db.get(targetMemberId);
+    if (!target || target.poolId !== poolId || !target.isActive) {
+      throw new ConvexError("Membro não encontrado");
+    }
+    if (target.userId === user._id) throw new ConvexError("Escolha outro membro");
+
+    const actor = publicUserSnapshot(user).displayNickname;
+    await ctx.db.insert("gepetoPoolActivities", {
+      poolId,
+      userId: user._id,
+      type: "poke",
+      targetUserId: target.userId,
+      message: `${actor} cutucou ${target.displayNickname} para lacrar um palpite.`,
+      createdAt: Date.now(),
+    });
   },
 });
 

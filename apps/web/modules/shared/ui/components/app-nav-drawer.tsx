@@ -79,6 +79,7 @@ export function useAppNavGroups(): RenderedNavGroup[] {
             isFeatured: true,
           },
           { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+          { label: "Gepeto", href: "/dashboard/gepeto", icon: Bot },
           { label: "Meu Álbum", href: "/album", icon: StickyNote },
           {
             label: "Cadastrar figurinhas",

@@ -299,6 +299,7 @@ export const getTeamStickers = query({
         slug: s.slug,
         type: s.type,
         variant: s.variant,
+        displayCode: s.displayCode ?? `${s.sectionCode}-${s.relativeNum}`,
       }));
   },
 });

@@ -41,7 +41,7 @@ export function FinalCTA() {
             size="lg"
             className="h-14 gap-2 px-7 text-base shadow-lg shadow-primary/30"
           >
-            <Link href="/dashboard">
+            <Link href="/dashboard/gepeto">
               <Zap className="h-4 w-4" /> Entrar na arena
             </Link>
           </Button>

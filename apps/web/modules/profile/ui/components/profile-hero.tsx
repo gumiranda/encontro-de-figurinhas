@@ -22,6 +22,7 @@ type ProfileHeroProps = {
   isVerified?: boolean;
   profileUrl?: string;
   isPublic?: boolean;
+  showEditButton?: boolean;
   onShare?: () => void;
 };
 
@@ -211,17 +212,19 @@ export function ProfileHero(props: ProfileHeroProps) {
             <Share2 className="size-4 shrink-0" />
             <span className="truncate">Compartilhar perfil</span>
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="border-white/10 bg-white/5 hover:bg-white/10"
-            asChild
-          >
-            <Link href="/perfil/editar">
-              <Pencil className="size-4" />
-              <span className="sr-only">Editar perfil</span>
-            </Link>
-          </Button>
+          {props.showEditButton !== false && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="border-white/10 bg-white/5 hover:bg-white/10"
+              asChild
+            >
+              <Link href="/perfil/editar">
+                <Pencil className="size-4" />
+                <span className="sr-only">Editar perfil</span>
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -209,12 +209,12 @@ function StickerSectionGroupBase({
 
   const stickerDetails = useQuery(api.album.getTeamStickers, { sectionCode: section.code });
   const playerNameMap = useMemo(() => {
-    if (!stickerDetails) return new Map<number, { name: string; short: string }>();
-    const map = new Map<number, { name: string; short: string }>();
+    if (!stickerDetails) return new Map<number, { name: string; short: string; displayCode: string }>();
+    const map = new Map<number, { name: string; short: string; displayCode: string }>();
     for (const s of stickerDetails) {
       const parts = s.name.split(" ");
       const short = parts.length > 1 ? (parts[parts.length - 1] ?? s.name.slice(0, 8)) : s.name.slice(0, 8);
-      map.set(s.absoluteNum, { name: s.name, short });
+      map.set(s.absoluteNum, { name: s.name, short, displayCode: s.displayCode });
     }
     return map;
   }, [stickerDetails]);
@@ -427,6 +427,9 @@ function StickerSectionGroupBase({
                         >
                           {extInfo?.playerShort}
                         </span>
+                        <span className={cn("font-mono text-[7px] font-bold", config.textColor)}>
+                          {section.code}-{relativeNum}
+                        </span>
 
                         {/* Duplicate count badge */}
                         {state === "have" && dupCount && dupCount > 1 && (
@@ -550,12 +553,12 @@ function StickerSectionGroupBase({
                     ✦
                   </span>
                   <span
-                    className={cn(
-                      "w-full text-left font-mono text-[7px] font-bold tabular-nums sm:text-[8px]",
-                      CC_LAM_CARD.subtext
-                    )}
-                  >
-                    #{relLabel}
+                      className={cn(
+                        "w-full text-left font-mono text-[7px] font-bold tabular-nums sm:text-[8px]",
+                        CC_LAM_CARD.subtext
+                      )}
+                    >
+                    {section.code}-{relLabel}
                   </span>
                   <div className="flex min-h-0 flex-1 flex-col justify-center">
                     {cc ? (
@@ -620,6 +623,7 @@ function StickerSectionGroupBase({
                 sectionCode={section.code}
                 state={state}
                 dupCount={duplicateCounts?.get(num)}
+                displayCode={playerInfo?.displayCode ?? `${section.code}-${relativeNum}`}
                 playerName={playerInfo?.name}
                 shortName={playerInfo?.short}
                 onClick={handleTileClick}

@@ -78,7 +78,7 @@ function HeroSection() {
                 size="lg"
                 className="h-[52px] gap-2 px-6 shadow-lg shadow-primary/40"
               >
-                <Link href="/dashboard">
+                <Link href="/dashboard/gepeto">
                   <Zap className="h-4 w-4" /> Desafiar agora
                 </Link>
               </Button>

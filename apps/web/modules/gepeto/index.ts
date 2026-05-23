@@ -22,6 +22,13 @@ export { TrashCarousel } from "./ui/components/trash-carousel";
 export { FeaturesGrid } from "./ui/components/features-grid";
 export { FinalCTA } from "./ui/components/final-cta";
 
+// Dashboard views
+export {
+  GepetoDashboardView,
+  GepetoMatchDashboardView,
+  GepetoPoolDetailView,
+} from "./ui/views/gepeto-dashboard-view";
+
 // Hooks
 export {
   useGepetoPrediction,
@@ -29,3 +36,4 @@ export {
   useLeaderboard,
   useWeeklyNarrative,
 } from "./hooks/use-gepeto-prediction";
+export { useMatchDetail, useUserStats } from "./hooks/use-match-detail";

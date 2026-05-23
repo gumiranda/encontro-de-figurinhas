@@ -52,9 +52,14 @@ function filterValidStickerNumbers(numbers: number[], totalCount: number): numbe
   );
 }
 
-/** Dedupe + ascending sort (canonical order for sticker ids). */
-function normalizeStickerList(numbers: number[]): number[] {
+/** Missing is set-like: dedupe + ascending sort. */
+function normalizeMissingList(numbers: number[]): number[] {
   return Array.from(new Set(numbers)).sort((a, b) => a - b);
+}
+
+/** Duplicates preserve quantity by keeping repeated sticker ids. */
+function normalizeDuplicateList(numbers: number[]): number[] {
+  return [...numbers].sort((a, b) => a - b);
 }
 
 function clampStickerListsToMax(
@@ -63,8 +68,8 @@ function clampStickerListsToMax(
   maxSticker: number
 ): { duplicates: number[]; missing: number[] } {
   return {
-    duplicates: normalizeStickerList(filterValidStickerNumbers(duplicates, maxSticker)),
-    missing: normalizeStickerList(filterValidStickerNumbers(missing, maxSticker)),
+    duplicates: normalizeDuplicateList(filterValidStickerNumbers(duplicates, maxSticker)),
+    missing: normalizeMissingList(filterValidStickerNumbers(missing, maxSticker)),
   };
 }
 
@@ -253,7 +258,11 @@ export function useStickers(debounceMs = 300) {
     (kind: ListKind, numbers: number[]) => {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
       if (!valid.length) return;
-      applyListUpdate(kind, (prev) => normalizeStickerList([...prev, ...valid]));
+      applyListUpdate(kind, (prev) =>
+        kind === "duplicates"
+          ? normalizeDuplicateList([...prev, ...valid])
+          : normalizeMissingList([...prev, ...valid])
+      );
     },
     [applyListUpdate, totalStickers]
   );
@@ -261,7 +270,17 @@ export function useStickers(debounceMs = 300) {
   const removeNumber = useCallback(
     (kind: ListKind, num: number) => {
       if (!Number.isInteger(num) || num < 0 || num >= totalStickers) return;
-      applyListUpdate(kind, (prev) => prev.filter((n) => n !== num));
+      applyListUpdate(kind, (prev) => {
+        if (kind !== "duplicates") return prev.filter((n) => n !== num);
+        let removed = false;
+        return prev.filter((n) => {
+          if (!removed && n === num) {
+            removed = true;
+            return false;
+          }
+          return true;
+        });
+      });
     },
     [applyListUpdate, totalStickers]
   );
@@ -269,7 +288,11 @@ export function useStickers(debounceMs = 300) {
   const setList = useCallback(
     (kind: ListKind, numbers: number[]) => {
       const valid = filterValidStickerNumbers(numbers, totalStickers);
-      applyListUpdate(kind, () => normalizeStickerList(valid));
+      applyListUpdate(kind, () =>
+        kind === "duplicates"
+          ? normalizeDuplicateList(valid)
+          : normalizeMissingList(valid)
+      );
     },
     [applyListUpdate, totalStickers]
   );
@@ -301,7 +324,9 @@ export function useStickers(debounceMs = 300) {
 
   const duplicateCounts = useMemo(() => {
     const counts = new Map<number, number>();
-    for (const num of localDuplicates) counts.set(num, 1);
+    for (const num of localDuplicates) {
+      counts.set(num, (counts.get(num) ?? 0) + 1);
+    }
     return counts;
   }, [localDuplicates]);
 
@@ -401,7 +426,14 @@ export function useStickers(debounceMs = 300) {
       const sectionNumbers = getSectionNumbers(sectionCode);
       if (sectionNumbers.length === 0) return;
 
-      applyListUpdate(mode, (prev) => normalizeStickerList([...prev, ...sectionNumbers]));
+      applyListUpdate(mode, (prev) =>
+        mode === "duplicates"
+          ? normalizeDuplicateList([
+              ...prev,
+              ...sectionNumbers.filter((num) => !prev.includes(num)),
+            ])
+          : normalizeMissingList([...prev, ...sectionNumbers])
+      );
     },
     [sectionLookup, applyListUpdate]
   );
@@ -434,7 +466,9 @@ export function useStickers(debounceMs = 300) {
             newList.push(num);
           }
         }
-        return normalizeStickerList(newList);
+        return mode === "duplicates"
+          ? normalizeDuplicateList(newList)
+          : normalizeMissingList(newList);
       });
     },
     [sectionLookup, applyListUpdate]

@@ -723,6 +723,65 @@ export default defineSchema({
     generatedAt: v.number(),
   }).index("by_week_year", ["year", "weekNumber"]),
 
+  gepetoPools: defineTable({
+    ownerUserId: v.id("users"),
+    name: v.string(),
+    emoji: v.string(),
+    color: v.string(),
+    description: v.optional(v.string()),
+    privacy: v.union(
+      v.literal("private"),
+      v.literal("city"),
+      v.literal("open"),
+    ),
+    cityId: v.optional(v.id("cities")),
+    inviteCode: v.string(),
+    includeGepeto: v.boolean(),
+    knockoutMultiplier: v.number(),
+    finalMultiplier: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_owner", ["ownerUserId"])
+    .index("by_inviteCode", ["inviteCode"])
+    .index("by_city_privacy", ["cityId", "privacy"]),
+
+  gepetoPoolMembers: defineTable({
+    poolId: v.id("gepetoPools"),
+    userId: v.optional(v.id("users")),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("member"),
+      v.literal("gepeto"),
+    ),
+    displayNickname: v.string(),
+    avatarSeed: v.optional(v.string()),
+    joinedAt: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_pool", ["poolId"])
+    .index("by_user", ["userId"])
+    .index("by_pool_user", ["poolId", "userId"]),
+
+  gepetoPoolActivities: defineTable({
+    poolId: v.id("gepetoPools"),
+    userId: v.optional(v.id("users")),
+    type: v.union(
+      v.literal("join"),
+      v.literal("comment"),
+      v.literal("poke"),
+      v.literal("prediction"),
+      v.literal("system"),
+      v.literal("gepeto"),
+    ),
+    targetUserId: v.optional(v.id("users")),
+    matchId: v.optional(v.id("worldCupMatches")),
+    message: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_pool_created", ["poolId", "createdAt"])
+    .index("by_user_created", ["userId", "createdAt"]),
+
   scoreAuditLog: defineTable({
     matchId: v.id("worldCupMatches"),
     adminUserId: v.id("users"),

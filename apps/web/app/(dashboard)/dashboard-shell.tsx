@@ -36,6 +36,7 @@ import { useEffect, useRef } from "react";
 
 const ROUTE_LABELS: Record<string, string> = {
   "/dashboard": "Início",
+  "/dashboard/gepeto": "Gepeto",
   "/album": "Meu álbum",
   "/matches": "Encontrar trocas",
   "/propostas": "Propostas de troca",

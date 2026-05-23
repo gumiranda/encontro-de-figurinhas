@@ -428,50 +428,7 @@ function PrivateHero({
   );
 }
 
-function PublicHero({
-  profile,
-}: {
-  profile: PublicProfileV2;
-}) {
-  const name = displayName(profile);
 
-  return (
-    <Card className="overflow-hidden border-white/10 bg-surface-container-high text-center shadow-xl">
-      <CardHeader className="items-center gap-4 p-6">
-        <ProfileAvatar seed={profile.avatarSeed} name={name} isPublic />
-        <div className="min-w-0">
-          <div className="flex items-center justify-center gap-2">
-            <CardTitle className="truncate font-headline text-2xl">
-              @{name}
-            </CardTitle>
-            {profile.isVerified && (
-              <BadgeCheck className="size-5 fill-primary text-background" />
-            )}
-          </div>
-          <div className="flex justify-center">
-            <HeroMeta city={profile.city} createdAt={profile.createdAt} />
-          </div>
-        </div>
-        <div className="grid w-full grid-cols-3 gap-3">
-          <ProfileMetric
-            label={profile.ratingCount === 1 ? "review" : "reviews"}
-            value={profile.ratingAvg?.toFixed(1) ?? "—"}
-            tone="tertiary"
-          />
-          <ProfileMetric
-            label="trocas"
-            value={profile.totalTrades}
-            tone="secondary"
-          />
-          <ProfileMetric
-            label="álbum"
-            value={formatPercent(profile.albumCompletionPct)}
-          />
-        </div>
-      </CardHeader>
-    </Card>
-  );
-}
 
 export function ProfileProgressCard({
   albumCompletionPct,
@@ -1104,10 +1061,40 @@ export function PublicProfileView({
   profileUrl: string;
 }) {
   const name = displayName(profile);
+  const handleShare = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: `@${name} no Figurinha Fácil`,
+        text: `${profile.duplicatesCount} repetidas disponíveis para troca.`,
+        url: profileUrl,
+      });
+      return;
+    }
+    await navigator.clipboard.writeText(profileUrl);
+    toast.success("Link copiado");
+  };
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6 lg:py-8">
-      <PublicHero profile={profile} />
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 sm:px-6 lg:py-8">
+      <ProfileHero
+        nickname={profile.nickname}
+        displayNickname={profile.displayNickname}
+        avatarSeed={profile.avatarSeed}
+        flag={profile.flag ?? "🇧🇷"}
+        cardCode={profile.cardCode ?? "BRA-10"}
+        cardNumber={profile.cardNumber ?? "001"}
+        city={profile.city}
+        joinedAt={profile.createdAt}
+        ratingAvg={profile.ratingAvg}
+        ratingCount={profile.ratingCount}
+        totalTrades={profile.totalTrades}
+        albumCompletionPct={profile.albumCompletionPct}
+        isVerified={profile.isVerified}
+        profileUrl={profileUrl}
+        isPublic
+        showEditButton={false}
+        onShare={handleShare}
+      />
 
       <ProfileProgressCard
         albumCompletionPct={profile.albumCompletionPct}
