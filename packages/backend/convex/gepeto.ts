@@ -214,19 +214,36 @@ function maskAiPrediction<T extends Doc<"aiPredictions"> | null>(
   };
 }
 
+function isOpenMatch(
+  match: Pick<Doc<"worldCupMatches">, "homeScore" | "awayScore" | "status">,
+) {
+  if (hasFinalScore(match)) return false;
+  return (match.status ?? "scheduled") !== "finished";
+}
+
 async function getCurrentMatch(ctx: QueryCtx) {
   const now = Date.now();
   const matches = await ctx.db.query("worldCupMatches").collect();
   if (matches.length === 0) return null;
-  const live = matches
+
+  const openMatches = matches.filter(isOpenMatch);
+
+  const live = openMatches
     .filter((match) => (match.status ?? "scheduled") === "live")
     .sort((a, b) => a.kickoffAt - b.kickoffAt)[0];
   if (live) return live;
-  const upcoming = matches
-    .filter((match) => match.kickoffAt >= now && (match.status ?? "scheduled") !== "finished")
+
+  const inProgress = openMatches
+    .filter((match) => match.kickoffAt <= now)
+    .sort((a, b) => a.kickoffAt - b.kickoffAt)[0];
+  if (inProgress) return inProgress;
+
+  const upcoming = openMatches
+    .filter((match) => match.kickoffAt > now)
     .sort((a, b) => a.kickoffAt - b.kickoffAt)[0];
   if (upcoming) return upcoming;
-  return matches.sort((a, b) => b.kickoffAt - a.kickoffAt)[0];
+
+  return null;
 }
 
 async function getPoolSummary(ctx: QueryCtx, membership: Doc<"gepetoPoolMembers">) {

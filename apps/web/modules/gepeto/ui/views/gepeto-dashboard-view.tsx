@@ -9,9 +9,20 @@ import type { ReactNode } from "react";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
-import { Switch } from "@workspace/ui/components/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import {
@@ -30,6 +41,7 @@ import {
   Sparkles,
   Trophy,
   Users,
+  X,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -44,7 +56,10 @@ import {
   StreakStrip,
   VerdictBanner,
 } from "@/modules/gepeto";
-import { hasFinalScore, isPredictionRevealed } from "@/modules/gepeto/lib/match-state";
+import {
+  hasFinalScore,
+  isPredictionRevealed,
+} from "@/modules/gepeto/lib/match-state";
 import {
   formatPhaseLabel,
   formatRoundSectionLabel,
@@ -54,11 +69,21 @@ import {
 type Choice = "home" | "draw" | "away";
 type TabKey = "hub" | "jogos" | "boloes" | "capitulo" | "ranking";
 type DashboardHub = FunctionReturnType<typeof api.gepeto.getDashboardHub>;
-type DashboardFixtures = FunctionReturnType<typeof api.gepeto.listDashboardFixtures>;
+type DashboardFixtures = FunctionReturnType<
+  typeof api.gepeto.listDashboardFixtures
+>;
 type DashboardPools = FunctionReturnType<typeof api.gepeto.listMyPools>;
-type DashboardLeaderboard = FunctionReturnType<typeof api.gepeto.listLeaderboardWithUsers>;
+type DashboardLeaderboard = FunctionReturnType<
+  typeof api.gepeto.listLeaderboardWithUsers
+>;
 
-const TAB_KEYS = new Set<TabKey>(["hub", "jogos", "boloes", "capitulo", "ranking"]);
+const TAB_KEYS = new Set<TabKey>([
+  "hub",
+  "jogos",
+  "boloes",
+  "capitulo",
+  "ranking",
+]);
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -66,6 +91,35 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   hour: "2-digit",
   minute: "2-digit",
 });
+
+const POOL_NAME_INPUT_MAX = 32;
+const POOL_DESCRIPTION_INPUT_MAX = 140;
+const POOL_EMOJI_OPTIONS = [
+  "🏆",
+  "🏠",
+  "🍻",
+  "💼",
+  "⚽",
+  "🔥",
+  "⭐",
+  "🌈",
+  "🎯",
+  "⚡",
+  "🤖",
+  "👾",
+  "🏁",
+  "🎪",
+  "🌮",
+  "🏈",
+];
+const POOL_ACCENT_COLORS = [
+  "#95AAFF",
+  "#4FF325",
+  "#FFC965",
+  "#FF6B82",
+  "#A97AE6",
+  "#5DD3CE",
+];
 
 function pickTab(raw: string | null): TabKey {
   if (raw === "vs-ia") return "ranking";
@@ -78,15 +132,20 @@ function matchState(match: {
   homeScore?: number;
   awayScore?: number;
 }) {
-  if (hasFinalScore(match) || (match.status ?? "scheduled") === "finished") return "pos";
-  if ((match.status ?? "scheduled") === "live" || match.kickoffAt <= Date.now()) return "ao vivo";
+  if (hasFinalScore(match) || (match.status ?? "scheduled") === "finished")
+    return "pos";
+  if ((match.status ?? "scheduled") === "live" || match.kickoffAt <= Date.now())
+    return "ao vivo";
   return "pre";
 }
 
-function choiceLabel(match: {
-  homeTeamName: string;
-  awayTeamName: string;
-}, choice: Choice | null | undefined) {
+function choiceLabel(
+  match: {
+    homeTeamName: string;
+    awayTeamName: string;
+  },
+  choice: Choice | null | undefined,
+) {
   if (choice === "home") return match.homeTeamName;
   if (choice === "away") return match.awayTeamName;
   if (choice === "draw") return "Empate";
@@ -149,14 +208,18 @@ function MatchScore({
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
       <div className="min-w-0 text-right">
         <div className="text-3xl">{match.homeTeamFlag}</div>
-        <div className="truncate text-sm font-semibold">{match.homeTeamName}</div>
+        <div className="truncate text-sm font-semibold">
+          {match.homeTeamName}
+        </div>
       </div>
       <div className="rounded-lg border border-border bg-background px-4 py-2 text-center font-display text-2xl font-black">
         {match.homeScore ?? "-"} x {match.awayScore ?? "-"}
       </div>
       <div className="min-w-0">
         <div className="text-3xl">{match.awayTeamFlag}</div>
-        <div className="truncate text-sm font-semibold">{match.awayTeamName}</div>
+        <div className="truncate text-sm font-semibold">
+          {match.awayTeamName}
+        </div>
       </div>
     </div>
   );
@@ -228,7 +291,10 @@ function FixtureRow({
     awayTeamFlag: string;
     kickoffAt: number;
     status?: string;
-    userPrediction?: { prediction: Choice; exactScore?: { home: number; away: number } | null } | null;
+    userPrediction?: {
+      prediction: Choice;
+      exactScore?: { home: number; away: number } | null;
+    } | null;
     aiPrediction?: { prediction: Choice | null; confidence?: number } | null;
     communityCount: number;
   };
@@ -260,9 +326,13 @@ function FixtureRow({
       </div>
       <div className="flex items-center gap-2">
         {match.userPrediction ? (
-          <Badge className="rounded-full">Você: {choiceLabel(match, match.userPrediction.prediction)}</Badge>
+          <Badge className="rounded-full">
+            Você: {choiceLabel(match, match.userPrediction.prediction)}
+          </Badge>
         ) : (
-          <Badge variant="outline" className="rounded-full">Sem palpite</Badge>
+          <Badge variant="outline" className="rounded-full">
+            Sem palpite
+          </Badge>
         )}
         <ChevronRight className="size-4 text-muted-foreground" />
       </div>
@@ -283,24 +353,39 @@ function LeaderboardList({
   }>;
 }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-muted-foreground">Ranking vazio por enquanto.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        Ranking vazio por enquanto.
+      </p>
+    );
   }
   return (
     <div className="space-y-2">
       {rows.map((row) => (
-        <div key={`${row.rank}-${row.user?.displayNickname ?? "user"}`} className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+        <div
+          key={`${row.rank}-${row.user?.displayNickname ?? "user"}`}
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-3"
+        >
           <div className="flex items-center gap-3">
             <div className="grid size-9 place-items-center rounded-full bg-primary/15 font-display font-black text-primary">
               {row.rank}
             </div>
             <div>
-              <div className="font-semibold">{row.user?.displayNickname ?? "Colecionador"}</div>
-              <div className="text-xs text-muted-foreground">{row.totalMatches} jogos contra Gepeto</div>
+              <div className="font-semibold">
+                {row.user?.displayNickname ?? "Colecionador"}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {row.totalMatches} jogos contra Gepeto
+              </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="font-display text-xl font-black">{row.winCount}V</div>
-            <div className="text-xs text-muted-foreground">{row.tieCount}E · {row.lossCount}D</div>
+            <div className="font-display text-xl font-black">
+              {row.winCount}V
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {row.tieCount}E · {row.lossCount}D
+            </div>
           </div>
         </div>
       ))}
@@ -324,31 +409,37 @@ function PoolsPanel({
   const createPool = useMutation(api.gepeto.createPool);
   const joinPool = useMutation(api.gepeto.joinPoolByCode);
   const router = useRouter();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("⚽");
+  const [emoji, setEmoji] = useState("🏆");
   const [color, setColor] = useState("#95AAFF");
-  const [includeGepeto, setIncludeGepeto] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
   const [isBusy, setIsBusy] = useState(false);
+  const trimmedName = name.trim();
+  const canCreate =
+    trimmedName.length >= 3 && trimmedName.length <= POOL_NAME_INPUT_MAX;
 
   async function handleCreate() {
     setIsBusy(true);
     try {
       const result = await createPool({
-        name,
+        name: trimmedName,
         description,
         emoji,
         color,
         privacy: "private",
-        includeGepeto,
+        includeGepeto: true,
         knockoutMultiplier: 2,
         finalMultiplier: 3,
       });
       toast.success(`Bolão criado: ${result.inviteCode}`);
+      setIsCreateOpen(false);
       router.push(`/dashboard/gepeto/boloes/${result.poolId}`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar bolão");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar bolão",
+      );
     } finally {
       setIsBusy(false);
     }
@@ -361,7 +452,9 @@ function PoolsPanel({
       toast.success("Você entrou no bolão");
       router.push(`/dashboard/gepeto/boloes/${result.poolId}`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao entrar no bolão");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao entrar no bolão",
+      );
     } finally {
       setIsBusy(false);
     }
@@ -370,36 +463,178 @@ function PoolsPanel({
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
       <div className="space-y-4">
-        <Card className="space-y-4 p-4">
-          <div className="flex items-center gap-2 font-display text-xl font-bold">
-            <Plus className="size-5 text-primary" />
-            Criar bolão
-          </div>
-          <div className="grid grid-cols-[76px_1fr] gap-3">
-            <Input value={emoji} onChange={(event) => setEmoji(event.target.value)} maxLength={8} aria-label="Emoji" />
-            <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome do bolão" />
-          </div>
-          <Textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Descrição curta" />
-          <div className="flex items-center justify-between rounded-lg border border-border p-3">
-            <div className="flex items-center gap-3">
-              <Input type="color" value={color} onChange={(event) => setColor(event.target.value)} className="h-10 w-14 p-1" aria-label="Cor" />
-              <span className="text-sm text-muted-foreground">Cor do bolão</span>
+        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <Card className="overflow-hidden border-[#444b65] bg-[#12192e] p-4 text-[#dfe5ff]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 font-display text-xl font-black">
+                  <Plus className="size-5 text-[#95aaff]" />
+                  Criar bolão
+                </div>
+                <p className="mt-1 text-sm text-[#aeb4ca]">
+                  Monte a mesa, chame amigos e deixe o Gepeto provocar.
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={() => setIsCreateOpen(true)}
+                className="h-11 rounded-2xl bg-[#95aaff] px-4 font-black text-[#081433] hover:bg-[#a9baff]"
+              >
+                Criar
+              </Button>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              Gepeto
-              <Switch checked={includeGepeto} onCheckedChange={setIncludeGepeto} />
+          </Card>
+          <DialogContent
+            showCloseButton={false}
+            className="bottom-0 top-auto left-1/2 max-h-[calc(100dvh-1rem)] w-[min(100vw,860px)] max-w-[calc(100vw-1rem)] translate-x-[-50%] translate-y-0 gap-0 overflow-y-auto rounded-t-[32px] border-[#55607d] bg-[#12192e] p-0 text-[#dfe5ff] shadow-[0_-28px_80px_rgba(0,0,0,0.62)] sm:bottom-5 sm:rounded-[32px] md:max-w-[860px]"
+          >
+            <div className="mx-auto mt-5 h-1.5 w-14 rounded-full bg-[#dfe5ff]/35" />
+            <div className="space-y-7 p-6 pt-8 sm:p-8 sm:pt-9">
+              <div className="flex items-center justify-between gap-4">
+                <DialogTitle className="font-display text-3xl font-black tracking-normal text-[#dfe5ff]">
+                  Criar bolão
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Escolha nome, emoji, cor e descrição do bolão.
+                </DialogDescription>
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-11 rounded-full text-[#aeb4ca] hover:bg-[#202741] hover:text-[#dfe5ff]"
+                    aria-label="Fechar criação de bolão"
+                  >
+                    <X className="size-7" />
+                  </Button>
+                </DialogClose>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="h-1.5 rounded-full bg-[#95aaff]" />
+                <div className="h-1.5 rounded-full bg-[#dfe5ff]/25" />
+                <div className="h-1.5 rounded-full bg-[#dfe5ff]/25" />
+              </div>
+
+              <div className="space-y-5">
+                <div className="space-y-3">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Identidade
+                  </div>
+                  <div className="grid grid-cols-[112px_1fr] gap-4">
+                    <div
+                      className="grid aspect-square place-items-center rounded-[28px] border-4 border-[#95aaff] bg-[#202741] text-5xl shadow-[0_0_0_1px_rgba(149,170,255,0.24)]"
+                      style={{ borderColor: color }}
+                    >
+                      {emoji}
+                    </div>
+                    <div className="min-w-0">
+                      <Input
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        placeholder="Nome do bolão"
+                        maxLength={POOL_NAME_INPUT_MAX}
+                        className="h-[72px] rounded-2xl border-[#55607d] bg-[#172039] px-6 font-display text-2xl font-black text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                      />
+                      <div className="mt-2 text-right font-mono text-sm font-bold text-[#aeb4ca]">
+                        {name.length}/{POOL_NAME_INPUT_MAX}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Emoji
+                  </div>
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+                    {POOL_EMOJI_OPTIONS.map((option) => (
+                      <Button
+                        key={option}
+                        type="button"
+                        variant="outline"
+                        onClick={() => setEmoji(option)}
+                        className={cn(
+                          "aspect-square h-auto rounded-2xl border-[#55607d] bg-[#172039] p-0 text-3xl shadow-none hover:bg-[#202741]",
+                          emoji === option &&
+                            "border-[#95aaff] bg-[#202741] ring-2 ring-[#95aaff]/65",
+                        )}
+                        aria-label={`Usar emoji ${option}`}
+                      >
+                        {option}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Cor de acento
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {POOL_ACCENT_COLORS.map((option) => (
+                      <Button
+                        key={option}
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setColor(option)}
+                        className={cn(
+                          "size-14 rounded-full p-0 hover:bg-transparent",
+                          color === option &&
+                            "ring-4 ring-[#dfe5ff]/85 ring-offset-2 ring-offset-[#12192e]",
+                        )}
+                        style={{ backgroundColor: option }}
+                        aria-label={`Usar cor ${option}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="font-mono text-[13px] font-black uppercase tracking-[0.28em] text-[#aeb4ca]">
+                    Descrição (opcional)
+                  </div>
+                  <Textarea
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    placeholder="Ex: Bolão do escritório, quem ganhar leva o churrasco da final"
+                    maxLength={POOL_DESCRIPTION_INPUT_MAX}
+                    className="min-h-28 resize-none rounded-2xl border-[#55607d] bg-[#172039] px-5 py-5 text-lg text-[#dfe5ff] placeholder:text-[#dfe5ff]/48 focus-visible:border-[#95aaff] focus-visible:ring-[#95aaff]/30"
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleCreate}
+                  disabled={isBusy || !canCreate}
+                  className="h-16 w-full rounded-3xl bg-[#95aaff] font-display text-xl font-black text-[#081433] hover:bg-[#a9baff]"
+                >
+                  Continuar
+                  <ChevronRight className="size-5" />
+                </Button>
+              </div>
             </div>
-          </div>
-          <Button onClick={handleCreate} disabled={isBusy || name.trim().length < 3} className="w-full gap-2">
-            Criar e abrir
-            <ChevronRight className="size-4" />
-          </Button>
-        </Card>
+          </DialogContent>
+        </Dialog>
         <Card className="space-y-3 p-4">
-          <div className="font-display text-xl font-bold">Entrar por código</div>
+          <div className="font-display text-xl font-bold">
+            Entrar por código
+          </div>
           <div className="flex gap-2">
-            <Input value={inviteCode} onChange={(event) => setInviteCode(event.target.value.toUpperCase())} placeholder="ABC123" />
-            <Button onClick={handleJoin} disabled={isBusy || inviteCode.trim().length < 4}>Entrar</Button>
+            <Input
+              value={inviteCode}
+              onChange={(event) =>
+                setInviteCode(event.target.value.toUpperCase())
+              }
+              placeholder="ABC123"
+            />
+            <Button
+              onClick={handleJoin}
+              disabled={isBusy || inviteCode.trim().length < 4}
+            >
+              Entrar
+            </Button>
           </div>
         </Card>
       </div>
@@ -410,15 +645,26 @@ function PoolsPanel({
           </Card>
         ) : (
           pools.map((pool) => (
-            <Link key={pool._id} href={`/dashboard/gepeto/boloes/${pool._id}`} className="block rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/60">
+            <Link
+              key={pool._id}
+              href={`/dashboard/gepeto/boloes/${pool._id}`}
+              className="block rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/60"
+            >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="grid size-12 place-items-center rounded-lg text-2xl" style={{ backgroundColor: `${pool.color}24` }}>
+                  <div
+                    className="grid size-12 place-items-center rounded-lg text-2xl"
+                    style={{ backgroundColor: `${pool.color}24` }}
+                  >
                     {pool.emoji}
                   </div>
                   <div className="min-w-0">
-                    <div className="truncate font-display text-xl font-bold">{pool.name}</div>
-                    <div className="text-sm text-muted-foreground">{pool.activeMemberCount} membros · {pool.privacy}</div>
+                    <div className="truncate font-display text-xl font-bold">
+                      {pool.name}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {pool.activeMemberCount} membros · {pool.privacy}
+                    </div>
                   </div>
                 </div>
                 <ChevronRight className="size-5 text-muted-foreground" />
@@ -484,7 +730,8 @@ function predictionBadgeClass(
 function roundStatusLabel(round: DashboardFixtures[number]) {
   if (round.matches.length === 0) return "SEM JOGOS";
   if (round.matches.every((match) => hasFinalScore(match))) return "ENCERRADA";
-  if (round.matches.some((match) => matchState(match) === "ao vivo")) return "AO VIVO";
+  if (round.matches.some((match) => matchState(match) === "ao vivo"))
+    return "AO VIVO";
   return "ABERTA";
 }
 
@@ -563,7 +810,9 @@ function PhoneShell({
             <div className="flex min-w-0 items-center justify-center gap-2">
               <GepetoAvatar size={30} mood="neutral" glow={false} />
               <div className="min-w-0 leading-none">
-                <div className="truncate font-display text-sm font-black md:text-base">Gepeto</div>
+                <div className="truncate font-display text-sm font-black md:text-base">
+                  Gepeto
+                </div>
                 <div className="truncate font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#aeb4ca] md:text-[10px]">
                   Humano × IA
                 </div>
@@ -602,9 +851,20 @@ function CountdownChip({ time }: { time: string }) {
   );
 }
 
-function PhoneCard({ className, children }: { className?: string; children: ReactNode }) {
+function PhoneCard({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
   return (
-    <Card className={cn("rounded-3xl border-[#444b65] bg-[#12192e] text-[#dfe5ff]", className)}>
+    <Card
+      className={cn(
+        "rounded-3xl border-[#444b65] bg-[#12192e] text-[#dfe5ff]",
+        className,
+      )}
+    >
       {children}
     </Card>
   );
@@ -665,7 +925,8 @@ function NextDuelCard({
         </div>
       </div>
       <div className="mt-5 text-center text-sm text-[#aeb4ca]">
-        {dataRoundLabel(matchState(match))} · {match.venue ?? "Estádio a definir"}
+        {dataRoundLabel(matchState(match))} ·{" "}
+        {match.venue ?? "Estádio a definir"}
       </div>
 
       <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl border border-[#4a536d] bg-[#0c1222]/75 p-3">
@@ -765,13 +1026,18 @@ function HubPhoneScreen({
                 {pool.emoji}
               </div>
               <div className="min-w-0">
-                <div className="truncate font-display text-sm font-black">{pool.name}</div>
+                <div className="truncate font-display text-sm font-black">
+                  {pool.name}
+                </div>
                 <div className="text-xs text-[#aeb4ca]">
-                  {pool.activeMemberCount} membros · {pool.includeGepeto ? "Gepeto incluso" : "sem Gepeto"}
+                  {pool.activeMemberCount} membros ·{" "}
+                  {pool.includeGepeto ? "Gepeto incluso" : "sem Gepeto"}
                 </div>
               </div>
               <Badge className="rounded-lg bg-[#ffc965]/15 font-mono text-[#ffc965]">
-                {pool.activeMemberCount > 1 ? `${Math.max(0, pool.activeMemberCount - 1)} ok` : "novo"}
+                {pool.activeMemberCount > 1
+                  ? `${Math.max(0, pool.activeMemberCount - 1)} ok`
+                  : "novo"}
               </Badge>
             </Link>
           ))}
@@ -785,7 +1051,9 @@ function HubPhoneScreen({
 
       <PhoneCard className="p-4">
         <div className="mb-3 flex items-center justify-between">
-          <div className="font-display text-base font-black">Capítulo 3 · Quartas</div>
+          <div className="font-display text-base font-black">
+            Capítulo 3 · Quartas
+          </div>
           <button
             type="button"
             onClick={() => onGoTo("capitulo")}
@@ -868,8 +1136,10 @@ function FixturePhoneRow({
       href={`/dashboard/gepeto/matches/${match._id}`}
       className={cn(
         "grid w-full max-w-full min-w-0 grid-cols-[52px_minmax(0,1fr)_20px] items-center gap-2 overflow-hidden rounded-2xl border bg-[#172039] p-3 sm:gap-3",
-        featured && "border-[#ffc965] bg-[linear-gradient(90deg,rgba(255,201,101,0.09),#172039)]",
-        live && "border-[#ff6e84] bg-[linear-gradient(90deg,rgba(255,110,132,0.08),#172039)]",
+        featured &&
+          "border-[#ffc965] bg-[linear-gradient(90deg,rgba(255,201,101,0.09),#172039)]",
+        live &&
+          "border-[#ff6e84] bg-[linear-gradient(90deg,rgba(255,110,132,0.08),#172039)]",
         !featured && !live && "border-[#444b65]",
       )}
     >
@@ -882,7 +1152,9 @@ function FixturePhoneRow({
                 live
               </span>
             </div>
-            <div className="mt-1 font-mono text-lg font-black">{match.status === "live" ? "56'" : "agora"}</div>
+            <div className="mt-1 font-mono text-lg font-black">
+              {match.status === "live" ? "56'" : "agora"}
+            </div>
           </>
         ) : finished ? (
           <div className="font-mono text-[9px] font-black uppercase leading-tight tracking-[0.18em] text-[#aeb4ca] sm:text-[10px] sm:tracking-[0.24em]">
@@ -890,8 +1162,17 @@ function FixturePhoneRow({
           </div>
         ) : (
           <div className="font-mono text-xs font-black leading-tight text-[#ffc965]">
-            <div>{featured ? "hoje" : dateFormatter.format(match.kickoffAt).split(",")[0]}</div>
-            <div>{new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(match.kickoffAt)}</div>
+            <div>
+              {featured
+                ? "hoje"
+                : dateFormatter.format(match.kickoffAt).split(",")[0]}
+            </div>
+            <div>
+              {new Intl.DateTimeFormat("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }).format(match.kickoffAt)}
+            </div>
           </div>
         )}
       </div>
@@ -900,19 +1181,40 @@ function FixturePhoneRow({
           <div className="min-w-0 space-y-1.5">
             <div className="flex items-center gap-2 font-display text-base font-black">
               <span>{match.homeTeamFlag}</span>
-              <span className={cn("truncate", finished && (match.homeScore ?? 0) < (match.awayScore ?? 0) && "text-[#aeb4ca]")}>
+              <span
+                className={cn(
+                  "truncate",
+                  finished &&
+                    (match.homeScore ?? 0) < (match.awayScore ?? 0) &&
+                    "text-[#aeb4ca]",
+                )}
+              >
                 {shortTeamName(match.homeTeamName, match.homeTeamCode)}
               </span>
             </div>
             <div className="flex items-center gap-2 font-display text-base font-black">
               <span>{match.awayTeamFlag}</span>
-              <span className={cn("truncate", finished && (match.awayScore ?? 0) < (match.homeScore ?? 0) && "text-[#aeb4ca]")}>
+              <span
+                className={cn(
+                  "truncate",
+                  finished &&
+                    (match.awayScore ?? 0) < (match.homeScore ?? 0) &&
+                    "text-[#aeb4ca]",
+                )}
+              >
                 {shortTeamName(match.awayTeamName, match.awayTeamCode)}
               </span>
             </div>
           </div>
-          <div className={cn("shrink-0 font-mono text-lg font-black sm:text-xl", live && "text-[#ff6e84]")}>
-            {finished || live ? `${match.homeScore ?? 0} - ${match.awayScore ?? 0}` : "vs"}
+          <div
+            className={cn(
+              "shrink-0 font-mono text-lg font-black sm:text-xl",
+              live && "text-[#ff6e84]",
+            )}
+          >
+            {finished || live
+              ? `${match.homeScore ?? 0} - ${match.awayScore ?? 0}`
+              : "vs"}
           </div>
         </div>
         <div className="mt-3 flex min-w-0 flex-wrap gap-2 border-t border-dashed border-[#444b65] pt-2">
@@ -928,7 +1230,8 @@ function FixturePhoneRow({
                 ),
               )}
             >
-              <GepetoAvatar size={14} mood="neutral" glow={false} /> {gepetoScore}
+              <GepetoAvatar size={14} mood="neutral" glow={false} />{" "}
+              {gepetoScore}
             </span>
           ) : hasAiPrediction ? (
             <span className="rounded-lg border border-dashed border-[#ffc965]/45 px-2 py-1 font-mono text-xs font-black text-[#ffc965]">
@@ -973,7 +1276,9 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
   const activePhase = phases[phaseIndex] ?? phases[0];
 
   if (!activePhase) {
-    return <div className="p-4 text-sm text-[#aeb4ca]">Sem jogos carregados.</div>;
+    return (
+      <div className="p-4 text-sm text-[#aeb4ca]">Sem jogos carregados.</div>
+    );
   }
 
   const teamCount = countTeamsInRounds(activePhase.rounds);
@@ -985,7 +1290,9 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
         {phases.map((entry, index) => {
           const selected = phaseIndex === index;
           const accent = phaseAccent(entry.rounds[0] ?? fixtures[0]!);
-          const locked = entry.rounds.every((round) => !round.isActive) && index > activePhaseIndex;
+          const locked =
+            entry.rounds.every((round) => !round.isActive) &&
+            index > activePhaseIndex;
           return (
             <button
               key={entry.phase}
@@ -993,11 +1300,15 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
               onClick={() => setPhaseIndex(index)}
               className={cn(
                 "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black whitespace-nowrap sm:px-4 sm:text-sm",
-                selected ? "bg-[#dfe4fb] text-[#090e1c]" : "bg-transparent text-[#aeb4ca]",
+                selected
+                  ? "bg-[#dfe4fb] text-[#090e1c]"
+                  : "bg-transparent text-[#aeb4ca]",
               )}
               style={{ borderColor: selected ? "#dfe4fb" : accent }}
             >
-              {locked && <Lock className="size-3.5" style={{ color: accent }} />}
+              {locked && (
+                <Lock className="size-3.5" style={{ color: accent }} />
+              )}
               {entry.label}
             </button>
           );
@@ -1025,7 +1336,8 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
         {activePhase.rounds.map((round) => (
           <section key={round._id} className="space-y-3">
             <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca]">
-              {formatRoundSectionLabel(round).toUpperCase()} · {roundStatusLabel(round)}
+              {formatRoundSectionLabel(round).toUpperCase()} ·{" "}
+              {roundStatusLabel(round)}
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {[...round.matches]
@@ -1038,7 +1350,11 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
                   <FixturePhoneRow
                     key={match._id}
                     match={match}
-                    featured={index === 0 && matchState(match) !== "pos" && round.isActive}
+                    featured={
+                      index === 0 &&
+                      matchState(match) !== "pos" &&
+                      round.isActive
+                    }
                   />
                 ))}
             </div>
@@ -1054,7 +1370,9 @@ function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
     <div className="p-4 md:p-8">
       <div className="mb-4">
         <h2 className="font-display text-3xl font-black">Bolões</h2>
-        <p className="mt-1 text-sm text-[#aeb4ca]">Bata seus amigos. E o Gepeto, claro.</p>
+        <p className="mt-1 text-sm text-[#aeb4ca]">
+          Bata seus amigos. E o Gepeto, claro.
+        </p>
       </div>
       <PoolsPanel pools={pools} />
     </div>
@@ -1072,11 +1390,14 @@ function ChapterPhoneScreen({ hub }: { hub: DashboardHub }) {
               <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#ffc965]">
                 Capítulo
               </div>
-              <h2 className="font-display text-2xl font-black">Quartas no fio</h2>
+              <h2 className="font-display text-2xl font-black">
+                Quartas no fio
+              </h2>
             </div>
           </div>
           <p className="text-base leading-relaxed text-[#dfe5ff]">
-            {hub.narrative?.narrative ?? "Gepeto ainda está juntando munição para escrever o capítulo desta semana."}
+            {hub.narrative?.narrative ??
+              "Gepeto ainda está juntando munição para escrever o capítulo desta semana."}
           </p>
         </div>
       </PhoneCard>
@@ -1116,21 +1437,35 @@ function RankingPhoneScreen({
           <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#95aaff]">
             Você × Gepeto
           </div>
-          <h2 className="mt-1 font-display text-2xl font-black">O dossiê da rivalidade</h2>
+          <h2 className="mt-1 font-display text-2xl font-black">
+            O dossiê da rivalidade
+          </h2>
           <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center rounded-2xl border border-[#444b65] bg-[#0c1222]/70 p-4">
             <div className="text-center">
               <div className="mx-auto grid size-10 place-items-center rounded-full bg-[#95aaff] font-display font-black text-[#0a1432]">
                 {hub.user.displayNickname.slice(0, 2).toUpperCase()}
               </div>
-              <div className="mt-2 font-mono text-4xl font-black text-[#95aaff]">{hub.stats.winCount}</div>
+              <div className="mt-2 font-mono text-4xl font-black text-[#95aaff]">
+                {hub.stats.winCount}
+              </div>
               <div className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#aeb4ca]">
                 vitórias
               </div>
             </div>
-            <div className="font-display text-2xl font-black text-[#aeb4ca]">×</div>
+            <div className="font-display text-2xl font-black text-[#aeb4ca]">
+              ×
+            </div>
             <div className="text-center">
-              <GepetoAvatar size={40} mood={hub.stats.lossCount > hub.stats.winCount ? "smug" : "angry"} glow={false} />
-              <div className="mt-2 font-mono text-4xl font-black text-[#ffc965]">{hub.stats.lossCount}</div>
+              <GepetoAvatar
+                size={40}
+                mood={
+                  hub.stats.lossCount > hub.stats.winCount ? "smug" : "angry"
+                }
+                glow={false}
+              />
+              <div className="mt-2 font-mono text-4xl font-black text-[#ffc965]">
+                {hub.stats.lossCount}
+              </div>
               <div className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#aeb4ca]">
                 vitórias
               </div>
@@ -1140,7 +1475,9 @@ function RankingPhoneScreen({
       </PhoneCard>
       <PhoneCard className="p-4">
         <div className="mb-3 flex items-center justify-between">
-          <div className="font-display text-base font-black">Quem bateu mais o Gepeto</div>
+          <div className="font-display text-base font-black">
+            Quem bateu mais o Gepeto
+          </div>
           <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#aeb4ca]">
             Copa 2026
           </span>
@@ -1151,7 +1488,9 @@ function RankingPhoneScreen({
               key={row._id}
               className="grid grid-cols-[32px_34px_1fr_auto] items-center gap-2 rounded-xl border border-[#444b65] bg-[#172039] p-3"
             >
-              <div className="font-mono text-sm font-black text-[#ffc965]">#{row.rank}</div>
+              <div className="font-mono text-sm font-black text-[#ffc965]">
+                #{row.rank}
+              </div>
               <div className="grid size-8 place-items-center rounded-full bg-[#95aaff]/20 font-display text-xs font-black">
                 {(row.user?.displayNickname ?? "?").slice(0, 2).toUpperCase()}
               </div>
@@ -1159,11 +1498,17 @@ function RankingPhoneScreen({
                 <div className="truncate text-sm font-black">
                   @{row.user?.displayNickname ?? "colecionador"}
                 </div>
-                <div className="text-xs text-[#aeb4ca]">{row.totalMatches} jogos</div>
+                <div className="text-xs text-[#aeb4ca]">
+                  {row.totalMatches} jogos
+                </div>
               </div>
               <div className="text-right">
-                <div className="font-mono text-sm font-black text-[#4ff325]">{row.winCount}×</div>
-                <div className="text-[10px] text-[#aeb4ca]">{row.tieCount}E</div>
+                <div className="font-mono text-sm font-black text-[#4ff325]">
+                  {row.winCount}×
+                </div>
+                <div className="text-[10px] text-[#aeb4ca]">
+                  {row.tieCount}E
+                </div>
               </div>
             </div>
           ))}
@@ -1185,7 +1530,9 @@ export function GepetoDashboardView() {
   const hub = useQuery(api.gepeto.getDashboardHub, {});
   const fixtures = useQuery(api.gepeto.listDashboardFixtures, {});
   const pools = useQuery(api.gepeto.listMyPools, {});
-  const leaderboard = useQuery(api.gepeto.listLeaderboardWithUsers, { limit: 30 });
+  const leaderboard = useQuery(api.gepeto.listLeaderboardWithUsers, {
+    limit: 30,
+  });
 
   if (!hub || !fixtures || !pools || !leaderboard) {
     return (
@@ -1201,9 +1548,16 @@ export function GepetoDashboardView() {
   }
 
   return (
-    <PhoneShell tab={selectedTab} onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+    <PhoneShell
+      tab={selectedTab}
+      onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}
+    >
       {selectedTab === "hub" && (
-        <HubPhoneScreen hub={hub} pools={pools} onGoTo={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)} />
+        <HubPhoneScreen
+          hub={hub}
+          pools={pools}
+          onGoTo={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}
+        />
       )}
       {selectedTab === "jogos" && <FixturesPhoneScreen fixtures={fixtures} />}
       {selectedTab === "boloes" && <PoolsPhoneScreen pools={pools} />}
@@ -1215,25 +1569,37 @@ export function GepetoDashboardView() {
   );
 }
 
-export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMatches"> }) {
+export function GepetoMatchDashboardView({
+  matchId,
+}: {
+  matchId: Id<"worldCupMatches">;
+}) {
   const data = useQuery(api.gepeto.getDashboardMatch, { matchId });
   const router = useRouter();
 
   if (!data) {
     return (
-      <PhoneShell tab="jogos" onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+      <PhoneShell
+        tab="jogos"
+        onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}
+      >
         <div className="h-80 animate-pulse bg-[#12192e]" />
       </PhoneShell>
     );
   }
 
-  const { match, round, aiPrediction, userPrediction, community, result } = data;
+  const { match, round, aiPrediction, userPrediction, community, result } =
+    data;
   const total = Math.max(community.total, 1);
   const hasResult = hasFinalScore(match);
   const gepetoRevealed = isPredictionRevealed(match);
   const userExactScore = userPrediction?.exactScore ?? null;
   const gepetoExactScore = aiPrediction?.exactScore ?? null;
-  const matchHeaderState = hasResult ? "postMatch" : gepetoRevealed ? "live" : "preMatch";
+  const matchHeaderState = hasResult
+    ? "postMatch"
+    : gepetoRevealed
+      ? "live"
+      : "preMatch";
 
   const getTimeToKickoff = () => {
     const diff = match.kickoffAt - Date.now();
@@ -1245,7 +1611,10 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
   };
 
   return (
-    <PhoneShell tab="jogos" onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+    <PhoneShell
+      tab="jogos"
+      onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}
+    >
       <div className="min-w-0 space-y-4 p-4 md:p-8">
         <Link
           href="/dashboard/gepeto?tab=jogos"
@@ -1258,12 +1627,16 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
         <MatchHeader
           homeTeam={{
             name: match.homeTeamName,
-            code: match.homeTeamCode || match.homeTeamName.slice(0, 3).toUpperCase(),
+            code:
+              match.homeTeamCode ||
+              match.homeTeamName.slice(0, 3).toUpperCase(),
             flag: match.homeTeamFlag,
           }}
           awayTeam={{
             name: match.awayTeamName,
-            code: match.awayTeamCode || match.awayTeamName.slice(0, 3).toUpperCase(),
+            code:
+              match.awayTeamCode ||
+              match.awayTeamName.slice(0, 3).toUpperCase(),
             flag: match.awayTeamFlag,
           }}
           phase={round?.name ?? "Copa 2026"}
@@ -1289,7 +1662,10 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
           <VerdictBanner
             userPrediction={userExactScore}
             gepetoPrediction={gepetoExactScore}
-            actualResult={{ home: match.homeScore ?? 0, away: match.awayScore ?? 0 }}
+            actualResult={{
+              home: match.homeScore ?? 0,
+              away: match.awayScore ?? 0,
+            }}
           />
         ) : null}
 
@@ -1339,7 +1715,12 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
         ) : null}
 
         {result ? (
-          <PhoneCard className={cn("p-5", result.outcome === "win" && "border-[#4ff325]/60")}>
+          <PhoneCard
+            className={cn(
+              "p-5",
+              result.outcome === "win" && "border-[#4ff325]/60",
+            )}
+          >
             <div className="flex items-center gap-3">
               <Trophy className="size-6 text-[#ffc965]" />
               <div>
@@ -1364,7 +1745,11 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
   );
 }
 
-export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) {
+export function GepetoPoolDetailView({
+  poolId,
+}: {
+  poolId: Id<"gepetoPools">;
+}) {
   const data = useQuery(api.gepeto.getPoolDetail, { poolId });
   const postComment = useMutation(api.gepeto.postPoolComment);
   const pokeMember = useMutation(api.gepeto.pokePoolMember);
@@ -1408,25 +1793,38 @@ export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) 
       <div className="rounded-xl border border-border bg-card p-5 md:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="grid size-16 place-items-center rounded-xl text-4xl" style={{ backgroundColor: `${detail.pool.color}24` }}>
+            <div
+              className="grid size-16 place-items-center rounded-xl text-4xl"
+              style={{ backgroundColor: `${detail.pool.color}24` }}
+            >
               {detail.pool.emoji}
             </div>
             <div>
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-primary">
                 Bolão Gepeto
               </p>
-              <h1 className="font-display text-4xl font-black">{detail.pool.name}</h1>
-              <p className="mt-1 text-muted-foreground">{detail.pool.description ?? "Sem descrição"}</p>
+              <h1 className="font-display text-4xl font-black">
+                {detail.pool.name}
+              </h1>
+              <p className="mt-1 text-muted-foreground">
+                {detail.pool.description ?? "Sem descrição"}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={handleCopyInvite} variant="outline" className="gap-2">
+            <Button
+              onClick={handleCopyInvite}
+              variant="outline"
+              className="gap-2"
+            >
               <Clipboard className="size-4" />
               {detail.pool.inviteCode}
             </Button>
             {detail.nextMatch ? (
               <Button asChild className="gap-2">
-                <Link href={`/dashboard/gepeto/matches/${detail.nextMatch._id}`}>
+                <Link
+                  href={`/dashboard/gepeto/matches/${detail.nextMatch._id}`}
+                >
                   Próximo jogo
                   <ChevronRight className="size-4" />
                 </Link>
@@ -1442,33 +1840,56 @@ export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) 
             <SectionHeader eyebrow="Ranking" title="Mesa do bolão" />
             <div className="mt-4 space-y-2">
               {detail.ranking.map((row) => (
-                <div key={row.member._id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div
+                  key={row.member._id}
+                  className="flex items-center justify-between rounded-lg border border-border p-3"
+                >
                   <div className="flex items-center gap-3">
                     <div className="grid size-9 place-items-center rounded-full bg-primary/15 font-display font-black text-primary">
                       {row.rank}
                     </div>
                     <div>
                       <div className="font-semibold">
-                        {row.member.role === "gepeto" ? "🤖 " : ""}{row.member.displayNickname}
+                        {row.member.role === "gepeto" ? "🤖 " : ""}
+                        {row.member.displayNickname}
                       </div>
-                      <div className="text-xs text-muted-foreground">{row.correctHits} acertos · {row.exactHits} placares</div>
+                      <div className="text-xs text-muted-foreground">
+                        {row.correctHits} acertos · {row.exactHits} placares
+                      </div>
                     </div>
                   </div>
-                  <div className="font-display text-2xl font-black">{row.points}</div>
+                  <div className="font-display text-2xl font-black">
+                    {row.points}
+                  </div>
                 </div>
               ))}
             </div>
           </Card>
           <Card className="p-5">
-            <SectionHeader eyebrow="Membros" title={`${detail.members.length} na sala`} />
+            <SectionHeader
+              eyebrow="Membros"
+              title={`${detail.members.length} na sala`}
+            />
             <div className="mt-4 grid gap-2">
               {detail.members.map((member) => (
-                <div key={member._id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div
+                  key={member._id}
+                  className="flex items-center justify-between rounded-lg border border-border p-3"
+                >
                   <div>
-                    <div className="font-semibold">{member.displayNickname}</div>
-                    <div className="text-xs text-muted-foreground">{member.role}</div>
+                    <div className="font-semibold">
+                      {member.displayNickname}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {member.role}
+                    </div>
                   </div>
-                  <Button size="sm" variant="secondary" onClick={() => handlePoke(member._id)} className="gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handlePoke(member._id)}
+                    className="gap-2"
+                  >
                     <Flame className="size-4" />
                     Cutucar
                   </Button>
@@ -1482,14 +1903,26 @@ export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) 
           <Card className="p-5">
             <SectionHeader eyebrow="Chat" title="Atividades do bolão" />
             <div className="mt-4 flex gap-2">
-              <Input value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Comentar no bolão" />
-              <Button onClick={handleComment} disabled={isPosting || message.trim().length === 0} size="icon" aria-label="Enviar comentário">
+              <Input
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                placeholder="Comentar no bolão"
+              />
+              <Button
+                onClick={handleComment}
+                disabled={isPosting || message.trim().length === 0}
+                size="icon"
+                aria-label="Enviar comentário"
+              >
                 <Send className="size-4" />
               </Button>
             </div>
             <div className="mt-5 space-y-3">
               {detail.activities.map((activity) => (
-                <div key={activity._id} className="rounded-lg border border-border bg-background p-3">
+                <div
+                  key={activity._id}
+                  className="rounded-lg border border-border bg-background p-3"
+                >
                   <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
                     <MessageCircle className="size-3.5" />
                     {activity.actor?.displayNickname ?? "Gepeto"}
@@ -1500,7 +1933,9 @@ export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) 
                 </div>
               ))}
               {detail.activities.length === 0 && (
-                <p className="text-sm text-muted-foreground">Sem atividade ainda.</p>
+                <p className="text-sm text-muted-foreground">
+                  Sem atividade ainda.
+                </p>
               )}
             </div>
           </Card>
@@ -1508,9 +1943,12 @@ export function GepetoPoolDetailView({ poolId }: { poolId: Id<"gepetoPools"> }) 
             <div className="flex items-center gap-3">
               <Crown className="size-6 text-primary" />
               <div>
-                <div className="font-display text-xl font-bold">Multiplicadores</div>
+                <div className="font-display text-xl font-bold">
+                  Multiplicadores
+                </div>
                 <div className="text-sm text-muted-foreground">
-                  Mata-mata x{detail.pool.knockoutMultiplier} · Final x{detail.pool.finalMultiplier}
+                  Mata-mata x{detail.pool.knockoutMultiplier} · Final x
+                  {detail.pool.finalMultiplier}
                 </div>
               </div>
             </div>
