@@ -530,7 +530,15 @@ export const listDashboardFixtures = query({
             return {
               ...match,
               aiPrediction: maskAiPrediction(aiPrediction, isPredictionRevealed(match)),
-              userPrediction: userPredictionByMatch.get(match._id) ?? null,
+              userPrediction: (() => {
+                const prediction = userPredictionByMatch.get(match._id);
+                if (!prediction) return null;
+                const revealed = isPredictionRevealed(match);
+                return {
+                  ...prediction,
+                  exactScore: revealed ? prediction.exactScore : null,
+                };
+              })(),
               communityCount: predictionCount.length,
             };
           }),

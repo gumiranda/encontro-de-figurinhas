@@ -87,10 +87,10 @@ export function PredictionForm({
   };
 
   return (
-    <Card className="overflow-hidden rounded-xl border-border bg-card">
+    <Card className="overflow-hidden rounded-2xl border-[#444b65] bg-[#172039] text-[#dfe5ff]">
       <div className="flex items-center gap-2 px-4 pt-4">
-        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
-          <User className="size-4 text-primary" />
+        <div className="flex size-8 items-center justify-center rounded-full bg-[#95aaff]/15">
+          <User className="size-4 text-[#95aaff]" />
         </div>
         <span className="font-medium">Seu palpite</span>
       </div>
@@ -100,19 +100,21 @@ export function PredictionForm({
           value={homeScore}
           onChange={setHomeScore}
           disabled={!canPredict}
+          className="text-[#dfe5ff]"
         />
-        <span className="font-display text-3xl text-muted-foreground">×</span>
+        <span className="font-display text-3xl text-[#aeb4ca]">×</span>
         <ScoreStepper
           value={awayScore}
           onChange={setAwayScore}
           disabled={!canPredict}
+          className="text-[#dfe5ff]"
         />
       </div>
 
       <div className="px-4 pb-4">
         {canPredict ? (
           <Button
-            className="h-12 w-full gap-2 text-base font-semibold"
+            className="h-12 w-full gap-2 rounded-2xl bg-[#95aaff] text-base font-black text-[#082054] hover:bg-[#a9baff]"
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
@@ -124,14 +126,14 @@ export function PredictionForm({
                 : "Confirmar e enfrentar o Gepeto"}
           </Button>
         ) : (
-          <div className="rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-center text-sm text-muted-foreground">
+          <div className="rounded-xl border border-[#444b65] bg-[#12192e]/70 px-4 py-3 text-center text-sm text-[#aeb4ca]">
             🔒 {lockReason}
           </div>
         )}
       </div>
 
       {!canPredict && existingPrediction?.exactScore ? (
-        <p className="px-4 pb-4 text-center text-xs text-muted-foreground">
+        <p className="px-4 pb-4 text-center text-xs text-[#aeb4ca]">
           Você palpitou {existingPrediction.exactScore.home} ×{" "}
           {existingPrediction.exactScore.away} (
           {existingPrediction.prediction === "home"

@@ -67,8 +67,13 @@ function pickTab(raw: string | null): TabKey {
   return TAB_KEYS.has(raw as TabKey) ? (raw as TabKey) : "hub";
 }
 
-function matchState(match: { kickoffAt: number; status?: string }) {
-  if ((match.status ?? "scheduled") === "finished") return "pos";
+function matchState(match: {
+  kickoffAt: number;
+  status?: string;
+  homeScore?: number;
+  awayScore?: number;
+}) {
+  if (hasFinalScore(match) || (match.status ?? "scheduled") === "finished") return "pos";
   if ((match.status ?? "scheduled") === "live" || match.kickoffAt <= Date.now()) return "ao vivo";
   return "pre";
 }
@@ -446,6 +451,66 @@ function scoreLabel(score?: { home: number; away: number } | null) {
   return score ? `${score.home}-${score.away}` : null;
 }
 
+function predictionBadgeClass(
+  predicted: { home: number; away: number } | null | undefined,
+  actualHome?: number,
+  actualAway?: number,
+  variant: "gepeto" | "user" = "user",
+) {
+  if (
+    predicted &&
+    actualHome !== undefined &&
+    actualAway !== undefined &&
+    predicted.home === actualHome &&
+    predicted.away === actualAway
+  ) {
+    return "bg-[#4ff325]/15 text-[#4ff325]";
+  }
+  if (actualHome !== undefined && actualAway !== undefined && predicted) {
+    return variant === "gepeto"
+      ? "bg-[#ffc965]/15 text-[#ffc965]"
+      : "bg-[#ff6e84]/15 text-[#ff6e84]";
+  }
+  return variant === "gepeto"
+    ? "bg-[#ffc965]/15 text-[#ffc965]"
+    : "bg-[#95aaff]/15 text-[#95aaff]";
+}
+
+function roundStatusLabel(round: DashboardFixtures[number]) {
+  if (round.matches.length === 0) return "SEM JOGOS";
+  if (round.matches.every((match) => hasFinalScore(match))) return "ENCERRADA";
+  if (round.matches.some((match) => matchState(match) === "ao vivo")) return "AO VIVO";
+  return "ABERTA";
+}
+
+function groupFixturesByPhase(fixtures: DashboardFixtures) {
+  const map = new Map<string, DashboardFixtures>();
+  for (const round of fixtures) {
+    const rounds = map.get(round.phase) ?? [];
+    rounds.push(round);
+    map.set(round.phase, rounds);
+  }
+  return [...map.entries()].map(([phase, rounds]) => ({
+    phase,
+    rounds: rounds.sort((a, b) => a.order - b.order),
+  }));
+}
+
+function countTeamsInRounds(rounds: DashboardFixtures[number][]) {
+  const teams = new Set<string>();
+  for (const round of rounds) {
+    for (const match of round.matches) {
+      teams.add(match.homeTeamCode);
+      teams.add(match.awayTeamCode);
+    }
+  }
+  return teams.size;
+}
+
+function countMatchesInRounds(rounds: DashboardFixtures[number][]) {
+  return rounds.reduce((total, round) => total + round.matches.length, 0);
+}
+
 function userAccuracy(stats: DashboardHub["stats"]) {
   if (stats.totalMatches <= 0) return 0;
   return Math.round((stats.winCount / stats.totalMatches) * 100);
@@ -470,10 +535,10 @@ function PhoneShell({
   const router = useRouter();
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-3.5rem)] bg-[#070b18] px-3 py-5 text-[#dfe5ff] md:px-8 md:py-8">
-      <div className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[36px] border border-[#444b65] bg-[#090e1c] shadow-[0_24px_90px_rgba(0,0,0,0.5)]">
-        <div className="sticky top-0 z-20 border-b border-[#444b65] bg-[#090e1c]/95 px-4 py-4 backdrop-blur">
-          <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-center">
+    <div className="-m-6 min-h-[calc(100vh-3.5rem)] bg-[#070b18] text-[#dfe5ff]">
+      <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-[430px] flex-col overflow-hidden rounded-[36px] border border-[#444b65] bg-[#090e1c] shadow-[0_24px_90px_rgba(0,0,0,0.5)] md:max-w-none md:rounded-none md:border-0 md:shadow-none">
+        <div className="sticky top-0 z-20 shrink-0 border-b border-[#444b65] bg-[#090e1c]/95 px-4 py-4 backdrop-blur md:px-8 md:py-5">
+          <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-center md:mb-5">
             <button
               type="button"
               onClick={() => router.back()}
@@ -485,22 +550,22 @@ function PhoneShell({
             <div className="flex items-center gap-2">
               <GepetoAvatar size={30} mood="neutral" glow={false} />
               <div className="leading-none">
-                <div className="font-display text-sm font-black">Gepeto</div>
-                <div className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#aeb4ca]">
+                <div className="font-display text-sm font-black md:text-base">Gepeto</div>
+                <div className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#aeb4ca] md:text-[10px]">
                   Humano × IA
                 </div>
               </div>
             </div>
             <div />
           </div>
-          <div className="grid grid-cols-5 rounded-2xl border border-[#444b65] bg-[#202741] p-1">
+          <div className="grid grid-cols-5 rounded-2xl border border-[#444b65] bg-[#202741] p-1 md:mx-auto md:max-w-4xl">
             {GEPETO_TABS.map((item) => (
               <button
                 key={item.value}
                 type="button"
                 onClick={() => onTabChange(item.value)}
                 className={cn(
-                  "h-11 rounded-xl text-[11px] font-bold text-[#aeb4ca] transition-colors",
+                  "h-11 rounded-xl text-[11px] font-bold text-[#aeb4ca] transition-colors md:h-12 md:text-sm",
                   tab === item.value && "bg-[#dfe4fb] text-[#090e1c]",
                 )}
               >
@@ -509,7 +574,7 @@ function PhoneShell({
             ))}
           </div>
         </div>
-        <div className="min-h-[760px] pb-8">{children}</div>
+        <div className="flex-1 pb-8 md:pb-10">{children}</div>
       </div>
     </div>
   );
@@ -659,7 +724,7 @@ function HubPhoneScreen({
   onGoTo: (tab: TabKey) => void;
 }) {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 md:p-8">
       <NextDuelCard hub={hub} pools={pools} onGoTo={onGoTo} />
 
       <PhoneCard className="p-4">
@@ -778,7 +843,12 @@ function FixturePhoneRow({
   const live = state === "ao vivo";
   const finished = state === "pos";
   const gepetoScore = scoreLabel(match.aiPrediction?.exactScore);
-  const userScore = scoreLabel(match.userPrediction?.exactScore);
+  const userScore = scoreLabel(
+    isPredictionRevealed(match) ? match.userPrediction?.exactScore : null,
+  );
+  const hasAiPrediction = !!match.aiPrediction;
+  const actualHome = match.homeScore;
+  const actualAway = match.awayScore;
 
   return (
     <Link
@@ -802,7 +872,7 @@ function FixturePhoneRow({
             <div className="mt-1 font-mono text-lg font-black">{match.status === "live" ? "56'" : "agora"}</div>
           </>
         ) : finished ? (
-          <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#aeb4ca]">
+          <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#aeb4ca] [writing-mode:vertical-rl] rotate-180">
             Final
           </div>
         ) : (
@@ -834,16 +904,36 @@ function FixturePhoneRow({
         </div>
         <div className="mt-3 flex gap-2 border-t border-dashed border-[#444b65] pt-2">
           {gepetoScore ? (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#ffc965]/15 px-2 py-1 font-mono text-xs font-black text-[#ffc965]">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-lg px-2 py-1 font-mono text-xs font-black",
+                predictionBadgeClass(
+                  match.aiPrediction?.exactScore,
+                  actualHome,
+                  actualAway,
+                  "gepeto",
+                ),
+              )}
+            >
               <GepetoAvatar size={14} mood="neutral" glow={false} /> {gepetoScore}
             </span>
-          ) : (
+          ) : hasAiPrediction ? (
             <span className="rounded-lg border border-dashed border-[#ffc965]/45 px-2 py-1 font-mono text-xs font-black text-[#ffc965]">
               Gepeto lacrado
             </span>
-          )}
+          ) : null}
           {userScore ? (
-            <span className="rounded-lg bg-[#95aaff]/15 px-2 py-1 font-mono text-xs font-black text-[#95aaff]">
+            <span
+              className={cn(
+                "rounded-lg px-2 py-1 font-mono text-xs font-black",
+                predictionBadgeClass(
+                  match.userPrediction?.exactScore,
+                  actualHome,
+                  actualAway,
+                  "user",
+                ),
+              )}
+            >
               Você {userScore}
             </span>
           ) : (
@@ -861,23 +951,31 @@ function FixturePhoneRow({
 }
 
 function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
-  const currentIndex = Math.max(0, fixtures.findIndex((round) => round.isActive));
-  const [phaseIndex, setPhaseIndex] = useState(currentIndex);
-  const activeRound = fixtures[phaseIndex] ?? fixtures[0];
+  const phases = useMemo(() => groupFixturesByPhase(fixtures), [fixtures]);
+  const activePhaseIndex = Math.max(
+    0,
+    phases.findIndex((entry) => entry.rounds.some((round) => round.isActive)),
+  );
+  const [phaseIndex, setPhaseIndex] = useState(activePhaseIndex);
+  const activePhase = phases[phaseIndex] ?? phases[0];
 
-  if (!activeRound) {
+  if (!activePhase) {
     return <div className="p-4 text-sm text-[#aeb4ca]">Sem jogos carregados.</div>;
   }
 
+  const teamCount = countTeamsInRounds(activePhase.rounds);
+  const matchCount = countMatchesInRounds(activePhase.rounds);
+
   return (
     <div>
-      <div className="sticky top-[133px] z-10 flex gap-2 overflow-x-auto border-b border-[#444b65] bg-[#090e1c]/95 p-3 backdrop-blur">
-        {fixtures.map((round, index) => {
+      <div className="sticky top-[128px] z-10 flex gap-2 overflow-x-auto border-b border-[#444b65] bg-[#090e1c]/95 p-3 backdrop-blur md:top-[148px] md:px-8">
+        {phases.map((entry, index) => {
           const selected = phaseIndex === index;
-          const accent = phaseAccent(round);
+          const accent = phaseAccent(entry.rounds[0] ?? fixtures[0]!);
+          const locked = entry.rounds.every((round) => !round.isActive) && index > activePhaseIndex;
           return (
             <button
-              key={round._id}
+              key={entry.phase}
               type="button"
               onClick={() => setPhaseIndex(index)}
               className={cn(
@@ -886,42 +984,47 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
               )}
               style={{ borderColor: selected ? "#dfe4fb" : accent }}
             >
-              {!round.isActive && index > currentIndex && <Lock className="size-3.5" style={{ color: accent }} />}
-              {round.name}
+              {locked && <Lock className="size-3.5" style={{ color: accent }} />}
+              {entry.phase}
             </button>
           );
         })}
       </div>
 
-      <div className="space-y-4 p-4">
+      <div className="space-y-5 p-4 md:p-8">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="font-display text-3xl font-black text-[#ffc965]">
-              {activeRound.name}
+              {activePhase.phase}
             </h2>
             <p className="mt-1 text-sm text-[#aeb4ca]">
-              {activeRound.matches.length * 2} seleções · {activeRound.matches.length} jogos
+              {teamCount} seleções · {matchCount} jogos
             </p>
           </div>
-          {activeRound.isActive && (
+          {activePhase.rounds.some((round) => round.isActive) && (
             <Badge className="gap-1 rounded-lg bg-[#ffc965]/15 font-mono text-[#ffc965]">
               <span className="size-1.5 rounded-full bg-[#4ff325]" />
               Atual
             </Badge>
           )}
         </div>
-        <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca]">
-          {activeRound.phase} · {activeRound.matches.length} partidas
-        </div>
-        <div className="grid gap-3">
-          {activeRound.matches.map((match, index) => (
-            <FixturePhoneRow
-              key={match._id}
-              match={match}
-              featured={index === 0 && matchState(match) !== "pos"}
-            />
-          ))}
-        </div>
+
+        {activePhase.rounds.map((round) => (
+          <section key={round._id} className="space-y-3">
+            <div className="font-mono text-[11px] font-black uppercase tracking-[0.24em] text-[#aeb4ca]">
+              {round.name} · {roundStatusLabel(round)}
+            </div>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {round.matches.map((match, index) => (
+                <FixturePhoneRow
+                  key={match._id}
+                  match={match}
+                  featured={index === 0 && matchState(match) !== "pos" && round.isActive}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );
@@ -929,7 +1032,7 @@ function FixturesPhoneScreen({ fixtures }: { fixtures: DashboardFixtures }) {
 
 function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
   return (
-    <div className="p-4">
+    <div className="p-4 md:p-8">
       <div className="mb-4">
         <h2 className="font-display text-3xl font-black">Bolões</h2>
         <p className="mt-1 text-sm text-[#aeb4ca]">Bata seus amigos. E o Gepeto, claro.</p>
@@ -941,7 +1044,7 @@ function PoolsPhoneScreen({ pools }: { pools: DashboardPools }) {
 
 function ChapterPhoneScreen({ hub }: { hub: DashboardHub }) {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 md:p-8">
       <PhoneCard className="overflow-hidden p-0">
         <div className="bg-[linear-gradient(135deg,rgba(255,201,101,0.16),transparent_70%)] p-5">
           <div className="mb-4 flex items-center gap-3">
@@ -988,7 +1091,7 @@ function RankingPhoneScreen({
   leaderboard: DashboardLeaderboard;
 }) {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 md:p-8">
       <PhoneCard className="overflow-hidden p-0">
         <div className="bg-[linear-gradient(135deg,rgba(149,170,255,0.18),transparent_70%)] p-5">
           <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#95aaff]">
@@ -1065,11 +1168,6 @@ export function GepetoDashboardView() {
   const pools = useQuery(api.gepeto.listMyPools, {});
   const leaderboard = useQuery(api.gepeto.listLeaderboardWithUsers, { limit: 30 });
 
-  const allMatches = useMemo(
-    () => fixtures?.flatMap((round) => round.matches.map((match) => ({ ...match, roundName: round.name }))) ?? [],
-    [fixtures],
-  );
-
   if (!hub || !fixtures || !pools || !leaderboard) {
     return (
       <div className="space-y-4">
@@ -1084,137 +1182,30 @@ export function GepetoDashboardView() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <HeroMatchCard hub={hub} />
-      <div className="grid gap-3 md:grid-cols-4">
-        <StatPill label="Vitórias" value={hub.stats.winCount} />
-        <StatPill label="Empates" value={hub.stats.tieCount} />
-        <StatPill label="Derrotas" value={hub.stats.lossCount} />
-        <StatPill label="Bolões" value={pools.length} />
-      </div>
-
-      <Tabs
-        value={selectedTab}
-        onValueChange={(value) => router.push(`/dashboard/gepeto?tab=${value}`)}
-        className="space-y-5"
-      >
-        <TabsList className="grid h-auto grid-cols-2 gap-1 rounded-xl p-1 md:grid-cols-5">
-          <TabsTrigger value="hub">Hub</TabsTrigger>
-          <TabsTrigger value="jogos">Jogos</TabsTrigger>
-          <TabsTrigger value="boloes">Bolões</TabsTrigger>
-          <TabsTrigger value="capitulo">Capítulo</TabsTrigger>
-          <TabsTrigger value="ranking">Vs IA</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="hub" className="space-y-5">
-          <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
-            <Card className="p-5">
-              <SectionHeader eyebrow="Próxima decisão" title="Antes do apito, tudo fica lacrado." />
-              {hub.nextMatch ? (
-                <div className="mt-5 space-y-4">
-                  <MatchScore match={hub.nextMatch} />
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="text-sm text-muted-foreground">
-                      Gepeto: {hub.aiPrediction?.prediction ? choiceLabel(hub.nextMatch, hub.aiPrediction.prediction) : "palpite lacrado"}
-                    </div>
-                    <Button asChild className="gap-2">
-                      <Link href={`/dashboard/gepeto/matches/${hub.nextMatch._id}`}>
-                        Ir para o jogo
-                        <Zap className="size-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
-            </Card>
-            <StreakStrip
-              currentStreak={hub.stats.winCount}
-              days={[
-                { day: "S", played: true, beatAI: hub.stats.winCount > 0 },
-                { day: "T", played: true, beatAI: hub.stats.winCount > 1 },
-                { day: "Q", played: true, beatAI: false },
-                { day: "Q", played: true, beatAI: hub.stats.winCount > 2 },
-                { day: "S", played: false, beatAI: false, isToday: true },
-              ]}
-            />
-          </div>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Card className="p-5">
-              <SectionHeader eyebrow="Mesa" title="Top contra o robô" />
-              <div className="mt-4">
-                <LeaderboardList rows={hub.leaderboard} />
-              </div>
-            </Card>
-            <Card className="p-5">
-              <SectionHeader eyebrow="Bolões" title="Seus grupos ativos" />
-              <div className="mt-4 grid gap-2">
-                {pools.slice(0, 3).map((pool) => (
-                  <Link key={pool._id} href={`/dashboard/gepeto/boloes/${pool._id}`} className="flex items-center justify-between rounded-lg border border-border p-3 hover:border-primary/60">
-                    <span className="font-semibold">{pool.emoji} {pool.name}</span>
-                    <Badge variant="secondary">{pool.activeMemberCount}</Badge>
-                  </Link>
-                ))}
-                {pools.length === 0 && <p className="text-sm text-muted-foreground">Crie seu primeiro bolão na aba Bolões.</p>}
-              </div>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="jogos" className="space-y-5">
-          <SectionHeader eyebrow="Tabela" title={`${allMatches.length} jogos para desafiar Gepeto`} />
-          <div className="space-y-5">
-            {fixtures.map((round) => (
-              <section key={round._id} className="space-y-3">
-                <h3 className="font-display text-xl font-bold">{round.name}</h3>
-                <div className="space-y-2">
-                  {round.matches.map((match) => (
-                    <FixtureRow key={match._id} match={match} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="boloes">
-          <SectionHeader eyebrow="Bolões" title="Rivalidade privada, zoeira pública." />
-          <div className="mt-5">
-            <PoolsPanel pools={pools} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="capitulo" className="space-y-4">
-          <SectionHeader eyebrow="Capítulo" title="O boletim semanal do Gepeto" />
-          <Card className="p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <GepetoAvatar size={56} mood="neutral" />
-              <div>
-                <div className="font-display text-xl font-bold">Narrativa da rodada</div>
-                <div className="text-sm text-muted-foreground">
-                  Gepeto {hub.narrative?.gepetoScore ?? 0} x {hub.narrative?.communityScore ?? 0} comunidade
-                </div>
-              </div>
-            </div>
-            <p className="text-lg leading-relaxed">
-              {hub.narrative?.narrative ?? "Gepeto ainda está juntando munição para escrever o capítulo desta semana."}
-            </p>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ranking" className="space-y-4">
-          <SectionHeader eyebrow="Vs IA" title="Quem já calou o Gepeto" />
-          <LeaderboardList rows={leaderboard} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <PhoneShell tab={selectedTab} onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+      {selectedTab === "hub" && (
+        <HubPhoneScreen hub={hub} pools={pools} onGoTo={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)} />
+      )}
+      {selectedTab === "jogos" && <FixturesPhoneScreen fixtures={fixtures} />}
+      {selectedTab === "boloes" && <PoolsPhoneScreen pools={pools} />}
+      {selectedTab === "capitulo" && <ChapterPhoneScreen hub={hub} />}
+      {selectedTab === "ranking" && (
+        <RankingPhoneScreen hub={hub} leaderboard={leaderboard} />
+      )}
+    </PhoneShell>
   );
 }
 
 export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMatches"> }) {
   const data = useQuery(api.gepeto.getDashboardMatch, { matchId });
+  const router = useRouter();
 
   if (!data) {
-    return <div className="h-80 animate-pulse rounded-xl bg-muted" />;
+    return (
+      <PhoneShell tab="jogos" onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+        <div className="h-80 animate-pulse bg-[#12192e]" />
+      </PhoneShell>
+    );
   }
 
   const { match, round, aiPrediction, userPrediction, community, result } = data;
@@ -1235,116 +1226,122 @@ export function GepetoMatchDashboardView({ matchId }: { matchId: Id<"worldCupMat
   };
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
-      <Button asChild variant="ghost" size="sm" className="-ml-2 gap-2 px-2">
-        <Link href="/dashboard/gepeto?tab=jogos">
+    <PhoneShell tab="jogos" onTabChange={(tab) => router.push(`/dashboard/gepeto?tab=${tab}`)}>
+      <div className="space-y-4 p-4 md:p-8">
+        <Link
+          href="/dashboard/gepeto?tab=jogos"
+          className="inline-flex items-center gap-2 text-sm font-bold text-[#aeb4ca]"
+        >
           <ArrowLeft className="size-4" />
           Todos os jogos
         </Link>
-      </Button>
 
-      <MatchHeader
-        homeTeam={{
-          name: match.homeTeamName,
-          code: match.homeTeamName.slice(0, 3).toUpperCase(),
-          flag: match.homeTeamFlag,
-        }}
-        awayTeam={{
-          name: match.awayTeamName,
-          code: match.awayTeamName.slice(0, 3).toUpperCase(),
-          flag: match.awayTeamFlag,
-        }}
-        phase={round?.name ?? "Copa 2026"}
-        date={new Date(match.kickoffAt).toLocaleDateString("pt-BR", {
-          weekday: "short",
-          day: "numeric",
-          month: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-        stadium={match.venue}
-        state={matchHeaderState}
-        timeToKickoff={getTimeToKickoff()}
-        finalScore={
-          hasResult
-            ? { home: match.homeScore ?? 0, away: match.awayScore ?? 0 }
-            : undefined
-        }
-      />
-
-      {hasResult && userExactScore && gepetoExactScore ? (
-        <VerdictBanner
-          userPrediction={userExactScore}
-          gepetoPrediction={gepetoExactScore}
-          actualResult={{ home: match.homeScore ?? 0, away: match.awayScore ?? 0 }}
+        <MatchHeader
+          homeTeam={{
+            name: match.homeTeamName,
+            code: match.homeTeamCode || match.homeTeamName.slice(0, 3).toUpperCase(),
+            flag: match.homeTeamFlag,
+          }}
+          awayTeam={{
+            name: match.awayTeamName,
+            code: match.awayTeamCode || match.awayTeamName.slice(0, 3).toUpperCase(),
+            flag: match.awayTeamFlag,
+          }}
+          phase={round?.name ?? "Copa 2026"}
+          date={new Date(match.kickoffAt).toLocaleDateString("pt-BR", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+          stadium={match.venue}
+          state={matchHeaderState}
+          timeToKickoff={getTimeToKickoff()}
+          finalScore={
+            hasResult
+              ? { home: match.homeScore ?? 0, away: match.awayScore ?? 0 }
+              : undefined
+          }
+          className="rounded-2xl border border-[#444b65] bg-[#12192e] text-[#dfe5ff]"
         />
-      ) : null}
 
-      <PredictionForm
-        matchId={match._id}
-        homeTeam={match.homeTeamName}
-        awayTeam={match.awayTeamName}
-        kickoffAt={match.kickoffAt}
-        homeScore={match.homeScore}
-        awayScore={match.awayScore}
-        existingPrediction={
-          userPrediction?.prediction
-            ? {
-                prediction: userPrediction.prediction,
-                exactScore: userPrediction.exactScore,
-              }
-            : undefined
-        }
-      />
+        {hasResult && userExactScore && gepetoExactScore ? (
+          <VerdictBanner
+            userPrediction={userExactScore}
+            gepetoPrediction={gepetoExactScore}
+            actualResult={{ home: match.homeScore ?? 0, away: match.awayScore ?? 0 }}
+          />
+        ) : null}
 
-      <GepetoPredictionPanel
-        matchId={match._id}
-        homeTeam={match.homeTeamName}
-        awayTeam={match.awayTeamName}
-        isRevealed={gepetoRevealed}
-        hasPrediction={!!aiPrediction}
-        hasUserPrediction={!!userPrediction}
-        prediction={aiPrediction?.prediction ?? null}
-        exactScore={aiPrediction?.exactScore ?? null}
-        confidence={aiPrediction?.confidence}
-        reasoning={aiPrediction?.reasoning ?? []}
-        trashTalk={aiPrediction?.trashTalk}
-        generatedAt={aiPrediction?.generatedAt}
-      />
+        <div className="grid gap-4 md:grid-cols-2 md:items-start">
+          <PredictionForm
+            matchId={match._id}
+            homeTeam={match.homeTeamName}
+            awayTeam={match.awayTeamName}
+            kickoffAt={match.kickoffAt}
+            homeScore={match.homeScore}
+            awayScore={match.awayScore}
+            existingPrediction={
+              userPrediction?.prediction
+                ? {
+                    prediction: userPrediction.prediction,
+                    exactScore: userPrediction.exactScore,
+                  }
+                : undefined
+            }
+          />
 
-      {community.total > 0 ? (
-        <CommunityBar
-          homeFlag={match.homeTeamFlag}
-          awayFlag={match.awayTeamFlag}
-          homePercent={toPercent(community.counts.home, total)}
-          drawPercent={toPercent(community.counts.draw, total)}
-          awayPercent={toPercent(community.counts.away, total)}
-          totalPredictions={community.total}
-        />
-      ) : null}
+          <GepetoPredictionPanel
+            matchId={match._id}
+            homeTeam={match.homeTeamName}
+            awayTeam={match.awayTeamName}
+            isRevealed={gepetoRevealed}
+            hasPrediction={!!aiPrediction}
+            hasUserPrediction={!!userPrediction}
+            prediction={aiPrediction?.prediction ?? null}
+            exactScore={aiPrediction?.exactScore ?? null}
+            confidence={aiPrediction?.confidence}
+            reasoning={aiPrediction?.reasoning ?? []}
+            trashTalk={aiPrediction?.trashTalk}
+            generatedAt={aiPrediction?.generatedAt}
+          />
+        </div>
 
-      {result ? (
-        <Card className={cn("p-5", result.outcome === "win" && "border-emerald-400/60 bg-emerald-400/5")}>
-          <div className="flex items-center gap-3">
-            <Trophy className="size-6 text-primary" />
-            <div>
-              <div className="font-display text-xl font-bold">
-                {result.outcome === "win"
-                  ? "Badge conquistado"
-                  : result.outcome === "tie"
-                    ? "Empate técnico"
-                    : "Gepeto levou essa"}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {userPrediction?.hasBadge
-                  ? "Seu distintivo já está registrado."
-                  : "O resultado entra após o placar final."}
+        {community.total > 0 ? (
+          <CommunityBar
+            homeFlag={match.homeTeamFlag}
+            awayFlag={match.awayTeamFlag}
+            homePercent={toPercent(community.counts.home, total)}
+            drawPercent={toPercent(community.counts.draw, total)}
+            awayPercent={toPercent(community.counts.away, total)}
+            totalPredictions={community.total}
+          />
+        ) : null}
+
+        {result ? (
+          <PhoneCard className={cn("p-5", result.outcome === "win" && "border-[#4ff325]/60")}>
+            <div className="flex items-center gap-3">
+              <Trophy className="size-6 text-[#ffc965]" />
+              <div>
+                <div className="font-display text-xl font-bold">
+                  {result.outcome === "win"
+                    ? "Badge conquistado"
+                    : result.outcome === "tie"
+                      ? "Empate técnico"
+                      : "Gepeto levou essa"}
+                </div>
+                <div className="text-sm text-[#aeb4ca]">
+                  {userPrediction?.hasBadge
+                    ? "Seu distintivo já está registrado."
+                    : "O resultado entra após o placar final."}
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
-      ) : null}
-    </div>
+          </PhoneCard>
+        ) : null}
+      </div>
+    </PhoneShell>
   );
 }
 

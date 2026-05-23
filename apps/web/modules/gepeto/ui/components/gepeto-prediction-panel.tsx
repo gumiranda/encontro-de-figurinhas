@@ -69,7 +69,7 @@ export function GepetoPredictionPanel({
   return (
     <Card
       className={cn(
-        "relative overflow-hidden rounded-xl border-border bg-card p-4",
+        "relative overflow-hidden rounded-2xl border-[#444b65] bg-[#172039] p-4 text-[#dfe5ff]",
         className,
       )}
     >
@@ -98,7 +98,7 @@ export function GepetoPredictionPanel({
                 NV 7
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">Oponente da rodada</p>
+            <p className="text-xs text-[#aeb4ca]">Oponente da rodada</p>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export function GepetoPredictionPanel({
               <p className="font-display text-2xl font-black">
                 {choiceLabel(homeTeam, awayTeam, prediction)}
               </p>
-              <p className="font-display text-xl text-muted-foreground">
+              <p className="font-display text-xl text-[#aeb4ca]">
                 {exactScore.home} × {exactScore.away}
               </p>
             </div>
@@ -137,7 +137,7 @@ export function GepetoPredictionPanel({
               <Lock className="size-3" />
               PALPITE LACRADO
             </Badge>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-sm leading-relaxed text-[#aeb4ca]">
               {hasUserPrediction
                 ? "Gepeto já cravou o palpite dele. O placar abre no apito inicial."
                 : "Gepeto já gravou o palpite dele. Mande o seu primeiro pra ver o que ele cravou."}
@@ -147,7 +147,7 @@ export function GepetoPredictionPanel({
             </p>
           </div>
         ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-[#aeb4ca]">
             Gepeto ainda não analisou este jogo.
           </p>
         )}
