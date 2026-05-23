@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 function HeroSection() {
   return (
-    <section className="relative py-12 md:py-16">
+    <section className="relative overflow-x-hidden pt-20 pb-12 md:pt-24 md:pb-16">
       {/* Background blobs */}
       <div
         className="pointer-events-none absolute -top-24 left-[10%] h-[360px] w-[360px] blur-[40px]"
@@ -44,9 +44,9 @@ function HeroSection() {
         }}
       />
 
-      <div className="container mx-auto px-4">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
-          <div>
+      <div className="container mx-auto min-w-0 px-4">
+        <div className="grid min-w-0 items-center gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          <div className="min-w-0">
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-amber-400">
               <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400 shadow-lg shadow-amber-400/50" />
@@ -54,7 +54,7 @@ function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="font-display text-5xl font-bold leading-[0.92] tracking-tighter md:text-7xl lg:text-[88px]">
+            <h1 className="font-display text-4xl font-bold leading-[0.95] tracking-tighter sm:text-5xl md:text-7xl lg:text-[88px]">
               Bata o
               <br />
               <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">
@@ -116,7 +116,9 @@ function HeroSection() {
           </div>
 
           {/* Hero Board */}
-          <HeroBoard />
+          <div className="min-w-0">
+            <HeroBoard />
+          </div>
         </div>
       </div>
     </section>
@@ -127,7 +129,7 @@ export default function GepetoLandingPage() {
   return (
     <>
       <LandingHeader />
-      <main>
+      <main id="main-content" className="min-w-0 overflow-x-hidden">
         <HeroSection />
         <StatStrip />
         <HowItWorks />

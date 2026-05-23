@@ -16,14 +16,14 @@ export function HeroBoard() {
   const humanScores = [9, 9, 10];
 
   return (
-    <div className="relative animate-float">
-      {/* Floating quote bubble */}
-      <div className="absolute -top-7 -left-4 z-10 max-w-[260px] rounded-2xl rounded-bl border border-amber-400 bg-slate-900/90 px-3.5 py-2.5 text-sm italic text-foreground shadow-2xl">
+    <div className="relative mx-auto w-full min-w-0 max-w-md md:max-w-none md:animate-float">
+      {/* Quote bubble: in-flow on mobile, floating on desktop */}
+      <div className="relative z-10 mb-4 max-w-[280px] rounded-2xl rounded-bl border border-amber-400 bg-slate-900/90 px-3.5 py-2.5 text-sm italic text-foreground shadow-2xl md:absolute md:-left-4 md:-top-7 md:mb-0">
         <span className="mr-0.5 font-display text-xl text-amber-400/50">"</span>
         Cravei Brasil 2-1. Quem discorda, abre o Excel.
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-slate-800/80 to-slate-900/90 p-7 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-slate-800/80 to-slate-900/90 p-5 shadow-2xl sm:p-7">
         {/* Background grid effect */}
         <div
           className="pointer-events-none absolute inset-0 opacity-5"
