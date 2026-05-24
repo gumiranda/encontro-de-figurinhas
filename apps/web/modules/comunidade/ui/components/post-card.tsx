@@ -3,7 +3,17 @@
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
-import { Calendar, Check, Mail, MapPin, MessageCircle, MoreHorizontal, Share2, Star, Trash2 } from "lucide-react";
+import {
+  Calendar,
+  Check,
+  Mail,
+  MapPin,
+  MessageCircle,
+  MoreHorizontal,
+  Share2,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { PostStickersGrid } from "./post-stickers-grid";
 import { ReactionRow } from "./reaction-row";
 import { CommentsThread } from "./comments-thread";
@@ -11,11 +21,7 @@ import { FeedAvatar } from "./feed-avatar";
 
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +35,10 @@ type PostSticker = {
   displayCode: string;
   flagEmoji: string;
   name: string;
+  rare?: boolean;
+  isGolden?: boolean;
+  isLegend?: boolean;
+  quantity?: number;
 };
 
 type PostAuthor = {
@@ -82,7 +92,9 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
         <FeedAvatar
           seed={post.author?.avatarSeed ?? "anon"}
           size={40}
-          fallbackInitials={post.author?.displayNickname?.slice(0, 2).toUpperCase() ?? "??"}
+          fallbackInitials={
+            post.author?.displayNickname?.slice(0, 2).toUpperCase() ?? "??"
+          }
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -103,9 +115,12 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
             <Badge
               className={cn(
                 "text-[9px] px-2 py-0.5 font-headline font-bold tracking-wider inline-flex items-center gap-1",
-                post.type === "have" && "bg-secondary/12 text-secondary border-secondary/30",
-                post.type === "need" && "bg-primary/12 text-primary border-primary/30",
-                post.type === "event" && "bg-tertiary/12 text-tertiary border-tertiary/30"
+                post.type === "have" &&
+                  "bg-secondary/12 text-secondary border-secondary/30",
+                post.type === "need" &&
+                  "bg-primary/12 text-primary border-primary/30",
+                post.type === "event" &&
+                  "bg-tertiary/12 text-tertiary border-tertiary/30",
               )}
             >
               {post.type === "have" && (
@@ -171,7 +186,9 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
 
       <CardContent className="space-y-3 pt-0">
         {post.message && (
-          <p className="text-[13px] text-foreground leading-relaxed">{post.message}</p>
+          <p className="text-[13px] text-foreground leading-relaxed">
+            {post.message}
+          </p>
         )}
 
         {post.type === "event" && post.eventDate && (
@@ -193,7 +210,11 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
                 </div>
               )}
             </div>
-            <Button variant="outline" size="sm" className="h-8 px-2.5 text-[11px] border-white/10">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-2.5 text-[11px] border-white/10"
+            >
               Confirmar
             </Button>
           </div>
@@ -247,9 +268,7 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
           </div>
         </div>
 
-        {showComments && (
-          <CommentsThread postId={post._id} />
-        )}
+        {showComments && <CommentsThread postId={post._id} />}
       </CardContent>
     </Card>
   );

@@ -32,7 +32,7 @@ export const getNavContext = query({
     if (!user) return null;
     const pendingProposalsCount = await getPendingProposalsForUserCount(
       ctx,
-      user._id
+      user._id,
     );
     return {
       role: user.role,
@@ -123,11 +123,13 @@ export const getAllUsers = query({
     ] as Id<"cities">[];
     const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));
     const cityById = new Map(
-      cities.filter((c): c is Doc<"cities"> => c !== null).map((c) => [c._id, c])
+      cities
+        .filter((c): c is Doc<"cities"> => c !== null)
+        .map((c) => [c._id, c]),
     );
 
     const page = usersPage.page.map((user) => {
-      const city = user.cityId ? cityById.get(user.cityId) ?? null : null;
+      const city = user.cityId ? (cityById.get(user.cityId) ?? null) : null;
       return {
         ...user,
         city: city
@@ -217,7 +219,6 @@ export const updateUserSector = mutation({
   },
 });
 
-
 const NICKNAME_REGEX = /^[a-z0-9_]+$/;
 
 /** Normalizes nickname (accents removed, lowercased) and enforces safe charset for storage. */
@@ -230,7 +231,7 @@ function normalizeNickname(nickname: string): string {
 
   if (!NICKNAME_REGEX.test(normalized)) {
     throw new Error(
-      "Nickname can only contain letters, numbers, and underscores"
+      "Nickname can only contain letters, numbers, and underscores",
     );
   }
 
@@ -249,7 +250,9 @@ export const checkNicknameAvailable = query({
     }
     if (normalized.length < 3) return { available: false };
 
-    const status = await rateLimiter.check(ctx, "nicknameCheck", { key: "global" });
+    const status = await rateLimiter.check(ctx, "nicknameCheck", {
+      key: "global",
+    });
     if (!status.ok) return { available: false };
 
     const existing = await ctx.db
@@ -281,17 +284,22 @@ export const completeProfile = mutation({
       .unique();
 
     if (!user) throw new Error("User not found");
-    if (user.hasCompletedOnboarding) throw new Error("Profile already completed");
+    if (user.hasCompletedOnboarding)
+      throw new Error("Profile already completed");
 
     const birthDate = new Date(args.birthDate);
     const today = new Date();
     const minDate = new Date("1900-01-01");
-    if (birthDate > today) throw new Error("Birth date cannot be in the future");
-    if (birthDate < minDate) throw new Error("Birth date cannot be before 1900");
+    if (birthDate > today)
+      throw new Error("Birth date cannot be in the future");
+    if (birthDate < minDate)
+      throw new Error("Birth date cannot be before 1900");
 
     const nicknameLower = normalizeNickname(args.nickname);
-    if (nicknameLower.length < 3) throw new Error("Nickname must be at least 3 characters");
-    if (nicknameLower.length > 20) throw new Error("Nickname must be at most 20 characters");
+    if (nicknameLower.length < 3)
+      throw new Error("Nickname must be at least 3 characters");
+    if (nicknameLower.length > 20)
+      throw new Error("Nickname must be at most 20 characters");
 
     const existingNickname = await ctx.db
       .query("users")
@@ -367,23 +375,23 @@ export const setAvatar = mutation({
       ctx.db
         .query("trades")
         .withIndex("by_counterparty_status", (q) =>
-          q.eq("counterpartyId", user._id).eq("status", "pending_confirmation")
+          q.eq("counterpartyId", user._id).eq("status", "pending_confirmation"),
         )
         .take(50),
       ctx.db
         .query("trades")
         .withIndex("by_initiator_status", (q) =>
-          q.eq("initiatorId", user._id).eq("status", "pending_confirmation")
+          q.eq("initiatorId", user._id).eq("status", "pending_confirmation"),
         )
         .take(50),
     ]);
 
     await Promise.all([
       ...pendingAsCounterparty.map((t) =>
-        ctx.db.patch(t._id, { counterpartyAvatarUrl: url })
+        ctx.db.patch(t._id, { counterpartyAvatarUrl: url }),
       ),
       ...pendingAsInitiator.map((t) =>
-        ctx.db.patch(t._id, { initiatorAvatarUrl: url })
+        ctx.db.patch(t._id, { initiatorAvatarUrl: url }),
       ),
     ]);
 
@@ -409,6 +417,7 @@ export const MAX_FAVORITE_TRADE_POINTS = 50;
 const NICKNAME_PUBLIC_REGEX = /^[a-zA-Z0-9_-]{3,20}$/;
 const PROFILE_DUPLICATE_SAMPLE_LIMIT = 18;
 const PROFILE_MISSING_SAMPLE_LIMIT = 12;
+const COMMUNITY_STICKER_PAGE_LIMIT = 48;
 
 type StickerEntry = {
   absoluteNum: number;
@@ -420,7 +429,10 @@ function clampPercent(value: number): number {
   return Math.min(100, Math.max(0, value));
 }
 
-function aggregateStickerNumbers(numbers: number[], limit: number): StickerEntry[] {
+function aggregateStickerNumbers(
+  numbers: number[],
+  limit: number,
+): StickerEntry[] {
   const counts = new Map<number, number>();
   for (const absoluteNum of numbers) {
     counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
@@ -432,14 +444,25 @@ function aggregateStickerNumbers(numbers: number[], limit: number): StickerEntry
     .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
 }
 
+function aggregateAllStickerNumbers(numbers: number[]): StickerEntry[] {
+  const counts = new Map<number, number>();
+  for (const absoluteNum of numbers) {
+    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
+}
+
 async function getStickerSummaries(ctx: QueryCtx, entries: StickerEntry[]) {
   const details = await Promise.all(
     entries.map(({ absoluteNum }) =>
       ctx.db
         .query("stickerDetail")
         .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum))
-        .first()
-    )
+        .first(),
+    ),
   );
 
   return details
@@ -481,7 +504,7 @@ type NationProgress = {
 
 async function computeTopNations(
   ctx: QueryCtx,
-  missing: number[]
+  missing: number[],
 ): Promise<NationProgress[]> {
   const sections = await ctx.db.query("albumSections").collect();
   const mainSections = sections.filter((s) => !s.isExtra);
@@ -520,20 +543,21 @@ async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
   const missing = user.missing ?? [];
   const duplicateEntries = aggregateStickerNumbers(
     duplicates,
-    PROFILE_DUPLICATE_SAMPLE_LIMIT
+    PROFILE_DUPLICATE_SAMPLE_LIMIT,
   );
   const missingEntries = aggregateStickerNumbers(
     missing,
-    PROFILE_MISSING_SAMPLE_LIMIT
+    PROFILE_MISSING_SAMPLE_LIMIT,
   );
 
-  const [stats, city, duplicatesSample, missingSample, topNations] = await Promise.all([
-    readSiteStatsOrNull(ctx),
-    getCitySummary(ctx, user.cityId),
-    getStickerSummaries(ctx, duplicateEntries),
-    getStickerSummaries(ctx, missingEntries),
-    computeTopNations(ctx, missing),
-  ]);
+  const [stats, city, duplicatesSample, missingSample, topNations] =
+    await Promise.all([
+      readSiteStatsOrNull(ctx),
+      getCitySummary(ctx, user.cityId),
+      getStickerSummaries(ctx, duplicateEntries),
+      getStickerSummaries(ctx, missingEntries),
+      computeTopNations(ctx, missing),
+    ]);
 
   const albumTotal = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
   const inferredOwnedCount =
@@ -542,11 +566,11 @@ async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
       : 0;
   const albumOwnedCount = Math.min(
     albumTotal,
-    Math.max(0, user.totalStickersOwned ?? inferredOwnedCount)
+    Math.max(0, user.totalStickersOwned ?? inferredOwnedCount),
   );
   const albumCompletionPct = clampPercent(
     user.albumCompletionPct ??
-      (albumTotal > 0 ? (albumOwnedCount / albumTotal) * 100 : 0)
+      (albumTotal > 0 ? (albumOwnedCount / albumTotal) * 100 : 0),
   );
 
   return {
@@ -572,7 +596,9 @@ export const getPublicProfile = query({
   args: { nickname: v.string() },
   handler: async (ctx, { nickname }) => {
     // Rate limit global (não por nickname = evita user enumeration)
-    const status = await rateLimiter.check(ctx, "publicProfile", { key: "global" });
+    const status = await rateLimiter.check(ctx, "publicProfile", {
+      key: "global",
+    });
     if (!status.ok) return null;
 
     // Validação regex antes de query
@@ -651,6 +677,45 @@ export const getProfileSettings = query({
   },
 });
 
+export const getCommunityStickerPage = query({
+  args: {
+    kind: v.union(v.literal("duplicates"), v.literal("missing")),
+    cursor: v.optional(v.number()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { kind, cursor, limit }) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) {
+      return {
+        stickers: [],
+        totalCount: 0,
+        nextCursor: null,
+      };
+    }
+
+    const source =
+      kind === "duplicates" ? (user.duplicates ?? []) : (user.missing ?? []);
+    const entries = aggregateAllStickerNumbers(source);
+    const start = Math.max(0, cursor ?? 0);
+    const pageLimit = Math.min(
+      COMMUNITY_STICKER_PAGE_LIMIT,
+      Math.max(1, limit ?? COMMUNITY_STICKER_PAGE_LIMIT),
+    );
+    const pageEntries = entries.slice(start, start + pageLimit);
+    const stickers = await getStickerSummaries(ctx, pageEntries);
+    const nextCursor =
+      start + pageEntries.length < entries.length
+        ? start + pageEntries.length
+        : null;
+
+    return {
+      stickers,
+      totalCount: entries.length,
+      nextCursor,
+    };
+  },
+});
+
 export const toggleFavoriteTradePoint = mutation({
   args: { tradePointId: v.id("tradePoints") },
   handler: async (ctx, { tradePointId }) => {
@@ -678,7 +743,7 @@ export const setLocation = mutation({
     locationSource: v.union(
       v.literal("gps"),
       v.literal("manual"),
-      v.literal("ip")
+      v.literal("ip"),
     ),
     lat: v.optional(v.float64()),
     lng: v.optional(v.float64()),
@@ -693,21 +758,17 @@ export const setLocation = mutation({
 
     const timestampsInWindow = getLocationUpdateTimestampsForWindow(user, now);
 
-    const rateLimit = checkRateLimit(
-      lastUpdate,
-      timestampsInWindow.length,
-      {
-        cooldownMs: LOCATION_RATE_LIMIT.COOLDOWN_MS,
-        maxPerHour: LOCATION_RATE_LIMIT.MAX_PER_HOUR,
-        windowMs: LOCATION_RATE_LIMIT.WINDOW_MS,
-      }
-    );
+    const rateLimit = checkRateLimit(lastUpdate, timestampsInWindow.length, {
+      cooldownMs: LOCATION_RATE_LIMIT.COOLDOWN_MS,
+      maxPerHour: LOCATION_RATE_LIMIT.MAX_PER_HOUR,
+      windowMs: LOCATION_RATE_LIMIT.WINDOW_MS,
+    });
 
     if (!rateLimit.allowed) {
       throwSetLocationError(
         rateLimit.reason === "cooldown"
           ? "LOCATION_RATE_LIMIT_COOLDOWN"
-          : "LOCATION_RATE_LIMIT_HOURLY"
+          : "LOCATION_RATE_LIMIT_HOURLY",
       );
     }
 
@@ -715,7 +776,8 @@ export const setLocation = mutation({
 
     const city = await ctx.db.get(args.cityId);
     if (!city) throwSetLocationError("LOCATION_CITY_NOT_FOUND");
-    if (city.isActive === false) throwSetLocationError("LOCATION_CITY_INACTIVE");
+    if (city.isActive === false)
+      throwSetLocationError("LOCATION_CITY_INACTIVE");
 
     if ((args.lat !== undefined) !== (args.lng !== undefined)) {
       throwSetLocationError("LOCATION_COORDS_PAIR_INVALID");
@@ -757,7 +819,7 @@ export const setLocation = mutation({
       const payload = await verifyIpLocationToken(
         args.ipLocationToken,
         user.clerkId,
-        secret
+        secret,
       );
       if (!payload) {
         throwSetLocationError("LOCATION_IP_TOKEN_INVALID");

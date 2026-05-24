@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -27,7 +27,10 @@ type CreatePostDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) {
+export function CreatePostDialog({
+  open,
+  onOpenChange,
+}: CreatePostDialogProps) {
   const [type, setType] = useState<"need" | "have">("need");
   const [message, setMessage] = useState("");
   const [stickerInput, setStickerInput] = useState("");
@@ -74,8 +77,10 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
       setType("need");
       setMessage("");
       setStickerInput("");
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao criar post");
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar post",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -107,10 +112,14 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
                   "flex cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition-colors",
                   type === "need"
                     ? "border-primary bg-primary/10 text-primary"
-                    : "border-white/10 hover:border-white/20"
+                    : "border-white/10 hover:border-white/20",
                 )}
               >
-                <RadioGroupItem value="need" id="type-need" className="sr-only" />
+                <RadioGroupItem
+                  value="need"
+                  id="type-need"
+                  className="sr-only"
+                />
                 Preciso
               </Label>
               <Label
@@ -119,10 +128,14 @@ export function CreatePostDialog({ open, onOpenChange }: CreatePostDialogProps) 
                   "flex cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition-colors",
                   type === "have"
                     ? "border-secondary bg-secondary/10 text-secondary"
-                    : "border-white/10 hover:border-white/20"
+                    : "border-white/10 hover:border-white/20",
                 )}
               >
-                <RadioGroupItem value="have" id="type-have" className="sr-only" />
+                <RadioGroupItem
+                  value="have"
+                  id="type-have"
+                  className="sr-only"
+                />
                 Tenho
               </Label>
             </RadioGroup>

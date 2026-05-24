@@ -750,11 +750,7 @@ export default defineSchema({
   gepetoPoolMembers: defineTable({
     poolId: v.id("gepetoPools"),
     userId: v.optional(v.id("users")),
-    role: v.union(
-      v.literal("owner"),
-      v.literal("member"),
-      v.literal("gepeto"),
-    ),
+    role: v.union(v.literal("owner"), v.literal("member"), v.literal("gepeto")),
     displayNickname: v.string(),
     avatarSeed: v.optional(v.string()),
     joinedAt: v.number(),
@@ -808,7 +804,10 @@ export default defineSchema({
     eventDate: v.optional(v.number()),
     eventLocation: v.optional(v.string()),
   })
+    .index("by_created", ["createdAt"])
     .index("by_city_created", ["cityId", "createdAt"])
+    .index("by_city_type_created", ["cityId", "type", "createdAt"])
+    .index("by_type_created", ["type", "createdAt"])
     .index("by_user", ["userId"]),
 
   postReactions: defineTable({

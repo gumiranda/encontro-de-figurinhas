@@ -13,6 +13,7 @@ interface ComposerCardProps {
   userNick: string;
   userAvatar?: string;
   onPublish: (data: { text: string; type: PostType }) => void;
+  onOpenCreate?: () => void;
 }
 
 const POST_TYPES: { id: PostType; label: string; icon: typeof Search }[] = [
@@ -21,7 +22,12 @@ const POST_TYPES: { id: PostType; label: string; icon: typeof Search }[] = [
   { id: "swap", label: "Encontro", icon: Calendar },
 ];
 
-export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardProps) {
+export function ComposerCard({
+  userNick,
+  userAvatar,
+  onPublish,
+  onOpenCreate,
+}: ComposerCardProps) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [type, setType] = useState<PostType>("need");
@@ -43,7 +49,13 @@ export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardPr
       <Card className="p-3 border-white/10 bg-surface-container">
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            if (onOpenCreate) {
+              onOpenCreate();
+              return;
+            }
+            setOpen(true);
+          }}
           className="w-full flex items-center gap-2.5 text-left"
         >
           <MatchDicebearAvatar
@@ -54,7 +66,7 @@ export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardPr
           <div
             className={cn(
               "flex-1 bg-surface-container-high border border-white/10 rounded-full",
-              "px-3.5 py-2.5 text-muted-foreground text-sm"
+              "px-3.5 py-2.5 text-muted-foreground text-sm",
             )}
           >
             Quais figurinhas você precisa, @{userNick}?
@@ -81,7 +93,7 @@ export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardPr
             "flex-1 bg-surface-container-high border border-white/10 rounded-xl",
             "px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground",
             "focus:outline-none focus:border-primary/50",
-            "min-h-[70px] resize-y"
+            "min-h-[70px] resize-y",
           )}
         />
       </div>
@@ -102,7 +114,7 @@ export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardPr
                 "transition-colors",
                 isSelected
                   ? "bg-primary text-primary-foreground border border-primary"
-                  : "bg-transparent text-muted-foreground border border-white/10 hover:border-white/20"
+                  : "bg-transparent text-muted-foreground border border-white/10 hover:border-white/20",
               )}
             >
               <Icon className="size-3" />
@@ -117,7 +129,7 @@ export function ComposerCard({ userNick, userAvatar, onPublish }: ComposerCardPr
             "inline-flex items-center gap-1.5 h-7 px-2.5 ml-auto",
             "rounded-lg text-[11px] font-semibold",
             "bg-transparent text-muted-foreground border border-dashed border-white/10",
-            "hover:border-white/20"
+            "hover:border-white/20",
           )}
         >
           <Paperclip className="size-3" />

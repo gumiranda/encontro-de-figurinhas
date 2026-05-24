@@ -1,14 +1,23 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import {
+  internalMutation,
+  query,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
 import { computeStickerOverlap } from "./lib/stickerOverlap";
 import { getUserDisplayName } from "./lib/userDisplay";
-import { readSpecialNumbersFromSiteStats } from "./siteStats";
+import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import {
+  readSiteStatsOrNull,
+  readSpecialNumbersFromSiteStats,
+} from "./siteStats";
 
 // In-memory cache for static albumSections (changes ~1x/year).
 // Survives across queries in the same isolate; falls back to DB on cold start.
@@ -16,9 +25,14 @@ let _albumSectionsCache: Doc<"albumSections">[] | null = null;
 let _albumSectionsCacheTs = 0;
 const ALBUM_SECTIONS_CACHE_TTL_MS = 60_000;
 
-async function getCachedAlbumSections(ctx: QueryCtx): Promise<Doc<"albumSections">[]> {
+async function getCachedAlbumSections(
+  ctx: QueryCtx,
+): Promise<Doc<"albumSections">[]> {
   const now = Date.now();
-  if (_albumSectionsCache && now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS) {
+  if (
+    _albumSectionsCache &&
+    now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS
+  ) {
     return _albumSectionsCache;
   }
   const rows = await ctx.db.query("albumSections").collect();
@@ -88,7 +102,7 @@ async function persistCache(
     recomputedAt: number;
     recomputeStartedAt: number | null;
     stale: boolean;
-  }
+  },
 ): Promise<void> {
   if (existing) {
     await ctx.db.patch(existing._id, {
@@ -165,12 +179,14 @@ export const recomputeMatchCache = internalMutation({
     const myMissSorted = [...(me.missing ?? [])].sort((a, b) => a - b);
 
     const accumulator: CachedMatch[] =
-      isContinuation && existing?.partialMatches ? [...existing.partialMatches] : [];
+      isContinuation && existing?.partialMatches
+        ? [...existing.partialMatches]
+        : [];
 
     const page = await ctx.db
       .query("users")
       .withIndex("by_sticker_setup", (q) =>
-        q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+        q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId),
       )
       .paginate({ numItems: PAGE_SIZE, cursor: cursor ?? null });
 
@@ -193,7 +209,8 @@ export const recomputeMatchCache = internalMutation({
         candidate.lat != null &&
         candidate.lng != null
       ) {
-        distanceMeters = haversine(me.lat, me.lng, candidate.lat, candidate.lng) * 1000;
+        distanceMeters =
+          haversine(me.lat, me.lng, candidate.lat, candidate.lng) * 1000;
       }
 
       accumulator.push({
@@ -258,7 +275,7 @@ const MATCH_RECOMPUTE_RUN_AFTER_MS = 5000;
  */
 export async function scheduleDebouncedMatchRecompute(
   ctx: MutationCtx,
-  userId: Id<"users">
+  userId: Id<"users">,
 ): Promise<void> {
   const user = await ctx.db.get(userId);
   if (!user) return;
@@ -271,7 +288,7 @@ export async function scheduleDebouncedMatchRecompute(
   await ctx.scheduler.runAfter(
     MATCH_RECOMPUTE_RUN_AFTER_MS,
     internal.matches.recomputeForUser,
-    { userId }
+    { userId },
   );
 }
 
@@ -294,7 +311,10 @@ const BATCH_RECOMPUTE_PAGE_SIZE = 200;
 const CITIES_SCAN_PAGE_SIZE = 100;
 const CITIES_SCAN_MAX_CHUNKS = 50;
 
-function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolean {
+function userQualifiesForBatchRecompute(
+  u: Doc<"users">,
+  cutoff: number,
+): boolean {
   return (
     u.cityId != null &&
     u.hasCompletedStickerSetup === true &&
@@ -303,8 +323,6 @@ function userQualifiesForBatchRecompute(u: Doc<"users">, cutoff: number): boolea
     u.lastActiveAt >= cutoff
   );
 }
-
-
 
 /**
  * Cron: refresh match caches for users active in the last 6h.
@@ -325,9 +343,12 @@ export const batchRecomputeMatches = internalMutation({
       const page = await ctx.db
         .query("users")
         .withIndex("by_sticker_setup", (q) =>
-          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId)
+          q.eq("hasCompletedStickerSetup", true).eq("cityId", cityId),
         )
-        .paginate({ numItems: BATCH_RECOMPUTE_PAGE_SIZE, cursor: cursor ?? null });
+        .paginate({
+          numItems: BATCH_RECOMPUTE_PAGE_SIZE,
+          cursor: cursor ?? null,
+        });
 
       let scheduled = 0;
       for (const u of page.page) {
@@ -339,10 +360,14 @@ export const batchRecomputeMatches = internalMutation({
       }
 
       if (!page.isDone) {
-        await ctx.scheduler.runAfter(0, internal.matches.batchRecomputeMatches, {
-          cityId,
-          cursor: page.continueCursor,
-        });
+        await ctx.scheduler.runAfter(
+          0,
+          internal.matches.batchRecomputeMatches,
+          {
+            cityId,
+            cursor: page.continueCursor,
+          },
+        );
       }
 
       return {
@@ -416,6 +441,72 @@ const VERIFIED_RELIABILITY_THRESHOLD = 4.0;
 const VERIFIED_TRADES_THRESHOLD = 5;
 
 const MATCH_STICKER_SAMPLE = 5;
+const COMMUNITY_MATCH_STICKER_PAGE_LIMIT = 48;
+
+type CommunityStickerKind = "duplicates" | "missing";
+type CommunityStickerEntry = {
+  absoluteNum: number;
+  quantity: number;
+};
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
+
+function aggregateAllStickerNumbers(
+  numbers: number[],
+): CommunityStickerEntry[] {
+  const counts = new Map<number, number>();
+  for (const absoluteNum of numbers) {
+    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
+}
+
+async function getCommunityStickerSummaries(
+  ctx: QueryCtx,
+  entries: CommunityStickerEntry[],
+) {
+  const details = await Promise.all(
+    entries.map(({ absoluteNum }) =>
+      ctx.db
+        .query("stickerDetail")
+        .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum))
+        .first(),
+    ),
+  );
+
+  return details
+    .map((detail, index) => {
+      const entry = entries[index];
+      if (!detail || !entry) return null;
+      return {
+        absoluteNum: entry.absoluteNum,
+        displayCode:
+          detail.displayCode ?? `${detail.sectionCode}-${detail.relativeNum}`,
+        flagEmoji: detail.flagEmoji,
+        name: detail.name,
+        isGolden: detail.isGolden ?? false,
+        isLegend: detail.isLegend ?? false,
+        quantity: entry.quantity,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+}
+
+async function getCitySummary(ctx: QueryCtx, cityId?: Id<"cities">) {
+  if (!cityId) return null;
+  const city = await ctx.db.get(cityId);
+  if (!city) return null;
+  return {
+    name: city.name,
+    state: city.state,
+  };
+}
 
 /**
  * Precomputed matches for the "Encontrar trocas" UI. Filters on the server only.
@@ -446,26 +537,33 @@ export const listMyMatches = query({
         ? await ctx.db
             .query("precomputedMatches")
             .withIndex("by_user_layer_bidirectional", (q) =>
-              q.eq("userId", userId).eq("layer", layer).eq("isBidirectional", true)
+              q
+                .eq("userId", userId)
+                .eq("layer", layer)
+                .eq("isBidirectional", true),
             )
             .take(100)
         : await ctx.db
             .query("precomputedMatches")
-            .withIndex("by_user_layer", (q) => q.eq("userId", userId).eq("layer", layer))
+            .withIndex("by_user_layer", (q) =>
+              q.eq("userId", userId).eq("layer", layer),
+            )
             .take(100);
       rows.push(...chunk);
     }
 
     const hiddenInteractions = await ctx.db
       .query("userMatchInteractions")
-      .withIndex("by_user_hidden", (q) => q.eq("userId", userId).eq("isHidden", true))
+      .withIndex("by_user_hidden", (q) =>
+        q.eq("userId", userId).eq("isHidden", true),
+      )
       .take(100);
     const hiddenSet = new Set(
-      hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`)
+      hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`),
     );
 
     const filteredRows = rows.filter(
-      (r) => !hiddenSet.has(`${r.matchedUserId}_${r.tradePointId}`)
+      (r) => !hiddenSet.has(`${r.matchedUserId}_${r.tradePointId}`),
     );
 
     filteredRows.sort((a, b) => {
@@ -481,7 +579,7 @@ export const listMyMatches = query({
 
     // Prefer denormalized fields to eliminate N+1 db.get; fallback only when absent.
     const needsFallback = filteredRows.some(
-      (r) => r.matchedDisplayNickname == null
+      (r) => r.matchedDisplayNickname == null,
     );
 
     let otherById = new Map<Id<"users">, Doc<"users">>();
@@ -489,7 +587,9 @@ export const listMyMatches = query({
       const matchedIds = [...new Set(filteredRows.map((r) => r.matchedUserId))];
       const others = await Promise.all(matchedIds.map((id) => ctx.db.get(id)));
       otherById = new Map(
-        others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
+        others
+          .filter((u): u is Doc<"users"> => u !== null)
+          .map((u) => [u._id, u]),
       );
     }
 
@@ -504,9 +604,18 @@ export const listMyMatches = query({
           : "");
       if (!displayNickname) continue;
 
-      const albumProgress = r.matchedAlbumProgress ?? otherById.get(r.matchedUserId)?.albumProgress ?? 0;
-      const totalTrades = r.matchedTotalTrades ?? otherById.get(r.matchedUserId)?.totalTrades ?? 0;
-      const reliabilityScore = r.matchedReliabilityScore ?? otherById.get(r.matchedUserId)?.reliabilityScore ?? 0;
+      const albumProgress =
+        r.matchedAlbumProgress ??
+        otherById.get(r.matchedUserId)?.albumProgress ??
+        0;
+      const totalTrades =
+        r.matchedTotalTrades ??
+        otherById.get(r.matchedUserId)?.totalTrades ??
+        0;
+      const reliabilityScore =
+        r.matchedReliabilityScore ??
+        otherById.get(r.matchedUserId)?.reliabilityScore ??
+        0;
 
       const isVerified =
         reliabilityScore >= VERIFIED_RELIABILITY_THRESHOLD ||
@@ -537,6 +646,182 @@ export const listMyMatches = query({
     }
 
     return { matches, meta: { userMissingCount } };
+  },
+});
+
+async function getBestCommunityMatchRow(ctx: QueryCtx, userId: Id<"users">) {
+  const rows: Doc<"precomputedMatches">[] = [];
+  for (const layer of [1, 2] as const) {
+    const chunk = await ctx.db
+      .query("precomputedMatches")
+      .withIndex("by_user_layer", (q) =>
+        q.eq("userId", userId).eq("layer", layer),
+      )
+      .take(100);
+    rows.push(...chunk);
+  }
+
+  const hiddenInteractions = await ctx.db
+    .query("userMatchInteractions")
+    .withIndex("by_user_hidden", (q) =>
+      q.eq("userId", userId).eq("isHidden", true),
+    )
+    .take(100);
+  const hiddenSet = new Set(
+    hiddenInteractions.map((h) => `${h.matchedUserId}_${h.tradePointId}`),
+  );
+
+  const visibleRows = rows.filter(
+    (r) => !hiddenSet.has(`${r.matchedUserId}_${r.tradePointId}`),
+  );
+
+  visibleRows.sort((a, b) => {
+    const aScore = scoreOf(a.theyHaveINeed.length, a.iHaveTheyNeed.length);
+    const bScore = scoreOf(b.theyHaveINeed.length, b.iHaveTheyNeed.length);
+    if (bScore !== aScore) return bScore - aScore;
+    return b.computedAt - a.computedAt;
+  });
+
+  return visibleRows[0] ?? null;
+}
+
+export const getCommunityBestMatchProfile = query({
+  args: {
+    matchedUserId: v.optional(v.id("users")),
+    tradePointId: v.optional(v.id("tradePoints")),
+    stickerKind: v.optional(
+      v.union(v.literal("duplicates"), v.literal("missing")),
+    ),
+    stickerCursor: v.optional(v.number()),
+    stickerLimit: v.optional(v.number()),
+  },
+  handler: async (
+    ctx,
+    { matchedUserId, tradePointId, stickerKind, stickerCursor, stickerLimit },
+  ) => {
+    const auth = await checkAuth(ctx);
+    if (auth.state !== "ok") return null;
+
+    const me = auth.user;
+    if (me.isShadowBanned === true || me.isBanned === true) return null;
+
+    let matchRow: Doc<"precomputedMatches"> | null = null;
+    if (matchedUserId && tradePointId) {
+      matchRow = await ctx.db
+        .query("precomputedMatches")
+        .withIndex("by_user_matched_point", (q) =>
+          q
+            .eq("userId", me._id)
+            .eq("matchedUserId", matchedUserId)
+            .eq("tradePointId", tradePointId),
+        )
+        .unique();
+
+      if (matchRow) {
+        const hidden = await ctx.db
+          .query("userMatchInteractions")
+          .withIndex("by_user_matched_point", (q) =>
+            q
+              .eq("userId", me._id)
+              .eq("matchedUserId", matchedUserId)
+              .eq("tradePointId", tradePointId),
+          )
+          .first();
+        if (hidden?.isHidden) matchRow = null;
+      }
+    } else {
+      matchRow = await getBestCommunityMatchRow(ctx, me._id);
+    }
+
+    const targetUserId = matchedUserId ?? matchRow?.matchedUserId;
+    if (!targetUserId) return null;
+
+    const matchedUser = await ctx.db.get(targetUserId);
+    if (!matchedUser) return null;
+    if (matchedUser.isBanned === true) return null;
+    if (matchedUser.isShadowBanned === true) return null;
+    if (matchedUser.deletionPending === true) return null;
+    if (matchedUser.hasCompletedStickerSetup !== true) return null;
+    if (!matchRow && matchedUser.isProfilePublic !== true) return null;
+
+    const kind: CommunityStickerKind = stickerKind ?? "duplicates";
+    const source =
+      kind === "duplicates"
+        ? (matchedUser.duplicates ?? [])
+        : (matchedUser.missing ?? []);
+    const entries = aggregateAllStickerNumbers(source);
+    const start = Math.max(0, stickerCursor ?? 0);
+    const pageLimit = Math.min(
+      COMMUNITY_MATCH_STICKER_PAGE_LIMIT,
+      Math.max(1, stickerLimit ?? COMMUNITY_MATCH_STICKER_PAGE_LIMIT),
+    );
+    const pageEntries = entries.slice(start, start + pageLimit);
+    const stickers = await getCommunityStickerSummaries(ctx, pageEntries);
+    const nextCursor =
+      start + pageEntries.length < entries.length
+        ? start + pageEntries.length
+        : null;
+
+    const stats = await readSiteStatsOrNull(ctx);
+    const albumTotal = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
+    const missing = matchedUser.missing ?? [];
+    const inferredOwnedCount = matchedUser.hasCompletedStickerSetup
+      ? Math.max(0, albumTotal - missing.length)
+      : 0;
+    const albumOwnedCount = Math.min(
+      albumTotal,
+      Math.max(0, matchedUser.totalStickersOwned ?? inferredOwnedCount),
+    );
+    const albumCompletionPct = clampPercent(
+      matchedUser.albumCompletionPct ??
+        matchedUser.albumProgress ??
+        (albumTotal > 0 ? (albumOwnedCount / albumTotal) * 100 : 0),
+    );
+
+    const matchScore = matchRow
+      ? scoreOf(matchRow.theyHaveINeed.length, matchRow.iHaveTheyNeed.length)
+      : 0;
+    const heroStickerNum =
+      matchRow?.theyHaveINeed[0] ?? entries[0]?.absoluteNum;
+    const heroSticker =
+      heroStickerNum === undefined
+        ? null
+        : ((
+            await getCommunityStickerSummaries(ctx, [
+              { absoluteNum: heroStickerNum, quantity: 1 },
+            ])
+          )[0] ?? null);
+
+    return {
+      matchedUserId: matchedUser._id,
+      displayNickname: getUserDisplayName(matchedUser).slice(0, 24),
+      avatarSeed: matchedUser._id,
+      city: await getCitySummary(ctx, matchedUser.cityId),
+      createdAt: matchedUser.createdAt ?? matchedUser._creationTime,
+      albumCompletionPct,
+      albumOwnedCount,
+      albumTotal,
+      totalTrades: matchedUser.totalTrades ?? 0,
+      ratingAvg: matchedUser.ratingAvg,
+      ratingCount: matchedUser.ratingCount ?? 0,
+      duplicatesCount: matchedUser.duplicates?.length ?? 0,
+      missingCount: matchedUser.missing?.length ?? 0,
+      isVerified: matchedUser.isVerified ?? false,
+      isProfilePublic: matchedUser.isProfilePublic === true,
+      tradePointId: matchRow?.tradePointId ?? tradePointId ?? null,
+      tradePointSlug: matchRow?.tradePointSlug ?? null,
+      distanceKm: matchRow ? roundDistanceKmHalf(matchRow.distanceKm) : 0,
+      matchScore,
+      theyHaveINeedCount: matchRow?.theyHaveINeed.length ?? 0,
+      iHaveTheyNeedCount: matchRow?.iHaveTheyNeed.length ?? 0,
+      heroSticker,
+      stickersPage: {
+        kind,
+        stickers,
+        totalCount: entries.length,
+        nextCursor,
+      },
+    };
   },
 });
 
@@ -587,19 +872,21 @@ export const listPresentMatchRowsAtActivePoint = query({
         q
           .eq("tradePointId", active.tradePointId)
           .eq("countedInPublic", true)
-          .gt("expiresAt", now)
+          .gt("expiresAt", now),
       )
       .take(PRESENT_FALLBACK_CHECKIN_CAP);
 
     // Bounded: otherIds ≤ PRESENT_FALLBACK_CHECKIN_CAP (50)
     const otherIds = [
       ...new Set(
-        checkins.filter((c) => c.userId !== me._id).map((c) => c.userId)
+        checkins.filter((c) => c.userId !== me._id).map((c) => c.userId),
       ),
     ];
     const others = await Promise.all(otherIds.map((id) => ctx.db.get(id)));
     const otherById = new Map(
-      others.filter((u): u is Doc<"users"> => u !== null).map((u) => [u._id, u])
+      others
+        .filter((u): u is Doc<"users"> => u !== null)
+        .map((u) => [u._id, u]),
     );
 
     const matches: ListMyMatchRow[] = [];
@@ -615,7 +902,7 @@ export const listPresentMatchRowsAtActivePoint = query({
         myDupSorted,
         myMissSorted,
         other.duplicates ?? [],
-        other.missing ?? []
+        other.missing ?? [],
       );
 
       const okBoth = theyHaveINeed.length >= 1 && iHaveTheyNeed.length >= 1;
@@ -739,7 +1026,9 @@ export const findUserMatches = query({
     const userIds = top.map((m) => m.otherUserId);
     const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
     const userMap = new Map(
-      users.filter((u): u is NonNullable<typeof u> => u !== null).map((u) => [u._id, u])
+      users
+        .filter((u): u is NonNullable<typeof u> => u !== null)
+        .map((u) => [u._id, u]),
     );
 
     const enriched: MatchView[] = [];
@@ -759,7 +1048,7 @@ export const findUserMatches = query({
           [...myDupSet],
           [...myMissSet],
           other.duplicates ?? [],
-          other.missing ?? []
+          other.missing ?? [],
         );
         const ihave = overlap.iHaveTheyNeed.sort((a, b) => a - b);
         const ineed = overlap.theyHaveINeed.sort((a, b) => a - b);
@@ -907,7 +1196,7 @@ export const getFullStickerOverlap = query({
           endNumber: v.number(),
           goldenNumbers: v.array(v.number()),
           legendNumbers: v.array(v.number()),
-        })
+        }),
       ),
       matchedUser: v.object({
         displayNickname: v.string(),
@@ -917,11 +1206,11 @@ export const getFullStickerOverlap = query({
         distanceKm: v.number(),
       }),
       tradePointName: v.string(),
-    })
+    }),
   ),
   handler: async (
     ctx,
-    { matchedUserId, tradePointId }
+    { matchedUserId, tradePointId },
   ): Promise<FullStickerOverlapResult | null> => {
     const auth = await checkAuth(ctx);
     if (auth.state !== "ok") return null;
@@ -943,7 +1232,7 @@ export const getFullStickerOverlap = query({
         q
           .eq("userId", me._id)
           .eq("matchedUserId", matchedUserId)
-          .eq("tradePointId", tradePointId)
+          .eq("tradePointId", tradePointId),
       )
       .unique();
 
@@ -961,7 +1250,7 @@ export const getFullStickerOverlap = query({
         me.duplicates ?? [],
         me.missing ?? [],
         matchedUser.duplicates ?? [],
-        matchedUser.missing ?? []
+        matchedUser.missing ?? [],
       );
       theyHaveINeedNums = overlap.theyHaveINeed.sort((a, b) => a - b);
       iHaveTheyNeedNums = overlap.iHaveTheyNeed.sort((a, b) => a - b);
@@ -974,7 +1263,7 @@ export const getFullStickerOverlap = query({
         matchedUser.lng != null
       ) {
         distanceKm = roundDistanceKmHalf(
-          haversine(me.lat, me.lng, matchedUser.lat, matchedUser.lng)
+          haversine(me.lat, me.lng, matchedUser.lat, matchedUser.lng),
         );
       }
     }
@@ -1005,8 +1294,7 @@ export const getFullStickerOverlap = query({
       iHaveTheyNeed,
       sections,
       matchedUser: {
-        displayNickname:
-          getUserDisplayName(matchedUser),
+        displayNickname: getUserDisplayName(matchedUser),
         avatarSeed: matchedUserId,
         albumCompletionPct: matchedUser.albumProgress ?? 0,
         confirmedTradesCount: matchedUser.totalTrades ?? 0,
@@ -1023,7 +1311,7 @@ export const getFullStickerOverlap = query({
  */
 async function syncDenormForUser(
   ctx: MutationCtx,
-  userId: Id<"users">
+  userId: Id<"users">,
 ): Promise<{ updated: number }> {
   const user = await ctx.db.get(userId);
   if (!user || user.isBanned || user.isShadowBanned) return { updated: 0 };
@@ -1089,9 +1377,12 @@ export const backfillPrecomputedMatchesDenorm = internalMutation({
     if (!page.isDone) {
       const nextChunk = chunk + 1;
       if (nextChunk >= DENORM_BACKFILL_MAX_CHUNKS) {
-        console.error("backfillPrecomputedMatchesDenorm: hit MAX_CHUNKS guard", {
-          chunk: nextChunk,
-        });
+        console.error(
+          "backfillPrecomputedMatchesDenorm: hit MAX_CHUNKS guard",
+          {
+            chunk: nextChunk,
+          },
+        );
         return { touched: batchUpdated, totalUpdated: newTotal, aborted: true };
       }
       await ctx.scheduler.runAfter(
@@ -1101,7 +1392,7 @@ export const backfillPrecomputedMatchesDenorm = internalMutation({
           cursor: page.continueCursor,
           chunk: nextChunk,
           totalUpdated: newTotal,
-        }
+        },
       );
     }
 
