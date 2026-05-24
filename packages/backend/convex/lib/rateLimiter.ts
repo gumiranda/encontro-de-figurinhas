@@ -239,4 +239,31 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: DAY,
     capacity: 1,
   },
+
+  // states.ts public queries — SSG/ISR friendly, global bucket
+  publicStates: {
+    kind: "token bucket",
+    rate: 300,
+    period: MINUTE,
+    capacity: 600,
+    shards: 4,
+  },
+
+  // boringGame public queries — global bucket for read-heavy pages
+  publicBoringGame: {
+    kind: "token bucket",
+    rate: 300,
+    period: MINUTE,
+    capacity: 600,
+    shards: 4,
+  },
+
+  // blog public queries — global bucket for SEO/SSG pages
+  publicBlog: {
+    kind: "token bucket",
+    rate: 300,
+    period: MINUTE,
+    capacity: 600,
+    shards: 4,
+  },
 });

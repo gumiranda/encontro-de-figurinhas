@@ -1,16 +1,11 @@
 import { ConvexError, v } from "convex/values";
-import {
-  httpAction,
-  internalMutation,
-  mutation,
-  query,
-} from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { boringReason } from "./schema";
-import { rateLimiter } from "./lib/rateLimiter";
+import { httpAction, internalMutation, mutation, query } from "./_generated/server";
 import { getAuthenticatedUser, requireAdmin } from "./lib/auth";
+import { rateLimiter } from "./lib/rateLimiter";
 import { updateWorldCupMatchScore } from "./lib/worldCupMatchScore";
+import { boringReason } from "./schema";
 
 const REASON_KEYS = [
   "sem_chances",
@@ -25,7 +20,7 @@ type ReasonKey = (typeof REASON_KEYS)[number];
 function applyDelta(
   counts: Record<ReasonKey, number>,
   reasons: ReasonKey[],
-  delta: 1 | -1,
+  delta: 1 | -1
 ): Record<ReasonKey, number> {
   const next = { ...counts };
   for (const r of reasons) next[r] = Math.max(0, (next[r] ?? 0) + delta);
@@ -35,6 +30,9 @@ function applyDelta(
 export const getActiveRound = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return null;
+
     // Filtro duplo: isActive flag + endDate ainda não passou. Protege contra
     // admin esquecer de virar isActive=false quando a rodada acaba.
     const now = Date.now();
@@ -50,6 +48,9 @@ export const getActiveRound = query({
 export const getRoundBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return null;
+
     const round = await ctx.db
       .query("worldCupRounds")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -65,6 +66,9 @@ export const getRoundBySlug = query({
 export const listRounds = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     return await ctx.db
       .query("worldCupRounds")
       .withIndex("by_isActive_order", (q) => q.eq("isActive", true))
@@ -96,7 +100,7 @@ export const listRoundsForAdmin = query({
     return rounds.map((round) => ({
       ...round,
       matches: (matchesByRound.get(String(round._id)) ?? []).sort(
-        (a, b) => a.kickoffAt - b.kickoffAt,
+        (a, b) => a.kickoffAt - b.kickoffAt
       ),
     }));
   },
@@ -133,10 +137,7 @@ export const setMatchScore = mutation({
       homeScore,
       awayScore,
       status: "finished",
-      reason:
-        match.status === "finished"
-          ? "Correção via Jogo Mais Chato"
-          : undefined,
+      reason: match.status === "finished" ? "Correção via Jogo Mais Chato" : undefined,
     });
   },
 });
@@ -144,6 +145,9 @@ export const setMatchScore = mutation({
 export const listMatchesByRound = query({
   args: { roundId: v.id("worldCupRounds") },
   handler: async (ctx, { roundId }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     const round = await ctx.db.get(roundId);
     if (!round?.isActive) return [];
 
@@ -157,6 +161,9 @@ export const listMatchesByRound = query({
 export const getMatchBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return null;
+
     const match = await ctx.db
       .query("worldCupMatches")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -172,6 +179,9 @@ export const getMatchBySlug = query({
 export const getMatch = query({
   args: { matchId: v.id("worldCupMatches") },
   handler: async (ctx, { matchId }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return null;
+
     return ctx.db.get(matchId);
   },
 });
@@ -179,6 +189,9 @@ export const getMatch = query({
 export const getRoundResult = query({
   args: { roundId: v.id("worldCupRounds") },
   handler: async (ctx, { roundId }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     const round = await ctx.db.get(roundId);
     if (!round?.isActive) return [];
 
@@ -197,6 +210,9 @@ export const getRoundResult = query({
 export const getAllTimeRanking = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     const max = limit ?? 10;
     const matches = await ctx.db
       .query("worldCupMatches")
@@ -208,7 +224,7 @@ export const getAllTimeRanking = query({
     const roundMap = new Map(
       rounds
         .filter((r): r is NonNullable<typeof r> => r !== null && r.isActive)
-        .map((r) => [r._id as string, r]),
+        .map((r) => [r._id as string, r])
     );
     const ordered = matches
       .filter((m) => roundMap.has(m.roundId as string))
@@ -231,9 +247,7 @@ export const getUserVoteForMatch = query({
     if (!user) return null;
     const vote = await ctx.db
       .query("boringGameVotes")
-      .withIndex("by_match_user", (q) =>
-        q.eq("matchId", matchId).eq("userId", user._id),
-      )
+      .withIndex("by_match_user", (q) => q.eq("matchId", matchId).eq("userId", user._id))
       .unique();
     return vote ? { reasons: vote.reasons } : null;
   },
@@ -242,6 +256,9 @@ export const getUserVoteForMatch = query({
 export const listRoundsForSitemap = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     const rounds = await ctx.db
       .query("worldCupRounds")
       .withIndex("by_isActive_order", (q) => q.eq("isActive", true))
@@ -262,10 +279,7 @@ export const listRoundsForSitemap = query({
     }> = [];
     for (const r of rounds) {
       const matches = matchesByRound.get(r._id) ?? [];
-      const maxVote = matches.reduce(
-        (acc, m) => Math.max(acc, m.lastVoteAt ?? 0),
-        0,
-      );
+      const maxVote = matches.reduce((acc, m) => Math.max(acc, m.lastVoteAt ?? 0), 0);
       result.push({
         slug: r.slug,
         endDate: r.endDate,
@@ -280,13 +294,16 @@ export const listRoundsForSitemap = query({
 export const listMatchesForSitemap = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBoringGame", { key: "global" });
+    if (!ok) return [];
+
     const matches = await ctx.db.query("worldCupMatches").take(1000);
     const roundIds = [...new Set(matches.map((m) => m.roundId))];
     const rounds = await Promise.all(roundIds.map((id) => ctx.db.get(id)));
     const roundMap = new Map(
       rounds
         .filter((r): r is NonNullable<typeof r> => r !== null && r.isActive)
-        .map((r) => [r._id as string, r.slug]),
+        .map((r) => [r._id as string, r.slug])
     );
     return matches
       .map((m) => ({
@@ -357,9 +374,7 @@ export const castVoteInternal = internalMutation({
 
     const existing = await ctx.db
       .query("boringGameVotes")
-      .withIndex("by_match_user", (q) =>
-        q.eq("matchId", matchId).eq("userId", userId),
-      )
+      .withIndex("by_match_user", (q) => q.eq("matchId", matchId).eq("userId", userId))
       .unique();
 
     const now = Date.now();
@@ -421,9 +436,7 @@ function isAllowedOrigin(origin: string | null): origin is string {
 }
 
 function corsHeadersFor(origin: string | null): Record<string, string> {
-  const allow = isAllowedOrigin(origin)
-    ? origin
-    : "https://figurinhafacil.com.br";
+  const allow = isAllowedOrigin(origin) ? origin : "https://figurinhafacil.com.br";
   return {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": allow,
@@ -471,13 +484,10 @@ export const castVoteHttp = httpAction(async (ctx, request) => {
   }
 
   if (!body.matchId || !Array.isArray(body.reasons)) {
-    return new Response(
-      JSON.stringify({ error: "Missing matchId or reasons" }),
-      {
-        status: 400,
-        headers,
-      },
-    );
+    return new Response(JSON.stringify({ error: "Missing matchId or reasons" }), {
+      status: 400,
+      headers,
+    });
   }
 
   try {

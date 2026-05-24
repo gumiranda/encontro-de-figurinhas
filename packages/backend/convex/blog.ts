@@ -10,6 +10,7 @@ import {
 } from "./_generated/server";
 import { rescheduleIfMore } from "./_helpers/pagination";
 import { requireAdmin } from "./lib/auth";
+import { rateLimiter } from "./lib/rateLimiter";
 import { validateCoverImageUrl } from "./lib/coverImageUrl";
 
 function projectListPost<T extends {
@@ -43,6 +44,9 @@ export const getPublished = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, { limit }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return [];
+
     const posts = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
@@ -55,6 +59,9 @@ export const getPublished = query({
 export const getPublishedPaginated = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, { paginationOpts }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return { page: [], continueCursor: "", isDone: true };
+
     const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
@@ -74,6 +81,9 @@ export const getByCategoryPaginated = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, { category, paginationOpts }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return { page: [], continueCursor: "", isDone: true };
+
     const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_category_status", (q) =>
@@ -92,6 +102,9 @@ export const getByCategoryPaginated = query({
 export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return null;
+
     const post = await ctx.db
       .query("blogPosts")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -218,6 +231,9 @@ export const pruneViewIdempotency = internalMutation({
 export const getAllSlugs = query({
   args: { paginationOpts: v.optional(paginationOptsValidator) },
   handler: async (ctx, { paginationOpts }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return { slugs: [], continueCursor: "", isDone: true };
+
     const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))
@@ -234,6 +250,9 @@ export const getAllSlugs = query({
 export const getByCategory = query({
   args: { category: v.string() },
   handler: async (ctx, { category }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return [];
+
     const posts = await ctx.db
       .query("blogPosts")
       .withIndex("by_category_status", (q) =>
@@ -368,6 +387,9 @@ export const remove = mutation({
 export const getActiveSeries = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return null;
+
     const series = await ctx.db
       .query("blogSeries")
       .withIndex("by_isActive_createdAt", (q) => q.eq("isActive", true))
@@ -407,6 +429,9 @@ export const getActiveSeries = query({
 export const getTrending = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return [];
+
     const max = Math.min(Math.max(limit ?? 5, 1), 20);
     const topMetrics = await ctx.db
       .query("postMetrics")
@@ -461,6 +486,9 @@ export const getRelated = query({
     })
   ),
   handler: async (ctx, { slug, category, tags, limit }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return [];
+
     const maxResults = Math.min(limit ?? 3, 6);
     let currentCategory = category;
     let currentTags = new Set((tags ?? []).map((t) => t.toLowerCase().trim()));
@@ -523,6 +551,9 @@ export const listForSitemap = query({
     isDone: v.boolean(),
   }),
   handler: async (ctx, { paginationOpts }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicBlog", { key: "global" });
+    if (!ok) return { page: [], continueCursor: "", isDone: true };
+
     const result = await ctx.db
       .query("blogPosts")
       .withIndex("by_status_publishedAt", (q) => q.eq("status", "published"))

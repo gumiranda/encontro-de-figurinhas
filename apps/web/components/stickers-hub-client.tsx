@@ -41,6 +41,21 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
 
+  // Pre-compute lookup structures for O(1) access instead of O(n) includes/find
+  const teamLookups = useMemo(() => {
+    const lookups = new Map<string, {
+      goldenSet: Set<number>;
+      legendMap: Map<number, LegendNumber>;
+    }>();
+    for (const team of teams) {
+      lookups.set(team.code, {
+        goldenSet: new Set(team.goldenNumbers),
+        legendMap: new Map(team.legendNumbers.map((l) => [l.number, l])),
+      });
+    }
+    return lookups;
+  }, [teams]);
+
   const filteredTeams = useMemo(() => {
     let result = teams;
 
@@ -66,10 +81,12 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
   }, [teams, query]);
 
   const getStickerNumbers = (team: Team) => {
+    const lookup = teamLookups.get(team.code);
+    if (!lookup) return [];
     const numbers: number[] = [];
     for (let n = team.startNumber; n <= team.endNumber; n++) {
-      if (filter === "golden" && !team.goldenNumbers.includes(n)) continue;
-      if (filter === "legend" && !team.legendNumbers.find((l) => l.number === n)) continue;
+      if (filter === "golden" && !lookup.goldenSet.has(n)) continue;
+      if (filter === "legend" && !lookup.legendMap.has(n)) continue;
       numbers.push(n);
     }
     return numbers;
@@ -163,8 +180,9 @@ export function StickersHubClient({ teams }: StickersHubClientProps) {
                     ? Array.from({ length: team.stickerCount }, (_, i) => team.startNumber + i)
                     : numbers
                   ).map((num) => {
-                    const isGolden = team.goldenNumbers.includes(num);
-                    const legend = team.legendNumbers.find((l) => l.number === num);
+                    const lookup = teamLookups.get(team.code);
+                    const isGolden = lookup?.goldenSet.has(num) ?? false;
+                    const legend = lookup?.legendMap.get(num);
 
                     return (
                       <Link key={num} href={`/figurinha/${num}`}>

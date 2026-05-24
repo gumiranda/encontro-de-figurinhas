@@ -186,10 +186,16 @@ export const getStatsBySlug = query({
       }
     }
 
+    // Build lookup Map for O(1) section lookup instead of O(m) find
+    const sectionByNum = new Map<number, (typeof sections)[0]>();
+    for (const s of sections) {
+      for (let n = s.startNumber; n <= s.endNumber; n++) {
+        sectionByNum.set(n, s);
+      }
+    }
+
     const formatSticker = (n: number) => {
-      const section = sections.find(
-        (s) => n >= s.startNumber && n <= s.endNumber
-      );
+      const section = sectionByNum.get(n);
       if (!section) {
         return {
           number: n,

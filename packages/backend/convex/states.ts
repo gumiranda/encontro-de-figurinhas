@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { rateLimiter } from "./lib/rateLimiter";
 
 const STATE_NAMES: Record<string, string> = {
   AC: "Acre",
@@ -51,6 +52,9 @@ function slugToState(slug: string): string | null {
 export const getAllStates = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicStates", { key: "global" });
+    if (!ok) return [];
+
     const cities = await ctx.db
       .query("cities")
       .withIndex("by_isActive", (q) => q.eq("isActive", true))
@@ -73,6 +77,9 @@ export const getAllStates = query({
 export const getAllStateSlugs = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicStates", { key: "global" });
+    if (!ok) return [];
+
     const cities = await ctx.db
       .query("cities")
       .withIndex("by_isActive", (q) => q.eq("isActive", true))
@@ -88,6 +95,9 @@ export const getAllStateSlugs = query({
 export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicStates", { key: "global" });
+    if (!ok) return null;
+
     const stateCode = slugToState(slug);
     if (!stateCode || !STATE_NAMES[stateCode]) return null;
 
@@ -116,6 +126,9 @@ export const getBySlug = query({
 export const getStatsBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
+    const { ok } = await rateLimiter.check(ctx, "publicStates", { key: "global" });
+    if (!ok) return null;
+
     const stateCode = slugToState(slug);
     if (!stateCode) return null;
 
@@ -186,6 +199,9 @@ export const getStatsBySlug = query({
 export const listForSitemap = query({
   args: {},
   handler: async (ctx) => {
+    const { ok } = await rateLimiter.check(ctx, "publicStates", { key: "global" });
+    if (!ok) return [];
+
     const cities = await ctx.db
       .query("cities")
       .withIndex("by_isActive", (q) => q.eq("isActive", true))

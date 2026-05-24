@@ -376,13 +376,36 @@ async function scorePoolMember(
     );
   }
 
+  // Batch fetch all matches and rounds instead of sequential awaits
+  const matchIds = [...new Set(rows.map((r) => r.matchId))];
+  const matches = await Promise.all(matchIds.map((id) => ctx.db.get(id)));
+  const matchById = new Map(
+    matches
+      .filter((m): m is NonNullable<typeof m> => m !== null)
+      .map((m) => [m._id, m]),
+  );
+
+  const roundIds = [
+    ...new Set(
+      matches
+        .filter((m): m is NonNullable<typeof m> => m !== null)
+        .map((m) => m.roundId),
+    ),
+  ];
+  const rounds = await Promise.all(roundIds.map((id) => ctx.db.get(id)));
+  const roundById = new Map(
+    rounds
+      .filter((r): r is NonNullable<typeof r> => r !== null)
+      .map((r) => [r._id, r]),
+  );
+
   let points = 0;
   let exactHits = 0;
   let correctHits = 0;
   for (const row of rows) {
-    const match = await ctx.db.get(row.matchId);
+    const match = matchById.get(row.matchId);
     if (!match) continue;
-    const round = await ctx.db.get(match.roundId);
+    const round = roundById.get(match.roundId) ?? null;
     const multiplier = getRoundMultiplier(pool, round);
     const earned = scorePredictionAgainstMatch(row, match, multiplier);
     points += earned;
