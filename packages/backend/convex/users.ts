@@ -17,6 +17,11 @@ import { throwSetLocationError } from "./lib/setLocationErrors";
 import { getPendingProposalsForUserCount } from "./lib/tradeHelpers";
 import { readSiteStatsOrNull } from "./siteStats";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
+import {
+  buildStickerCountEntries,
+  pageStickerCountEntries,
+  type StickerCountEntry,
+} from "./lib/stickerCounts";
 
 export const getCurrentUser = query({
   args: {},
@@ -419,43 +424,15 @@ const PROFILE_DUPLICATE_SAMPLE_LIMIT = 18;
 const PROFILE_MISSING_SAMPLE_LIMIT = 12;
 const COMMUNITY_STICKER_PAGE_LIMIT = 48;
 
-type StickerEntry = {
-  absoluteNum: number;
-  quantity: number;
-};
-
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, value));
 }
 
-function aggregateStickerNumbers(
-  numbers: number[],
-  limit: number,
-): StickerEntry[] {
-  const counts = new Map<number, number>();
-  for (const absoluteNum of numbers) {
-    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
-  }
-
-  return [...counts.entries()]
-    .sort(([a], [b]) => a - b)
-    .slice(0, limit)
-    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
-}
-
-function aggregateAllStickerNumbers(numbers: number[]): StickerEntry[] {
-  const counts = new Map<number, number>();
-  for (const absoluteNum of numbers) {
-    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
-  }
-
-  return [...counts.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
-}
-
-async function getStickerSummaries(ctx: QueryCtx, entries: StickerEntry[]) {
+async function getStickerSummaries(
+  ctx: QueryCtx,
+  entries: StickerCountEntry[],
+) {
   const details = await Promise.all(
     entries.map(({ absoluteNum }) =>
       ctx.db
@@ -541,14 +518,12 @@ async function computeTopNations(
 async function buildProfileSummary(ctx: QueryCtx, user: Doc<"users">) {
   const duplicates = user.duplicates ?? [];
   const missing = user.missing ?? [];
-  const duplicateEntries = aggregateStickerNumbers(
-    duplicates,
-    PROFILE_DUPLICATE_SAMPLE_LIMIT,
-  );
-  const missingEntries = aggregateStickerNumbers(
-    missing,
-    PROFILE_MISSING_SAMPLE_LIMIT,
-  );
+  const duplicateEntries = (
+    user.duplicateStickerCounts ?? buildStickerCountEntries(duplicates)
+  ).slice(0, PROFILE_DUPLICATE_SAMPLE_LIMIT);
+  const missingEntries = (
+    user.missingStickerCounts ?? buildStickerCountEntries(missing)
+  ).slice(0, PROFILE_MISSING_SAMPLE_LIMIT);
 
   const [stats, city, duplicatesSample, missingSample, topNations] =
     await Promise.all([
@@ -680,7 +655,7 @@ export const getProfileSettings = query({
 export const getCommunityStickerPage = query({
   args: {
     kind: v.union(v.literal("duplicates"), v.literal("missing")),
-    cursor: v.optional(v.number()),
+    cursor: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, { kind, cursor, limit }) => {
@@ -695,18 +670,20 @@ export const getCommunityStickerPage = query({
 
     const source =
       kind === "duplicates" ? (user.duplicates ?? []) : (user.missing ?? []);
-    const entries = aggregateAllStickerNumbers(source);
-    const start = Math.max(0, cursor ?? 0);
+    const entries =
+      kind === "duplicates"
+        ? (user.duplicateStickerCounts ?? buildStickerCountEntries(source))
+        : (user.missingStickerCounts ?? buildStickerCountEntries(source));
     const pageLimit = Math.min(
       COMMUNITY_STICKER_PAGE_LIMIT,
       Math.max(1, limit ?? COMMUNITY_STICKER_PAGE_LIMIT),
     );
-    const pageEntries = entries.slice(start, start + pageLimit);
+    const { pageEntries, nextCursor } = pageStickerCountEntries(
+      entries,
+      cursor,
+      pageLimit,
+    );
     const stickers = await getStickerSummaries(ctx, pageEntries);
-    const nextCursor =
-      start + pageEntries.length < entries.length
-        ? start + pageEntries.length
-        : null;
 
     return {
       stickers,

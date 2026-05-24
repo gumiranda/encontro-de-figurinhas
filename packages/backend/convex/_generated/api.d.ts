@@ -36,6 +36,7 @@ import type * as lib_sanitize from "../lib/sanitize.js";
 import type * as lib_seedAlbumData from "../lib/seedAlbumData.js";
 import type * as lib_setLocationErrors from "../lib/setLocationErrors.js";
 import type * as lib_slug from "../lib/slug.js";
+import type * as lib_stickerCounts from "../lib/stickerCounts.js";
 import type * as lib_stickerNumbering from "../lib/stickerNumbering.js";
 import type * as lib_stickerOverlap from "../lib/stickerOverlap.js";
 import type * as lib_tradeHelpers from "../lib/tradeHelpers.js";
@@ -109,6 +110,7 @@ declare const fullApi: ApiFromModules<{
   "lib/seedAlbumData": typeof lib_seedAlbumData;
   "lib/setLocationErrors": typeof lib_setLocationErrors;
   "lib/slug": typeof lib_slug;
+  "lib/stickerCounts": typeof lib_stickerCounts;
   "lib/stickerNumbering": typeof lib_stickerNumbering;
   "lib/stickerOverlap": typeof lib_stickerOverlap;
   "lib/tradeHelpers": typeof lib_tradeHelpers;

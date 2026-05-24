@@ -29,7 +29,7 @@ export type CommunityProfileData = {
   stickersPage?: {
     stickers: CommunitySticker[];
     totalCount: number;
-    nextCursor: number | null;
+    nextCursor: string | null;
   };
   distanceKm?: number;
 };
@@ -40,13 +40,13 @@ function useCommunityStickerPager(
   kind: "duplicates" | "missing",
   enabled: boolean,
 ) {
-  const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [loadedCursor, setLoadedCursor] = useState<number | null>(null);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [loadedCursor, setLoadedCursor] = useState<string | null>(null);
   const [stickers, setStickers] = useState<CommunitySticker[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [nextCursor, setNextCursor] = useState<number | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const cursorKey = cursor ?? 0;
+  const cursorKey = cursor ?? "";
   const page = useQuery(
     api.users.getCommunityStickerPage,
     enabled ? { kind, cursor, limit: STICKER_PAGE_LIMIT } : "skip",
@@ -64,7 +64,7 @@ function useCommunityStickerPager(
     if (!page || loadedCursor === cursorKey) return;
 
     setStickers((current) =>
-      cursorKey === 0 ? page.stickers : [...current, ...page.stickers],
+      cursorKey === "" ? page.stickers : [...current, ...page.stickers],
     );
     setTotalCount(page.totalCount);
     setNextCursor(page.nextCursor);

@@ -55,6 +55,11 @@ const cachedMatchValidator = v.object({
   otherAcceptsMail: v.boolean(),
 });
 
+const stickerCountValidator = v.object({
+  absoluteNum: v.number(),
+  quantity: v.number(),
+});
+
 export default defineSchema({
   users: defineTable({
     name: v.string(),
@@ -113,6 +118,8 @@ export default defineSchema({
     // consider splitting into userStickers table with userId + stickerNumber index.
     duplicates: v.optional(v.array(v.number())),
     missing: v.optional(v.array(v.number())),
+    duplicateStickerCounts: v.optional(v.array(stickerCountValidator)),
+    missingStickerCounts: v.optional(v.array(stickerCountValidator)),
     albumProgress: v.optional(v.number()),
     albumCompletionPct: v.optional(v.number()),
     totalStickersOwned: v.optional(v.number()),

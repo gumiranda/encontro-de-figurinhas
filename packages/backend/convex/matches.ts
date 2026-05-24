@@ -12,6 +12,11 @@ import { checkAuth, getAuthenticatedUser } from "./lib/auth";
 import { getActiveCheckin } from "./lib/checkinHelpers";
 import { haversine } from "./lib/geo";
 import { computeStickerOverlap } from "./lib/stickerOverlap";
+import {
+  buildStickerCountEntries,
+  pageStickerCountEntries,
+  type StickerCountEntry,
+} from "./lib/stickerCounts";
 import { getUserDisplayName } from "./lib/userDisplay";
 import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import {
@@ -444,32 +449,15 @@ const MATCH_STICKER_SAMPLE = 5;
 const COMMUNITY_MATCH_STICKER_PAGE_LIMIT = 48;
 
 type CommunityStickerKind = "duplicates" | "missing";
-type CommunityStickerEntry = {
-  absoluteNum: number;
-  quantity: number;
-};
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, value));
 }
 
-function aggregateAllStickerNumbers(
-  numbers: number[],
-): CommunityStickerEntry[] {
-  const counts = new Map<number, number>();
-  for (const absoluteNum of numbers) {
-    counts.set(absoluteNum, (counts.get(absoluteNum) ?? 0) + 1);
-  }
-
-  return [...counts.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([absoluteNum, quantity]) => ({ absoluteNum, quantity }));
-}
-
 async function getCommunityStickerSummaries(
   ctx: QueryCtx,
-  entries: CommunityStickerEntry[],
+  entries: StickerCountEntry[],
 ) {
   const details = await Promise.all(
     entries.map(({ absoluteNum }) =>
@@ -692,7 +680,7 @@ export const getCommunityBestMatchProfile = query({
     stickerKind: v.optional(
       v.union(v.literal("duplicates"), v.literal("missing")),
     ),
-    stickerCursor: v.optional(v.number()),
+    stickerCursor: v.optional(v.string()),
     stickerLimit: v.optional(v.number()),
   },
   handler: async (
@@ -749,18 +737,22 @@ export const getCommunityBestMatchProfile = query({
       kind === "duplicates"
         ? (matchedUser.duplicates ?? [])
         : (matchedUser.missing ?? []);
-    const entries = aggregateAllStickerNumbers(source);
-    const start = Math.max(0, stickerCursor ?? 0);
+    const entries =
+      kind === "duplicates"
+        ? (matchedUser.duplicateStickerCounts ??
+          buildStickerCountEntries(source))
+        : (matchedUser.missingStickerCounts ??
+          buildStickerCountEntries(source));
     const pageLimit = Math.min(
       COMMUNITY_MATCH_STICKER_PAGE_LIMIT,
       Math.max(1, stickerLimit ?? COMMUNITY_MATCH_STICKER_PAGE_LIMIT),
     );
-    const pageEntries = entries.slice(start, start + pageLimit);
+    const { pageEntries, nextCursor } = pageStickerCountEntries(
+      entries,
+      stickerCursor,
+      pageLimit,
+    );
     const stickers = await getCommunityStickerSummaries(ctx, pageEntries);
-    const nextCursor =
-      start + pageEntries.length < entries.length
-        ? start + pageEntries.length
-        : null;
 
     const stats = await readSiteStatsOrNull(ctx);
     const albumTotal = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;

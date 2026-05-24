@@ -11,6 +11,10 @@ import { DEFAULT_TOTAL_STICKERS } from "./lib/constants";
 import { rateLimiter } from "./lib/rateLimiter";
 import { scheduleDebouncedMatchRecompute } from "./matches";
 import { isValidAbsolute } from "./lib/stickerNumbering";
+import {
+  buildStickerCountEntries,
+  normalizeStickerNumbers,
+} from "./lib/stickerCounts";
 import { readSiteStatsOrNull } from "./siteStats";
 
 // In-memory cache for static albumSections (changes ~1x/year).
@@ -18,9 +22,18 @@ let _albumSectionsCache: Doc<"albumSections">[] | null = null;
 let _albumSectionsCacheTs = 0;
 const ALBUM_SECTIONS_CACHE_TTL_MS = 60_000;
 
-async function getCachedAlbumSections(ctx: { db: { query: (table: "albumSections") => { collect: () => Promise<Doc<"albumSections">[]> } } }): Promise<Doc<"albumSections">[]> {
+async function getCachedAlbumSections(ctx: {
+  db: {
+    query: (table: "albumSections") => {
+      collect: () => Promise<Doc<"albumSections">[]>;
+    };
+  };
+}): Promise<Doc<"albumSections">[]> {
   const now = Date.now();
-  if (_albumSectionsCache && now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS) {
+  if (
+    _albumSectionsCache &&
+    now - _albumSectionsCacheTs < ALBUM_SECTIONS_CACHE_TTL_MS
+  ) {
     return _albumSectionsCache;
   }
   const rows = await ctx.db.query("albumSections").collect();
@@ -28,9 +41,6 @@ async function getCachedAlbumSections(ctx: { db: { query: (table: "albumSections
   _albumSectionsCacheTs = now;
   return rows;
 }
-
-const setsEqual = <T>(a: Set<T>, b: Set<T>): boolean =>
-  a.size === b.size && [...a].every((x) => b.has(x));
 
 /** Limite de elementos por array para evitar DoS (memória/CPU/billing). */
 const MAX_STICKER_ARRAY_SIZE = 3000;
@@ -43,6 +53,8 @@ type UserPatch = Partial<
     Doc<"users">,
     | "duplicates"
     | "missing"
+    | "duplicateStickerCounts"
+    | "missingStickerCounts"
     | "albumProgress"
     | "albumCompletionPct"
     | "totalStickersOwned"
@@ -59,7 +71,7 @@ async function syncActiveCheckinsStickerSnapshot(
   ctx: MutationCtx,
   userId: Id<"users">,
   user: Doc<"users">,
-  duplicates: number[]
+  duplicates: number[],
 ) {
   const activeCheckin = await getActiveCheckin(ctx, userId);
   if (!activeCheckin) return;
@@ -68,7 +80,7 @@ async function syncActiveCheckinsStickerSnapshot(
   const activeCheckins = await ctx.db
     .query("checkins")
     .withIndex("by_user_active", (q) =>
-      q.eq("userId", userId).gt("expiresAt", Date.now())
+      q.eq("userId", userId).gt("expiresAt", Date.now()),
     )
     .take(20);
 
@@ -79,7 +91,7 @@ async function syncActiveCheckinsStickerSnapshot(
     (c) =>
       !arraysEqual(c.duplicates ?? [], duplicates) ||
       c.displayNickname !== denorm.displayNickname ||
-      c.avatarSeed !== denorm.avatarSeed
+      c.avatarSeed !== denorm.avatarSeed,
   );
 
   if (needsPatch.length === 0) return;
@@ -129,26 +141,27 @@ export const updateStickerList = mutation({
       args.missing.length > MAX_STICKER_ARRAY_SIZE
     ) {
       throw new Error(
-        `Cada lista pode ter no máximo ${MAX_STICKER_ARRAY_SIZE} figurinhas`
+        `Cada lista pode ter no máximo ${MAX_STICKER_ARRAY_SIZE} figurinhas`,
       );
     }
 
     const stats = await readSiteStatsOrNull(ctx);
     const totalCount = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
 
-    const newDup = new Set<number>(args.duplicates);
-    const newMiss = new Set<number>(args.missing);
+    const nextDup = normalizeStickerNumbers(args.duplicates);
+    const nextMiss = normalizeStickerNumbers(args.missing, true);
+    const newDup = new Set<number>(nextDup);
 
     // 1. Arrays disjuntos
-    const intersection = args.missing.filter((n) => newDup.has(n));
+    const intersection = nextMiss.filter((n) => newDup.has(n));
     if (intersection.length > 0) {
       throw new Error(
-        `Numeros nao podem estar em ambas listas: ${intersection.join(", ")}`
+        `Numeros nao podem estar em ambas listas: ${intersection.join(", ")}`,
       );
     }
 
     // 2. Números absolutos: 0 .. totalCount - 1
-    const allNumbers = [...args.duplicates, ...args.missing];
+    const allNumbers = [...nextDup, ...nextMiss];
     const invalid = allNumbers.filter((n) => !isValidAbsolute(n, totalCount));
     if (invalid.length > 0) {
       const maxAbs = totalCount - 1;
@@ -156,12 +169,12 @@ export const updateStickerList = mutation({
     }
 
     // 3. Skip se iguais
-    const currentDup = new Set<number>(user.duplicates ?? []);
-    const currentMiss = new Set<number>(user.missing ?? []);
+    const currentDup = normalizeStickerNumbers(user.duplicates ?? []);
+    const currentMiss = normalizeStickerNumbers(user.missing ?? [], true);
 
     if (
-      setsEqual(currentDup, newDup) &&
-      setsEqual(currentMiss, newMiss) &&
+      arraysEqual(currentDup, nextDup) &&
+      arraysEqual(currentMiss, nextMiss) &&
       !args.finalize
     ) {
       return null;
@@ -173,18 +186,22 @@ export const updateStickerList = mutation({
     }
 
     // 4. Finalize: pelo menos uma lista não vazia
-    if (args.finalize && args.duplicates.length === 0 && args.missing.length === 0) {
-      throw new Error("Preencha figurinhas repetidas ou faltantes antes de continuar");
+    if (args.finalize && nextDup.length === 0 && nextMiss.length === 0) {
+      throw new Error(
+        "Preencha figurinhas repetidas ou faltantes antes de continuar",
+      );
     }
 
     // 5. Contadores
-    const totalStickersOwned = totalCount - args.missing.length;
+    const totalStickersOwned = totalCount - nextMiss.length;
     const albumProgress = Math.round((totalStickersOwned / totalCount) * 100);
 
     // 6. Patch
     const patch: UserPatch = {
-      duplicates: args.duplicates,
-      missing: args.missing,
+      duplicates: nextDup,
+      missing: nextMiss,
+      duplicateStickerCounts: buildStickerCountEntries(nextDup),
+      missingStickerCounts: buildStickerCountEntries(nextMiss),
       albumProgress,
       albumCompletionPct: albumProgress,
       totalStickersOwned,
@@ -198,7 +215,7 @@ export const updateStickerList = mutation({
     await ctx.db.patch(user._id, patch);
 
     const mergedUser = { ...user, ...patch };
-    await syncActiveCheckinsStickerSnapshot(ctx, user._id, mergedUser, args.duplicates);
+    await syncActiveCheckinsStickerSnapshot(ctx, user._id, mergedUser, nextDup);
 
     await scheduleDebouncedMatchRecompute(ctx, user._id);
 
@@ -209,12 +226,19 @@ export const updateStickerList = mutation({
 export const toggleSticker = mutation({
   args: {
     number: v.number(),
-    target: v.union(v.literal("missing"), v.literal("duplicate"), v.literal("clear")),
+    target: v.union(
+      v.literal("missing"),
+      v.literal("duplicate"),
+      v.literal("clear"),
+    ),
   },
   handler: async (ctx, args) => {
     const user = await requireAuth(ctx);
 
-    await rateLimiter.limit(ctx, "toggleSticker", { key: user._id, throws: true });
+    await rateLimiter.limit(ctx, "toggleSticker", {
+      key: user._id,
+      throws: true,
+    });
 
     const stats = await readSiteStatsOrNull(ctx);
     const totalCount = stats?.totalStickers ?? DEFAULT_TOTAL_STICKERS;
@@ -248,6 +272,8 @@ export const toggleSticker = mutation({
     const userPatch: UserPatch = {
       duplicates: nextDup,
       missing: nextMiss,
+      duplicateStickerCounts: buildStickerCountEntries(nextDup),
+      missingStickerCounts: buildStickerCountEntries(nextMiss),
       albumProgress,
       albumCompletionPct: albumProgress,
       totalStickersOwned,

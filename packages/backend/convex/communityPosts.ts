@@ -372,17 +372,23 @@ export const getCityFilterCounts = query({
 
     const cityIds = allCities.map((c) => c._id);
 
-    const posts = await ctx.db
-      .query("communityPosts")
-      .filter((q) => q.or(...cityIds.map((id) => q.eq(q.field("cityId"), id))))
-      .collect();
-
     const countByCity = new Map<string, number>();
     let totalCount = 0;
-    for (const post of posts) {
-      const current = countByCity.get(post.cityId) ?? 0;
-      countByCity.set(post.cityId, current + 1);
-      totalCount++;
+
+    const cityPostPages = await Promise.all(
+      cityIds.map((cityId) =>
+        ctx.db
+          .query("communityPosts")
+          .withIndex("by_city_created", (q) => q.eq("cityId", cityId))
+          .take(1000),
+      ),
+    );
+
+    for (const [index, posts] of cityPostPages.entries()) {
+      const cityId = cityIds[index];
+      if (!cityId) continue;
+      countByCity.set(cityId, posts.length);
+      totalCount += posts.length;
     }
 
     const result = [
