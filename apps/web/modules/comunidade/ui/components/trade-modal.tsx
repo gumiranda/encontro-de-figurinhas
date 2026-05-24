@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "convex/react";
 import { cn } from "@workspace/ui/lib/utils";
-import { X, ArrowLeftRight, MapPin, Check } from "lucide-react";
+import { X, ArrowLeftRight, MapPin, Check, Loader2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -10,6 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 import { MatchDicebearAvatar } from "@/modules/matches/ui/components/match-dicebear-avatar";
 import { MiniStickerFigure } from "./mini-sticker-figure";
 
@@ -23,10 +26,10 @@ interface Sticker {
 interface TradeModalProps {
   open: boolean;
   onClose: () => void;
+  postId: string;
   authorNick: string;
   authorCity: string;
   theirStickers: Sticker[];
-  myStickers: Sticker[];
   onSend: (data: {
     pickedTheirs: string[];
     pickedMine: string[];
@@ -43,19 +46,36 @@ const MEET_SUGGESTIONS = [
 export function TradeModal({
   open,
   onClose,
+  postId,
   authorNick,
   authorCity,
   theirStickers,
-  myStickers,
   onSend,
 }: TradeModalProps) {
-  const [pickedTheirs, setPickedTheirs] = useState<string[]>(
-    theirStickers.slice(0, 1).map((s) => s.code + s.num)
+  const tradeIntel = useQuery(
+    api.communityPosts.getTradeIntelligence,
+    open ? { postId: postId as Id<"communityPosts"> } : "skip"
   );
-  const [pickedMine, setPickedMine] = useState<string[]>(
-    myStickers.map((s) => s.code + s.num)
-  );
+
+  const myStickers: Sticker[] = (tradeIntel?.myDupesTheyNeed ?? []).map((s) => ({
+    code: s.displayCode,
+    flag: s.flagEmoji,
+    num: s.displayCode.split("-")[1] || String(s.absoluteNum),
+    rare: s.isGolden,
+  }));
+
+  const theirDupesINeed: Sticker[] = (tradeIntel?.theirDupesINeed ?? []).map((s) => ({
+    code: s.displayCode,
+    flag: s.flagEmoji,
+    num: s.displayCode.split("-")[1] || String(s.absoluteNum),
+    rare: s.isGolden,
+  }));
+
+  const [pickedTheirs, setPickedTheirs] = useState<string[]>([]);
+  const [pickedMine, setPickedMine] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+
+  const displayTheirStickers = theirDupesINeed.length > 0 ? theirDupesINeed : theirStickers;
 
   const toggle = (
     list: string[],
@@ -108,18 +128,26 @@ export function TradeModal({
         </DialogHeader>
 
         <div className="p-4 max-h-[55vh] overflow-y-auto space-y-4">
+          {!tradeIntel && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {tradeIntel && (
+            <>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-1.5">
               → Você recebe ({pickedTheirs.length})
             </p>
-            {theirStickers.length === 0 ? (
+            {displayTheirStickers.length === 0 ? (
               <p className="text-xs text-muted-foreground py-2">
                 Sem repetidas confirmadas — envie sua proposta e aguarde
                 resposta.
               </p>
             ) : (
               <div className="grid grid-cols-4 gap-1.5">
-                {theirStickers.map((s) => {
+                {displayTheirStickers.map((s) => {
                   const key = s.code + s.num;
                   return (
                     <MiniStickerFigure
@@ -209,6 +237,8 @@ export function TradeModal({
               ))}
             </div>
           </div>
+            </>
+          )}
         </div>
 
         <div className="p-3 border-t border-white/10 bg-surface-container-high flex items-center gap-2.5">

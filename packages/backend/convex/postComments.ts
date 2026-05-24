@@ -11,11 +11,17 @@ export const listComments = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, { postId, paginationOpts }) => {
+    const currentUser = await getAuthenticatedUser(ctx);
+
     const result = await ctx.db
       .query("postComments")
       .withIndex("by_post_created", (q) => q.eq("postId", postId))
       .order("desc")
       .paginate(paginationOpts);
+
+    const post = await ctx.db.get(postId);
+    const postAuthor = post ? await ctx.db.get(post.userId) : null;
+    const postAuthorNeeds = postAuthor?.missing ?? [];
 
     const userIds = [...new Set(result.page.map((c) => c.userId))];
     const users = await Promise.all(userIds.map((id) => ctx.db.get(id)));
@@ -26,10 +32,15 @@ export const listComments = query({
     return {
       page: result.page.map((c) => {
         const author = userById.get(c.userId);
+        const commenterDupes = author?.duplicates ?? [];
+        const hasMatch = post?.type === "need" && commenterDupes.some((d) => postAuthorNeeds.includes(d));
+
         return {
           _id: c._id,
           message: c.message,
           createdAt: c.createdAt,
+          isMe: currentUser?._id === c.userId,
+          hasMatch: hasMatch ?? false,
           author: author
             ? {
                 _id: author._id,

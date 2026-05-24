@@ -151,6 +151,21 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 10,
   },
 
+  // gepeto dashboard read queries — soft guard only, queries call .check()
+  gepetoDashboardMatchRead: {
+    kind: "token bucket",
+    rate: 120,
+    period: MINUTE,
+    capacity: 240,
+  },
+
+  gepetoDashboardFixturesRead: {
+    kind: "token bucket",
+    rate: 60,
+    period: MINUTE,
+    capacity: 120,
+  },
+
   // gepeto.updateMatchScore — per-admin throttle
   gepetoScoreUpdate: {
     kind: "token bucket",

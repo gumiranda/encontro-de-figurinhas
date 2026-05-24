@@ -18,11 +18,14 @@ interface PostStickersGridProps {
 }
 
 function extractNum(displayCode: string, absoluteNum: number): string {
+  let num: number;
   if (displayCode.includes("-")) {
     const parts = displayCode.split("-");
-    return parts[parts.length - 1] ?? String(absoluteNum);
+    num = parseInt(parts[parts.length - 1] ?? String(absoluteNum), 10);
+  } else {
+    num = absoluteNum;
   }
-  return String(absoluteNum);
+  return String(num).padStart(3, "0");
 }
 
 export function PostStickersGrid({
@@ -39,7 +42,7 @@ export function PostStickersGrid({
   return (
     <div
       className="grid gap-1.5 mt-3"
-      style={{ gridTemplateColumns: `repeat(${Math.min(visible.length + (overflow > 0 ? 1 : 0), 6)}, 1fr)` }}
+      style={{ gridTemplateColumns: `repeat(${Math.min(visible.length + (overflow > 0 ? 1 : 0), 6)}, minmax(0, 56px))` }}
     >
       {visible.map((s) => (
         <div
@@ -59,7 +62,7 @@ export function PostStickersGrid({
           <div>
             <div
               className={cn(
-                "font-headline text-sm font-bold leading-none",
+                "font-headline text-xl font-bold leading-none",
                 s.rare && "text-tertiary",
                 !s.rare && isDupe && "text-secondary",
                 !s.rare && !isDupe && "text-foreground/85"

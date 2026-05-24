@@ -630,6 +630,7 @@ export default defineSchema({
     finishedAt: v.optional(v.number()),
   })
     .index("by_round_kickoff", ["roundId", "kickoffAt"])
+    .index("by_kickoff", ["kickoffAt"])
     .index("by_slug", ["slug"])
     .index("by_round_totalVotes", ["roundId", "totalVotes"])
     .index("by_totalVotes", ["totalVotes"])
@@ -796,11 +797,16 @@ export default defineSchema({
   communityPosts: defineTable({
     userId: v.id("users"),
     cityId: v.id("cities"),
-    type: v.union(v.literal("need"), v.literal("have")),
+    type: v.union(v.literal("need"), v.literal("have"), v.literal("event")),
     stickers: v.array(v.number()),
     message: v.optional(v.string()),
     createdAt: v.number(),
     expiresAt: v.optional(v.number()),
+    isFeatured: v.optional(v.boolean()),
+    acceptsMail: v.optional(v.boolean()),
+    // Event-specific fields
+    eventDate: v.optional(v.number()),
+    eventLocation: v.optional(v.string()),
   })
     .index("by_city_created", ["cityId", "createdAt"])
     .index("by_user", ["userId"]),

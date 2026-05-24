@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
+import { Pill, PillIndicator } from "@workspace/ui/components/kibo-ui/pill";
+import { Spinner } from "@workspace/ui/components/kibo-ui/spinner";
 import { toast } from "sonner";
-import { Lock, User } from "lucide-react";
+import { Check, Lock, User } from "lucide-react";
 import {
   canRecordUserPrediction,
   getPredictionLockReason,
 } from "../../lib/match-state";
+import { getGepetoToastError } from "../../lib/toast-errors";
 import { ScoreStepper } from "./score-stepper";
 
 type Prediction = "home" | "draw" | "away";
+type ConfirmedPrediction = {
+  prediction: Prediction;
+  exactScore?: { home: number; away: number } | null;
+} | null;
 
 interface PredictionFormProps {
   matchId: Id<"worldCupMatches">;
@@ -36,6 +43,16 @@ function derivePrediction(home: number, away: number): Prediction {
   return "draw";
 }
 
+function predictionLabel(
+  homeTeam: string,
+  awayTeam: string,
+  prediction: Prediction,
+) {
+  if (prediction === "home") return homeTeam;
+  if (prediction === "away") return awayTeam;
+  return "Empate";
+}
+
 export function PredictionForm({
   matchId,
   homeTeam,
@@ -53,6 +70,8 @@ export function PredictionForm({
   const [awayScore, setAwayScore] = useState(
     existingPrediction?.exactScore?.away ?? 0,
   );
+  const [confirmedPrediction, setConfirmedPrediction] =
+    useState<ConfirmedPrediction>(existingPrediction ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const match = {
@@ -62,25 +81,63 @@ export function PredictionForm({
   };
   const canPredict = canRecordUserPrediction(match);
   const lockReason = getPredictionLockReason(match);
-  const prediction = derivePrediction(homeScore, awayScore);
+  const controlsDisabled = !canPredict || isSubmitting;
+  const existingPredictionChoice = existingPrediction?.prediction;
+  const existingPredictionHome = existingPrediction?.exactScore?.home;
+  const existingPredictionAway = existingPrediction?.exactScore?.away;
+
+  useEffect(() => {
+    if (isSubmitting) return;
+
+    const exactScore =
+      existingPredictionHome !== undefined &&
+      existingPredictionAway !== undefined
+        ? { home: existingPredictionHome, away: existingPredictionAway }
+        : null;
+
+    setConfirmedPrediction(
+      existingPredictionChoice
+        ? { prediction: existingPredictionChoice, exactScore }
+        : null,
+    );
+    if (exactScore) {
+      setHomeScore(exactScore.home);
+      setAwayScore(exactScore.away);
+    }
+  }, [
+    existingPredictionChoice,
+    existingPredictionHome,
+    existingPredictionAway,
+    isSubmitting,
+  ]);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!canPredict) {
       toast.error(lockReason ?? "Palpites fechados.");
       return;
     }
 
+    const nextScore = { home: homeScore, away: awayScore };
+    const nextPrediction = derivePrediction(nextScore.home, nextScore.away);
+
     setIsSubmitting(true);
     try {
       await recordPrediction({
         matchId,
-        prediction,
-        exactScore: { home: homeScore, away: awayScore },
+        prediction: nextPrediction,
+        exactScore: nextScore,
+      });
+      setConfirmedPrediction({
+        prediction: nextPrediction,
+        exactScore: nextScore,
       });
       toast.success("Palpite registrado!");
       onSuccess?.();
-    } catch (e: any) {
-      toast.error(e.message || "Erro ao registrar palpite");
+    } catch (error: unknown) {
+      toast.error(
+        getGepetoToastError(error, "Não foi possível registrar seu palpite."),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -93,23 +150,53 @@ export function PredictionForm({
           <User className="size-4 text-[#95aaff]" />
         </div>
         <span className="font-medium">Seu palpite</span>
+        {confirmedPrediction ? (
+          <Pill className="ml-auto border-[#4ff325]/30 bg-[#4ff325]/10 text-[#b9ff9f]">
+            <PillIndicator variant="success" />
+            Salvo
+          </Pill>
+        ) : null}
       </div>
 
       <div className="flex items-center justify-center gap-3 px-2 py-6 sm:gap-5 sm:px-4">
         <ScoreStepper
           value={homeScore}
           onChange={setHomeScore}
-          disabled={!canPredict}
+          disabled={controlsDisabled}
           className="text-[#dfe5ff]"
         />
-        <span className="font-display text-2xl text-[#aeb4ca] sm:text-3xl">×</span>
+        <span className="font-display text-2xl text-[#aeb4ca] sm:text-3xl">
+          ×
+        </span>
         <ScoreStepper
           value={awayScore}
           onChange={setAwayScore}
-          disabled={!canPredict}
+          disabled={controlsDisabled}
           className="text-[#dfe5ff]"
         />
       </div>
+
+      {confirmedPrediction ? (
+        <div className="px-4 pb-4">
+          <div className="rounded-xl border border-[#95aaff]/35 bg-[#95aaff]/10 px-4 py-3 text-sm">
+            <div className="flex items-center gap-2 font-black text-[#dfe5ff]">
+              <Check className="size-4 text-[#4ff325]" />
+              Palpite salvo
+            </div>
+            <p className="mt-1 text-[#aeb4ca]">
+              Seu palpite:{" "}
+              {confirmedPrediction.exactScore
+                ? `${confirmedPrediction.exactScore.home} × ${confirmedPrediction.exactScore.away}, `
+                : ""}
+              {predictionLabel(
+                homeTeam,
+                awayTeam,
+                confirmedPrediction.prediction,
+              )}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="px-4 pb-4">
         {canPredict ? (
@@ -118,32 +205,24 @@ export function PredictionForm({
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
-            <Lock className="size-4" />
+            {isSubmitting ? (
+              <Spinner className="size-4" />
+            ) : (
+              <Lock className="size-4" />
+            )}
             {isSubmitting
               ? "Salvando..."
-              : existingPrediction
+              : confirmedPrediction
                 ? "Atualizar e enfrentar o Gepeto"
                 : "Confirmar e enfrentar o Gepeto"}
           </Button>
         ) : (
-          <div className="rounded-xl border border-[#444b65] bg-[#12192e]/70 px-4 py-3 text-center text-sm text-[#aeb4ca]">
-            🔒 {lockReason}
+          <div className="flex items-center justify-center gap-2 rounded-xl border border-[#444b65] bg-[#12192e]/70 px-4 py-3 text-center text-sm text-[#aeb4ca]">
+            <Lock className="size-4" />
+            {lockReason}
           </div>
         )}
       </div>
-
-      {!canPredict && existingPrediction?.exactScore ? (
-        <p className="px-4 pb-4 text-center text-xs text-[#aeb4ca]">
-          Você palpitou {existingPrediction.exactScore.home} ×{" "}
-          {existingPrediction.exactScore.away} (
-          {existingPrediction.prediction === "home"
-            ? homeTeam
-            : existingPrediction.prediction === "away"
-              ? awayTeam
-              : "Empate"}
-          )
-        </p>
-      ) : null}
     </Card>
   );
 }

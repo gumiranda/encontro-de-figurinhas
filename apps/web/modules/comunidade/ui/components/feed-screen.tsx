@@ -1,8 +1,9 @@
 "use client";
 
-import { useMutation, usePaginatedQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Plus, Users } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { api } from "@workspace/backend/_generated/api";
@@ -10,6 +11,15 @@ import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
 import { cn } from "@workspace/ui/lib/utils";
+import { FeedCityFilters } from "./feed-city-filters";
+
+type FeedTab = "profile" | "public" | "feed";
+
+const FEED_TABS: { id: FeedTab; label: string }[] = [
+  { id: "profile", label: "Meu perfil" },
+  { id: "public", label: "Público" },
+  { id: "feed", label: "Feed" },
+];
 
 import { ComposerCard } from "./composer-card";
 import { CreatePostDialog } from "./create-post-dialog";
@@ -17,9 +27,22 @@ import { PostCard, type CommunityPost } from "./post-card";
 import { TradeModal } from "./trade-modal";
 
 export function FeedScreen() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<FeedTab>("feed");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [sortBy, setSortBy] = useState<"recent" | "need" | "have">("recent");
   const [tradePost, setTradePost] = useState<CommunityPost | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string>("all");
+
+  const cityFilters = useQuery(api.communityPosts.getCityFilterCounts) ?? [];
+
+  const handleTabChange = (tab: FeedTab) => {
+    if (tab === "profile") {
+      router.push("/dashboard/perfil");
+      return;
+    }
+    setActiveTab(tab);
+  };
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.communityPosts.listByCityPaginated,
@@ -76,12 +99,42 @@ export function FeedScreen() {
     return true;
   });
 
+  const selectedCityLabel = cityFilters.find((c) => c.id === selectedCity)?.label ?? "SUA CIDADE";
+
   return (
-    <div className="space-y-0">
+    <div className="mx-auto max-w-[420px] space-y-0">
+      <div className="px-4 pt-3">
+        <div className="flex p-1 bg-surface-container-high rounded-lg border border-white/10">
+          {FEED_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleTabChange(tab.id)}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-md text-sm font-semibold transition-colors",
+                activeTab === tab.id
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {cityFilters.length > 0 && (
+        <FeedCityFilters
+          cities={cityFilters}
+          value={selectedCity}
+          onChange={setSelectedCity}
+        />
+      )}
+
       <div className="px-4 pt-3 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground font-headline">
-            {filteredPosts.length} POSTS · {cityName ?? "SUA CIDADE"}
+            {filteredPosts.length} POSTS · {selectedCityLabel}
           </span>
           <div className="flex gap-1 p-1 bg-surface-container-high rounded-lg border border-white/10">
             {(["recent", "need", "have"] as const).map((s) => (
@@ -144,14 +197,14 @@ export function FeedScreen() {
         <TradeModal
           open={!!tradePost}
           onClose={() => setTradePost(null)}
+          postId={tradePost._id}
           authorNick={tradePost.author?.displayNickname ?? "user"}
-          authorCity="São Paulo, SP"
+          authorCity={tradePost.authorCity ?? ""}
           theirStickers={tradePost.stickers.map((s) => ({
             code: s.displayCode,
             flag: s.flagEmoji,
             num: s.displayCode.split("-")[1] || String(s.absoluteNum),
           }))}
-          myStickers={[]}
           onSend={(data) => {
             toast.success("Proposta enviada!");
             setTradePost(null);

@@ -580,6 +580,13 @@ export const listDashboardFixtures = query({
   args: {},
   handler: async (ctx) => {
     const user = await requireAuth(ctx);
+    const rateLimit = await rateLimiter.check(
+      ctx,
+      "gepetoDashboardFixturesRead",
+      { key: user._id },
+    );
+    if (!rateLimit.ok) return [];
+
     const rounds = await ctx.db
       .query("worldCupRounds")
       .withIndex("by_order")
@@ -619,10 +626,9 @@ export const listDashboardFixtures = query({
               userPrediction: (() => {
                 const prediction = userPredictionByMatch.get(match._id);
                 if (!prediction) return null;
-                const revealed = isPredictionRevealed(match);
                 return {
                   ...prediction,
-                  exactScore: revealed ? prediction.exactScore : null,
+                  exactScore: prediction.exactScore,
                 };
               })(),
               communityCount: predictionCount.length,
@@ -643,39 +649,69 @@ export const getDashboardMatch = query({
   args: { matchId: v.id("worldCupMatches") },
   handler: async (ctx, { matchId }) => {
     const user = await requireAuth(ctx);
+    const rateLimit = await rateLimiter.check(ctx, "gepetoDashboardMatchRead", {
+      key: user._id,
+    });
+    if (!rateLimit.ok) {
+      throw new ConvexError("Muitas tentativas. Tente novamente em instantes.");
+    }
+
     const match = await ctx.db.get(matchId);
     if (!match) throw new ConvexError("Jogo não encontrado");
+    const now = Date.now();
+    const nextMatchStart = Math.max(now, match.kickoffAt + 1);
 
-    const [round, aiPrediction, userPrediction, badge, result, allPredictions] =
-      await Promise.all([
-        ctx.db.get(match.roundId),
-        ctx.db
-          .query("aiPredictions")
-          .withIndex("by_match", (q) => q.eq("matchId", matchId))
-          .unique(),
-        ctx.db
-          .query("userPredictions")
-          .withIndex("by_user_match", (q) =>
-            q.eq("userId", user._id).eq("matchId", matchId),
-          )
-          .unique(),
-        ctx.db
-          .query("userAiBadges")
-          .withIndex("by_user_match", (q) =>
-            q.eq("userId", user._id).eq("matchId", matchId),
-          )
-          .unique(),
-        ctx.db
-          .query("userAiMatchResults")
-          .withIndex("by_user_match", (q) =>
-            q.eq("userId", user._id).eq("matchId", matchId),
-          )
-          .unique(),
-        ctx.db
-          .query("userPredictions")
-          .withIndex("by_match", (q) => q.eq("matchId", matchId))
-          .take(500),
-      ]);
+    const [
+      round,
+      aiPrediction,
+      userPrediction,
+      badge,
+      result,
+      allPredictions,
+      upcomingMatches,
+    ] = await Promise.all([
+      ctx.db.get(match.roundId),
+      ctx.db
+        .query("aiPredictions")
+        .withIndex("by_match", (q) => q.eq("matchId", matchId))
+        .unique(),
+      ctx.db
+        .query("userPredictions")
+        .withIndex("by_user_match", (q) =>
+          q.eq("userId", user._id).eq("matchId", matchId),
+        )
+        .unique(),
+      ctx.db
+        .query("userAiBadges")
+        .withIndex("by_user_match", (q) =>
+          q.eq("userId", user._id).eq("matchId", matchId),
+        )
+        .unique(),
+      ctx.db
+        .query("userAiMatchResults")
+        .withIndex("by_user_match", (q) =>
+          q.eq("userId", user._id).eq("matchId", matchId),
+        )
+        .unique(),
+      ctx.db
+        .query("userPredictions")
+        .withIndex("by_match", (q) => q.eq("matchId", matchId))
+        .take(500),
+      ctx.db
+        .query("worldCupMatches")
+        .withIndex("by_kickoff", (q) => q.gte("kickoffAt", nextMatchStart))
+        .take(24),
+    ]);
+    const nextMatches = upcomingMatches
+      .filter(
+        (upcoming) =>
+          !hasFinalScore(upcoming) && upcoming.status !== "finished",
+      )
+      .slice(0, 3);
+    const ownPrediction =
+      userPrediction && userPrediction.userId === user._id
+        ? userPrediction
+        : null;
 
     const community = allPredictions.reduce(
       (acc, prediction) => {
@@ -689,16 +725,25 @@ export const getDashboardMatch = query({
       match,
       round,
       aiPrediction: maskAiPrediction(aiPrediction, isPredictionRevealed(match)),
-      userPrediction: userPrediction
+      userPrediction: ownPrediction
         ? {
-            ...userPrediction,
-            exactScore: isPredictionRevealed(match)
-              ? userPrediction.exactScore
-              : null,
+            ...ownPrediction,
+            exactScore: ownPrediction.exactScore,
             isRevealed: isPredictionRevealed(match),
             hasBadge: !!badge,
           }
         : null,
+      nextMatches: nextMatches.map((nextMatch) => ({
+        _id: nextMatch._id,
+        homeTeamCode: nextMatch.homeTeamCode,
+        homeTeamName: nextMatch.homeTeamName,
+        homeTeamFlag: nextMatch.homeTeamFlag,
+        awayTeamCode: nextMatch.awayTeamCode,
+        awayTeamName: nextMatch.awayTeamName,
+        awayTeamFlag: nextMatch.awayTeamFlag,
+        kickoffAt: nextMatch.kickoffAt,
+        venue: nextMatch.venue,
+      })),
       result,
       community: {
         total: allPredictions.length,
@@ -882,10 +927,22 @@ export const recordUserPrediction = mutation({
       }
     }
 
-    await rateLimiter.limit(ctx, "gepetoPrediction", {
-      key: user._id,
-      throws: true,
-    });
+    let predictionRateLimit: { ok: boolean; retryAfter?: number };
+    try {
+      predictionRateLimit = await rateLimiter.limit(ctx, "gepetoPrediction", {
+        key: user._id,
+        throws: true,
+      });
+    } catch {
+      throw new ConvexError(
+        "Muitas tentativas. Aguarde alguns minutos antes de palpitar de novo.",
+      );
+    }
+    if (!predictionRateLimit.ok) {
+      throw new ConvexError(
+        "Muitas tentativas. Aguarde alguns minutos antes de palpitar de novo.",
+      );
+    }
 
     const existing = await ctx.db
       .query("userPredictions")

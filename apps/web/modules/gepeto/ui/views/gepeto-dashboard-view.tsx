@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
+import { Pill, PillIndicator } from "@workspace/ui/components/kibo-ui/pill";
 import {
   Dialog,
   DialogClose,
@@ -71,6 +72,7 @@ import {
   formatRoundSectionLabel,
   PHASE_ORDER,
 } from "@/modules/gepeto/lib/round-labels";
+import { getGepetoToastError } from "@/modules/gepeto/lib/toast-errors";
 
 type Choice = "home" | "draw" | "away";
 type TabKey = "hub" | "jogos" | "boloes" | "capitulo" | "ranking";
@@ -514,7 +516,7 @@ function PoolsPanel({
       router.push(`/dashboard/gepeto/boloes/${result.poolId}`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao criar bolão",
+        getGepetoToastError(error, "Não foi possível criar o bolão."),
       );
     } finally {
       setIsBusy(false);
@@ -529,7 +531,7 @@ function PoolsPanel({
       router.push(`/dashboard/gepeto/boloes/${result.poolId}`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao entrar no bolão",
+        getGepetoToastError(error, "Não foi possível entrar no bolão."),
       );
     } finally {
       setIsBusy(false);
@@ -1798,6 +1800,106 @@ function RankingPhoneScreen({
   );
 }
 
+function NextMatchShortcuts({
+  nextMatches,
+}: {
+  nextMatches: Array<{
+    _id: Id<"worldCupMatches">;
+    homeTeamCode: string;
+    homeTeamName: string;
+    homeTeamFlag: string;
+    awayTeamCode: string;
+    awayTeamName: string;
+    awayTeamFlag: string;
+    kickoffAt: number;
+    venue?: string;
+  }>;
+}) {
+  if (nextMatches.length === 0) {
+    return (
+      <PhoneCard className="p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <Pill className="mb-3 border-[#95aaff]/35 bg-[#95aaff]/10 text-[#b9c6ff]">
+              <PillIndicator variant="info" />
+              Calendário
+            </Pill>
+            <h3 className="font-display text-lg font-black">
+              Sem próximo jogo aberto
+            </h3>
+            <p className="mt-1 text-sm text-[#aeb4ca]">
+              Veja a lista completa para revisar seus palpites.
+            </p>
+          </div>
+          <Button asChild className="gap-2 rounded-xl">
+            <Link href="/dashboard/gepeto?tab=jogos">
+              Ver todos os jogos
+              <ChevronRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
+      </PhoneCard>
+    );
+  }
+
+  return (
+    <PhoneCard className="p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <Pill className="border-[#ffc965]/35 bg-[#ffc965]/10 text-[#ffd98e]">
+          <PillIndicator variant="warning" />
+          Próximos jogos
+        </Pill>
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#aeb4ca]">
+          {nextMatches.length} atalho{nextMatches.length === 1 ? "" : "s"}
+        </span>
+      </div>
+      <div className="grid gap-2">
+        {nextMatches.map((nextMatch, index) => (
+          <div
+            key={nextMatch._id}
+            className="grid gap-3 rounded-xl border border-[#444b65] bg-[#172039] p-3 transition-colors hover:border-[#95aaff] sm:grid-cols-[1fr_auto] sm:items-center"
+          >
+            <div className="min-w-0">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                {index === 0 ? (
+                  <Pill className="border-[#95aaff]/35 bg-[#95aaff]/10 py-1 text-[10px] text-[#b9c6ff]">
+                    Próximo
+                  </Pill>
+                ) : null}
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#aeb4ca]">
+                  {dateFormatter.format(nextMatch.kickoffAt)}
+                </span>
+              </div>
+              <h3 className="truncate font-display text-base font-black">
+                {nextMatch.homeTeamFlag}{" "}
+                {shortTeamName(nextMatch.homeTeamName, nextMatch.homeTeamCode)}{" "}
+                ×{" "}
+                {shortTeamName(nextMatch.awayTeamName, nextMatch.awayTeamCode)}{" "}
+                {nextMatch.awayTeamFlag}
+              </h3>
+              {nextMatch.venue ? (
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-[#aeb4ca]">
+                  <MapPin className="size-3 shrink-0" />
+                  <span className="truncate">{nextMatch.venue}</span>
+                </p>
+              ) : null}
+            </div>
+            <Button
+              asChild
+              className="gap-2 rounded-xl bg-[#95aaff] text-[#082054] hover:bg-[#a9baff]"
+            >
+              <Link href={`/dashboard/gepeto/matches/${nextMatch._id}`}>
+                Palpitar
+                <ChevronRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        ))}
+      </div>
+    </PhoneCard>
+  );
+}
+
 export function GepetoDashboardView() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -1863,8 +1965,15 @@ export function GepetoMatchDashboardView({
     );
   }
 
-  const { match, round, aiPrediction, userPrediction, community, result } =
-    data;
+  const {
+    match,
+    round,
+    aiPrediction,
+    userPrediction,
+    nextMatches,
+    community,
+    result,
+  } = data;
   const total = Math.max(community.total, 1);
   const hasResult = hasFinalScore(match);
   const gepetoRevealed = isPredictionRevealed(match);
@@ -1978,6 +2087,8 @@ export function GepetoMatchDashboardView({
           />
         </div>
 
+        <NextMatchShortcuts nextMatches={nextMatches} />
+
         {community.total > 0 ? (
           <CommunityBar
             homeFlag={match.homeTeamFlag}
@@ -2082,14 +2193,17 @@ export function GepetoInviteJoinView({ inviteCode }: { inviteCode: string }) {
         router.replace(`/dashboard/gepeto/boloes/${result.poolId}`);
       })
       .catch((error) => {
-        const message =
-          error instanceof Error ? error.message : "Erro ao entrar no bolão";
-        if (message.includes("Not authenticated")) {
+        const rawMessage = error instanceof Error ? error.message : "";
+        if (rawMessage.includes("Not authenticated")) {
           router.replace(
             `/complete-profile?redirect=${encodeURIComponent(invitePath)}`,
           );
           return;
         }
+        const message = getGepetoToastError(
+          error,
+          "Não foi possível entrar no bolão.",
+        );
         didJoinRef.current = false;
         setJoinError(message);
       });
@@ -2350,7 +2464,9 @@ export function GepetoPoolDetailView({
       setMessage("");
       toast.success("Comentário publicado");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao comentar");
+      toast.error(
+        getGepetoToastError(error, "Não foi possível publicar o comentário."),
+      );
     } finally {
       setIsPosting(false);
     }
@@ -2361,7 +2477,9 @@ export function GepetoPoolDetailView({
       await pokeMember({ poolId, targetMemberId: memberId });
       toast.success("Cutucado");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao cutucar");
+      toast.error(
+        getGepetoToastError(error, "Não foi possível cutucar agora."),
+      );
     }
   }
 

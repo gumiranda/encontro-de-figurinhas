@@ -3,6 +3,36 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAuth, getAuthenticatedUser } from "./lib/auth";
 import { rateLimiter } from "./lib/rateLimiter";
+import { Id } from "./_generated/dataModel";
+
+async function getReactionCounts(
+  ctx: { db: any },
+  postIds: Id<"communityPosts">[]
+): Promise<Map<string, { love: number; fire: number; hand: number }>> {
+  if (postIds.length === 0) return new Map();
+
+  const reactions = await ctx.db
+    .query("postReactions")
+    .filter((q: any) =>
+      q.or(...postIds.map((id: Id<"communityPosts">) => q.eq(q.field("postId"), id)))
+    )
+    .collect();
+
+  const counts = new Map<string, { love: number; fire: number; hand: number }>();
+  for (const postId of postIds) {
+    counts.set(postId, { love: 0, fire: 0, hand: 0 });
+  }
+
+  for (const r of reactions) {
+    const c = counts.get(r.postId);
+    const t = r.type as "love" | "fire" | "hand";
+    if (c && (t === "love" || t === "fire" || t === "hand")) {
+      c[t]++;
+    }
+  }
+
+  return counts;
+}
 
 export const listByCityPaginated = query({
   args: {
@@ -42,13 +72,23 @@ export const listByCityPaginated = query({
       .collect();
     const stickerByNum = new Map(stickerDetails.map((s) => [s.absoluteNum, s]));
 
+    const postIds = result.page.map((p) => p._id);
+    const reactionCounts = await getReactionCounts(ctx, postIds);
+
     const page = result.page.map((post) => {
       const author = userById.get(post.userId);
+      const reactions = reactionCounts.get(post._id) ?? { love: 0, fire: 0, hand: 0 };
       return {
         _id: post._id,
         type: post.type,
         message: post.message,
         createdAt: post.createdAt,
+        isFeatured: post.isFeatured ?? false,
+        acceptsMail: post.acceptsMail ?? false,
+        eventDate: post.eventDate,
+        eventLocation: post.eventLocation,
+        authorCity: city ? `${city.name}, ${city.state}` : null,
+        reactions,
         stickers: post.stickers.map((num) => {
           const detail = stickerByNum.get(num);
           return {
@@ -82,17 +122,20 @@ export const listByCityPaginated = query({
 
 export const create = mutation({
   args: {
-    type: v.union(v.literal("need"), v.literal("have")),
+    type: v.union(v.literal("need"), v.literal("have"), v.literal("event")),
     stickers: v.array(v.number()),
     message: v.optional(v.string()),
+    acceptsMail: v.optional(v.boolean()),
+    eventDate: v.optional(v.number()),
+    eventLocation: v.optional(v.string()),
   },
-  handler: async (ctx, { type, stickers, message }) => {
+  handler: async (ctx, { type, stickers, message, acceptsMail, eventDate, eventLocation }) => {
     const user = await requireAuth(ctx);
     if (!user.cityId) {
       throw new Error("Selecione uma cidade antes de postar");
     }
 
-    if (stickers.length === 0) {
+    if (type !== "event" && stickers.length === 0) {
       throw new Error("Selecione pelo menos uma figurinha");
     }
 
@@ -107,6 +150,9 @@ export const create = mutation({
       stickers,
       message: message?.trim() || undefined,
       createdAt: Date.now(),
+      acceptsMail: acceptsMail ?? false,
+      eventDate: type === "event" ? eventDate : undefined,
+      eventLocation: type === "event" ? eventLocation?.trim() : undefined,
     });
 
     return postId;
@@ -146,5 +192,114 @@ export const listMyPosts = query({
       .take(20);
 
     return posts;
+  },
+});
+
+export const getTradeIntelligence = query({
+  args: {
+    postId: v.id("communityPosts"),
+  },
+  handler: async (ctx, { postId }) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) return { myDupesTheyNeed: [], theirDupesINeed: [] };
+
+    const post = await ctx.db.get(postId);
+    if (!post) return { myDupesTheyNeed: [], theirDupesINeed: [] };
+
+    const postAuthor = await ctx.db.get(post.userId);
+    if (!postAuthor) return { myDupesTheyNeed: [], theirDupesINeed: [] };
+
+    const myDupes = user.duplicates ?? [];
+    const myMissing = user.missing ?? [];
+    const theirDupes = postAuthor.duplicates ?? [];
+    const theirMissing = postAuthor.missing ?? [];
+
+    const myDupesTheyNeedNums = myDupes.filter((n) => theirMissing.includes(n)).slice(0, 12);
+    const theirDupesINeedNums = theirDupes.filter((n) => myMissing.includes(n)).slice(0, 12);
+
+    const allNums = [...myDupesTheyNeedNums, ...theirDupesINeedNums];
+    const stickerDetails = allNums.length > 0
+      ? await ctx.db
+          .query("stickerDetail")
+          .filter((q) => q.or(...allNums.map((n) => q.eq(q.field("absoluteNum"), n))))
+          .collect()
+      : [];
+    const detailByNum = new Map(stickerDetails.map((s) => [s.absoluteNum, s]));
+
+    const mapStickers = (nums: number[]) =>
+      nums.map((num) => {
+        const d = detailByNum.get(num);
+        return {
+          absoluteNum: num,
+          displayCode: d?.displayCode ?? `#${num}`,
+          flagEmoji: d?.flagEmoji ?? "🏳️",
+          name: d?.name ?? "",
+          isGolden: d?.isGolden ?? false,
+        };
+      });
+
+    return {
+      myDupesTheyNeed: mapStickers(myDupesTheyNeedNums),
+      theirDupesINeed: mapStickers(theirDupesINeedNums),
+    };
+  },
+});
+
+export const getCityFilterCounts = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedUser(ctx);
+    if (!user?.cityId) return [];
+
+    const userCity = await ctx.db.get(user.cityId);
+    if (!userCity) return [];
+
+    const allCities = await ctx.db
+      .query("cities")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .take(50);
+
+    const cityIds = allCities.map((c) => c._id);
+
+    const posts = await ctx.db
+      .query("communityPosts")
+      .filter((q) =>
+        q.or(...cityIds.map((id) => q.eq(q.field("cityId"), id)))
+      )
+      .collect();
+
+    const countByCity = new Map<string, number>();
+    let totalCount = 0;
+    for (const post of posts) {
+      const current = countByCity.get(post.cityId) ?? 0;
+      countByCity.set(post.cityId, current + 1);
+      totalCount++;
+    }
+
+    const result = [
+      { id: "all", label: "Todas as cidades", count: totalCount },
+    ];
+
+    if (user.cityId && countByCity.has(user.cityId)) {
+      result.push({
+        id: user.cityId,
+        label: `${userCity.name}, ${userCity.state}`,
+        count: countByCity.get(user.cityId) ?? 0,
+      });
+    }
+
+    for (const city of allCities) {
+      if (city._id === user.cityId) continue;
+      const count = countByCity.get(city._id);
+      if (count && count > 0) {
+        result.push({
+          id: city._id,
+          label: `${city.name}, ${city.state}`,
+          count,
+        });
+      }
+    }
+
+    return result.slice(0, 10);
   },
 });

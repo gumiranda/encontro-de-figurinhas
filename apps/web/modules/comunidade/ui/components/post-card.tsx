@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
-import { Check, MessageCircle, MoreHorizontal, Share2, Star, Swords, Trash2 } from "lucide-react";
+import { Calendar, Check, Mail, MapPin, MessageCircle, MoreHorizontal, Share2, Star, Trash2 } from "lucide-react";
 import { PostStickersGrid } from "./post-stickers-grid";
 import { ReactionRow } from "./reaction-row";
 import { CommentsThread } from "./comments-thread";
@@ -41,9 +41,15 @@ type PostAuthor = {
 
 export type CommunityPost = {
   _id: string;
-  type: "need" | "have";
+  type: "need" | "have" | "event";
   message?: string;
   createdAt: number;
+  isFeatured?: boolean;
+  acceptsMail?: boolean;
+  eventDate?: number;
+  eventLocation?: string;
+  authorCity?: string | null;
+  reactions?: { love: number; fire: number; hand: number };
   stickers: PostSticker[];
   author: PostAuthor | null;
   isOwn: boolean;
@@ -64,6 +70,14 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
 
   return (
     <Card className="border-white/10 bg-surface-container">
+      {post.isFeatured && (
+        <div className="px-4 pt-3 pb-0">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-tertiary/20 text-tertiary font-headline text-[9px] font-bold tracking-widest">
+            <Star className="size-2.5 fill-current" />
+            EM DESTAQUE
+          </span>
+        </div>
+      )}
       <CardHeader className="flex-row items-start gap-3 space-y-0 pb-3">
         <FeedAvatar
           seed={post.author?.avatarSeed ?? "anon"}
@@ -89,26 +103,49 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
             <Badge
               className={cn(
                 "text-[9px] px-2 py-0.5 font-headline font-bold tracking-wider inline-flex items-center gap-1",
-                post.type === "have"
-                  ? "bg-secondary/12 text-secondary border-secondary/30"
-                  : "bg-primary/12 text-primary border-primary/30"
+                post.type === "have" && "bg-secondary/12 text-secondary border-secondary/30",
+                post.type === "need" && "bg-primary/12 text-primary border-primary/30",
+                post.type === "event" && "bg-tertiary/12 text-tertiary border-tertiary/30"
               )}
             >
-              {post.type === "have" ? (
+              {post.type === "have" && (
                 <>
                   <Check className="size-2.5" />
                   TENHO
                 </>
-              ) : (
+              )}
+              {post.type === "need" && (
                 <>
                   <Star className="size-2.5" />
                   PRECISO
                 </>
               )}
+              {post.type === "event" && (
+                <>
+                  <Calendar className="size-2.5" />
+                  ENCONTRO
+                </>
+              )}
             </Badge>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
+            {post.authorCity && (
+              <>
+                <MapPin className="size-2.5" />
+                <span>{post.authorCity}</span>
+                <span>·</span>
+              </>
+            )}
             <span>{timeAgo}</span>
+            {post.acceptsMail && (
+              <>
+                <span>·</span>
+                <span className="inline-flex items-center gap-0.5">
+                  <Mail className="size-2.5" />
+                  correio
+                </span>
+              </>
+            )}
           </div>
         </div>
 
@@ -137,13 +174,38 @@ export function PostCard({ post, onTrade, onDelete }: PostCardProps) {
           <p className="text-[13px] text-foreground leading-relaxed">{post.message}</p>
         )}
 
+        {post.type === "event" && post.eventDate && (
+          <div className="p-2.5 bg-tertiary/8 border border-dashed border-tertiary/40 rounded-lg flex items-center gap-2.5">
+            <div className="size-9 rounded-lg bg-tertiary/18 text-tertiary grid place-items-center">
+              <Calendar className="size-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold">
+                {new Date(post.eventDate).toLocaleDateString("pt-BR", {
+                  weekday: "long",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+              {post.eventLocation && (
+                <div className="text-[11px] text-muted-foreground truncate">
+                  {post.eventLocation}
+                </div>
+              )}
+            </div>
+            <Button variant="outline" size="sm" className="h-8 px-2.5 text-[11px] border-white/10">
+              Confirmar
+            </Button>
+          </div>
+        )}
+
         <PostStickersGrid
           stickers={post.stickers}
-          postType={post.type}
+          postType={post.type === "event" ? "have" : post.type}
         />
 
         <div className="flex items-center justify-between pt-2.5 border-t border-white/10 gap-2 flex-wrap">
-          <ReactionRow postId={post._id} />
+          <ReactionRow postId={post._id} initialCounts={post.reactions} />
 
           <div className="flex items-center gap-1.5">
             <button

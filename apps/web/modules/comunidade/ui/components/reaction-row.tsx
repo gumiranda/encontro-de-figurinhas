@@ -7,9 +7,11 @@ import { cn } from "@workspace/ui/lib/utils";
 import type { Id } from "@workspace/backend/_generated/dataModel";
 
 type ReactionType = "love" | "fire" | "hand";
+type ReactionCounts = { love: number; fire: number; hand: number };
 
 interface ReactionRowProps {
   postId: string;
+  initialCounts?: ReactionCounts;
 }
 
 const REACTIONS: { id: ReactionType; emoji: string; label: string }[] = [
@@ -18,10 +20,12 @@ const REACTIONS: { id: ReactionType; emoji: string; label: string }[] = [
   { id: "hand", emoji: "🤝", label: "tenho!" },
 ];
 
-export function ReactionRow({ postId }: ReactionRowProps) {
-  const counts = useQuery(api.postReactions.getReactionCounts, {
-    postId: postId as Id<"communityPosts">,
-  });
+export function ReactionRow({ postId, initialCounts }: ReactionRowProps) {
+  const fetchedCounts = useQuery(
+    api.postReactions.getReactionCounts,
+    initialCounts ? "skip" : { postId: postId as Id<"communityPosts"> }
+  );
+  const counts = initialCounts ?? fetchedCounts;
   const userReaction = useQuery(api.postReactions.getUserReaction, {
     postId: postId as Id<"communityPosts">,
   });

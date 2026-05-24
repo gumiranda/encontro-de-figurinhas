@@ -3,8 +3,8 @@
 import { useMutation, usePaginatedQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Star } from "lucide-react";
-import { useState } from "react";
+import { Check, Star } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@workspace/backend/_generated/api";
@@ -21,6 +21,8 @@ interface CommentData {
   _id: Id<"postComments">;
   message: string;
   createdAt: number;
+  isMe?: boolean;
+  hasMatch?: boolean;
   author: {
     _id: Id<"users">;
     nickname: string;
@@ -29,11 +31,21 @@ interface CommentData {
   } | null;
 }
 
-function CommentItem({ comment }: { comment: CommentData }) {
+function CommentItem({
+  comment,
+  onReply
+}: {
+  comment: CommentData;
+  onReply?: () => void;
+}) {
   const timeAgo = formatDistanceToNow(comment.createdAt, {
     addSuffix: true,
     locale: ptBR,
   });
+
+  const handlePrivateMessage = () => {
+    toast.info("Em breve!");
+  };
 
   return (
     <div className="flex gap-2 pt-2.5">
@@ -52,10 +64,23 @@ function CommentItem({ comment }: { comment: CommentData }) {
             @{comment.author?.nickname ?? "Anônimo"}
           </span>
 
+          {comment.isMe && (
+            <span className="px-1 py-0.5 rounded bg-primary/15 text-primary font-headline text-[7px] font-bold tracking-[0.1em]">
+              VOCÊ
+            </span>
+          )}
+
           {comment.author?.rating !== undefined && comment.author.rating > 0 && (
             <span className="text-[10px] text-muted-foreground inline-flex items-center gap-0.5">
               <Star className="size-2.5 fill-tertiary text-tertiary" />
               {comment.author.rating.toFixed(1)}
+            </span>
+          )}
+
+          {comment.hasMatch && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-secondary/12 text-secondary font-headline text-[8px] font-bold tracking-[0.1em]">
+              <Check className="size-2" />
+              MATCH
             </span>
           )}
 
@@ -67,6 +92,23 @@ function CommentItem({ comment }: { comment: CommentData }) {
         <p className="text-xs text-foreground mt-0.5 leading-relaxed">
           {comment.message}
         </p>
+
+        <div className="flex items-center gap-3 mt-1">
+          <button
+            type="button"
+            onClick={onReply}
+            className="text-[10px] font-semibold text-primary hover:underline"
+          >
+            Responder
+          </button>
+          <button
+            type="button"
+            onClick={handlePrivateMessage}
+            className="text-[10px] font-semibold text-muted-foreground hover:text-foreground"
+          >
+            Mensagem privada
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -75,6 +117,11 @@ function CommentItem({ comment }: { comment: CommentData }) {
 export function CommentsThread({ postId }: CommentsThreadProps) {
   const [replyText, setReplyText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const focusInput = () => {
+    inputRef.current?.focus();
+  };
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.postComments.listComments,
@@ -106,7 +153,7 @@ export function CommentsThread({ postId }: CommentsThreadProps) {
   return (
     <div className="mt-2.5 pt-1 border-t border-dashed border-white/10">
       {comments.map((c) => (
-        <CommentItem key={c._id} comment={c} />
+        <CommentItem key={c._id} comment={c} onReply={focusInput} />
       ))}
 
       {status === "CanLoadMore" && (
@@ -122,6 +169,7 @@ export function CommentsThread({ postId }: CommentsThreadProps) {
       <div className="flex gap-2 mt-3 pt-2.5 border-t border-white/10">
         <div className="flex-1 flex gap-1.5">
           <input
+            ref={inputRef}
             type="text"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
