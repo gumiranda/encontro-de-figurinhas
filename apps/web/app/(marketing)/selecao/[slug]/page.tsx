@@ -21,6 +21,7 @@ import {
   BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { TeamStickerGrid } from "@/components/team-sticker-grid";
 
 interface TeamPageProps {
   params: Promise<{ slug: string }>;
@@ -38,6 +39,13 @@ async function loadAllSections() {
   cacheTag("selecao");
   cacheLife("days");
   return convexServer.query(api.album.getSections, {});
+}
+
+async function loadTeamStickers(sectionCode: string) {
+  "use cache";
+  cacheTag(`selecao:stickers:${sectionCode}`);
+  cacheLife("days");
+  return convexServer.query(api.album.getTeamStickers, { sectionCode });
 }
 
 export async function generateMetadata({
@@ -78,6 +86,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
   if (!section) {
     notFound();
   }
+
+  const teamStickers = await loadTeamStickers(section.code);
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Início", url: BASE_URL },
@@ -161,12 +171,29 @@ export default async function TeamPage({ params }: TeamPageProps) {
           </div>
         </section>
 
-        {/* Sticker Range Section */}
+        {/* Sticker Grid Section */}
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-headline font-bold mb-12 text-center">
-              Figurinhas da {section.name}
+            <h2 className="text-2xl md:text-3xl font-headline font-bold mb-8 text-center">
+              Todas as figurinhas da {section.name}
             </h2>
+            <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
+              Clique em uma figurinha para ver detalhes e encontrar colecionadores para trocar.
+            </p>
+
+            {teamStickers.length > 0 && (
+              <div className="mb-16">
+                <TeamStickerGrid
+                  stickers={teamStickers}
+                  sectionCode={section.code}
+                  flagEmoji={section.flagEmoji ?? ""}
+                />
+              </div>
+            )}
+
+            <h3 className="text-xl font-headline font-bold mb-8 text-center text-muted-foreground">
+              Resumo da seleção
+            </h3>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <Card>

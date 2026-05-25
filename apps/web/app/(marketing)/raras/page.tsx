@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cacheLife, cacheTag } from "next/cache";
-import { ArrowRight, Crown, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Crown, Sparkles, Star, Trophy } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -117,7 +117,9 @@ export default async function RareHubPage() {
       <JsonLd data={faqSchema} />
       <LandingHeader />
       <main className="pt-24 min-h-screen">
-        <section className="bg-gradient-to-b from-yellow-500/5 to-background py-16 md:py-24">
+        <section className="relative bg-gradient-to-b from-[#ffc965]/10 via-[#ffc965]/5 to-background py-16 md:py-24 overflow-hidden">
+          {/* Premium golden glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#ffc965]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="container mx-auto px-4">
             <nav className="mb-8 text-sm text-muted-foreground">
               <ol className="flex items-center gap-2">
@@ -161,33 +163,37 @@ export default async function RareHubPage() {
           </div>
         </section>
 
-        <section className="py-12 border-y bg-muted/30">
+        <section className="py-12 border-y border-[#ffc965]/10 bg-gradient-to-r from-transparent via-[#ffc965]/5 to-transparent">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold">
+              <div className="text-center p-4 rounded-xl bg-card/30 border border-border/30">
+                <Crown className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <div className="text-3xl md:text-4xl font-headline font-bold">
                   {sections.length}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
                   Seleções
                 </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-yellow-600">
+              <div className="text-center p-4 rounded-xl bg-[#ffc965]/5 border border-[#ffc965]/20">
+                <Star className="h-5 w-5 mx-auto mb-2 text-[#ffc965]" />
+                <div className="text-3xl md:text-4xl font-headline font-bold text-[#ffc965]">
                   {totalGolden}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
                   Douradas
                 </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-purple-600">
+              <div className="text-center p-4 rounded-xl bg-purple-500/5 border border-purple-500/20">
+                <Sparkles className="h-5 w-5 mx-auto mb-2 text-purple-400" />
+                <div className="text-3xl md:text-4xl font-headline font-bold text-purple-400">
                   {totalLegends}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">Lendas</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold">
+              <div className="text-center p-4 rounded-xl bg-card/30 border border-border/30">
+                <Trophy className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                <div className="text-3xl md:text-4xl font-headline font-bold">
                   {totalRare}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
@@ -208,13 +214,20 @@ export default async function RareHubPage() {
                 <Link
                   key={team.slug}
                   href={`/raras/${team.slug}`}
-                  className="block"
+                  className="block group"
                 >
-                  <Card className="hover:border-primary transition-colors">
+                  <Card className="transition-all duration-200 hover:border-[#ffc965]/40 hover:shadow-[0_0_20px_rgba(255,201,101,0.1)] group-hover:-translate-y-0.5">
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-3xl">{team.flagEmoji}</span>
+                          <div className="relative">
+                            <span className="text-3xl">{team.flagEmoji}</span>
+                            {i < 3 && (
+                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#ffc965] rounded-full flex items-center justify-center">
+                                <Trophy className="h-2.5 w-2.5 text-[#1a1408]" />
+                              </div>
+                            )}
+                          </div>
                           <div>
                             <h3 className="font-semibold">{team.name}</h3>
                             <p className="text-xs text-muted-foreground">
@@ -222,18 +235,20 @@ export default async function RareHubPage() {
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline">{team.rareCount}</Badge>
+                        <Badge variant="outline" className="border-[#ffc965]/30 text-[#ffc965]">
+                          {team.rareCount}
+                        </Badge>
                       </div>
                       <div className="flex gap-2 text-sm">
                         {team.legendNumbers.length > 0 && (
-                          <span className="flex items-center gap-1 text-purple-600">
+                          <span className="flex items-center gap-1 text-purple-400">
                             <Sparkles className="h-3 w-3" />
                             {team.legendNumbers.length} lendas
                           </span>
                         )}
                         {team.goldenNumbers.length > 0 && (
-                          <span className="flex items-center gap-1 text-yellow-600">
-                            <Star className="h-3 w-3" />
+                          <span className="flex items-center gap-1 text-[#ffc965]">
+                            <Star className="h-3 w-3 fill-current" />
                             {team.goldenNumbers.length} douradas
                           </span>
                         )}

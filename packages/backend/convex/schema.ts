@@ -330,6 +330,7 @@ export default defineSchema({
     isLegend: v.optional(v.boolean()),
     legendName: v.optional(v.string()),
     isExtra: v.optional(v.boolean()),
+    imageUrl: v.optional(v.string()),
   })
     .index("by_section_rel", ["sectionCode", "relativeNum"])
     .index("by_absolute", ["absoluteNum"])

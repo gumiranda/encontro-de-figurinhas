@@ -21,6 +21,7 @@ import { StickerHero } from "@/components/sticker-hero";
 import { QuickFactsStrip } from "@/components/quick-facts-strip";
 import { TradingStepsSection } from "@/components/trading-steps-section";
 import { StickerSEOContent } from "@/components/sticker-seo-content";
+import { StickerNavigation } from "@/components/sticker-navigation";
 
 interface StickerPageProps {
   params: Promise<{ slug: string }>;
@@ -199,37 +200,12 @@ export default async function StickerPage({ params }: StickerPageProps) {
         />
 
         {/* Navigation Section */}
-        <section className="py-6 border-b border-border/50">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center max-w-xl mx-auto">
-              {prevSlug ? (
-                <Link
-                  href={`/figurinha/${prevSlug}`}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="text-sm">Anterior</span>
-                </Link>
-              ) : (
-                <div />
-              )}
-              <span className="text-xs text-muted-foreground font-mono">
-                {sticker.absoluteNum === 0 ? "00" : sticker.absoluteNum} / {albumCount.totalStickers}
-              </span>
-              {nextSlug ? (
-                <Link
-                  href={`/figurinha/${nextSlug}`}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <span className="text-sm">Próxima</span>
-                  <ArrowRightIcon className="h-4 w-4" />
-                </Link>
-              ) : (
-                <div />
-              )}
-            </div>
-          </div>
-        </section>
+        <StickerNavigation
+          prevSlug={prevSlug}
+          nextSlug={nextSlug}
+          currentNumber={sticker.absoluteNum}
+          totalStickers={albumCount.totalStickers}
+        />
 
         {/* Trading Steps Section */}
         <TradingStepsSection displayLabel={displayLabel} />

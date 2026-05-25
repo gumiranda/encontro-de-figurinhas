@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { readSiteStatsOrNull } from "./siteStats";
 import { relativeFromAbsolute } from "./lib/stickerNumbering";
@@ -362,5 +362,35 @@ export const getStickerWithDetail = query({
       variant: detail.variant,
       slug: detail.slug,
     };
+  },
+});
+
+export const updateStickerImage = mutation({
+  args: { absoluteNum: v.number(), imageUrl: v.string() },
+  handler: async (ctx, { absoluteNum, imageUrl }) => {
+    const sticker = await ctx.db
+      .query("stickerDetail")
+      .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum))
+      .first();
+    if (!sticker) throw new Error(`Sticker ${absoluteNum} not found`);
+    await ctx.db.patch(sticker._id, { imageUrl });
+    return { success: true, absoluteNum };
+  },
+});
+
+export const getStickersWithoutImages = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit = 50 }) => {
+    const stickers = await ctx.db.query("stickerDetail").take(500);
+    return stickers
+      .filter((s) => !s.imageUrl)
+      .slice(0, limit)
+      .map((s) => ({
+        absoluteNum: s.absoluteNum,
+        name: s.name,
+        sectionCode: s.sectionCode,
+        sectionName: s.sectionName,
+        type: s.type,
+      }));
   },
 });

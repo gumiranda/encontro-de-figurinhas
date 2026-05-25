@@ -151,8 +151,10 @@ export default async function RarePage({ params }: RarePageProps) {
       <LandingHeader />
       <main className="pt-24 min-h-screen">
         {/* Hero */}
-        <section className="bg-gradient-to-b from-yellow-500/5 to-background py-16 md:py-24">
-          <div className="container mx-auto px-4">
+        <section className="relative bg-gradient-to-b from-[#ffc965]/10 via-[#ffc965]/5 to-background py-16 md:py-24 overflow-hidden">
+          {/* Premium golden glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#ffc965]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="container mx-auto px-4 relative">
             <nav className="mb-8 text-sm text-muted-foreground">
               <ol className="flex items-center gap-2 flex-wrap">
                 <li>
@@ -175,11 +177,14 @@ export default async function RarePage({ params }: RarePageProps) {
             </nav>
 
             <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-5xl">{section.flagEmoji}</span>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative">
+                  <span className="text-5xl">{section.flagEmoji}</span>
+                  <div className="absolute -inset-2 bg-[#ffc965]/20 rounded-full blur-xl -z-10" />
+                </div>
                 <Badge
                   variant="outline"
-                  className="text-sm border-yellow-500 text-yellow-600"
+                  className="text-sm border-[#ffc965]/50 text-[#ffc965] bg-[#ffc965]/10"
                 >
                   <Crown className="h-3 w-3 mr-1" />
                   {rareTotal} raras
@@ -268,11 +273,14 @@ export default async function RarePage({ params }: RarePageProps) {
 
         {/* Lendas */}
         {legendCount > 0 && (
-          <section className="py-16 md:py-20">
-            <div className="container mx-auto px-4">
+          <section className="py-16 md:py-20 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
+            <div className="container mx-auto px-4 relative">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">
-                  <Sparkles className="h-7 w-7 text-purple-500" />
+                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-purple-400" />
+                  </div>
                   <h2 className="text-2xl md:text-3xl font-headline font-bold">
                     Lendas da {section.name}
                   </h2>
@@ -286,26 +294,26 @@ export default async function RarePage({ params }: RarePageProps) {
                     const code = `${section.code}-${legend.number - section.startNumber + 1}`;
                     const alsoGolden = goldenSet.has(legend.number);
                     return (
-                      <Card key={legend.number} className="border-purple-500/30">
+                      <Card key={legend.number} className="border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-purple-950/10 hover:border-purple-500/50 transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(168,85,247,0.1)]">
                         <CardContent className="pt-6">
                           <div className="flex items-start justify-between mb-3">
                             <Badge
                               variant="outline"
-                              className="border-purple-500 text-purple-600 font-mono"
+                              className="border-purple-400/50 text-purple-400 font-mono text-base px-3 py-1"
                             >
                               {code}
                             </Badge>
                             {alsoGolden && (
                               <Badge
                                 variant="outline"
-                                className="border-yellow-500 text-yellow-600"
+                                className="border-[#ffc965]/50 text-[#ffc965] bg-[#ffc965]/10"
                               >
-                                <Star className="h-3 w-3 mr-1" />
+                                <Star className="h-3 w-3 mr-1 fill-current" />
                                 Dourada
                               </Badge>
                             )}
                           </div>
-                          <h3 className="text-lg font-semibold">
+                          <h3 className="text-xl font-semibold">
                             {legend.name}
                           </h3>
                           <p className="text-sm text-muted-foreground mt-1">
@@ -323,11 +331,13 @@ export default async function RarePage({ params }: RarePageProps) {
 
         {/* Douradas */}
         {goldenCount > 0 && (
-          <section className="py-16 md:py-20 bg-muted/30">
+          <section className="py-16 md:py-20 bg-gradient-to-b from-[#ffc965]/5 via-[#ffc965]/[0.02] to-transparent">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">
-                  <Star className="h-7 w-7 text-yellow-500" />
+                  <div className="w-10 h-10 rounded-full bg-[#ffc965]/20 flex items-center justify-center">
+                    <Star className="h-5 w-5 text-[#ffc965] fill-current" />
+                  </div>
                   <h2 className="text-2xl md:text-3xl font-headline font-bold">
                     Douradas da {section.name}
                   </h2>
@@ -341,23 +351,28 @@ export default async function RarePage({ params }: RarePageProps) {
                     const code = `${section.code}-${n - section.startNumber + 1}`;
                     const isAlsoLegend = legendNumberSet.has(n);
                     return (
-                      <Badge
+                      <div
                         key={n}
-                        variant="outline"
-                        className="border-yellow-500 text-yellow-600 font-mono text-base px-4 py-2"
+                        className="relative group"
                       >
-                        <Star className="h-3 w-3 mr-1" />
-                        {code}
-                        {isAlsoLegend && (
-                          <Sparkles className="h-3 w-3 ml-1 text-purple-500" />
-                        )}
-                      </Badge>
+                        <div className="absolute inset-0 bg-[#ffc965]/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Badge
+                          variant="outline"
+                          className="relative border-[#ffc965]/50 text-[#ffc965] bg-[#ffc965]/10 font-mono text-lg px-5 py-2.5 hover:border-[#ffc965] transition-colors"
+                        >
+                          <Star className="h-4 w-4 mr-2 fill-current" />
+                          {code}
+                          {isAlsoLegend && (
+                            <Sparkles className="h-4 w-4 ml-2 text-purple-400" />
+                          )}
+                        </Badge>
+                      </div>
                     );
                   })}
                 </div>
                 {overlapping.length > 0 && (
                   <p className="text-sm text-muted-foreground mt-6">
-                    <Sparkles className="inline h-3 w-3 text-purple-500 mr-1" />
+                    <Sparkles className="inline h-3 w-3 text-purple-400 mr-1" />
                     indica figurinha que é dourada <em>e</em> lenda — dupla
                     raridade.
                   </p>

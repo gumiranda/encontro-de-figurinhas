@@ -47,6 +47,7 @@ interface StickerCardProps {
   code: string;
   flag: string;
   photoText?: string;
+  imageUrl?: string;
   className?: string;
 }
 
@@ -83,7 +84,7 @@ export function LandingCard(props: LandingCardProps) {
     );
   }
 
-  const { variant, code, flag, photoText, className } = props;
+  const { variant, code, flag, photoText, imageUrl, className } = props;
 
   return (
     <div
@@ -96,12 +97,20 @@ export function LandingCard(props: LandingCardProps) {
     >
       <div
         className={cn(
-          "flex-1 rounded-lg flex items-center justify-center font-mono text-[0.625rem] tracking-wide",
-          "bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.025)_0_6px,transparent_6px_14px)]",
-          PHOTO_CLASSES[variant]
+          "flex-1 rounded-lg flex items-center justify-center overflow-hidden",
+          !imageUrl && "font-mono text-[0.625rem] tracking-wide bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.025)_0_6px,transparent_6px_14px)]",
+          !imageUrl && PHOTO_CLASSES[variant]
         )}
       >
-        {photoText || "photo"}
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={photoText || code}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          photoText || "photo"
+        )}
       </div>
       <div className="flex justify-between items-center mt-2 text-[0.6875rem]">
         <span className={cn("font-bold tracking-wide", CODE_CLASSES[variant])}>
