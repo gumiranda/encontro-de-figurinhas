@@ -189,6 +189,7 @@ export const getRelatedStickers = query({
       stickers: selected.map((s) => ({
         number: s.absoluteNum,
         relativeNum: s.relativeNum,
+        slug: s.slug,
         isGolden: s.isGolden ?? false,
         isLegend: s.isLegend ?? false,
         legendName: s.legendName,
@@ -216,6 +217,28 @@ export const getStickerDetailBySlug = query({
       .query("stickerDetail")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
+  },
+});
+
+export const getAdjacentStickerSlugs = query({
+  args: { absoluteNum: v.number() },
+  handler: async (ctx, { absoluteNum }) => {
+    const [prev, next] = await Promise.all([
+      absoluteNum > 0
+        ? ctx.db
+            .query("stickerDetail")
+            .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum - 1))
+            .first()
+        : null,
+      ctx.db
+        .query("stickerDetail")
+        .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum + 1))
+        .first(),
+    ]);
+    return {
+      prevSlug: prev?.slug ?? null,
+      nextSlug: next?.slug ?? null,
+    };
   },
 });
 
