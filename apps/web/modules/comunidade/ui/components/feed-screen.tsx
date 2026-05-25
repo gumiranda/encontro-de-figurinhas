@@ -459,6 +459,7 @@ function PublicTab({
 
 function FeedTabView({
   data,
+  profile,
   selectedCity,
   setSelectedCity,
   feedSort,
@@ -468,6 +469,7 @@ function FeedTabView({
   onDelete,
 }: {
   data: ReturnType<typeof useCommunityTabData>["feed"];
+  profile: CommunityProfileData | null | undefined;
   selectedCity: string;
   setSelectedCity: (city: string) => void;
   feedSort: FeedSort;
@@ -479,6 +481,8 @@ function FeedTabView({
   const selectedCityLabel =
     data.cityFilters.find((c: CityFilter) => c.id === selectedCity)?.label ??
     "São Paulo, SP";
+  const userNick = displayName(profile);
+  const userAvatar = profile?.avatarSeed;
 
   return (
     <>
@@ -519,7 +523,8 @@ function FeedTabView({
         </div>
 
         <ComposerCard
-          userNick="miltonfigueira"
+          userNick={userNick}
+          userAvatar={userAvatar}
           onPublish={onCreatePost}
           onOpenCreate={onCreatePost}
         />
@@ -597,6 +602,7 @@ export function FeedScreen() {
       {activeTab === "feed" && (
         <FeedTabView
           data={data.feed}
+          profile={data.profile}
           selectedCity={selectedCity}
           setSelectedCity={setSelectedCity}
           feedSort={feedSort}

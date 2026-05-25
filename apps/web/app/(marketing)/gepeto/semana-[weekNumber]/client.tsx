@@ -18,6 +18,12 @@ interface WeeklyClientProps {
   } | null;
 }
 
+function displayName(
+  profile: { displayNickname?: string; nickname?: string } | null | undefined,
+) {
+  return profile?.displayNickname?.trim() || profile?.nickname || "colecionador";
+}
+
 const PHASE_NAMES: Record<number, string> = {
   1: "Fase de Grupos A",
   2: "Fase de Grupos B",
@@ -37,8 +43,10 @@ export function WeeklyClient({
     weekNumber,
     year,
   });
+  const profile = useQuery(api.users.getProfileSettings);
 
   const data = narrative ?? initialNarrative;
+  const userNickname = displayName(profile);
 
   if (narrative === undefined && !initialNarrative) {
     return (
@@ -105,7 +113,7 @@ export function WeeklyClient({
       narrative={data.narrative}
       highlights={mockHighlights}
       topHumans={[
-        { nickname: "miltonfigueira", score: 14, isMe: true },
+        { nickname: userNickname, score: 14, isMe: true },
         { nickname: "rafa_dias", score: 13 },
         { nickname: "carol_m", score: 12 },
       ]}

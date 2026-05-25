@@ -1,12 +1,23 @@
 "use client";
 
+import { useQuery } from "convex/react";
+
+import { api } from "@workspace/backend/_generated/api";
 import { GepetoAvatar } from "./gepeto-avatar";
 
+function displayName(
+  profile: { displayNickname?: string; nickname?: string } | null | undefined,
+) {
+  return profile?.displayNickname?.trim() || profile?.nickname || "colecionador";
+}
+
 function BoloesFeature() {
+  const profile = useQuery(api.users.getProfileSettings);
+  const userNickname = displayName(profile);
   const leaderboard = [
     { rank: 1, name: "thiagomb", pts: 312 },
     { rank: 2, name: "Gepeto", pts: 298, isAI: true },
-    { rank: 3, name: "miltonfigueira", pts: 281, isMe: true },
+    { rank: 3, name: userNickname, pts: 281, isMe: true },
   ];
 
   return (
@@ -64,7 +75,7 @@ function VsIAFeature() {
         VS IA
       </div>
       <h3 className="mt-2 font-display text-xl font-bold tracking-tight">
-        "Bati a IA" virou status.
+        &quot;Bati a IA&quot; virou status.
       </h3>
       <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
         Cada rodada que você bate o Gepeto vira badge. Compartilhe a streak no

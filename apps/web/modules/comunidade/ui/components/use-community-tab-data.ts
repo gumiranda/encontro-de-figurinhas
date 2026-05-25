@@ -92,10 +92,7 @@ export function useCommunityTabData({
   selectedCity: string;
   feedSort: FeedSort;
 }) {
-  const profile = useQuery(
-    api.users.getProfileSettings,
-    activeTab === "profile" ? {} : "skip",
-  );
+  const profile = useQuery(api.users.getProfileSettings);
   const profileDuplicates = useCommunityStickerPager(
     "duplicates",
     activeTab === "profile",
