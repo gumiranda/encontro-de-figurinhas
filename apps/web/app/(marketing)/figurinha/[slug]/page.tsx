@@ -48,13 +48,6 @@ async function loadAlbumConfig() {
   return convexServer.query(api.album.getPublicAlbumCount, {});
 }
 
-async function loadAdjacentSlugs(absoluteNum: number) {
-  "use cache";
-  cacheTag(`figurinha:adjacent:${absoluteNum}`);
-  cacheLife("days");
-  return convexServer.query(api.album.getAdjacentStickerSlugs, { absoluteNum });
-}
-
 export async function generateMetadata({
   params,
 }: StickerPageProps): Promise<Metadata> {
@@ -112,10 +105,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
     notFound();
   }
 
-  const [relatedStickers, adjacentSlugs] = await Promise.all([
-    loadRelatedStickers(sticker.absoluteNum),
-    loadAdjacentSlugs(sticker.absoluteNum),
-  ]);
+  const relatedStickers = await loadRelatedStickers(sticker.absoluteNum);
 
   const relDisplay =
     sticker.relativeNum === 0 ? "00" : String(sticker.relativeNum);
@@ -165,7 +155,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
       })
     : null;
 
-  const { prevSlug, nextSlug } = adjacentSlugs;
+  const { prevSlug, nextSlug } = sticker;
 
   return (
     <>

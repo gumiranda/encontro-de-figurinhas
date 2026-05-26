@@ -213,29 +213,27 @@ export const getStickerDetail = query({
 export const getStickerDetailBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {
-    return await ctx.db
+    const detail = await ctx.db
       .query("stickerDetail")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
-  },
-});
+    if (!detail) return null;
 
-export const getAdjacentStickerSlugs = query({
-  args: { absoluteNum: v.number() },
-  handler: async (ctx, { absoluteNum }) => {
     const [prev, next] = await Promise.all([
-      absoluteNum > 0
+      detail.absoluteNum > 0
         ? ctx.db
             .query("stickerDetail")
-            .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum - 1))
+            .withIndex("by_absolute", (q) => q.eq("absoluteNum", detail.absoluteNum - 1))
             .first()
         : null,
       ctx.db
         .query("stickerDetail")
-        .withIndex("by_absolute", (q) => q.eq("absoluteNum", absoluteNum + 1))
+        .withIndex("by_absolute", (q) => q.eq("absoluteNum", detail.absoluteNum + 1))
         .first(),
     ]);
+
     return {
+      ...detail,
       prevSlug: prev?.slug ?? null,
       nextSlug: next?.slug ?? null,
     };
