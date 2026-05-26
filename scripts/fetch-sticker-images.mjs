@@ -12,6 +12,12 @@
 
 import { execSync } from "node:child_process";
 import { createInterface } from "node:readline";
+import { statSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const BACKEND_DIR = join(REPO_ROOT, "packages/backend");
 
 function searchGoogleImages(query) {
   const encodedQuery = encodeURIComponent(query);
@@ -72,9 +78,9 @@ function buildSearchQuery(sticker) {
 
 function updateStickerImage(absoluteNum, imageUrl) {
   const escaped = imageUrl.replace(/"/g, '\\"');
-  const cmd = `cd packages/backend && pnpm convex run album:updateStickerImage '{"absoluteNum": ${absoluteNum}, "imageUrl": "${escaped}"}'`;
+  const cmd = `pnpm convex run album:updateStickerImage '{"absoluteNum": ${absoluteNum}, "imageUrl": "${escaped}"}'`;
   try {
-    execSync(cmd, { encoding: "utf-8", stdio: "pipe" });
+    execSync(cmd, { encoding: "utf-8", stdio: "pipe", cwd: BACKEND_DIR });
     console.log(`✓ Updated sticker ${absoluteNum}`);
     return true;
   } catch (e) {
@@ -83,26 +89,59 @@ function updateStickerImage(absoluteNum, imageUrl) {
   }
 }
 
+function stdinIsPiped() {
+  if (process.stdin.isTTY) return false;
+  try {
+    return statSync(0).isFIFO();
+  } catch {
+    return false;
+  }
+}
+
+async function readStdin() {
+  let input = "";
+  const rl = createInterface({ input: process.stdin });
+  for await (const line of rl) {
+    input += line;
+  }
+  return input.trim();
+}
+
+function loadStickersFromConvex() {
+  console.log("Loading stickers from Convex...\n");
+  const output = execSync("pnpm convex run album:getStickersWithoutImages", {
+    encoding: "utf-8",
+    cwd: BACKEND_DIR,
+  });
+  return JSON.parse(output.trim());
+}
+
+async function loadStickers() {
+  if (!stdinIsPiped()) {
+    return loadStickersFromConvex();
+  }
+
+  const input = await readStdin();
+  if (!input) {
+    throw new Error("No sticker data on stdin.");
+  }
+  return JSON.parse(input);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   
   if (args.includes("--help")) {
-    console.log("Usage: pnpm convex run album:getStickersWithoutImages | node scripts/fetch-sticker-images.mjs [--limit N]");
+    console.log("Usage:");
+    console.log("  cd packages/backend && pnpm fetch:sticker-images --limit N");
+    console.log("  pnpm convex run album:getStickersWithoutImages | node scripts/fetch-sticker-images.mjs --limit N");
     process.exit(0);
   }
 
   const limitIdx = args.indexOf("--limit");
   const limit = limitIdx >= 0 ? parseInt(args[limitIdx + 1]) : 10;
 
-  // Read stdin
-  let input = "";
-  const rl = createInterface({ input: process.stdin });
-  
-  for await (const line of rl) {
-    input += line;
-  }
-
-  const stickers = JSON.parse(input);
+  const stickers = await loadStickers();
   const total = Math.min(stickers.length, limit);
   console.log(`Processing ${total} of ${stickers.length} stickers...\n`);
 

@@ -13,7 +13,8 @@
     "dev:prod": "pnpm env:prod && turbo dev",
     "backend:dev": "pnpm --filter @workspace/backend dev:env-dev",
     "backend:prod": "pnpm --filter @workspace/backend dev:env-prod",
-    "seed:convex": "pnpm --filter @workspace/backend seed:convex"
+    "seed:convex": "pnpm --filter @workspace/backend seed:convex",
+    "fetch:sticker-images": "pnpm --filter @workspace/backend fetch:sticker-images"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

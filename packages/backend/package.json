@@ -10,7 +10,8 @@
     "seed:tradepoints": "convex run seeds/seedTradePoints:seedTradePoints",
     "seed:blog": "convex run seedBlog:seedBlogPosts",
     "seed:all": "pnpm seed:cities && pnpm seed:tradepoints",
-    "seed:album:dashboard": "echo 'Run seedAlbumConfig from Convex dashboard (requires admin auth)'"
+    "seed:album:dashboard": "echo 'Run seedAlbumConfig from Convex dashboard (requires admin auth)'",
+    "fetch:sticker-images": "node scripts/fetch-sticker-images.mjs"
   },
   "exports": {
     "./convex": "./convex/*.ts",
