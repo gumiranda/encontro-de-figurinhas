@@ -186,6 +186,7 @@ export default async function StickerPage({ params }: StickerPageProps) {
           type={sticker.type}
           variant={sticker.variant ?? undefined}
           relativeNum={sticker.relativeNum}
+          imageUrl={sticker.imageUrl}
           breadcrumbItems={breadcrumbItems}
         />
 

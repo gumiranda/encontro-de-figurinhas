@@ -18,6 +18,7 @@ interface StickerHeroProps {
   type?: string;
   variant?: string;
   relativeNum: number;
+  imageUrl?: string;
   breadcrumbItems: Array<{ label: string; href?: string }>;
 }
 
@@ -31,6 +32,7 @@ export function StickerHero({
   type,
   variant,
   relativeNum,
+  imageUrl,
   breadcrumbItems,
 }: StickerHeroProps) {
   const isLegend = variant === "legend";
@@ -162,6 +164,7 @@ export function StickerHero({
                 code={displayLabel}
                 flag={flagEmoji}
                 photoText={stickerType === "player" ? name.split(" ")[0] : stickerType}
+                imageUrl={imageUrl}
                 className="w-48 shadow-2xl"
               />
             </div>

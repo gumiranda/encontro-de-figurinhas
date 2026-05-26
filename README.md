@@ -322,6 +322,14 @@ Isso iniciara:
 | `pnpm -F web build`     | Build do frontend         |
 | `pnpm -F web typecheck` | Verifica tipos TypeScript |
 
+### Scripts de SEO (Imagens)
+
+| Comando | Descricao |
+| ------- | --------- |
+| `pnpm convex run album:getStickersWithoutImages` | Lista figurinhas sem imagem |
+| `node scripts/fetch-sticker-images.mjs --limit N` | Busca N imagens no Google |
+| `pnpm convex run album:updateStickerImage '{...}'` | Atualiza imagem manualmente |
+
 ---
 
 ## Primeiro Acesso
