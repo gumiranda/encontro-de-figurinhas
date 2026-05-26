@@ -327,7 +327,7 @@ Isso iniciara:
 | Comando | Descricao |
 | ------- | --------- |
 | `cd packages/backend && pnpm convex run album:getStickersWithoutImages` | Lista figurinhas sem imagem |
-| `cd packages/backend && pnpm fetch:sticker-images --limit N` | Busca N imagens no Google |
+| `cd packages/backend && pnpm fetch:sticker-images --limit N` | Busca N imagens no Google (mostra `/figurinha/{slug}` e verifica no DB) |
 | `cd packages/backend && pnpm convex run album:updateStickerImage '{...}'` | Atualiza imagem manualmente |
 
 ---

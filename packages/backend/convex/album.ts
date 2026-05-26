@@ -372,7 +372,7 @@ export const updateStickerImage = mutation({
       .first();
     if (!sticker) throw new Error(`Sticker ${absoluteNum} not found`);
     await ctx.db.patch(sticker._id, { imageUrl });
-    return { success: true, absoluteNum };
+    return { success: true, absoluteNum, slug: sticker.slug, imageUrl };
   },
 });
 
@@ -385,6 +385,7 @@ export const getStickersWithoutImages = query({
       .slice(0, limit)
       .map((s) => ({
         absoluteNum: s.absoluteNum,
+        slug: s.slug,
         name: s.name,
         sectionCode: s.sectionCode,
         sectionName: s.sectionName,
