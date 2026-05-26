@@ -41,46 +41,155 @@ function runConvex(functionName, args = {}) {
   return JSON.parse(result.stdout.trim());
 }
 
-function searchGoogleImages(query) {
+function buildSearchQueries(sticker) {
+  const { name, sectionName, type } = sticker;
+  const primary = buildSearchQuery(sticker);
+  const fallbacks = [
+    `${name} ${sectionName}`,
+    sectionName,
+    name,
+  ];
+  if (type === "escudo") {
+    fallbacks.push(`${sectionName} football badge`, `${sectionName} seleção escudo`);
+  }
+  return [...new Set([primary, ...fallbacks])];
+}
+
+function searchGoogleImages(query, { largeOnly = true } = {}) {
   const encodedQuery = encodeURIComponent(query);
+  const sizeFilter = largeOnly ? "&tbs=isz:l" : "";
   const script = `
 browser-harness <<'PY'
-new_tab("https://www.google.com/search?tbm=isch&q=${encodedQuery}")
+new_tab("https://www.google.com/search?tbm=isch&q=${encodedQuery}${sizeFilter}")
 wait_for_load()
 import time
 time.sleep(2)
 
-# Click on first good result
-click_at_xy(180, 270)
+extract_js = r"""
+(() => {
+  const bad = (src) =>
+    !src ||
+    !src.startsWith("http") ||
+    /[.]svg($|[?#])/i.test(src) ||
+    /fonts[.]gstatic[.]com|productlogos|google[.]com\\/images\\/branding|gstatic[.]com\\/images\\/cleardot|favicon|lh3[.]google[.]com\\/u\\//i.test(src);
+
+  const estimateWidth = (src, width = 0) => {
+    if (width > 0) return width;
+    const patterns = [
+      /[?&]w=(\\d+)/i,
+      /=w(\\d+)/i,
+      /=s(\\d+)/i,
+      /-w(\\d+)/i,
+    ];
+    for (const pattern of patterns) {
+      const match = src.match(pattern);
+      if (match) return Number(match[1]);
+    }
+    if (src.includes("encrypted-tbn")) return 120;
+    return 0;
+  };
+
+  const score = (src, meta = {}) => {
+    let points = 0;
+    if (meta.kind === "imgurl") points += 2000;
+    if (meta.kind === "data-ou") points += 1800;
+    if (meta.kind === "panel") points += 1400;
+    if (meta.kind === "grid") points += 400;
+
+    const width = estimateWidth(src, meta.width || 0);
+    points += Math.min(width, 2400);
+    if (width > 0 && width < 220) points -= 800;
+    if (src.includes("encrypted-tbn")) points -= 200;
+    return points;
+  };
+
+  const ranked = [];
+  const push = (src, meta = {}) => {
+    if (bad(src)) return;
+    ranked.push({ src, points: score(src, meta) });
+  };
+
+  const scopes = ["#search", "[data-ri]", "div[data-id]"];
+  for (const scope of scopes) {
+    for (const a of document.querySelectorAll(scope + ' a[href*="imgurl="]')) {
+      const match = a.href.match(/imgurl=([^&]+)/);
+      if (match) push(decodeURIComponent(match[1]), { kind: "imgurl" });
+    }
+    for (const el of document.querySelectorAll(scope + " [data-ou]")) {
+      push(el.getAttribute("data-ou"), { kind: "data-ou" });
+    }
+    for (const img of document.querySelectorAll(scope + " img")) {
+      const width = img.naturalWidth || img.width || 0;
+      const height = img.naturalHeight || img.height || 0;
+      const kind = width >= 320 || height >= 320 ? "panel" : "grid";
+      push(img.currentSrc, { kind, width, height });
+      push(img.src, { kind, width, height });
+      push(img.getAttribute("data-src"), { kind: "grid", width, height });
+      push(img.getAttribute("data-iurl"), { kind: "grid", width, height });
+    }
+  }
+
+  ranked.sort((a, b) => b.points - a.points);
+  const best = ranked[0];
+  if (!best) return null;
+  if (best.points >= 700) return best.src;
+  const acceptable = ranked.find((entry) => entry.points >= 250);
+  return acceptable?.src ?? null;
+})()
+"""
+
 time.sleep(2)
 
-# Extract large image URL
-result = js("""
+result = js(extract_js)
+if not result:
+    grid_link = js("""
 (() => {
-    const panelImgs = document.querySelectorAll('img[src^="https://"]');
-    for (const img of panelImgs) {
-        if ((img.naturalWidth > 400 || img.width > 400) && !img.src.includes('encrypted-tbn')) {
-            return img.src;
-        }
-    }
-    return null;
+  const link =
+    document.querySelector('#search a[href*="imgurl="]') ||
+    document.querySelector('#search a[href*="imgres"]') ||
+    document.querySelector("div[data-id] a");
+  if (!link) return false;
+  link.click();
+  return true;
 })()
 """)
+    if grid_link:
+        time.sleep(2)
+    result = js(extract_js)
+
 print(result or "NO_IMAGE")
 PY
 `;
 
   try {
-    const output = execSync(script, { encoding: "utf-8", timeout: 30000 });
-    const url = output.trim();
+    const output = execSync(script, { encoding: "utf-8", timeout: 45000 });
+    const lines = output
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const url = lines.at(-1);
     if (url && url !== "NO_IMAGE" && url.startsWith("http")) {
       return url;
     }
     return null;
   } catch (e) {
-    console.error("Error searching:", e.message);
+    console.error("  Error searching:", e.message);
     return null;
   }
+}
+
+function searchStickerImage(sticker) {
+  const queries = buildSearchQueries(sticker);
+  for (const query of queries) {
+    let imageUrl = searchGoogleImages(query, { largeOnly: true });
+    if (!imageUrl) {
+      imageUrl = searchGoogleImages(query, { largeOnly: false });
+    }
+    if (imageUrl) {
+      return { imageUrl, query };
+    }
+  }
+  return { imageUrl: null, query: queries[0] };
 }
 
 function buildSearchQuery(sticker) {
@@ -193,11 +302,17 @@ async function main() {
     console.log(`  Page:  ${pagePath}`);
     console.log(`  Open:  ${pageUrl}`);
 
-    const query = buildSearchQuery(sticker);
-    console.log(`  Query: ${query}`);
+    const queryList = buildSearchQueries(sticker);
+    console.log(`  Query: ${queryList[0]}`);
+    if (queryList.length > 1) {
+      console.log(`  Fallbacks: ${queryList.slice(1).join(" | ")}`);
+    }
 
-    const imageUrl = searchGoogleImages(query);
+    const { imageUrl, query } = searchStickerImage(sticker);
     if (imageUrl) {
+      if (query !== queryList[0]) {
+        console.log(`  Matched query: ${query}`);
+      }
       console.log(`  Found: ${imageUrl}`);
       const update = updateStickerImage(sticker, imageUrl);
       if (update.ok && update.verified?.ok) {
