@@ -21,7 +21,9 @@ import {
 } from "@workspace/ui/components/table";
 import { Progress } from "@workspace/ui/components/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
-import { ArrowUp, BookOpen, Loader2, MapPin, Trophy } from "lucide-react";
+import { Switch } from "@workspace/ui/components/switch";
+import { Label } from "@workspace/ui/components/label";
+import { ArrowUp, BookOpen, Clock, Loader2, MapPin, Trophy } from "lucide-react";
 
 function getCityLabel(city: { name: string; state: string } | null) {
   return city ? `${city.name} (${city.state})` : "Sem cidade";
@@ -40,6 +42,18 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
+function formatRelativeTime(timestamp: number | undefined): string {
+  if (!timestamp) return "nunca";
+  const now = Date.now();
+  const diff = now - timestamp;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return "hoje";
+  if (days === 1) return "ontem";
+  if (days < 7) return `${days}d`;
+  if (days < 30) return `${Math.floor(days / 7)}sem`;
+  return `${Math.floor(days / 30)}m`;
+}
+
 export default function AdminRankingPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
   const isSuperadmin = currentUser?.role === "superadmin";
@@ -47,11 +61,12 @@ export default function AdminRankingPage() {
   const canView = isSuperadmin || isCeo;
 
   const [cursor, setCursor] = useState(0);
+  const [strictFilter, setStrictFilter] = useState(true);
   const limit = 50;
 
   const rankingData = useQuery(
     api.users.getRankedUsersByMissing,
-    canView ? { cursor, limit } : "skip",
+    canView ? { cursor, limit, strictFilter } : "skip",
   );
 
   if (currentUser === undefined) {
@@ -89,14 +104,40 @@ export default function AdminRankingPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Top Colecionadores
-          </CardTitle>
-          <CardDescription>
-            Exibindo {users.length} de {total} usuarios qualificados (excluindo
-            usuarios sem cidade e com mais de 1000 figurinhas faltando)
-          </CardDescription>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5" />
+                Top Colecionadores
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Exibindo {users.length} de {total} usuarios qualificados
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="strict-filter"
+                checked={strictFilter}
+                onCheckedChange={(checked) => {
+                  setStrictFilter(checked);
+                  setCursor(0);
+                }}
+              />
+              <Label htmlFor="strict-filter" className="text-sm cursor-pointer">
+                Filtro rigoroso
+              </Label>
+            </div>
+          </div>
+          {strictFilter && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Excluindo: sem cidade, &gt;1000 faltando, nome &quot;Unknown&quot;, sem repetidas, inativos &gt;30 dias
+            </p>
+          )}
+          {!strictFilter && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Excluindo apenas: sem cidade, &gt;1000 faltando
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -119,7 +160,8 @@ export default function AdminRankingPage() {
                         </span>
                       </TableHead>
                       <TableHead className="text-right">Repetidas</TableHead>
-                      <TableHead className="min-w-40">Progresso</TableHead>
+                      <TableHead className="text-center">Ativo</TableHead>
+                      <TableHead className="min-w-36">Progresso</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -168,15 +210,18 @@ export default function AdminRankingPage() {
                           <TableCell className="text-right tabular-nums text-muted-foreground">
                             {user.duplicatesCount}
                           </TableCell>
+                          <TableCell className="text-center">
+                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatRelativeTime(user.lastActiveAt)}
+                            </span>
+                          </TableCell>
                           <TableCell>
                             <div className="space-y-1">
                               <div className="flex items-center justify-between text-sm">
                                 <span className="flex items-center gap-1">
                                   <BookOpen className="h-3 w-3 text-muted-foreground" />
                                   {albumPercent.toFixed(1)}%
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {user.albumProgress} completas
                                 </span>
                               </div>
                               <Progress value={albumPercent} className="h-2" />

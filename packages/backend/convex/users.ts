@@ -159,12 +159,15 @@ export const getRankedUsersByMissing = query({
   args: {
     cursor: v.optional(v.number()),
     limit: v.optional(v.number()),
+    strictFilter: v.optional(v.boolean()),
   },
-  handler: async (ctx, { cursor = 0, limit = 50 }) => {
+  handler: async (ctx, { cursor = 0, limit = 50, strictFilter = true }) => {
     const currentUser = await requireAuth(ctx);
     if (!isAdmin(currentUser.role)) {
       throw new Error("Admin access required");
     }
+
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
     const allUsers = await ctx.db
       .query("users")
@@ -174,7 +177,19 @@ export const getRankedUsersByMissing = query({
       .collect();
 
     const filtered = allUsers
-      .filter((u) => u.cityId && (u.missing?.length ?? 0) <= 1000)
+      .filter((u) => {
+        // Base filters: has city, reasonable missing count
+        if (!u.cityId || (u.missing?.length ?? 0) > 1000) return false;
+
+        if (strictFilter) {
+          // Red flag filters for fake/inactive users
+          if (u.name === "Unknown") return false;
+          if ((u.duplicates?.length ?? 0) === 0) return false;
+          if (!u.lastActiveAt || u.lastActiveAt < thirtyDaysAgo) return false;
+        }
+
+        return true;
+      })
       .sort((a, b) => (a.missing?.length ?? 0) - (b.missing?.length ?? 0));
 
     const total = filtered.length;
@@ -203,6 +218,7 @@ export const getRankedUsersByMissing = query({
         duplicatesCount: user.duplicates?.length ?? 0,
         albumCompletionPct: user.albumCompletionPct ?? 0,
         albumProgress: user.albumProgress ?? 0,
+        lastActiveAt: user.lastActiveAt,
       };
     });
 
