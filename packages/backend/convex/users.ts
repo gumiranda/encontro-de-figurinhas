@@ -155,6 +155,67 @@ export const getAllUsers = query({
   },
 });
 
+export const getRankedUsersByMissing = query({
+  args: {
+    cursor: v.optional(v.number()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, { cursor = 0, limit = 50 }) => {
+    const currentUser = await requireAuth(ctx);
+    if (!isAdmin(currentUser.role)) {
+      throw new Error("Admin access required");
+    }
+
+    const allUsers = await ctx.db
+      .query("users")
+      .withIndex("by_sticker_setup", (q) =>
+        q.eq("hasCompletedStickerSetup", true),
+      )
+      .collect();
+
+    const filtered = allUsers
+      .filter((u) => u.cityId && (u.missing?.length ?? 0) <= 1000)
+      .sort((a, b) => (a.missing?.length ?? 0) - (b.missing?.length ?? 0));
+
+    const total = filtered.length;
+    const pageUsers = filtered.slice(cursor, cursor + limit);
+
+    const cityIds = [
+      ...new Set(pageUsers.map((u) => u.cityId).filter(Boolean)),
+    ] as Id<"cities">[];
+    const cities = await Promise.all(cityIds.map((id) => ctx.db.get(id)));
+    const cityById = new Map(
+      cities
+        .filter((c): c is Doc<"cities"> => c !== null)
+        .map((c) => [c._id, c]),
+    );
+
+    const page = pageUsers.map((user) => {
+      const city = user.cityId ? (cityById.get(user.cityId) ?? null) : null;
+      return {
+        _id: user._id,
+        name: user.name,
+        nickname: user.nickname,
+        displayNickname: user.displayNickname,
+        avatarUrl: user.avatarUrl,
+        city: city ? { name: city.name, state: city.state } : null,
+        missingCount: user.missing?.length ?? 0,
+        duplicatesCount: user.duplicates?.length ?? 0,
+        albumCompletionPct: user.albumCompletionPct ?? 0,
+        albumProgress: user.albumProgress ?? 0,
+      };
+    });
+
+    const nextCursor = cursor + limit < total ? cursor + limit : null;
+
+    return {
+      page,
+      nextCursor,
+      total,
+    };
+  },
+});
+
 export const updateUserRole = mutation({
   args: {
     userId: v.id("users"),
