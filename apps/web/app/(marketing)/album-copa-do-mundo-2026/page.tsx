@@ -1,707 +1,356 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CalendarDays,
-  CircleDollarSign,
-  Globe,
-  Sparkles,
-  Sticker,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Check, AlertCircle, Zap } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { DownloadGuideButton } from "@/components/download-guide-button";
 import {
-  BASE_URL,
-  SITE_NAME,
+  generateWebPageSchema,
   generateBreadcrumbSchema,
-  generateCombinedSchema,
+  generateArticleSchema,
   generateFAQSchema,
-  generateCollectionPageSchema,
-  generateSportsEventSchema,
+  generateCombinedSchema,
+  BASE_URL,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
-
-const ARTICLE_PATH = "/album-copa-do-mundo-2026";
-const ARTICLE_URL = `${BASE_URL}${ARTICLE_PATH}`;
-const PUBLISHED_AT = "2026-04-17T00:00:00Z";
-const MODIFIED_AT = "2026-04-17T00:00:00Z";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 export const metadata: Metadata = {
-  title:
-    "Álbum da Copa do Mundo 2026: Guia Completo de Figurinhas, Preços e Como Completar",
+  title: {
+    absolute: "Álbum Copa do Mundo 2026 - Guia Completo Panini com 980 Figurinhas",
+  },
   description:
-    "Tudo sobre o álbum da Copa do Mundo 2026 da Panini: quantas figurinhas tem, quanto custa o pacotinho, quando foi lançado, figurinhas legendárias e como completar o álbum trocando com colecionadores perto de você.",
-  keywords: [
-    "álbum da copa 2026",
-    "álbum copa do mundo 2026",
-    "figurinhas copa 2026",
-    "figurinhas copa do mundo 2026",
-    "quantas figurinhas tem o álbum da copa 2026",
-    "quanto custa o álbum da copa 2026",
-    "pacote de figurinhas copa 2026",
-    "álbum panini copa 2026",
-    "figurinhas legendárias copa 2026",
-    "álbum fifa world cup 2026",
-    "completar álbum copa 2026",
-    "trocar figurinhas copa 2026",
-  ],
-  openGraph: {
-    title:
-      "Álbum da Copa do Mundo 2026: Guia Completo de Figurinhas e Preços",
-    description:
-      "Quantas figurinhas tem, quanto custa o pacotinho, figurinhas legendárias e como completar o álbum da Copa 2026 trocando com colecionadores.",
-    url: ARTICLE_URL,
-    type: "article",
-    publishedTime: PUBLISHED_AT,
-    modifiedTime: MODIFIED_AT,
-    authors: [SITE_NAME],
-    tags: [
-      "Copa do Mundo 2026",
-      "Álbum de figurinhas",
-      "Panini",
-      "Figurinhas",
-      "FIFA World Cup 2026",
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title:
-      "Álbum da Copa do Mundo 2026: Guia Completo de Figurinhas e Preços",
-    description:
-      "Quantas figurinhas tem, preço do pacotinho e como completar o álbum da Copa 2026.",
-  },
+    "Guia completo do álbum Copa 2026 Panini: 980 figurinhas, preços, como completar, figurinhas raras e Legends. Tudo que você precisa saber.",
   alternates: {
-    canonical: ARTICLE_URL,
+    canonical: `${BASE_URL}/album-copa-do-mundo-2026`,
+  },
+  openGraph: {
+    type: "article",
+    url: `${BASE_URL}/album-copa-do-mundo-2026`,
+    title: "Álbum Copa do Mundo 2026 - Guia Completo",
+    description:
+      "Tudo sobre o álbum oficial Panini da Copa 2026: 980 figurinhas, preços, tipos especiais e dicas para completar.",
   },
 };
 
-const FAQS = [
+const FAQ_DATA = [
   {
-    question: "Quantas figurinhas tem o álbum da Copa do Mundo 2026?",
+    question: "Qual é o preço do álbum Copa 2026?",
     answer:
-      "O álbum oficial da Panini da Copa do Mundo 2026 tem 980 figurinhas no total, sendo 68 especiais. É a maior edição da história da coleção, superando o recorde do álbum da Copa de 2018, que tinha 681 figurinhas.",
+      "O álbum em capa cartão custa R$ 24,90, enquanto a versão em capa dura (premium) custa R$ 74,90. Cada pacote de figurinhas contém 7 figurinhas e custa R$ 7,00.",
   },
   {
-    question: "Quanto custa o pacotinho de figurinhas da Copa 2026?",
+    question: "Quantas figurinhas tem o álbum Copa 2026?",
     answer:
-      "Cada pacote de figurinhas da Copa do Mundo 2026 custa R$ 7,00 e vem com 7 figurinhas. O álbum em versão brochura custa cerca de R$ 24,90, e as versões especiais de capa dura vão de R$ 49,90 até R$ 79,90 (capa prata e capa ouro).",
+      "O álbum da Copa do Mundo 2026 possui 980 figurinhas ao todo, distribuídas em 112 páginas. Essa é a maior edição de álbum de Copa da história.",
   },
   {
-    question: "Quando foi lançado o álbum da Copa do Mundo 2026?",
+    question: "Quais são os tipos de figurinhas especiais?",
     answer:
-      "O álbum oficial da FIFA World Cup 2026 começou a ser distribuído no Brasil em maio de 2026, algumas semanas antes do início do torneio, que acontece entre junho e julho nos Estados Unidos, México e Canadá.",
+      "Existem 68 figurinhas especiais e a série Legends com 20 jogadores lendários. Além disso, há figurinhas douradas e cromos premium que são mais raros.",
   },
   {
-    question: "Quantas seleções aparecem no álbum da Copa 2026?",
+    question: "Como completar o álbum Copa 2026?",
     answer:
-      "O álbum contempla as 48 seleções classificadas para o Mundial de 2026, a primeira Copa do Mundo com formato expandido. Cada seleção tem páginas dedicadas com jogadores, escudo, uniforme e figurinhas do elenco.",
+      "Para completar o álbum, você pode comprar pacotes, trocar repetidas com outros colecionadores ou usar a plataforma FigurinhaFácil para encontrar pessoas com as figurinhas que faltam.",
   },
   {
-    question: "Quanto custa para completar o álbum da Copa do Mundo 2026?",
+    question: "Onde comprar figurinhas da Copa 2026?",
     answer:
-      "Comprando apenas pacotinhos na loteria, o custo médio para completar o álbum passa dos R$ 2.500, já que figurinhas repetidas são comuns. Usando plataformas de troca como o Figurinha Fácil, dá para reduzir drasticamente esse valor, trocando repetidas por figurinhas que faltam com colecionadores da sua cidade.",
+      "Você pode comprar em bancas, livrarias, supermercados ou online. A Panini é o fornecedor oficial das figurinhas Panini Copa 2026.",
   },
   {
-    question: "O que são figurinhas legendárias do álbum da Copa 2026?",
+    question: "Quais figurinhas são as mais raras?",
     answer:
-      "As figurinhas legendárias e especiais são as mais raras e brilhantes do álbum. Elas incluem jogadores icônicos, capitães das seleções, mascotes da Copa, bola oficial e troféu da FIFA. Essas figurinhas costumam ter maior valor de troca entre colecionadores.",
-  },
-  {
-    question: "Como completar o álbum da Copa 2026 mais rápido?",
-    answer:
-      "A forma mais econômica é combinar compra de pacotinhos com trocas. No Figurinha Fácil você cadastra suas figurinhas repetidas e as que faltam, e a plataforma encontra automaticamente colecionadores perto de você com figurinhas compatíveis para a troca.",
+      "As figurinhas mais raras são geralmente as especiais, douradas e da série Legends. A raridade também depende de quanto tempo o álbum está circulando.",
   },
 ];
 
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: "Início", url: BASE_URL },
-  { name: "Álbum da Copa do Mundo 2026", url: ARTICLE_URL },
-]);
+export default function AlbumCopaPage() {
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Início", url: BASE_URL },
+    { name: "Álbum Copa 2026" },
+  ]);
 
-const faqSchema = generateFAQSchema(FAQS);
+  const articleSchema = generateArticleSchema({
+    headline: "Álbum Copa do Mundo 2026 - Guia Completo Panini com 980 Figurinhas",
+    description:
+      "Guia completo sobre o álbum oficial da Copa 2026 com 980 figurinhas: preços, tipos especiais, como completar e dicas para colecionadores.",
+    url: `${BASE_URL}/album-copa-do-mundo-2026`,
+    datePublished: "2025-05-29",
+    dateModified: "2025-05-29",
+    author: "Figurinha Fácil",
+  });
 
-const articleSchema = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  headline:
-    "Álbum da Copa do Mundo 2026: Guia Completo de Figurinhas, Preços e Como Completar",
-  description:
-    "Guia completo sobre o álbum da Copa do Mundo 2026 da Panini: quantidade de figurinhas, preços, data de lançamento, figurinhas legendárias e dicas para completar o álbum trocando com colecionadores.",
-  image: `${BASE_URL}/opengraph-image`,
-  datePublished: PUBLISHED_AT,
-  dateModified: MODIFIED_AT,
-  author: {
-    "@type": "Organization",
-    name: SITE_NAME,
-    url: BASE_URL,
-  },
-  publisher: {
-    "@type": "Organization",
-    name: SITE_NAME,
-    logo: {
-      "@type": "ImageObject",
-      url: `${BASE_URL}/logo.svg`,
-    },
-  },
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": ARTICLE_URL,
-  },
-  keywords: [
-    "álbum da copa 2026",
-    "figurinhas copa do mundo 2026",
-    "panini",
-    "fifa world cup 2026",
-    "figurinhas legendárias",
-  ],
-  inLanguage: "pt-BR",
-};
+  const faqSchema = generateFAQSchema(FAQ_DATA);
 
-const collectionPageSchema = generateCollectionPageSchema();
+  const webPageSchema = generateWebPageSchema({
+    url: `${BASE_URL}/album-copa-do-mundo-2026`,
+    name: "Álbum Copa do Mundo 2026",
+    description:
+      "Tudo sobre o álbum Copa 2026: 980 figurinhas, preços, como completar, figurinhas raras e Legends.",
+  });
 
-const combinedSchema = generateCombinedSchema([
-  articleSchema,
-  breadcrumbSchema,
-  faqSchema,
-  collectionPageSchema,
-  generateSportsEventSchema(),
-]);
+  const combinedSchema = generateCombinedSchema([
+    webPageSchema,
+    breadcrumbSchema,
+    articleSchema,
+    faqSchema,
+  ]);
 
-const quickFacts = [
-  {
-    icon: Sticker,
-    label: "Total de figurinhas",
-    value: "980",
-    detail: "68 especiais",
-  },
-  {
-    icon: CircleDollarSign,
-    label: "Preço do pacotinho",
-    value: "R$ 7,00",
-    detail: "7 figurinhas",
-  },
-  {
-    icon: CalendarDays,
-    label: "Lançamento",
-    value: "Maio/2026",
-    detail: "antes da Copa",
-  },
-  {
-    icon: Globe,
-    label: "Seleções",
-    value: "48",
-    detail: "formato expandido",
-  },
-];
-
-const albumVersions = [
-  {
-    name: "Brochura",
-    price: "R$ 24,90",
-    description:
-      "Versão tradicional, ideal para quem está começando a coleção e quer economizar.",
-  },
-  {
-    name: "Capa Dura Clássica",
-    price: "R$ 49,90",
-    description:
-      "Capa reforçada que protege as figurinhas e valoriza o álbum como peça de coleção.",
-  },
-  {
-    name: "Capa Dura Prata",
-    price: "R$ 69,90",
-    description:
-      "Edição especial com detalhes prateados, muito procurada por colecionadores.",
-  },
-  {
-    name: "Capa Dura Ouro",
-    price: "R$ 79,90",
-    description:
-      "Versão mais luxuosa da Panini para a Copa 2026, com acabamento dourado premium.",
-  },
-];
-
-const stickerTypes = [
-  {
-    title: "Figurinhas base",
-    description:
-      "Jogadores das 48 seleções, escudos e uniformes. São a maior parte do álbum e as mais fáceis de encontrar em pacotinhos.",
-  },
-  {
-    title: "Figurinhas especiais",
-    description:
-      "68 figurinhas brilhantes com capitães, craques, bola oficial, troféu e mascote da FIFA World Cup 2026. Maior raridade e valor de troca.",
-  },
-  {
-    title: "Figurinhas legendárias",
-    description:
-      "Homenagem a nomes históricos que marcaram a Copa do Mundo. Muito disputadas entre colecionadores por seu apelo emocional.",
-  },
-  {
-    title: "Figurinhas dos estádios",
-    description:
-      "Arenas do México, Estados Unidos e Canadá que vão receber os 104 jogos do primeiro Mundial com 48 seleções.",
-  },
-];
-
-const completeSteps = [
-  {
-    number: 1,
-    title: "Compre o álbum e os primeiros pacotinhos",
-    description:
-      "Comece com o álbum e um box inicial de figurinhas para ter base para trocar. Evite comprar muitos pacotinhos de uma vez: foque em qualidade e trocas.",
-  },
-  {
-    number: 2,
-    title: "Cadastre suas figurinhas no Figurinha Fácil",
-    description:
-      "Adicione os números das figurinhas que você tem repetidas e das que ainda faltam. O sistema encontra automaticamente matches com colecionadores da sua cidade.",
-  },
-  {
-    number: 3,
-    title: "Troque com colecionadores próximos",
-    description:
-      "Combine o encontro em um ponto de troca público e seguro. Trocas presenciais são mais rápidas, gratuitas e ajudam a construir comunidade.",
-  },
-  {
-    number: 4,
-    title: "Foque nas especiais por último",
-    description:
-      "As figurinhas especiais e legendárias são as mais raras. Deixe para completar essas no fim, quando já tiver um bom estoque de repetidas para oferecer em troca.",
-  },
-];
-
-export default function AlbumCopaDoMundo2026Page() {
   return (
     <>
       <JsonLd data={combinedSchema} />
       <LandingHeader />
-      <main
-        id="main-content"
-        className="pt-24 min-h-screen text-[var(--on-surface)]"
-      >
-        {/* Hero */}
-        <section className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 md:py-24">
-          <nav
-            aria-label="Breadcrumb"
-            className="mb-8 text-sm text-[var(--outline)]"
-          >
-            <ol className="flex flex-wrap items-center gap-2">
-              <li>
-                <Link
-                  href="/"
-                  className="hover:text-[var(--primary)] transition-colors"
-                >
-                  Início
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-[var(--on-surface)] font-medium">
-                Álbum da Copa do Mundo 2026
-              </li>
-            </ol>
-          </nav>
+      <main className="pt-24 min-h-screen">
+        <article className="max-w-4xl mx-auto">
+          {/* Hero Section */}
+          <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-24 px-4">
+            <Breadcrumbs items={[{ label: "Álbum Copa 2026" }]} className="mb-8" />
 
-          <div className="space-y-6">
-            <Badge className="bg-[var(--secondary-container)]/20 text-[var(--secondary)] border border-[var(--secondary)]/20 uppercase tracking-widest text-[10px] font-bold">
-              Guia Copa 2026
-            </Badge>
+            <div className="space-y-6">
+              <div>
+                <Badge className="mb-4">Guia Completo</Badge>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold tracking-tight mb-6">
+                  Álbum Copa do Mundo{" "}
+                  <span className="text-primary">2026</span>
+                </h1>
+              </div>
 
-            <h1 className="font-[var(--font-headline)] text-3xl font-black leading-tight tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
-              Álbum da Copa do Mundo 2026:{" "}
-              <span className="text-gradient-primary">
-                guia completo de figurinhas, preços e como completar
-              </span>
-            </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+                Guia completo sobre o álbum oficial Panini da Copa 2026 com 980 figurinhas. Descubra preços, tipos especiais, figurinhas raras e as melhores dicas para completar sua coleção.
+              </p>
 
-            <p className="text-lg md:text-xl text-[var(--on-surface-variant)] max-w-3xl leading-relaxed">
-              Com <strong>980 figurinhas</strong>, o álbum oficial da Panini para a
-              FIFA World Cup 2026 é o maior da história. Neste guia você descobre{" "}
-              <strong>quantas figurinhas tem</strong>, <strong>quanto custa o
-              pacotinho</strong>, quais são as figurinhas legendárias e como
-              completar o álbum gastando menos trocando com outros colecionadores.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-[var(--outline)]">
-              <span>Publicado em 17/04/2026</span>
-              <span aria-hidden="true">•</span>
-              <span>Leitura de 6 min</span>
-              <span aria-hidden="true">•</span>
-              <span>Atualizado regularmente</span>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <Badge variant="secondary" className="text-base py-2 px-4">
+                  <Zap className="h-4 w-4 mr-2" />
+                  980 figurinhas
+                </Badge>
+                <Badge variant="outline" className="text-base py-2 px-4">
+                  <Check className="h-4 w-4 mr-2" />
+                  112 páginas
+                </Badge>
+                <Badge variant="outline" className="text-base py-2 px-4">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  Panini Oficial
+                </Badge>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Quick facts */}
-        <section
-          aria-labelledby="quick-facts-heading"
-          className="mx-auto max-w-5xl px-4 sm:px-6 pb-8"
-        >
-          <h2 id="quick-facts-heading" className="sr-only">
-            Resumo rápido do álbum
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {quickFacts.map((fact) => {
-              const Icon = fact.icon;
-              return (
-                <Card
-                  key={fact.label}
-                  className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
-                >
-                  <CardHeader className="pb-2">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center mb-2">
-                      <Icon
-                        className="h-5 w-5 text-[var(--primary)]"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <CardDescription className="text-[10px] uppercase tracking-widest text-[var(--outline)]">
-                      {fact.label}
-                    </CardDescription>
-                    <CardTitle className="text-2xl font-[var(--font-headline)]">
-                      {fact.value}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-[var(--on-surface-variant)]">
-                      {fact.detail}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Intro */}
-        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            O que é o álbum da Copa do Mundo 2026?
-          </h2>
-          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
-            <p>
-              O <strong>álbum da Copa do Mundo 2026</strong> é a coleção oficial
-              da Panini para a <strong>FIFA World Cup 2026</strong>, o primeiro
-              Mundial da história disputado por <strong>48 seleções</strong>, com
-              sede compartilhada entre <strong>Estados Unidos, México e
-              Canadá</strong>. Como em todas as edições desde 1970, colecionar o
-              álbum faz parte da tradição de cada Copa no Brasil — e em 2026 ele
-              vem ainda maior.
-            </p>
-            <p>
-              São <strong>112 páginas</strong> que cobrem o troféu da FIFA, os 16
-              estádios-sede, as 48 seleções classificadas, craques, mascote e
-              figurinhas especiais brilhantes. A Panini lançou o álbum em{" "}
-              <strong>maio de 2026</strong>, poucas semanas antes da bola rolar,
-              dando tempo para colecionadores começarem a troca antes do início
-              dos jogos em junho.
-            </p>
-          </div>
-        </section>
-
-        {/* Quantas figurinhas */}
-        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            Quantas figurinhas tem o álbum da Copa 2026?
-          </h2>
-          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
-            <p>
-              O álbum tem <strong>980 figurinhas no total</strong>, sendo{" "}
-              <strong>68 figurinhas especiais</strong> com efeito brilhante. É a
-              maior coleção da história dos álbuns de Copa, superando o recorde
-              anterior de 681 figurinhas da Copa de 2018 na Rússia.
-            </p>
-            <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-6">
-              <h3 className="font-semibold mb-4 text-[var(--on-surface)]">
-                Evolução dos álbuns de Copa (Panini)
-              </h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex justify-between">
-                  <span>Copa 2014 (Brasil)</span>
-                  <span className="font-mono text-[var(--primary)]">
-                    640 figurinhas
-                  </span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Copa 2018 (Rússia)</span>
-                  <span className="font-mono text-[var(--primary)]">
-                    681 figurinhas
-                  </span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Copa 2022 (Catar)</span>
-                  <span className="font-mono text-[var(--primary)]">
-                    670 figurinhas
-                  </span>
-                </li>
-                <li className="flex justify-between font-bold">
-                  <span>Copa 2026 (EUA/MEX/CAN)</span>
-                  <span className="font-mono text-[var(--secondary)]">
-                    980 figurinhas
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Preço */}
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            Quanto custa o álbum e o pacotinho da Copa 2026?
-          </h2>
-          <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
-            O <strong>pacotinho da Copa 2026 custa R$ 7,00</strong> e vem com 7
-            figurinhas — um reajuste em relação ao pacote de R$ 5,00 do último
-            Mundial. O álbum aparece em quatro versões, e o preço muda conforme o
-            acabamento:
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {albumVersions.map((version) => (
-              <Card
-                key={version.name}
-                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
-              >
+          {/* Key Facts Section */}
+          <section className="py-16 md:py-20 px-4">
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{version.name}</CardTitle>
-                    <span className="font-mono text-[var(--primary)] font-bold">
-                      {version.price}
-                    </span>
-                  </div>
+                  <CardTitle className="text-3xl text-primary">980</CardTitle>
+                  <CardDescription>Figurinhas no Total</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-[var(--on-surface-variant)]">
-                    {version.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <p className="text-sm text-[var(--outline)] mt-6 max-w-3xl">
-            Valores de referência para o mercado brasileiro. Preços podem variar
-            entre bancas, supermercados, Panini, Amazon, Magazine Luiza e Mercado
-            Livre.
-          </p>
-        </section>
-
-        {/* Tipos de figurinhas */}
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            Tipos de figurinhas: especiais, legendárias e estádios
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {stickerTypes.map((type) => (
-              <Card
-                key={type.title}
-                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Sparkles
-                      className="h-5 w-5 text-[var(--secondary)]"
-                      aria-hidden="true"
-                    />
-                    <CardTitle className="text-lg">{type.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-[var(--on-surface-variant)]">
-                    {type.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Como completar */}
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            Como completar o álbum da Copa do Mundo 2026 gastando menos
-          </h2>
-          <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
-            Comprando apenas pacotinhos até fechar o álbum, o gasto médio passa
-            dos <strong>R$ 2.500</strong> — a lei das repetidas faz o custo
-            explodir nas últimas figurinhas. Quem troca, gasta menos. Siga estes
-            4 passos para acelerar a coleção:
-          </p>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {completeSteps.map((step) => (
-              <Card
-                key={step.number}
-                className="relative bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
-              >
-                <CardHeader>
-                  <div className="absolute -top-4 left-4 w-8 h-8 rounded-full bg-[var(--primary)] text-[var(--on-primary)] flex items-center justify-center font-bold text-sm">
-                    {step.number}
-                  </div>
-                  <CardTitle className="text-lg mt-2">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-[var(--on-surface-variant)]">
-                    {step.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Seleções participantes */}
-        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
-          <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-6">
-            Seleções no álbum: a primeira Copa com 48 times
-          </h2>
-          <div className="space-y-4 text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed">
-            <p>
-              Pela primeira vez, a Copa do Mundo reúne <strong>48 seleções</strong>{" "}
-              — um salto em relação aos 32 times das edições anteriores. No álbum,
-              isso significa mais páginas, mais jogadores e uma oportunidade
-              histórica para colecionadores. As seleções estão organizadas em 12
-              grupos de 4, e cada uma tem sua página dedicada com escudo, uniforme
-              e plantel.
-            </p>
-            <p>
-              Entre os destaques, a <strong>Seleção Brasileira</strong> aparece
-              com figurinhas do craque Vinicius Jr., do capitão e dos demais
-              convocados para o Mundial. Países estreantes no Mundial também
-              ganham espaço, o que aumenta o apelo do álbum para colecionadores
-              que acompanham futebol internacional.
-            </p>
-          </div>
-        </section>
-
-        {/* Onde trocar */}
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
-          <div className="rounded-2xl border border-[var(--outline-variant)]/20 bg-[var(--surface-container-high)] p-8 md:p-12">
-            <div className="flex items-center gap-3 mb-4">
-              <Users
-                className="h-6 w-6 text-[var(--primary)]"
-                aria-hidden="true"
-              />
-              <h2 className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold">
-                Trocar é o caminho mais barato para completar o álbum
-              </h2>
-            </div>
-            <p className="text-[var(--on-surface-variant)] text-base md:text-lg leading-relaxed mb-6">
-              O <strong>Figurinha Fácil</strong> é a maior rede de troca de
-              figurinhas do Brasil. Você cadastra as figurinhas que tem repetidas
-              e as que faltam, e a plataforma conecta você automaticamente com
-              colecionadores da sua cidade com <strong>matches compatíveis</strong>
-              . A troca é gratuita, presencial e acontece em pontos de encontro
-              seguros.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary-container)] font-bold hover:opacity-95"
-              >
-                <Link href="/sign-up">
-                  Criar conta grátis
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-lg border-[var(--outline-variant)]/30 bg-transparent text-[var(--on-surface)] hover:bg-[var(--surface-variant)]"
-              >
-                <Link href="/como-funciona">Ver como funciona</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section
-          aria-labelledby="faq-heading"
-          className="mx-auto max-w-3xl px-4 sm:px-6 py-12"
-        >
-          <h2
-            id="faq-heading"
-            className="font-[var(--font-headline)] text-2xl md:text-3xl font-bold mb-8"
-          >
-            Perguntas frequentes sobre o álbum da Copa 2026
-          </h2>
-          <div className="space-y-4">
-            {FAQS.map((item) => (
-              <Card
-                key={item.question}
-                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
-              >
-                <CardHeader>
-                  <CardTitle className="text-base md:text-lg">
-                    {item.question}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--on-surface-variant)]">
-                    {item.answer}
+                  <p className="text-sm text-muted-foreground">
+                    A maior edição de álbum de Copa da história
                   </p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </section>
 
-        {/* Final CTA */}
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 py-16 md:py-24">
-          <div className="text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--secondary-container)]/20 border border-[var(--secondary)]/20">
-              <Trophy
-                className="w-4 h-4 text-[var(--secondary)]"
-                aria-hidden="true"
-              />
-              <span className="text-[var(--secondary)] text-[10px] font-bold tracking-[0.2em] uppercase">
-                Rumo ao álbum completo
-              </span>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-3xl text-primary">R$ 24,90</CardTitle>
+                  <CardDescription>Preço do Álbum</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Capa cartão (versão premium: R$ 74,90)
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-3xl text-primary">48</CardTitle>
+                  <CardDescription>Seleções</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Primeira Copa com 48 seleções participantes
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <h2 className="font-[var(--font-headline)] text-2xl md:text-4xl font-bold max-w-2xl mx-auto">
-              Comece a trocar figurinhas da Copa 2026 ainda hoje
+
+            {/* Main Content */}
+            <div className="space-y-12">
+              <div id="introducao" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  O Álbum Copa do Mundo 2026: A Maior Edição da História
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  O álbum da Copa do Mundo 2026 é um fenômeno colecionável que marca a maior edição de álbum de Copa da história. Com a expansão do torneio para 48 seleções (antes eram 32), a Panini criou um álbum robusto com 112 páginas e impressionantes 980 figurinhas.
+                </p>
+              </div>
+
+              <div id="especificacoes" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Especificações e Números do Álbum
+                </h2>
+                <div className="text-lg text-muted-foreground leading-relaxed space-y-2">
+                  <p>O álbum Copa 2026 possui as seguintes características:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-2">
+                    <li>112 páginas de alta qualidade</li>
+                    <li>980 figurinhas no total</li>
+                    <li>68 figurinhas especiais</li>
+                    <li>Série Legends com 20 jogadores famosos</li>
+                    <li>Figurinhas douradas raras</li>
+                    <li>Disponível em capa cartão e capa dura</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div id="preco" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Preço Figurinhas Copa 2026: Quanto Custa?
+                </h2>
+                <div className="text-lg text-muted-foreground leading-relaxed space-y-2">
+                  <p>Os preços para o álbum Copa 2026 são:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-2">
+                    <li>Álbum (capa cartão): R$ 24,90</li>
+                    <li>Álbum (capa dura - premium): R$ 74,90</li>
+                    <li>Pacote com 7 figurinhas: R$ 7,00</li>
+                    <li>Pacotes especiais e edições limitadas: preços variáveis</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div id="tipos" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Tipos de Figurinhas: Cromos Especiais e Legends
+                </h2>
+                <div className="text-lg text-muted-foreground leading-relaxed space-y-4">
+                  <p>O álbum conta com diferentes categorias de figurinhas:</p>
+                  
+                  <div>
+                    <p className="font-semibold text-foreground">Figurinhas Comuns:</p>
+                    <p className="ml-4">As 892 figurinhas padrão com jogadores, técnicos e informações das seleções.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground">Figurinhas Especiais (68):</p>
+                    <p className="ml-4">Cromos com design diferenciado, hologramas e efeitos especiais.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground">Figurinhas Douradas:</p>
+                    <p className="ml-4">Raras figurinhas com acabamento em ouro, muito procuradas por colecionadores.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground">Figurinhas Legends (20):</p>
+                    <p className="ml-4">Série exclusiva com 20 dos maiores jogadores da história do futebol.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-foreground">Figurinhas Limitadas:</p>
+                    <p className="ml-4">Edições especiais e exclusivas com tiragem reduzida.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="completar" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Como Completar o Álbum Copa 2026?
+                </h2>
+                <div className="text-lg text-muted-foreground leading-relaxed space-y-3">
+                  <p>Existem várias estratégias para completar seu álbum:</p>
+                  
+                  <ol className="space-y-3 ml-4">
+                    <li className="space-y-1">
+                      <p className="font-semibold text-foreground">1. Compra Organizada:</p>
+                      <p>Estabeleça um orçamento mensal e compre pacotes regularmente.</p>
+                    </li>
+                    <li className="space-y-1">
+                      <p className="font-semibold text-foreground">2. Troca com Amigos:</p>
+                      <p>Reúna-se com outros colecionadores e faça trocas de repetidas.</p>
+                    </li>
+                    <li className="space-y-1">
+                      <p className="font-semibold text-foreground">3. Plataformas de Troca:</p>
+                      <p>Use o FigurinhaFácil para encontrar colecionadores com as figurinhas que você precisa.</p>
+                    </li>
+                    <li className="space-y-1">
+                      <p className="font-semibold text-foreground">4. Mercado Online:</p>
+                      <p>Compre figurinhas específicas em plataformas de e-commerce e marketplaces.</p>
+                    </li>
+                    <li className="space-y-1">
+                      <p className="font-semibold text-foreground">5. Eventos de Colecionadores:</p>
+                      <p>Participe de encontros e feiras de colecionadores.</p>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+
+              <div id="raras" className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">
+                  Figurinhas Raras Copa do Mundo 2026
+                </h2>
+                <div className="text-lg text-muted-foreground leading-relaxed space-y-2">
+                  <p>As figurinhas mais raras e procuradas incluem:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-2">
+                    <li>Figurinhas Legends: A série com 20 ícones do futebol é altamente valiosa.</li>
+                    <li>Figurinhas Douradas: Seu acabamento em ouro as torna muito raras.</li>
+                    <li>Primeiras Edições: Figurinhas dos primeiros lotes costumam ser mais valiosas.</li>
+                    <li>Hologramas Especiais: Versões com efeitos holográficos premium.</li>
+                    <li>Figurinhas de Seleções Importantes: Jogadores de Brasil, Argentina, França, etc.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="py-16 md:py-20 px-4 bg-muted/30 rounded-lg my-12">
+            <h2 className="text-3xl md:text-4xl font-headline font-bold mb-12">
+              Perguntas Frequentes
             </h2>
-            <p className="text-[var(--on-surface-variant)] text-base md:text-lg max-w-2xl mx-auto">
-              Milhares de colecionadores já estão usando o Figurinha <span className="text-[#87d400]">Fácil</span> para
-              completar o álbum gastando muito menos. Cadastre-se grátis e encontre
-              colecionadores perto de você.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary-container)] font-bold hover:opacity-95"
-              >
+
+            <div className="space-y-6">
+              {FAQ_DATA.map((faq, index) => (
+                <details
+                  key={index}
+                  className="group border border-border rounded-lg p-6 hover:bg-background/50 transition-colors"
+                >
+                  <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+                    {faq.question}
+                    <span className="transform group-open:rotate-180 transition-transform">
+                      ▼
+                    </span>
+                  </summary>
+                  <p className="text-muted-foreground mt-4 leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="py-16 md:py-24 px-4">
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-8 md:p-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold mb-6">
+                Comece a Completar seu Álbum Hoje
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Use o FigurinhaFácil para encontrar colecionadores com as figurinhas que você precisa. Troque de forma segura e complete seu álbum Copa 2026 muito mais rápido.
+              </p>
+              <Button size="lg" asChild>
                 <Link href="/sign-up">
-                  Cadastrar grátis
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  Começar Agora
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <DownloadGuideButton />
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-lg border-[var(--outline-variant)]/30 bg-transparent text-[var(--on-surface)] hover:bg-[var(--surface-variant)]"
-              >
-                <Link href="/">Voltar à página inicial</Link>
-              </Button>
             </div>
-          </div>
-        </section>
+          </section>
+        </article>
       </main>
       <LandingFooter />
     </>
