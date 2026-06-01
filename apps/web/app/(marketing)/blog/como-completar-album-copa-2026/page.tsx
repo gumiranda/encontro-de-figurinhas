@@ -123,21 +123,13 @@ const BREADCRUMB = [
 export default function Page() {
   const breadcrumbSchema = generateBreadcrumbSchema(BREADCRUMB);
   const faqSchema = generateFAQSchema(FAQS);
-  const combinedSchema = generateCombinedSchema({
-    headline:
-      "Como Completar o Álbum da Copa 2026: Guia Completo de Trocas e Estratégias",
-    description:
-      "Descubra as melhores estratégias para completar o álbum da Copa do Mundo 2026 com trocas e economize até 80%.",
-    url: ARTICLE_URL,
-    datePublished: PUBLISHED_AT,
-    dateModified: MODIFIED_AT,
-    image: `${BASE_URL}/og-image.jpg`,
-  });
+  const combinedSchema = generateCombinedSchema([
+    breadcrumbSchema,
+    faqSchema,
+  ]);
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
-      <JsonLd data={faqSchema} />
       <JsonLd data={combinedSchema} />
 
       <LandingHeader />
