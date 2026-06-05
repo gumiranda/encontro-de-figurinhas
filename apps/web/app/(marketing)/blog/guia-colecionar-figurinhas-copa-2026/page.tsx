@@ -179,25 +179,40 @@ export default function ColecionarFigurinhasGuide() {
     },
   ];
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline:
+      "Guia Completo para Colecionar Figurinhas da Copa 2026: Estratégias Profissionais e Dicas Essenciais",
+    description:
+      "Um guia completo sobre como colecionar figurinhas da Copa 2026 com estratégias profissionais, dicas para evitar repetidas, e métodos para completar seu álbum.",
+    url: ARTICLE_URL,
+    image: `${BASE_URL}/og-image.png`,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    datePublished: PUBLISHED_AT,
+    dateModified: MODIFIED_AT,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": ARTICLE_URL,
+    },
+  };
+
+  const combinedSchema = generateCombinedSchema([
+    generateBreadcrumbSchema(breadcrumbs),
+    articleSchema,
+    generateFAQSchema(FAQS),
+  ]);
+
   return (
     <>
-      <JsonLd
-        data={generateCombinedSchema({
-          breadcrumbs,
-          article: {
-            headline:
-              "Guia Completo para Colecionar Figurinhas da Copa 2026: Estratégias Profissionais e Dicas Essenciais",
-            description:
-              "Um guia completo sobre como colecionar figurinhas da Copa 2026 com estratégias profissionais, dicas para evitar repetidas, e métodos para completar seu álbum.",
-            url: ARTICLE_URL,
-            image: `${BASE_URL}/og-image.png`,
-            author: SITE_NAME,
-            publishedTime: PUBLISHED_AT,
-            modifiedTime: MODIFIED_AT,
-          },
-          faqs: FAQS,
-        })}
-      />
+      <JsonLd data={combinedSchema} />
 
       <LandingHeader />
 

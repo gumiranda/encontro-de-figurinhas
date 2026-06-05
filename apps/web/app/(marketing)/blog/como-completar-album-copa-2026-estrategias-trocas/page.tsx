@@ -153,38 +153,47 @@ const strategies = [
 ];
 
 export default function ComoCompletarAlbumCopa2026Page() {
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline:
+      "Como Completar Álbum Copa 2026: Estratégias de Troca, Apps e Dicas Econômicas",
+    description:
+      "Guia completo com estratégias para completar o álbum da Copa do Mundo 2026 usando trocas inteligentes, apps e encontros de colecionadores.",
+    url: ARTICLE_URL,
+    datePublished: PUBLISHED_AT,
+    dateModified: MODIFIED_AT,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    image: `${BASE_URL}/opengraph-image.png`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": ARTICLE_URL,
+    },
+  };
+
+  const combinedSchema = generateCombinedSchema([
+    articleSchema,
+    generateBreadcrumbSchema([
+      { name: "Início", url: BASE_URL },
+      { name: "Blog", url: `${BASE_URL}/blog` },
+      { name: "Como Completar Álbum Copa 2026", url: ARTICLE_URL },
+    ]),
+    generateFAQSchema(FAQS),
+  ]);
+
   return (
     <div className="min-h-screen bg-white">
       <LandingHeader />
 
       <main className="relative">
-        <JsonLd
-          data={generateCombinedSchema(
-            "article",
-            {
-              headline:
-                "Como Completar Álbum Copa 2026: Estratégias de Troca, Apps e Dicas Econômicas",
-              description:
-                "Guia completo com estratégias para completar o álbum da Copa do Mundo 2026 usando trocas inteligentes, apps e encontros de colecionadores.",
-              url: ARTICLE_URL,
-              datePublished: PUBLISHED_AT,
-              dateModified: MODIFIED_AT,
-              author: SITE_NAME,
-              image: `${BASE_URL}/opengraph-image.png`,
-            },
-            [
-              generateBreadcrumbSchema([
-                { name: "Início", url: BASE_URL },
-                { name: "Blog", url: `${BASE_URL}/blog` },
-                {
-                  name: "Como Completar Álbum Copa 2026",
-                  url: ARTICLE_URL,
-                },
-              ]),
-              generateFAQSchema(FAQS),
-            ]
-          )}
-        />
+        <JsonLd data={combinedSchema} />
 
         {/* Hero Section */}
         <section className="relative px-4 py-16 sm:px-6 lg:px-8">

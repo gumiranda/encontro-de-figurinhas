@@ -195,38 +195,47 @@ const tips = [
 ];
 
 export default function OndeComprarFigurinhasCopa2026Page() {
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline:
+      "Onde Comprar Figurinhas Copa 2026: Guia de Preços, Lojas Físicas e Online",
+    description:
+      "Guia completo comparando preços de figurinhas da Copa 2026 em diferentes lojas e plataformas.",
+    url: ARTICLE_URL,
+    datePublished: PUBLISHED_AT,
+    dateModified: MODIFIED_AT,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    image: `${BASE_URL}/opengraph-image.png`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": ARTICLE_URL,
+    },
+  };
+
+  const combinedSchema = generateCombinedSchema([
+    articleSchema,
+    generateBreadcrumbSchema([
+      { name: "Início", url: BASE_URL },
+      { name: "Blog", url: `${BASE_URL}/blog` },
+      { name: "Onde Comprar Figurinhas Copa 2026", url: ARTICLE_URL },
+    ]),
+    generateFAQSchema(FAQS),
+  ]);
+
   return (
     <div className="min-h-screen bg-white">
       <LandingHeader />
 
       <main className="relative">
-        <JsonLd
-          data={generateCombinedSchema(
-            "article",
-            {
-              headline:
-                "Onde Comprar Figurinhas Copa 2026: Guia de Preços, Lojas Físicas e Online",
-              description:
-                "Guia completo comparando preços de figurinhas da Copa 2026 em diferentes lojas e plataformas.",
-              url: ARTICLE_URL,
-              datePublished: PUBLISHED_AT,
-              dateModified: MODIFIED_AT,
-              author: SITE_NAME,
-              image: `${BASE_URL}/opengraph-image.png`,
-            },
-            [
-              generateBreadcrumbSchema([
-                { name: "Início", url: BASE_URL },
-                { name: "Blog", url: `${BASE_URL}/blog` },
-                {
-                  name: "Onde Comprar Figurinhas Copa 2026",
-                  url: ARTICLE_URL,
-                },
-              ]),
-              generateFAQSchema(FAQS),
-            ]
-          )}
-        />
+        <JsonLd data={combinedSchema} />
 
         {/* Hero Section */}
         <section className="relative px-4 py-16 sm:px-6 lg:px-8">
