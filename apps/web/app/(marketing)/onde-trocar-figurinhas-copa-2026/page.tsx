@@ -14,13 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { LandingHeader } from "@/modules/landing/ui/components/landing-header";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import {
@@ -171,7 +164,6 @@ const tradingMethods = [
     description:
       "Maior plataforma de troca do Brasil com 2M+ usuários. Cadastre repetidas e faltantes, encontre matches automáticos com colecionadores perto de você.",
     highlight: "Mais popular",
-    color: "text-blue-500",
   },
   {
     icon: Users,
@@ -179,7 +171,6 @@ const tradingMethods = [
     description:
       "Diversos shoppings no Brasil sediam pontos de troca oficiais. Confira horários e localização no website da Coca-Cola e Panini.",
     highlight: "Presencial",
-    color: "text-green-500",
   },
   {
     icon: MessageSquare,
@@ -187,7 +178,6 @@ const tradingMethods = [
     description:
       "Comunidades locais organizam encontros regularmente. Busque pelo nome da sua cidade + 'figurinhas copa 2026'.",
     highlight: "Gratuito",
-    color: "text-purple-500",
   },
   {
     icon: Store,
@@ -195,7 +185,6 @@ const tradingMethods = [
     description:
       "Muitas bancas e lojas que vendem figurinhas também intermediam trocas entre clientes. Pergunte ao vendedor sobre possibilidades.",
     highlight: "Local",
-    color: "text-orange-500",
   },
 ];
 
@@ -380,33 +369,33 @@ export default function OndeTracarFigurinhasCopaPage() {
             {tradingMethods.map((method) => {
               const Icon = method.icon;
               return (
-                <Card
+                <div
                   key={method.title}
-                  className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)] relative overflow-hidden"
+                  className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)] relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[var(--primary)]/10 to-transparent rounded-bl-3xl" />
-                  <CardHeader>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#f0ebe0] to-transparent rounded-bl-3xl" />
+                  <div>
                     <div className="flex items-start justify-between gap-2 relative z-10">
                       <div>
-                        <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-[#f0ebe0]/70 flex items-center justify-center mb-3">
                           <Icon
-                            className={`h-5 w-5 ${method.color}`}
+                            className="h-5 w-5 text-[#535364]"
                             aria-hidden="true"
                           />
                         </div>
-                        <CardTitle className="text-lg">{method.title}</CardTitle>
+                        <h3 className="text-lg font-semibold">{method.title}</h3>
                       </div>
                       <Badge className="bg-[var(--secondary)]/10 text-[var(--secondary)] border-0 text-[10px] font-bold">
                         {method.highlight}
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-[var(--on-surface-variant)]">
+                  </div>
+                  <div>
+                    <p className="text-[var(--on-surface-variant)]">
                       {method.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                    </p>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -423,28 +412,28 @@ export default function OndeTracarFigurinhasCopaPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2">
             {topCities.map((city) => (
-              <Card
+              <div
                 key={city.name}
-                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
+                className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)]"
               >
-                <CardHeader>
+                <div>
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin
                       className="h-5 w-5 text-[var(--primary)]"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-lg">{city.name}</CardTitle>
+                    <h3 className="text-lg font-semibold">{city.name}</h3>
                   </div>
                   <Badge variant="outline" className="w-fit">
                     {city.estimate}
                   </Badge>
-                </CardHeader>
-                <CardContent className="space-y-2">
+                </div>
+                <div className="space-y-2">
                   <p className="text-sm text-[var(--on-surface-variant)]">
                     <strong>Locais:</strong> {city.locations}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
           <p className="text-sm text-[var(--outline)] mt-6 max-w-3xl">
@@ -465,27 +454,27 @@ export default function OndeTracarFigurinhasCopaPage() {
             {tradingTips.map((tip) => {
               const Icon = tip.icon;
               return (
-                <Card
+                <div
                   key={tip.title}
-                  className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
+                  className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)]"
                 >
-                  <CardHeader>
+                  <div>
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-10 h-10 rounded-lg bg-[#f0ebe0]/70 flex items-center justify-center flex-shrink-0 mt-1">
                         <Icon
-                          className="h-5 w-5 text-[var(--primary)]"
+                          className="h-5 w-5 text-[#535364]"
                           aria-hidden="true"
                         />
                       </div>
-                      <CardTitle className="text-base">{tip.title}</CardTitle>
+                      <h3 className="text-base font-semibold">{tip.title}</h3>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-[var(--on-surface-variant)]">
+                  </div>
+                  <div>
+                    <p className="text-[var(--on-surface-variant)]">
                       {tip.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                    </p>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -541,7 +530,7 @@ export default function OndeTracarFigurinhasCopaPage() {
 
                 <div className="rounded-lg border border-[var(--outline-variant)]/10 bg-[var(--surface)] p-4">
                   <h3 className="font-bold text-[var(--on-surface)] mb-2 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="w-2 h-2 rounded-full bg-[#535364]" />
                     Grupos em Telegram/WhatsApp
                   </h3>
                   <p className="text-sm text-[var(--on-surface-variant)] mb-2">
@@ -576,21 +565,21 @@ export default function OndeTracarFigurinhasCopaPage() {
                 Comparação de Custos
               </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[#f0ebe0]/70">
                   <span className="font-medium">Só pacotinhos (loteria)</span>
-                  <span className="font-mono text-lg font-bold text-red-600">
+                  <span className="font-mono text-lg font-bold text-[#dc2626]">
                     ~R$ 2.500
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[#f0ebe0]/70">
                   <span className="font-medium">Pacotinhos + poucas trocas</span>
-                  <span className="font-mono text-lg font-bold text-orange-600">
+                  <span className="font-mono text-lg font-bold text-[#dc2626]">
                     ~R$ 1.500
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[#f0ebe0]/70">
                   <span className="font-medium">Muitas trocas + app</span>
-                  <span className="font-mono text-lg font-bold text-green-600">
+                  <span className="font-mono text-lg font-bold text-[#1b7a3d]">
                     ~R$ 500
                   </span>
                 </div>
@@ -625,7 +614,7 @@ export default function OndeTracarFigurinhasCopaPage() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-lg border-0 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dim)] text-[var(--on-primary-container)] font-bold hover:opacity-95"
+                className="rounded-lg border-0 bg-[#12121f] text-[#f0f0f5] font-bold hover:opacity-95"
               >
                 <Link href="/sign-up">
                   Criar conta grátis
@@ -659,21 +648,21 @@ export default function OndeTracarFigurinhasCopaPage() {
           </h2>
           <div className="space-y-4">
             {FAQS.map((item) => (
-              <Card
+              <div
                 key={item.question}
-                className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)]"
+                className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)]"
               >
-                <CardHeader>
-                  <CardTitle className="text-base md:text-lg">
+                <div>
+                  <h3 className="text-base md:text-lg font-semibold">
                     {item.question}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </h3>
+                </div>
+                <div>
                   <p className="text-[var(--on-surface-variant)]">
                     {item.answer}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -684,32 +673,32 @@ export default function OndeTracarFigurinhasCopaPage() {
             Leia Também
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)] hover:border-[var(--outline-variant)]/30 transition-colors cursor-pointer group">
-              <CardHeader>
+            <div className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)] hover:border-[var(--outline-variant)]/30 transition-colors cursor-pointer group">
+              <div>
                 <Link href="/album-copa-do-mundo-2026" className="space-y-2">
-                  <CardTitle className="group-hover:text-[var(--primary)] transition-colors">
+                  <h3 className="group-hover:text-[var(--primary)] transition-colors font-semibold">
                     Álbum da Copa 2026: Guia Completo
-                  </CardTitle>
-                  <CardDescription className="text-[var(--on-surface-variant)]">
+                  </h3>
+                  <p className="text-[var(--on-surface-variant)]">
                     Saiba quantas figurinhas tem, preços e como completar o
                     álbum oficial da Panini.
-                  </CardDescription>
+                  </p>
                 </Link>
-              </CardHeader>
-            </Card>
-            <Card className="bg-[var(--surface-container-high)] border-[var(--outline-variant)]/10 text-[var(--on-surface)] hover:border-[var(--outline-variant)]/30 transition-colors cursor-pointer group">
-              <CardHeader>
+              </div>
+            </div>
+            <div className="p-5 bg-[#f0ebe0]/70 rounded-xl text-[var(--on-surface)] hover:border-[var(--outline-variant)]/30 transition-colors cursor-pointer group">
+              <div>
                 <Link href="/como-funciona" className="space-y-2">
-                  <CardTitle className="group-hover:text-[var(--primary)] transition-colors">
+                  <h3 className="group-hover:text-[var(--primary)] transition-colors font-semibold">
                     Como o Figurinha Fácil Funciona
-                  </CardTitle>
-                  <CardDescription className="text-[var(--on-surface-variant)]">
+                  </h3>
+                  <p className="text-[var(--on-surface-variant)]">
                     Entenda como nossa plataforma conecta colecionadores e
                     facilita trocas seguras.
-                  </CardDescription>
+                  </p>
                 </Link>
-              </CardHeader>
-            </Card>
+              </div>
+            </div>
           </div>
         </section>
       </main>
