@@ -182,7 +182,7 @@ export default function ColecionarFigurinhasGuide() {
   return (
     <>
       <JsonLd
-        schema={generateCombinedSchema({
+        data={generateCombinedSchema({
           breadcrumbs,
           article: {
             headline:

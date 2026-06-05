@@ -201,7 +201,7 @@ export default function OndeComprarFigurinhasCopa2026Page() {
 
       <main className="relative">
         <JsonLd
-          schema={generateCombinedSchema(
+          data={generateCombinedSchema(
             "article",
             {
               headline:
