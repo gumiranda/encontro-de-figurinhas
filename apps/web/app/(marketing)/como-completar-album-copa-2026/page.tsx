@@ -578,10 +578,10 @@ export default function ComoCompletarAlbumPage() {
               },
             },
             generateBreadcrumbSchema([
-              { name: "Início", path: "/" },
+              { name: "Início", url: BASE_URL },
               {
                 name: "Como Completar Álbum Copa 2026",
-                path: ARTICLE_PATH,
+                url: ARTICLE_URL,
               },
             ]),
             {
