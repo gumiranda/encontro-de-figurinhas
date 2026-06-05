@@ -199,14 +199,14 @@ export default function AlbumCopa2026Page() {
                 Características Principais
               </h2>
               <div className="space-y-4">
-                <div className="bg-muted/50 p-6 rounded-lg border-l-4 border-primary">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="text-xl font-bold mb-2">Total de Figurinhas</h3>
                   <p className="text-muted-foreground">
                     980 figurinhas divididas entre as 48 seleções que participam
                     da Copa 2026, incluindo figurinhas especiais de destaque.
                   </p>
                 </div>
-                <div className="bg-muted/50 p-6 rounded-lg border-l-4 border-yellow-600">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="text-xl font-bold mb-2">Figurinhas Douradas</h3>
                   <p className="text-muted-foreground">
                     O álbum conta com figurinhas douradas exclusivas e raras,
@@ -214,14 +214,14 @@ export default function AlbumCopa2026Page() {
                     as figurinhas mais procuradas pelos colecionadores.
                   </p>
                 </div>
-                <div className="bg-muted/50 p-6 rounded-lg border-l-4 border-purple-600">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="text-xl font-bold mb-2">Figurinhas Especiais</h3>
                   <p className="text-muted-foreground">
                     68 figurinhas especiais com designs únicos, incluindo
                     figurinhas de lendas do futebol e ícones históricos.
                   </p>
                 </div>
-                <div className="bg-muted/50 p-6 rounded-lg border-l-4 border-blue-600">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="text-xl font-bold mb-2">Edições Disponíveis</h3>
                   <p className="text-muted-foreground">
                     Edição brochura (R$ 24,90) com capa simples e edição especial
@@ -270,7 +270,7 @@ export default function AlbumCopa2026Page() {
                   </tbody>
                 </table>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-950 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="bg-[#f0ebe0]/70 p-6 rounded-lg">
                 <h3 className="font-bold mb-3 text-lg">Custo total estimado</h3>
                 <p className="text-muted-foreground mb-2">
                   Para completar as 980 figurinhas, considerando-se repetições
@@ -342,7 +342,7 @@ export default function AlbumCopa2026Page() {
                 Dicas para Colecionadores
               </h2>
               <div className="space-y-4">
-                <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="font-bold mb-2">Economize com Trocas</h3>
                   <p className="text-muted-foreground">
                     A estratégia mais inteligente é trocar figurinhas repetidas
@@ -350,7 +350,7 @@ export default function AlbumCopa2026Page() {
                     em até 40-50%.
                   </p>
                 </div>
-                <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="font-bold mb-2">Procure por Figurinhas Raras</h3>
                   <p className="text-muted-foreground">
                     As figurinhas douradas e especiais são as mais difíceis de
@@ -358,14 +358,14 @@ export default function AlbumCopa2026Page() {
                     localizar colecionadores que têm o que você precisa.
                   </p>
                 </div>
-                <div className="p-4 bg-purple-50 dark:bg-purple-950 rounded-lg border border-purple-200 dark:border-purple-800">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="font-bold mb-2">Use Aplicativos de Troca</h3>
                   <p className="text-muted-foreground">
                     Plataformas como Figurinha Fácil conectam colecionadores e
                     facilitam as trocas, economizando tempo e dinheiro.
                   </p>
                 </div>
-                <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="p-4 bg-[#f0ebe0]/70 rounded-lg">
                   <h3 className="font-bold mb-2">Organize sua Coleção</h3>
                   <p className="text-muted-foreground">
                     Mantenha um registro de quais figurinhas você tem e quais
