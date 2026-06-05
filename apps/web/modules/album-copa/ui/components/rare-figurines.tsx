@@ -1,12 +1,10 @@
 "use client";
 
-import { Badge } from "@workspace/ui/components/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Gem, Star } from "lucide-react";
 
 interface RareFigurine {
   name: string;
   code: string;
-  color: string;
   rarity: string;
   priceRange: string;
   description: string;
@@ -16,34 +14,30 @@ const rareFigurines: RareFigurine[] = [
   {
     name: "Vinícius Júnior",
     code: "BRA-1",
-    color: "Gold",
     rarity: "Lendária",
-    priceRange: "R$ 300 - R$ 5.000",
-    description: "O único brasileiro na categoria Legend com versão dourada",
+    priceRange: "R$ 300 – R$ 5.000",
+    description: "O único brasileiro na categoria Legend com versão dourada.",
   },
   {
     name: "Messi",
     code: "ARG-1",
-    color: "Gold",
     rarity: "Lendária",
-    priceRange: "R$ 800 - R$ 5.000",
-    description: "Uma das figuras mais icônicas do futebol mundial",
+    priceRange: "R$ 800 – R$ 5.000",
+    description: "Uma das figuras mais icônicas do futebol mundial.",
   },
   {
     name: "Cristiano Ronaldo",
     code: "POR-1",
-    color: "Gold",
     rarity: "Lendária",
-    priceRange: "R$ 800 - R$ 5.000",
-    description: "Lenda viva do futebol português",
+    priceRange: "R$ 800 – R$ 5.000",
+    description: "Lenda viva do futebol português.",
   },
   {
     name: "Kylian Mbappé",
     code: "FRA-1",
-    color: "Gold",
     rarity: "Lendária",
-    priceRange: "R$ 800 - R$ 4.000",
-    description: "Jovem promessa e grande estrela francesa",
+    priceRange: "R$ 800 – R$ 4.000",
+    description: "Jovem promessa e grande estrela francesa.",
   },
 ];
 
@@ -52,37 +46,37 @@ const colorVariations = [
     color: "Ouro",
     rarity: "Extremamente Rara",
     frequency: "1 a cada 1.900 pacotes",
-    price: "R$ 300 - R$ 5.000",
-    bgColor: "bg-yellow-50",
-    borderColor: "border-yellow-300",
-    badgeColor: "bg-yellow-100",
+    price: "R$ 300 – R$ 5.000",
+    accent: "bg-[#eab308]",
+    border: "border-[#eab308]/30",
+    bg: "bg-[#eab308]/5",
   },
   {
     color: "Prata",
     rarity: "Muito Rara",
     frequency: "Rara",
-    price: "R$ 180 - R$ 400",
-    bgColor: "bg-gray-50",
-    borderColor: "border-gray-300",
-    badgeColor: "bg-gray-100",
+    price: "R$ 180 – R$ 400",
+    accent: "bg-[#9ca3af]",
+    border: "border-[#9ca3af]/30",
+    bg: "bg-[#9ca3af]/5",
   },
   {
     color: "Bronze",
     rarity: "Rara",
     frequency: "Moderadamente rara",
     price: "R$ 200",
-    bgColor: "bg-orange-50",
-    borderColor: "border-orange-300",
-    badgeColor: "bg-orange-100",
+    accent: "bg-[#d97706]",
+    border: "border-[#d97706]/30",
+    bg: "bg-[#d97706]/5",
   },
   {
     color: "Roxa",
     rarity: "Semi-rara",
     frequency: "Menos rara",
     price: "R$ 150",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-300",
-    badgeColor: "bg-purple-100",
+    accent: "bg-[#7c3aed]",
+    border: "border-[#7c3aed]/30",
+    bg: "bg-[#7c3aed]/5",
   },
 ];
 
@@ -90,103 +84,108 @@ export function RareFigurinesSection() {
   return (
     <section
       id="figurinhas-raras"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-white"
+      className="py-24 px-4 sm:px-6 lg:px-8 bg-[#faf8f4]"
     >
-      <div className="mx-auto max-w-7xl">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-20">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#12121f] mb-4 tracking-tight">
             Figurinhas Raras e Mais Valiosas
           </h2>
-          <p className="text-xl text-gray-600">
-            Conheça as figurinhas mais procuradas e seus valores no mercado
+          <p className="text-lg text-[#535364] max-w-xl">
+            Conheça as figurinhas mais procuradas e seus valores no mercado.
           </p>
         </div>
 
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">
-            Categoria Legend - Os 20 Jogadores Especiais
+        {/* Legend players — horizontal scroll on mobile, 2-col on desktop */}
+        <div className="mb-20">
+          <h3 className="text-xl font-bold text-[#12121f] mb-8">
+            Categoria Legend — Os 20 Jogadores Especiais
           </h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 gap-4">
             {rareFigurines.map((fig) => (
-              <Card key={fig.name} className="border-0 shadow-lg overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 pb-3">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <CardTitle className="text-lg">{fig.name}</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Código: <span className="font-semibold">{fig.code}</span>
-                      </p>
-                    </div>
-                    <Badge className="bg-red-500 hover:bg-red-600">
-                      {fig.rarity}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <p className="text-gray-700 mb-4">{fig.description}</p>
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600">Faixa de Preço</p>
-                    <p className="text-lg font-bold text-green-600">
-                      {fig.priceRange}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">
-            Variações de Cores e Valores
-          </h3>
-          <p className="text-gray-600 mb-8">
-            As figurinhas Legend também vêm em diferentes cores, cada uma com seu nível de raridade e preço:
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {colorVariations.map((variation) => (
               <div
-                key={variation.color}
-                className={`${variation.bgColor} border-2 ${variation.borderColor} rounded-lg p-6`}
+                key={fig.name}
+                className="flex gap-4 p-5 bg-[#f0ebe0]/60"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xl font-bold text-gray-900">
-                    {variation.color}
-                  </h4>
-                  <Badge className={variation.badgeColor}>
-                    {variation.rarity}
-                  </Badge>
+                <div className="w-10 h-10 shrink-0 rounded-full bg-[#dc2626]/10 flex items-center justify-center">
+                  <Star className="h-5 w-5 text-[#dc2626]" />
                 </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-600">Frequência</p>
-                    <p className="font-semibold text-gray-900">
-                      {variation.frequency}
-                    </p>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-bold text-[#12121f] text-sm">
+                      {fig.name}
+                    </h4>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 bg-[#dc2626]/10 text-[#dc2626]">
+                      {fig.rarity}
+                    </span>
                   </div>
-                  <div className="border-t pt-3">
-                    <p className="text-sm text-gray-600">Preço Médio</p>
-                    <p className="text-lg font-bold text-green-600">
-                      {variation.price}
-                    </p>
-                  </div>
+                  <p className="text-xs text-[#535364] mb-1 font-mono">
+                    {fig.code}
+                  </p>
+                  <p className="text-xs text-[#535364] mb-2">
+                    {fig.description}
+                  </p>
+                  <p className="text-sm font-bold text-[#1b7a3d]">
+                    {fig.priceRange}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-16 bg-blue-50 border-2 border-blue-200 rounded-lg p-8">
-          <h4 className="text-lg font-bold text-blue-900 mb-4">
-            💎 Dica de Colecionador
-          </h4>
-          <p className="text-blue-800">
-            A versão dourada da figurinha Legend é a mais rara, aparecendo em apenas 1 a cada 1.900
-            pacotes! Por isso, colecionadores pagam até R$ 5.000 por uma única figurinha. Se
-            conseguir uma, você tem uma verdadeira joia em mãos.
+        {/* Color variations */}
+        <div>
+          <h3 className="text-xl font-bold text-[#12121f] mb-3">
+            Variações de Cores e Valores
+          </h3>
+          <p className="text-[#535364] text-sm mb-10 max-w-lg">
+            As figurinhas Legend também vêm em diferentes cores, cada uma com seu
+            nível de raridade e preço.
           </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {colorVariations.map((v) => (
+              <div
+                key={v.color}
+                className={`border ${v.border} ${v.bg} p-5`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full ${v.accent} mb-3`}
+                />
+                <h4 className="font-bold text-[#12121f] text-sm mb-1">
+                  {v.color}
+                </h4>
+                <p className="text-xs text-[#535364] mb-3">{v.rarity}</p>
+                <div className="text-xs text-[#535364] mb-1">Frequência</div>
+                <p className="text-xs font-semibold text-[#12121f] mb-3">
+                  {v.frequency}
+                </p>
+                <div className="text-xs text-[#535364] mb-1">Preço Médio</div>
+                <p className="text-sm font-bold text-[#1b7a3d]">
+                  {v.price}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Collector tip — inline, no box */}
+        <div className="mt-16 border-t border-[#d1cbb8] pt-10">
+          <div className="flex gap-3">
+            <Gem className="h-5 w-5 text-[#eab308] shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-bold text-[#12121f] text-sm mb-2">
+                Dica de Colecionador
+              </h4>
+              <p className="text-sm text-[#535364] leading-relaxed max-w-2xl">
+                A versão dourada da figurinha Legend é a mais rara, aparecendo em
+                apenas 1 a cada 1.900 pacotes. Colecionadores pagam até R$ 5.000
+                por uma única figurinha. Se conseguir uma, você tem uma joia em
+                mãos.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

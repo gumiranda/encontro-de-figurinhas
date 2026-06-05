@@ -8,14 +8,12 @@ import {
   TrendingUp,
   Zap,
   Trophy,
-  DollarSign,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
@@ -191,7 +189,7 @@ export default function GuidePage() {
               Guia Completo de Figurinhas da Copa do Mundo 2026
             </h1>
 
-            <p className="mb-8 text-xl text-slate-600">
+            <p className="mb-8 text-xl text-slate-700">
               Tudo que você precisa saber para colecionar, trocar e completar
               seu álbum Panini de forma inteligente. Dicas de colecionadores
               experientes para economizar e encontrar as figurinhas mais raras.
@@ -213,53 +211,38 @@ export default function GuidePage() {
 
         {/* Content Sections */}
         <section className="px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl space-y-12">
+          <div className="mx-auto max-w-3xl space-y-16">
             {/* Section 1: O Álbum 2026 */}
             <div>
               <h2 className="mb-4 text-3xl font-bold text-slate-900">
                 O Álbum da Copa 2026: Números e Fatos
               </h2>
-              <p className="mb-4 text-lg text-slate-600">
+              <p className="mb-4 text-lg text-slate-700">
                 O álbum da Copa do Mundo 2026 é um recorde. Pela primeira vez,
                 o torneio expande para 48 seleções (em vez de 32), e isso
                 reflete diretamente no número de figurinhas.
               </p>
 
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Números do Álbum 2026</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between border-b pb-3">
-                    <span className="font-semibold">Total de figurinhas:</span>
-                    <span>980</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-3">
-                    <span className="font-semibold">
-                      Figurinhas especiais metalizado:
-                    </span>
-                    <span>68</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-3">
-                    <span className="font-semibold">Figurinhas por envelope:</span>
-                    <span>7</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-3">
-                    <span className="font-semibold">Preço do envelope:</span>
-                    <span>R$ 7,00</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-3">
-                    <span className="font-semibold">Preço do álbum vazio:</span>
-                    <span>A partir de R$ 24,90</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Seleções participantes:</span>
-                    <span>48</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="rounded-lg border bg-white p-6 mb-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Números do Álbum 2026</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: "Total de figurinhas", value: "980" },
+                    { label: "Figurinhas especiais metalizado", value: "68" },
+                    { label: "Figurinhas por envelope", value: "7" },
+                    { label: "Preço do envelope", value: "R$ 7,00" },
+                    { label: "Preço do álbum vazio", value: "A partir de R$ 24,90" },
+                    { label: "Seleções participantes", value: "48" },
+                  ].map((row) => (
+                    <div key={row.label} className="flex justify-between items-center border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                      <span className="font-medium text-slate-700">{row.label}</span>
+                      <span className="font-semibold tabular-nums text-slate-900">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              <p className="text-slate-600">
+              <p className="text-slate-700">
                 O álbum está disponível em diferentes versões: capa mole (padrão),
                 capa dura, e edições especiais metalizado. Escolha a que mais
                 combina com seu estilo de colecionar.
@@ -271,76 +254,32 @@ export default function GuidePage() {
               <h2 className="mb-4 text-3xl font-bold text-slate-900">
                 Onde Comprar Figurinhas da Copa 2026
               </h2>
-              <p className="mb-6 text-lg text-slate-600">
+              <p className="mb-6 text-lg text-slate-700">
                 Existem várias opções para adquirir figurinhas, e cada uma tem
                 suas vantagens. Escolha de acordo com suas preferências e
                 orçamento.
               </p>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
-                      Bancas e Lojas Físicas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600">
-                      Compre envelopes individuais ou kits em bancas de jornal,
-                      lojas de conveniência e livrarias. Vantagem: você vê o
-                      que está comprando na hora.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Zap className="h-5 w-5" />
-                      Lojas Online
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600">
-                      Amazon, Mercado Livre e sites especializados vendem kits
-                      e álbuns. Procure por ofertas e pacotes lacrados para
-                      garantir autenticidade.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Pontos de Troca
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600">
-                      Use a rede de pontos de troca para pegar figurinhas sem
-                      gastar dinheiro. Leve suas duplicatas e negocie as que
-                      faltam.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Apps e Plataformas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600">
-                      Plataformas digitais conectam colecionadores para trocas
-                      inteligentes. Registre suas figurinhas e negocie de forma
-                      eficiente.
-                    </p>
-                  </CardContent>
-                </Card>
+              <div className="grid gap-3 md:grid-cols-2">
+                {[
+                  { icon: MapPin, title: "Bancas e Lojas Físicas", desc: "Compre envelopes individuais ou kits em bancas de jornal, lojas de conveniência e livrarias. Vantagem: você vê o que está comprando na hora." },
+                  { icon: Zap, title: "Lojas Online", desc: "Amazon, Mercado Livre e sites especializados vendem kits e álbuns. Procure por ofertas e pacotes lacrados para garantir autenticidade." },
+                  { icon: Users, title: "Pontos de Troca", desc: "Use a rede de pontos de troca para pegar figurinhas sem gastar dinheiro. Leve suas duplicatas e negocie as que faltam." },
+                  { icon: TrendingUp, title: "Apps e Plataformas", desc: "Plataformas digitais conectam colecionadores para trocas inteligentes. Registre suas figurinhas e negocie de forma eficiente." },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="rounded-lg border bg-white p-5">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-blue-50 text-blue-600">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <h3 className="font-semibold text-slate-900">{item.title}</h3>
+                      </div>
+                      <p className="text-sm text-slate-700 ml-12">{item.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -349,88 +288,31 @@ export default function GuidePage() {
               <h2 className="mb-4 text-3xl font-bold text-slate-900">
                 Estratégia de Trocas: Como Não Gastar Muito
               </h2>
-              <p className="mb-6 text-lg text-slate-600">
+              <p className="mb-6 text-lg text-slate-700">
                 A melhor forma de completar um álbum é trocar figurinhas
                 duplicadas. Com a estratégia certa, você reduz custos em até
                 70%.
               </p>
 
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      1. Registre Tudo que Você Tem
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600">
-                      Use um aplicativo ou plataforma para registrar todas as
-                      figurinhas que você já tem, inclusive as duplicadas.
-                      Assim você sabe exatamente o que falta.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      2. Troque Antes de Comprar Mais
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600">
-                      Sempre que possível, troque suas duplicatas pelas
-                      figurinhas que faltam. Isso economiza muito dinheiro a
-                      longo prazo.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      3. Encontre Seus Pontos de Troca Locais
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600">
-                      Identifique onde ficam os pontos de troca mais pertos de
-                      você. Visite regularmente para encontrar colecionadores
-                      com figurinhas diferentes.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      4. Negocie com Inteligência
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600">
-                      Figurinhas raras valem mais. Se você tem raras duplicadas,
-                      use-as para negociar múltiplas figurinhas comuns que
-                      faltam.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      5. Compre em Grupos
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600">
-                      Grupos de colecionadores online conseguem melhores preços.
-                      Compartilhe custos de kits lacrados e divida entre
-                      membros.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+              <div className="space-y-3">
+                {[
+                  { title: "1. Registre Tudo que Você Tem", desc: "Use um aplicativo ou plataforma para registrar todas as figurinhas que você já tem, inclusive as duplicadas. Assim você sabe exatamente o que falta." },
+                  { title: "2. Troque Antes de Comprar Mais", desc: "Sempre que possível, troque suas duplicatas pelas figurinhas que faltam. Isso economiza muito dinheiro a longo prazo." },
+                  { title: "3. Encontre Seus Pontos de Troca Locais", desc: "Identifique onde ficam os pontos de troca mais perto de você. Visite regularmente para encontrar colecionadores com figurinhas diferentes." },
+                  { title: "4. Negocie com Inteligência", desc: "Figurinhas raras valem mais. Se você tem raras duplicadas, use-as para negociar múltiplas figurinhas comuns que faltam." },
+                  { title: "5. Compre em Grupos", desc: "Grupos de colecionadores online conseguem melhores preços. Compartilhe custos de kits lacrados e divida entre membros." },
+                ].map((item, i) => (
+                  <div key={i} className={`flex gap-4 p-4 rounded-lg ${i % 2 === 0 ? "bg-slate-50" : "bg-white border"}`}>
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-600 text-white text-sm font-semibold flex-shrink-0">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900 text-sm">{item.title}</h3>
+                      <p className="text-slate-700 text-sm mt-1">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+            </div>
             </div>
 
             {/* Section 4: Figurinhas Raras */}
@@ -438,7 +320,7 @@ export default function GuidePage() {
               <h2 className="mb-4 text-3xl font-bold text-slate-900">
                 Identificando Figurinhas Raras da Copa 2026
               </h2>
-              <p className="mb-6 text-lg text-slate-600">
+              <p className="mb-6 text-lg text-slate-700">
                 Nem todas as figurinhas são iguais. Algumas aparecem com bem
                 menos frequência e são mais valiosas para trocas.
               </p>
@@ -469,7 +351,7 @@ export default function GuidePage() {
                   </ul>
                 </div>
 
-                <p className="text-slate-600">
+                <p className="text-slate-700">
                   Use o aplicativo Panini oficial para ver estatísticas de
                   quantos colecionadores têm cada figurinha. As que aparecem
                   menos frequentemente são as raras.
@@ -482,7 +364,7 @@ export default function GuidePage() {
               <h2 className="mb-4 text-3xl font-bold text-slate-900">
                 Dicas Finais para Completar Seu Álbum
               </h2>
-              <p className="mb-6 text-lg text-slate-600">
+              <p className="mb-6 text-lg text-slate-700">
                 Aqui estão os conselhos que colecionadores experientes
                 compartilham:
               </p>
@@ -586,7 +468,7 @@ export default function GuidePage() {
                       <CardTitle className="text-lg">{faq.question}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-600">{faq.answer}</p>
+                      <p className="text-slate-700">{faq.answer}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -607,7 +489,7 @@ export default function GuidePage() {
                     <h3 className="font-semibold group-hover:text-blue-600">
                       Álbum da Copa do Mundo 2026
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-700">
                       Tudo sobre preços, quantidade de figurinhas e novidades
                     </p>
                   </div>
@@ -622,7 +504,7 @@ export default function GuidePage() {
                     <h3 className="font-semibold group-hover:text-blue-600">
                       Quanto Custa Completar o Álbum?
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-700">
                       Cálculo realista com e sem trocas
                     </p>
                   </div>
@@ -637,7 +519,7 @@ export default function GuidePage() {
                     <h3 className="font-semibold group-hover:text-blue-600">
                       Análise de Peso e Batch
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-700">
                       Técnicas para identificar pacotes com figurinhas raras
                     </p>
                   </div>

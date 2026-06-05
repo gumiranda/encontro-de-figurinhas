@@ -13,7 +13,6 @@ import { Badge } from "@workspace/ui/components/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
@@ -159,7 +158,7 @@ export default function AlbumCopa2026Page() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-slate-900">
               Álbum Copa do Mundo 2026: Guia Completo e Informativo
             </h1>
-            <p className="text-xl md:text-2xl text-slate-700 mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-slate-800 mb-8 leading-relaxed">
               Descubra tudo sobre o maior álbum de figurinhas de Copa do Mundo
               da história: 980 figurinhas especiais, histórico da coleção e como
               começar sua jornada de colecionador.
@@ -183,48 +182,47 @@ export default function AlbumCopa2026Page() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-              <Card className="border-0 bg-white/80 backdrop-blur">
-                <CardContent className="pt-6">
-                  <p className="text-3xl font-bold text-blue-600">980</p>
-                  <p className="text-sm text-slate-600 mt-2">
-                    Figurinhas Totais
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 bg-white/80 backdrop-blur">
-                <CardContent className="pt-6">
-                  <p className="text-3xl font-bold text-blue-600">68</p>
-                  <p className="text-sm text-slate-600 mt-2">
-                    Figurinhas Especiais
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 bg-white/80 backdrop-blur">
-                <CardContent className="pt-6">
-                  <p className="text-3xl font-bold text-blue-600">32</p>
-                  <p className="text-sm text-slate-600 mt-2">Seleções</p>
-                </CardContent>
-              </Card>
-              <Card className="border-0 bg-white/80 backdrop-blur">
-                <CardContent className="pt-6">
-                  <p className="text-3xl font-bold text-blue-600">44%</p>
-                  <p className="text-sm text-slate-600 mt-2">Maior que 2018</p>
-                </CardContent>
-              </Card>
+            <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3 mb-12">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold tabular-nums tracking-tight text-blue-600">980</span>
+                <span className="text-sm font-medium text-slate-800">
+                  figurinhas totais
+                </span>
+              </div>
+              <span className="hidden sm:inline text-slate-300 select-none">|</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tabular-nums tracking-tight text-blue-600">68</span>
+                <span className="text-sm font-medium text-slate-800">
+                  especiais
+                </span>
+              </div>
+              <span className="hidden sm:inline text-slate-300 select-none">|</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tabular-nums tracking-tight text-blue-600">32</span>
+                <span className="text-sm font-medium text-slate-800">
+                  seleções
+                </span>
+              </div>
+              <span className="hidden sm:inline text-slate-300 select-none">|</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold tabular-nums tracking-tight text-blue-600">44%</span>
+                <span className="text-sm font-medium text-slate-800">
+                  maior que 2018
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Content Sections */}
         <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto space-y-12">
+          <div className="max-w-4xl mx-auto space-y-16 md:space-y-20">
             {/* Section 1: O que é o álbum */}
             <section>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
                 O que é o Álbum da Copa do Mundo 2026?
               </h2>
-              <p className="text-lg text-slate-700 mb-4 leading-relaxed">
+              <p className="text-lg text-slate-800 mb-4 leading-relaxed">
                 O álbum da Copa do Mundo 2026 é a coleção oficial de figurinhas
                 lançada pela Panini para a competição que será realizada nos
                 Estados Unidos, México e Canadá. É um projeto grandioso que
@@ -232,7 +230,7 @@ export default function AlbumCopa2026Page() {
                 figurinhas, o maior número jamais produzido em uma coleção de
                 Copa do Mundo.
               </p>
-              <p className="text-lg text-slate-700 mb-4 leading-relaxed">
+              <p className="text-lg text-slate-800 mb-4 leading-relaxed">
                 Este álbum é uma celebração da paixão global pelo futebol e
                 pela Copa do Mundo. Cada figurinha representa jogadores,
                 técnicos, estádios e momentos especiais do torneio. A coleção
@@ -253,7 +251,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-slate-900 text-lg">
                       Total de Figurinhas
                     </h3>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       980 figurinhas únicas no total, incluindo 68 figurinhas
                       especiais douradas e holográficas.
                     </p>
@@ -265,7 +263,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-slate-900 text-lg">
                       Figurinhas Especiais
                     </h3>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       68 figurinhas especiais incluindo: capitães dourados,
                       holográficas, em foil e edições limitadas de acrílico.
                     </p>
@@ -277,7 +275,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-slate-900 text-lg">
                       Cobertura de Seleções
                     </h3>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       Todas as 32 seleções participantes com aproximadamente
                       30 figurinhas cada (jogadores, técnicos e figurinhas
                       especiais).
@@ -290,7 +288,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-slate-900 text-lg">
                       Pacotinhos
                     </h3>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       Cada pacote contém 7 figurinhas. Preço sugerido: R$ 7,00
                       por pacotinho.
                     </p>
@@ -304,12 +302,12 @@ export default function AlbumCopa2026Page() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
                 Evolução dos Álbuns de Copa do Mundo
               </h2>
-              <p className="text-lg text-slate-700 mb-6 leading-relaxed">
+              <p className="text-lg text-slate-800 mb-6 leading-relaxed">
                 Os álbuns de figurinhas da Copa do Mundo evoluíram
                 significativamente ao longo das décadas. Veja como cresceram:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-l-4 border-l-blue-600">
+                <Card>
                   <CardHeader>
                     <CardTitle className="text-xl">Copa 2018</CardTitle>
                   </CardHeader>
@@ -317,12 +315,12 @@ export default function AlbumCopa2026Page() {
                     <p className="text-2xl font-bold text-blue-600 mb-2">
                       681 figurinhas
                     </p>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       Primeira grande expansão moderna dos álbuns de Copa.
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-blue-600">
+                <Card>
                   <CardHeader>
                     <CardTitle className="text-xl">Copa 2022</CardTitle>
                   </CardHeader>
@@ -330,27 +328,26 @@ export default function AlbumCopa2026Page() {
                     <p className="text-2xl font-bold text-blue-600 mb-2">
                       670 figurinhas
                     </p>
-                    <p className="text-slate-700">
+                    <p className="text-slate-800">
                       Manteve o tamanho anterior com novas figurinhas especiais.
                     </p>
                   </CardContent>
                 </Card>
               </div>
-              <Card className="border-2 border-blue-600 mt-4 bg-blue-50">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Copa 2026 - Recorde</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-blue-600 mb-2">
-                    980 figurinhas
-                  </p>
-                  <p className="text-slate-700">
-                    Aumento de 44% em relação a 2018. Maior álbum de Copa do
-                    Mundo de todos os tempos, refletindo a importância
-                    histórica do torneio realizado em três países.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="mt-4 rounded-lg bg-blue-600 p-8 text-white">
+                <div className="flex items-baseline gap-3 mb-3">
+                  <h3 className="text-2xl font-bold">Copa 2026</h3>
+                  <span className="text-blue-200 text-sm font-medium">Recorde</span>
+                </div>
+                <p className="text-4xl font-bold mb-3">
+                  980 figurinhas
+                </p>
+                <p className="text-blue-100">
+                  Aumento de 44% em relação a 2018. Maior álbum de Copa do
+                  Mundo de todos os tempos, refletindo a importância
+                  histórica do torneio realizado em três países.
+                </p>
+              </div>
             </section>
 
             {/* Section 4: Tipos de Figurinhas */}
@@ -358,61 +355,23 @@ export default function AlbumCopa2026Page() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
                 Tipos de Figurinhas no Álbum 2026
               </h2>
-              <div className="space-y-4">
-                <Card className="border-0 bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <span className="text-2xl">👥</span> Figurinhas Comuns
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-700">
-                      Jogadores regulares de cada seleção. A maioria do álbum
-                      consiste nestas figurinhas, que são as mais comuns nos
-                      pacotinhos.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-0 bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <span className="text-2xl">⭐</span> Figurinhas Especiais
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-700">
-                      68 figurinhas raras incluindo capitães dourados,
-                      holográficas e em foil. Estas figurinhas são muito mais
-                      difíceis de encontrar.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-0 bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <span className="text-2xl">🏆</span> Figurinhas de Estádios
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-700">
-                      Representam os estádios onde os jogos serão realizados nos
-                      EUA, México e Canadá.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-0 bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <span className="text-2xl">🎖️</span> Figurinhas Temáticas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-700">
-                      Figurinhas especiais dos temas da Copa, momentos históricos
-                      e referências culturais dos países anfitriões.
-                    </p>
-                  </CardContent>
-                </Card>
+              <div className="space-y-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5 rounded-lg overflow-hidden bg-slate-200">
+                  {[
+                    { emoji: "👥", title: "Figurinhas Comuns", desc: "Jogadores regulares de cada seleção. A maioria do álbum consiste nestas figurinhas, que são as mais comuns nos pacotinhos." },
+                    { emoji: "⭐", title: "Figurinhas Especiais", desc: "68 figurinhas raras incluindo capitães dourados, holográficas e em foil. Estas figurinhas são muito mais difíceis de encontrar." },
+                    { emoji: "🏆", title: "Figurinhas de Estádios", desc: "Representam os estádios onde os jogos serão realizados nos EUA, México e Canadá." },
+                    { emoji: "🎖️", title: "Figurinhas Temáticas", desc: "Figurinhas especiais dos temas da Copa, momentos históricos e referências culturais dos países anfitriões." },
+                  ].map((item) => (
+                    <div key={item.title} className="bg-white p-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">{item.emoji}</span>
+                        <h3 className="font-semibold text-slate-900">{item.title}</h3>
+                      </div>
+                      <p className="text-slate-800">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 
@@ -430,7 +389,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-lg text-slate-900">
                       Escolha a Edição do Álbum
                     </h3>
-                    <p className="text-slate-700 mt-2">
+                    <p className="text-slate-800 mt-2">
                       Brochura (R$ 24,90), Capa Dura (R$ 49,90), Edição Prata
                       (R$ 69,90) ou Edição Ouro (R$ 79,90). Todas têm o mesmo
                       conteúdo de figurinhas.
@@ -445,7 +404,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-lg text-slate-900">
                       Comece a Colecionar Pacotinhos
                     </h3>
-                    <p className="text-slate-700 mt-2">
+                    <p className="text-slate-800 mt-2">
                       Compre pacotinhos em bancas, farmácias, supermercados e
                       lojas de brinquedos. Preço: R$ 7,00 por pacote com 7
                       figurinhas.
@@ -460,7 +419,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-lg text-slate-900">
                       Registre suas Figurinhas
                     </h3>
-                    <p className="text-slate-700 mt-2">
+                    <p className="text-slate-800 mt-2">
                       Use plataformas como Figurinha Fácil para registrar quais
                       figurinhas você tem e quais faltam. Identifique fácil
                       porque usamos o código (ex: BRA-10, MEX-9).
@@ -475,7 +434,7 @@ export default function AlbumCopa2026Page() {
                     <h3 className="font-bold text-lg text-slate-900">
                       Troque com Outros Colecionadores
                     </h3>
-                    <p className="text-slate-700 mt-2">
+                    <p className="text-slate-800 mt-2">
                       Encontre matches automáticos com outras pessoas na sua
                       cidade e troque figurinhas repetidas. Isso economiza muito
                       dinheiro na hora de completar o álbum.
@@ -496,55 +455,21 @@ export default function AlbumCopa2026Page() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
                 Dicas para Colecionadores
               </h2>
-              <ul className="space-y-4">
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Organize por Seleção:</strong> Mantenha as
-                    figurinhas organizadas por país para facilitar o acompanhamento
-                    do progresso.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Guarde as Repetidas:</strong> Não descarte as
-                    figurinhas repetidas! Elas são ouro para trocas com outros
-                    colecionadores.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Use Plataformas de Troca:</strong> Plataformas como
-                    Figurinha Fácil te conectam com colecionadores perto de você,
-                    economizando até 60% comparado a comprar tudo.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Procure por Grupos Locais:</strong> Comunidades online
-                    e offline de colecionadores são ótimas para encontrar figurinhas
-                    específicas.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Acompanhe Promoções:</strong> Lojas frequentemente
-                    oferecem promoções em pacotinhos. Fique atento para economizar.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-blue-600 font-bold text-lg">✓</span>
-                  <p className="text-slate-700">
-                    <strong>Coleção de Longa Durabilidade:</strong> Guarde o álbum
-                    em local seco e longe da luz solar direta para preservar a
-                    qualidade das figurinhas.
-                  </p>
-                </li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { text: <><strong>Organize por Seleção:</strong> Mantenha as figurinhas organizadas por país para facilitar o acompanhamento do progresso.</> },
+                  { text: <><strong>Guarde as Repetidas:</strong> Não descarte as figurinhas repetidas! Elas são ouro para trocas com outros colecionadores.</> },
+                  { text: <><strong>Use Plataformas de Troca:</strong> Plataformas como Figurinha Fácil te conectam com colecionadores perto de você, economizando até 60% comparado a comprar tudo.</> },
+                  { text: <><strong>Procure por Grupos Locais:</strong> Comunidades online e offline de colecionadores são ótimas para encontrar figurinhas específicas.</> },
+                  { text: <><strong>Acompanhe Promoções:</strong> Lojas frequentemente oferecem promoções em pacotinhos. Fique atento para economizar.</> },
+                  { text: <><strong>Coleção de Longa Durabilidade:</strong> Guarde o álbum em local seco e longe da luz solar direta para preservar a qualidade das figurinhas.</> },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-3 p-3 rounded-md bg-slate-50">
+                    <span className="text-blue-600 font-bold text-lg flex-shrink-0 mt-px">✓</span>
+                    <p className="text-slate-800">{item.text}</p>
+                  </div>
+                ))}
+              </div>
             </section>
 
             {/* FAQs */}
@@ -559,7 +484,7 @@ export default function AlbumCopa2026Page() {
                       <CardTitle className="text-lg">{faq.question}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-700">{faq.answer}</p>
+                      <p className="text-slate-800">{faq.answer}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -603,20 +528,20 @@ export default function AlbumCopa2026Page() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">
                 Conclusão
               </h2>
-              <p className="text-lg text-slate-700 mb-4 leading-relaxed">
+              <p className="text-lg text-slate-800 mb-4 leading-relaxed">
                 O álbum da Copa do Mundo 2026 é um projeto histórico que marca
                 um novo recorde em tamanho e abrangência. Com 980 figurinhas
                 distribuídas entre 32 seleções, oferece uma experiência completa
                 para colecionadores de todas as idades.
               </p>
-              <p className="text-lg text-slate-700 mb-4 leading-relaxed">
+              <p className="text-lg text-slate-800 mb-4 leading-relaxed">
                 Começar sua coleção é simples: escolha uma edição do álbum,
                 comece a comprar pacotinhos e registre suas figurinhas em
                 plataformas de troca. A melhor parte? Você pode economizar
                 significativamente trocando figurinhas com outros colecionadores
                 na sua cidade.
               </p>
-              <p className="text-lg text-slate-700 leading-relaxed">
+              <p className="text-lg text-slate-800 leading-relaxed">
                 Seja você um colecionador veterano ou alguém descobrindo o
                 mundo das figurinhas agora, o álbum de 2026 oferece uma jornada
                 única de coleção. Comece hoje e junte-se à comunidade global de

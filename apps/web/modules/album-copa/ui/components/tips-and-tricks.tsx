@@ -1,109 +1,125 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { AlertCircle, DollarSign, Lightbulb, Target } from "lucide-react";
+import { DollarSign, Target, Lightbulb, AlertCircle } from "lucide-react";
 
 export function TipsAndTricksSection() {
   const tips = [
     {
       icon: DollarSign,
+      iconColor: "text-[#1b7a3d]",
       title: "Economize ao Máximo",
       tips: [
-        "Espere promoções relâmpago após a febre inicial",
-        "Compre caixas fechadas com desconto em distribuidoras",
-        "Procure lojas de bairro com preços mais baixos",
-        "Aproveite programas de cashback em compras online",
+        "Espere promoções relâmpago após a febre inicial.",
+        "Compre caixas fechadas com desconto em distribuidoras.",
+        "Procure lojas de bairro com preços mais baixos.",
+        "Aproveite programas de cashback em compras online.",
       ],
     },
     {
       icon: Target,
+      iconColor: "text-[#dc2626]",
       title: "Estratégia de Coleta",
       tips: [
-        "Comece com 5-10 pacotinhos para preencher o básico",
-        "Mapeie as figurinhas que mais caem com frequência",
-        "Mantenha suas repetidas para trocar",
-        "Organize listas com figurinhas que faltam",
+        "Comece com 5-10 pacotinhos para preencher o básico.",
+        "Mapeie as figurinhas que mais caem com frequência.",
+        "Mantenha suas repetidas para trocar.",
+        "Organize listas com figurinhas que faltam.",
       ],
     },
     {
       icon: Lightbulb,
+      iconColor: "text-[#eab308]",
       title: "Trocas Inteligentes",
       tips: [
-        "Faça trocas em praças nos fins de semana",
-        "Use grupos de redes sociais especializados",
-        "Procure colecionadores com figurinhas diferentes das suas",
-        "Estabeleça relações de longo prazo para trocas recorrentes",
+        "Faça trocas em praças nos fins de semana.",
+        "Use grupos de redes sociais especializados.",
+        "Procure colecionadores com interesses complementares.",
+        "Estabeleça relações de longo prazo para trocas recorrentes.",
       ],
     },
     {
       icon: AlertCircle,
+      iconColor: "text-[#7c3aed]",
       title: "Evite Erros Comuns",
       tips: [
-        "Não jogue fora as figurinhas repetidas",
-        "Não compre tudo no impulso na primeira semana",
-        "Não ignore o potencial das trocas escolares",
-        "Não pague acima da tabela por figurinhas comuns",
+        "Não jogue fora as figurinhas repetidas.",
+        "Não compre tudo no impulso na primeira semana.",
+        "Não ignore o potencial das trocas escolares.",
+        "Não pague acima da tabela por figurinhas comuns.",
       ],
     },
   ];
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="mx-auto max-w-7xl">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#f0ebe0]">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-20">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#12121f] mb-4 tracking-tight">
             Dicas e Truques para Colecionar
           </h2>
-          <p className="text-xl text-gray-600">
-            Estratégias de especialistas para completar seu álbum com economia
+          <p className="text-lg text-[#535364] max-w-xl">
+            Estratégias de especialistas para completar seu álbum com economia.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* Alternating layout: 2x2 grid but varying card heights naturally */}
+        <div className="grid md:grid-cols-2 gap-px bg-[#d1cbb8] mb-16">
           {tips.map((section, idx) => {
             const Icon = section.icon;
             return (
-              <Card key={idx} className="border-0 shadow-lg h-full">
-                <CardHeader>
-                  <Icon className="h-8 w-8 text-blue-600 mb-3" />
-                  <CardTitle className="text-xl">{section.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {section.tips.map((tip, tipIdx) => (
-                      <li key={tipIdx} className="flex items-start">
-                        <span className="inline-block h-2 w-2 rounded-full bg-blue-600 mr-3 mt-2 flex-shrink-0" />
-                        <span className="text-gray-700">{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <div
+                key={idx}
+                className="p-6 sm:p-8 bg-[#faf8f4]"
+              >
+                <Icon className={`h-6 w-6 ${section.iconColor} mb-4`} />
+                <h3 className="text-lg font-bold text-[#12121f] mb-4">
+                  {section.title}
+                </h3>
+                <ul className="space-y-2.5">
+                  {section.tips.map((tip, tipIdx) => (
+                    <li
+                      key={tipIdx}
+                      className="text-sm text-[#535364] leading-relaxed pl-4 border-l-2 border-[#d1cbb8]"
+                    >
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             );
           })}
         </div>
 
-        <div className="mt-12 bg-green-50 border-2 border-green-200 rounded-lg p-8">
-          <h3 className="text-lg font-bold text-green-900 mb-4">
-            ✅ Plano de Ação Recomendado
+        {/* Action plan — stepped timeline instead of colored boxes */}
+        <div>
+          <h3 className="text-lg font-bold text-[#12121f] mb-8">
+            Plano de Ação Recomendado
           </h3>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <p className="font-bold text-green-900 mb-2">Semana 1-2</p>
-              <p className="text-sm text-green-800">
-                Compre 5-10 pacotinhos, monte sua coleção inicial e mapeie seus números
+              <div className="text-sm font-bold text-[#dc2626] mb-2">
+                Semana 1-2
+              </div>
+              <p className="text-sm text-[#535364] leading-relaxed">
+                Compre 5-10 pacotinhos, monte sua coleção inicial e mapeie seus
+                números.
               </p>
             </div>
             <div>
-              <p className="font-bold text-green-900 mb-2">Semana 3+</p>
-              <p className="text-sm text-green-800">
-                Comece trocas com amigos, escolas e grupos online. Guarde todas as repetidas
+              <div className="text-sm font-bold text-[#1b7a3d] mb-2">
+                Semana 3+
+              </div>
+              <p className="text-sm text-[#535364] leading-relaxed">
+                Comece trocas com amigos, escolas e grupos online. Guarde todas
+                as repetidas.
               </p>
             </div>
             <div>
-              <p className="font-bold text-green-900 mb-2">Final</p>
-              <p className="text-sm text-green-800">
-                Use seus conhecimentos para encontrar figurinhas raras com economia
+              <div className="text-sm font-bold text-[#7c3aed] mb-2">
+                Reta Final
+              </div>
+              <p className="text-sm text-[#535364] leading-relaxed">
+                Use seus contatos para encontrar figurinhas raras com economia.
               </p>
             </div>
           </div>

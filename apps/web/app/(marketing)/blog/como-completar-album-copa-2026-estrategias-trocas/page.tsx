@@ -14,7 +14,6 @@ import { Badge } from "@workspace/ui/components/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
@@ -208,7 +207,7 @@ export default function ComoCompletarAlbumCopa2026Page() {
               Essenciais
             </h1>
 
-            <p className="mb-8 text-xl text-gray-600">
+            <p className="mb-8 text-xl text-gray-700">
               Descobrir como completar o álbum da Copa do Mundo 2026 sem
               quebrar o banco é a missão de todo colecionador. Com 980
               figurinhas para colecionar, as trocas inteligentes são a chave.
@@ -286,19 +285,19 @@ export default function ComoCompletarAlbumCopa2026Page() {
               {strategies.map((strategy, idx) => {
                 const Icon = strategy.icon;
                 return (
-                  <Card key={idx} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-6 w-6 text-blue-600" />
-                        <CardTitle className="text-lg">
-                          {strategy.title}
-                        </CardTitle>
+                  <div key={idx} className="group rounded-lg border bg-white p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <Icon className="h-5 w-5" />
                       </div>
-                    </CardHeader>
-                    <CardContent className="text-gray-600">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {strategy.title}
+                      </h3>
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed ml-[52px]">
                       {strategy.description}
-                    </CardContent>
-                  </Card>
+                    </p>
+                  </div>
                 );
               })}
             </div>
@@ -313,49 +312,44 @@ export default function ComoCompletarAlbumCopa2026Page() {
             </h2>
 
             <div className="grid gap-6 md:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Cromo26</CardTitle>
-                  <CardDescription>Trocas Inteligentes</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-gray-600">
-                  <p>✓ Cadastro automático de figurinhas</p>
-                  <p>✓ Gerador de QR Codes para trocas</p>
-                  <p>✓ Radar de colecionadores próximos</p>
-                  <p>✓ Sugestões automáticas de combos</p>
-                  <p className="pt-2 font-medium text-blue-600">Recomendado</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">FIFA Panini Digital</CardTitle>
-                  <CardDescription>Album Online Oficial</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-gray-600">
-                  <p>✓ Oficial da Panini</p>
-                  <p>✓ Trocas ilimitadas grátis</p>
-                  <p>✓ Trocar com pessoas do mundo todo</p>
-                  <p>✓ Suporte oficial 24/7</p>
-                  <p className="pt-2 font-medium text-blue-600">Essencial</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    Encontro de Figurinhas
-                  </CardTitle>
-                  <CardDescription>Mapa de Pontos</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-gray-600">
-                  <p>✓ Localização de pontos de troca</p>
-                  <p>✓ Filtra por tipo e horário</p>
-                  <p>✓ Avaliações de trocadores</p>
-                  <p>✓ Chat com colecionadores</p>
-                  <p className="pt-2 font-medium text-blue-600">Útil</p>
-                </CardContent>
-              </Card>
+              {[
+                {
+                  name: "Cromo26",
+                  subtitle: "Trocas Inteligentes",
+                  features: ["✓ Cadastro automático de figurinhas", "✓ Gerador de QR Codes para trocas", "✓ Radar de colecionadores próximos", "✓ Sugestões automáticas de combos"],
+                  tag: "Recomendado",
+                  featured: true,
+                },
+                {
+                  name: "FIFA Panini Digital",
+                  subtitle: "Álbum Online Oficial",
+                  features: ["✓ Oficial da Panini", "✓ Trocas ilimitadas grátis", "✓ Trocar com pessoas do mundo todo", "✓ Suporte oficial 24/7"],
+                  tag: "Essencial",
+                  featured: false,
+                },
+                {
+                  name: "Encontro de Figurinhas",
+                  subtitle: "Mapa de Pontos",
+                  features: ["✓ Localização de pontos de troca", "✓ Filtra por tipo e horário", "✓ Avaliações de trocadores", "✓ Chat com colecionadores"],
+                  tag: "Útil",
+                  featured: false,
+                },
+              ].map((app) => (
+                <div
+                  key={app.name}
+                  className={app.featured
+                    ? "rounded-lg border-2 border-blue-200 bg-gradient-to-b from-blue-50 to-white p-6"
+                    : "rounded-lg border bg-white p-6"
+                  }
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{app.name}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{app.subtitle}</p>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {app.features.map((f) => <p key={f}>{f}</p>)}
+                  </div>
+                  <p className="mt-4 text-xs font-medium text-blue-600 uppercase tracking-wide">{app.tag}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -367,111 +361,26 @@ export default function ComoCompletarAlbumCopa2026Page() {
               Dicas de Economia para Colecionadores Inteligentes
             </h2>
 
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    1. Organize suas trocas em lotes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Em vez de fazer trocas 1x1, organize lotes (5x5, 10x10).
-                    Isso economiza tempo e torna o processo mais eficiente,
-                    especialmente em encontros presenciais.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    2. Participe de grupos locais
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Grupos no Facebook como "Trocas Copa 2026 [Sua Cidade]"
-                    facilitam encontros com colecionadores próximos. Trocas
-                    presenciais são mais vantajosas que online.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    3. Compre com amigos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Comprando com amigos, vocês conseguem mais diversidade de
-                    figurinhas. Ao dividir os pacotes, ambos ganham repetidas
-                    diferentes para trocar.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    4. Guarde os pacotes chapa
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Algumas figurinhas parecem vir em "chapas" (lotes de
-                    produção). Ao notar padrões, concentre trocas com essas
-                    figurinhas repetidas.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    5. Use o McDonald's a seu favor
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    A promoção do McLanche Feliz com figurinhas de Copa oferece
-                    exclusivos brilhantes por R$5. Vale a pena se você gosta de
-                    comer lá mesmo.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    6. Negocie figurinhas raras
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Figurinhas especiais (68 no total) são mais procuradas.
-                    Ao conseguir uma rara duplicada, guarde para negociar por 2
-                    ou mais figurinhas comuns faltantes.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    7. Combine álbum digital com físico
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-600">
-                  <p>
-                    Use o álbum digital para completar online e mantê-lo como
-                    backup. O álbum físico é mais caro, então as trocas online
-                    ajudam sem gastar.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="space-y-3">
+              {[
+                { title: "1. Organize suas trocas em lotes", desc: "Em vez de fazer trocas 1x1, organize lotes (5x5, 10x10). Isso economiza tempo e torna o processo mais eficiente, especialmente em encontros presenciais." },
+                { title: "2. Participe de grupos locais", desc: "Grupos no Facebook como \"Trocas Copa 2026 [Sua Cidade]\" facilitam encontros com colecionadores próximos. Trocas presenciais são mais vantajosas que online." },
+                { title: "3. Compre com amigos", desc: "Comprando com amigos, vocês conseguem mais diversidade de figurinhas. Ao dividir os pacotes, ambos ganham repetidas diferentes para trocar." },
+                { title: "4. Guarde os pacotes chapa", desc: "Algumas figurinhas parecem vir em \"chapas\" (lotes de produção). Ao notar padrões, concentre trocas com essas figurinhas repetidas." },
+                { title: "5. Use o McDonald's a seu favor", desc: "A promoção do McLanche Feliz com figurinhas de Copa oferece exclusivos brilhantes por R$5. Vale a pena se você gosta de comer lá mesmo." },
+                { title: "6. Negocie figurinhas raras", desc: "Figurinhas especiais (68 no total) são mais procuradas. Ao conseguir uma rara duplicada, guarde para negociar por 2 ou mais figurinhas comuns faltantes." },
+                { title: "7. Combine álbum digital com físico", desc: "Use o álbum digital para completar online e mantê-lo como backup. O álbum físico é mais caro, então as trocas online ajudam sem gastar." },
+              ].map((item, i) => (
+                <div key={i} className={`flex gap-4 p-4 rounded-lg ${i % 2 === 0 ? "bg-gray-50" : "bg-white border"}`}>
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-600 text-white text-sm font-semibold flex-shrink-0">
+                    {i + 1}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">{item.title}</h3>
+                    <p className="text-gray-700 text-sm mt-1">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -484,36 +393,28 @@ export default function ComoCompletarAlbumCopa2026Page() {
             </h2>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <Card className="border-red-200 bg-red-50">
-                <CardHeader>
-                  <CardTitle className="text-lg">Apenas Comprando</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <p>
-                    <strong>980 figurinhas ÷ 7 por pacote = 140 pacotes</strong>
-                  </p>
+              <div className="rounded-lg bg-red-50 border border-red-100 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Apenas Comprando</h3>
+                <div className="space-y-1 text-sm text-gray-700">
+                  <p><strong>980 figurinhas ÷ 7 por pacote = 140 pacotes</strong></p>
                   <p>140 pacotes × R$7,00 = <strong>R$980,00</strong></p>
-                  <p className="pt-4 text-red-700 font-semibold">
-                    ❌ Alto investimento, sem garantia de completar
-                  </p>
-                </CardContent>
-              </Card>
+                </div>
+                <p className="mt-4 text-sm text-red-700 font-semibold">
+                  ❌ Alto investimento, sem garantia de completar
+                </p>
+              </div>
 
-              <Card className="border-green-200 bg-green-50">
-                <CardHeader>
-                  <CardTitle className="text-lg">Com Trocas Estratégicas</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <p>
-                    <strong>Compra + Trocas eficientes</strong>
-                  </p>
+              <div className="rounded-lg bg-green-50 border border-green-100 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Com Trocas Estratégicas</h3>
+                <div className="space-y-1 text-sm text-gray-700">
+                  <p><strong>Compra + Trocas eficientes</strong></p>
                   <p>~30 pacotes comprados = R$210</p>
                   <p>Restante conseguido em trocas</p>
-                  <p className="pt-4 text-green-700 font-semibold">
-                    ✓ Investimento baixo + comunidade engajada
-                  </p>
-                </CardContent>
-              </Card>
+                </div>
+                <p className="mt-4 text-sm text-green-700 font-semibold">
+                  ✓ Investimento baixo + comunidade engajada
+                </p>
+              </div>
             </div>
 
             <p className="mt-8 text-gray-700">
@@ -539,7 +440,7 @@ export default function ComoCompletarAlbumCopa2026Page() {
                       {faq.question}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-gray-600">{faq.answer}</CardContent>
+                  <CardContent className="text-gray-700">{faq.answer}</CardContent>
                 </Card>
               ))}
             </div>
