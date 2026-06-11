@@ -65,10 +65,10 @@ export function RankingClient() {
 
             <div className="text-right">
               <p className="text-lg font-bold text-primary">
-                {entry.winCount} vitórias
+                {entry.totalPoints} pontos
               </p>
               <p className="text-xs text-muted-foreground">
-                {entry.tieCount} empates · {entry.lossCount} derrotas
+                {entry.winCount} vitórias · {entry.tieCount} empates
               </p>
             </div>
           </CardContent>

@@ -718,10 +718,12 @@ export default defineSchema({
     lossCount: v.number(),
     tieCount: v.number(),
     totalMatches: v.number(),
+    totalPoints: v.number(),
     lastUpdated: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_wins", ["winCount"]),
+    .index("by_wins", ["winCount"])
+    .index("by_points", ["totalPoints"]),
 
   aiWeeklyNarratives: defineTable({
     weekNumber: v.number(),

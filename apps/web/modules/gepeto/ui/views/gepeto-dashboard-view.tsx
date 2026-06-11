@@ -370,6 +370,7 @@ function LeaderboardList({
     lossCount: number;
     tieCount: number;
     totalMatches: number;
+    totalPoints: number;
     user: { displayNickname: string } | null;
   }>;
 }) {
@@ -402,10 +403,10 @@ function LeaderboardList({
           </div>
           <div className="text-right">
             <div className="font-display text-xl font-black">
-              {row.winCount}V
+              {row.totalPoints} pontos
             </div>
             <div className="text-xs text-muted-foreground">
-              {row.tieCount}E · {row.lossCount}D
+              {row.winCount}V · {row.tieCount}E
             </div>
           </div>
         </div>
@@ -1792,10 +1793,10 @@ function RankingPhoneScreen({
               </div>
               <div className="text-right">
                 <div className="font-mono text-sm font-black text-[#4ff325]">
-                  {row.winCount}×
+                  {row.totalPoints}
                 </div>
                 <div className="text-[10px] text-[#aeb4ca]">
-                  {row.tieCount}E
+                  pontos
                 </div>
               </div>
             </div>

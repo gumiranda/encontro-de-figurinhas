@@ -302,7 +302,7 @@ async function getPoolSummary(
 async function getLeaderboardRows(ctx: QueryCtx, limit: number) {
   const rows = await ctx.db
     .query("userAiStats")
-    .withIndex("by_wins")
+    .withIndex("by_points")
     .order("desc")
     .take(limit);
   return Promise.all(
@@ -526,7 +526,7 @@ export const getLeaderboard = query({
   handler: async (ctx, { limit = 50 }) => {
     return ctx.db
       .query("userAiStats")
-      .withIndex("by_wins")
+      .withIndex("by_points")
       .order("desc")
       .take(limit);
   },
@@ -1513,6 +1513,7 @@ async function incrementUserAiStats(
   ctx: MutationCtx,
   userId: Id<"users">,
   outcome: AiOutcome,
+  points: number = 0,
 ) {
   const existing = await ctx.db
     .query("userAiStats")
@@ -1524,6 +1525,7 @@ async function incrementUserAiStats(
     const updates: Partial<Doc<"userAiStats">> = {
       lastUpdated: now,
       totalMatches: existing.totalMatches + 1,
+      totalPoints: existing.totalPoints + points,
     };
     if (outcome === "win") updates.winCount = existing.winCount + 1;
     else if (outcome === "loss") updates.lossCount = existing.lossCount + 1;
@@ -1537,6 +1539,7 @@ async function incrementUserAiStats(
       lossCount: outcome === "loss" ? 1 : 0,
       tieCount: outcome === "tie" ? 1 : 0,
       totalMatches: 1,
+      totalPoints: points,
       lastUpdated: now,
     });
   }
@@ -1612,6 +1615,7 @@ export const awardBadgesForMatch = internalMutation({
             : "loss";
         const awardedBadge = outcome === "win";
         const now = Date.now();
+        const points = scorePredictionAgainstMatch(userPred, match, 1);
 
         if (awardedBadge && !existingBadgeUserIds.has(userPred.userId)) {
           await ctx.db.insert("userAiBadges", {
@@ -1630,7 +1634,7 @@ export const awardBadgesForMatch = internalMutation({
           createdAt: now,
         });
         processedUserIds.add(userPred.userId);
-        await incrementUserAiStats(ctx, userPred.userId, outcome);
+        await incrementUserAiStats(ctx, userPred.userId, outcome, points);
         processed++;
       }
 
