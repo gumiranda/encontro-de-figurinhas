@@ -12,7 +12,7 @@ Code repetition: Any duplicated logic that should be refactored?
 
 Function extraction: Any blocks that should be moved to helpers\hooks?
 
-Console logs: Any leftover debug logs?
+Console logs: Any leftover debug logs?v
 
 Project patterns: Is this aligned with existing patterns or introducing new ones unnecessarily?
 Comments: Remove every single comment. 
