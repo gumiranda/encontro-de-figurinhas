@@ -1314,6 +1314,12 @@ export const setAIPredictionAdmin = mutation({
         prediction: args.prediction,
         exactScore: args.exactScore,
       });
+
+      if (match.status === "finished") {
+        await ctx.scheduler.runAfter(0, internal.gepeto.awardBadgesForMatch, {
+          matchId: args.matchId,
+        });
+      }
       return;
     }
 
@@ -1334,6 +1340,12 @@ export const setAIPredictionAdmin = mutation({
       modelVersion: MANUAL_PREDICTION_DEFAULTS.modelVersion,
       generatedAt: Date.now(),
     });
+
+    if (match.status === "finished") {
+      await ctx.scheduler.runAfter(0, internal.gepeto.awardBadgesForMatch, {
+        matchId: args.matchId,
+      });
+    }
   },
 });
 
@@ -1476,6 +1488,13 @@ export const savePrediction = internalMutation({
       ...args,
       generatedAt: Date.now(),
     });
+
+    const match = await ctx.db.get(args.matchId);
+    if (match?.status === "finished") {
+      await ctx.scheduler.runAfter(0, internal.gepeto.awardBadgesForMatch, {
+        matchId: args.matchId,
+      });
+    }
   },
 });
 
