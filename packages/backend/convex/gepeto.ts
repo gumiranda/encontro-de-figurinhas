@@ -760,6 +760,23 @@ export const getDashboardMatch = query({
       { home: 0, draw: 0, away: 0 } satisfies Record<PredictionChoice, number>,
     );
 
+    const predictions = isPredictionRevealed(match)
+      ? await Promise.all(
+          allPredictions.map(async (prediction) => {
+            const user = await ctx.db.get(prediction.userId);
+            return {
+              userId: prediction.userId,
+              displayNickname: user
+                ? publicUserSnapshot(user).displayNickname
+                : "Colecionador",
+              prediction: prediction.prediction,
+              exactScore: prediction.exactScore,
+              createdAt: prediction.createdAt,
+            };
+          }),
+        ).then((list) => list.sort((a, b) => b.createdAt - a.createdAt))
+      : [];
+
     return {
       match,
       round,
@@ -788,6 +805,7 @@ export const getDashboardMatch = query({
         total: allPredictions.length,
         counts: community,
       },
+      predictions,
     };
   },
 });

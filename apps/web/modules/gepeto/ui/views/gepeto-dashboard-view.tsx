@@ -1957,6 +1957,49 @@ export function GepetoDashboardView() {
   );
 }
 
+function PredictionsList({
+  predictions,
+  homeTeamName,
+  awayTeamName,
+}: {
+  predictions: Array<{
+    userId: Id<"users">;
+    displayNickname: string;
+    prediction: Choice;
+    exactScore?: { home: number; away: number } | null;
+    createdAt: number;
+  }>;
+  homeTeamName: string;
+  awayTeamName: string;
+}) {
+  if (predictions.length === 0) return null;
+
+  return (
+    <PhoneCard className="p-4">
+      <h3 className="mb-3 font-display text-lg font-bold text-[#dfe5ff]">
+        Palpites da galera
+      </h3>
+      <div className="space-y-2">
+        {predictions.map((item) => (
+          <div
+            key={item.userId}
+            className="flex items-center justify-between rounded-xl bg-[#12192e] px-3 py-2"
+          >
+            <span className="truncate text-sm font-semibold text-[#dfe5ff]">
+              {item.displayNickname}
+            </span>
+            <span className="shrink-0 font-mono text-sm font-black text-[#95aaff]">
+              {item.exactScore
+                ? `${item.exactScore.home} x ${item.exactScore.away}`
+                : choiceLabel({ homeTeamName, awayTeamName }, item.prediction)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </PhoneCard>
+  );
+}
+
 export function GepetoMatchDashboardView({
   matchId,
 }: {
@@ -1984,6 +2027,7 @@ export function GepetoMatchDashboardView({
     nextMatches,
     community,
     result,
+    predictions,
   } = data;
   const total = Math.max(community.total, 1);
   const hasResult = isMatchFinished(match);
@@ -2137,6 +2181,12 @@ export function GepetoMatchDashboardView({
             </div>
           </PhoneCard>
         ) : null}
+
+        <PredictionsList
+          predictions={predictions}
+          homeTeamName={match.homeTeamName}
+          awayTeamName={match.awayTeamName}
+        />
       </div>
     </PhoneShell>
   );
