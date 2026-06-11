@@ -143,3 +143,25 @@ describe("getPredictionLockReason", () => {
     );
   });
 });
+
+describe("user prediction visibility on fixture cards", () => {
+  it("keeps user prediction hidden from others before kickoff", () => {
+    assert.strictEqual(
+      isPredictionRevealed({
+        status: "scheduled",
+        kickoffAt: futureKickoff,
+      }),
+      false,
+    );
+  });
+
+  it("reveals user prediction after kickoff", () => {
+    assert.strictEqual(
+      isPredictionRevealed({
+        status: "scheduled",
+        kickoffAt: pastKickoff,
+      }),
+      true,
+    );
+  });
+});

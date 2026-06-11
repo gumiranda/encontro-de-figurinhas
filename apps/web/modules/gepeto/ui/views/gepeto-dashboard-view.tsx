@@ -1395,12 +1395,14 @@ function FixturePhoneRow({
   const live = state === "ao vivo";
   const finished = state === "pos";
   const gepetoScore = scoreLabel(match.aiPrediction?.exactScore);
-  const userScore = scoreLabel(
-    isPredictionRevealed(match) ? match.userPrediction?.exactScore : null,
-  );
+  const userScore = scoreLabel(match.userPrediction?.exactScore);
   const hasAiPrediction = !!match.aiPrediction;
   const actualHome = match.homeScore;
   const actualAway = match.awayScore;
+  const actualScore =
+    finished || live
+      ? `${match.homeScore ?? 0} - ${match.awayScore ?? 0}`
+      : null;
 
   return (
     <Link
@@ -1488,48 +1490,57 @@ function FixturePhoneRow({
               : "vs"}
           </div>
         </div>
-        <div className="mt-3 flex min-w-0 flex-wrap gap-2 border-t border-dashed border-[#444b65] pt-2">
-          {gepetoScore ? (
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded-lg px-2 py-1 font-mono text-xs font-black",
-                predictionBadgeClass(
-                  match.aiPrediction?.exactScore,
-                  actualHome,
-                  actualAway,
-                  "gepeto",
-                ),
-              )}
-            >
-              <GepetoAvatar size={14} mood="neutral" glow={false} />{" "}
-              {gepetoScore}
-            </span>
-          ) : hasAiPrediction ? (
-            <span className="rounded-lg border border-dashed border-[#ffc965]/45 px-2 py-1 font-mono text-xs font-black text-[#ffc965]">
-              Gepeto lacrado
-            </span>
-          ) : null}
+        <div className="mt-3 grid gap-1 border-t border-dashed border-[#444b65] pt-2">
           {userScore ? (
-            <span
-              className={cn(
-                "rounded-lg px-2 py-1 font-mono text-xs font-black",
-                predictionBadgeClass(
-                  match.userPrediction?.exactScore,
-                  actualHome,
-                  actualAway,
-                  "user",
-                ),
-              )}
-            >
-              Você {userScore}
-            </span>
-          ) : (
-            !finished && (
-              <span className="rounded-lg border border-dashed border-[#95aaff]/60 px-2 py-1 font-mono text-xs font-black text-[#95aaff]">
-                + palpitar
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-[#aeb4ca]">Você</span>
+              <span
+                className={cn(
+                  "font-black",
+                  predictionBadgeClass(
+                    match.userPrediction?.exactScore,
+                    actualHome,
+                    actualAway,
+                    "user",
+                  ),
+                )}
+              >
+                {userScore}
               </span>
-            )
-          )}
+            </div>
+          ) : !finished ? (
+            <div className="font-mono text-xs font-black text-[#95aaff]">
+              + palpitar
+            </div>
+          ) : null}
+          {gepetoScore ? (
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-[#aeb4ca]">Gepeto</span>
+              <span
+                className={cn(
+                  "font-black",
+                  predictionBadgeClass(
+                    match.aiPrediction?.exactScore,
+                    actualHome,
+                    actualAway,
+                    "gepeto",
+                  ),
+                )}
+              >
+                {gepetoScore}
+              </span>
+            </div>
+          ) : hasAiPrediction ? (
+            <div className="font-mono text-xs font-black text-[#ffc965]">
+              Gepeto lacrado
+            </div>
+          ) : null}
+          {actualScore ? (
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-[#aeb4ca]">Placar</span>
+              <span className="font-black text-white">{actualScore}</span>
+            </div>
+          ) : null}
         </div>
       </div>
       <ChevronRight className="size-5 text-[#aeb4ca]" />
