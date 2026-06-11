@@ -1525,7 +1525,7 @@ async function incrementUserAiStats(
     const updates: Partial<Doc<"userAiStats">> = {
       lastUpdated: now,
       totalMatches: existing.totalMatches + 1,
-      totalPoints: existing.totalPoints + points,
+      totalPoints: (existing.totalPoints ?? 0) + points,
     };
     if (outcome === "win") updates.winCount = existing.winCount + 1;
     else if (outcome === "loss") updates.lossCount = existing.lossCount + 1;
@@ -1643,6 +1643,49 @@ export const awardBadgesForMatch = internalMutation({
     }
 
     console.log(`Processed ${processed} predictions for match ${matchId}`);
+  },
+});
+
+export const backfillUserAiStatsPoints = internalMutation({
+  args: { cursor: v.optional(v.string()) },
+  handler: async (ctx, { cursor }) => {
+    const BATCH_SIZE = 50;
+    const batch = await ctx.db
+      .query("userAiStats")
+      .paginate({ numItems: BATCH_SIZE, cursor: cursor ?? null });
+
+    for (const stat of batch.page) {
+      const predictions = await ctx.db
+        .query("userPredictions")
+        .withIndex("by_user", (q) => q.eq("userId", stat.userId))
+        .collect();
+
+      let totalPoints = 0;
+      const matchIds = [...new Set(predictions.map((p) => p.matchId))];
+      const matches = await Promise.all(matchIds.map((id) => ctx.db.get(id)));
+      const matchById = new Map(
+        matches
+          .filter((m): m is NonNullable<typeof m> => m !== null)
+          .map((m) => [m._id, m]),
+      );
+
+      for (const pred of predictions) {
+        const match = matchById.get(pred.matchId);
+        if (!match) continue;
+        const points = scorePredictionAgainstMatch(pred, match, 1);
+        totalPoints += points;
+      }
+
+      await ctx.db.patch(stat._id, { totalPoints });
+    }
+
+    if (!batch.isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.gepeto.backfillUserAiStatsPoints,
+        { cursor: batch.continueCursor },
+      );
+    }
   },
 });
 

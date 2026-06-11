@@ -718,7 +718,7 @@ export default defineSchema({
     lossCount: v.number(),
     tieCount: v.number(),
     totalMatches: v.number(),
-    totalPoints: v.number(),
+    totalPoints: v.optional(v.number()),
     lastUpdated: v.number(),
   })
     .index("by_user", ["userId"])
