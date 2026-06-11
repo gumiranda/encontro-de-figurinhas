@@ -64,7 +64,7 @@ import {
   VerdictBanner,
 } from "@/modules/gepeto";
 import {
-  hasFinalScore,
+  isMatchFinished,
   isPredictionRevealed,
 } from "@/modules/gepeto/lib/match-state";
 import {
@@ -154,8 +154,7 @@ function matchState(match: {
   homeScore?: number;
   awayScore?: number;
 }) {
-  if (hasFinalScore(match) || (match.status ?? "scheduled") === "finished")
-    return "pos";
+  if (isMatchFinished(match)) return "pos";
   if ((match.status ?? "scheduled") === "live" || match.kickoffAt <= Date.now())
     return "ao vivo";
   return "pre";
@@ -1000,7 +999,8 @@ function predictionBadgeClass(
 
 function roundStatusLabel(round: DashboardFixtures[number]) {
   if (round.matches.length === 0) return "SEM JOGOS";
-  if (round.matches.every((match) => hasFinalScore(match))) return "ENCERRADA";
+  if (round.matches.every((match) => isMatchFinished(match)))
+    return "ENCERRADA";
   if (round.matches.some((match) => matchState(match) === "ao vivo"))
     return "AO VIVO";
   return "ABERTA";
@@ -1975,7 +1975,7 @@ export function GepetoMatchDashboardView({
     result,
   } = data;
   const total = Math.max(community.total, 1);
-  const hasResult = hasFinalScore(match);
+  const hasResult = isMatchFinished(match);
   const gepetoRevealed = isPredictionRevealed(match);
   const userExactScore = userPrediction?.exactScore ?? null;
   const gepetoExactScore = aiPrediction?.exactScore ?? null;

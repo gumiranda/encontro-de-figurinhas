@@ -12,7 +12,7 @@ import {
   MatchHeader,
 } from "@/modules/gepeto";
 import {
-  hasFinalScore,
+  isMatchFinished,
   isPredictionRevealed,
 } from "@/modules/gepeto/lib/match-state";
 import { Skeleton } from "@workspace/ui/components/skeleton";
@@ -40,7 +40,7 @@ export function GepetoMatchClient({ matchId, match: initialMatch }: GepetoMatchC
   const match = matchDetail.match ?? initialMatch;
   const { aiPrediction, userPrediction, community } = matchDetail;
 
-  const hasResult = hasFinalScore(match);
+  const hasResult = isMatchFinished(match);
   const isRevealed = isPredictionRevealed(match);
 
   const showVerdict =

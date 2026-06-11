@@ -35,16 +35,32 @@ function hasFinalScore(
   return match.homeScore !== undefined && match.awayScore !== undefined;
 }
 
-function isPredictionRevealed(
-  match: Pick<Doc<"worldCupMatches">, "kickoffAt" | "homeScore" | "awayScore">,
+function isMatchFinished(
+  match: Pick<Doc<"worldCupMatches">, "status" | "homeScore" | "awayScore">,
 ) {
-  return match.kickoffAt <= Date.now() || hasFinalScore(match);
+  return (match.status ?? "scheduled") === "finished";
+}
+
+function isPredictionRevealed(
+  match: Pick<
+    Doc<"worldCupMatches">,
+    "kickoffAt" | "status" | "homeScore" | "awayScore"
+  >,
+) {
+  return match.kickoffAt <= Date.now() || isMatchFinished(match);
 }
 
 function canRecordUserPrediction(
-  match: Pick<Doc<"worldCupMatches">, "kickoffAt" | "homeScore" | "awayScore">,
+  match: Pick<
+    Doc<"worldCupMatches">,
+    "kickoffAt" | "status" | "homeScore" | "awayScore"
+  >,
 ) {
-  return match.kickoffAt > Date.now() && !hasFinalScore(match);
+  return (
+    match.kickoffAt > Date.now() &&
+    !isMatchFinished(match) &&
+    !hasFinalScore(match)
+  );
 }
 
 type AiOutcome = "win" | "loss" | "tie";
@@ -237,8 +253,7 @@ function maskAiPrediction<T extends Doc<"aiPredictions"> | null>(
 function isOpenMatch(
   match: Pick<Doc<"worldCupMatches">, "homeScore" | "awayScore" | "status">,
 ) {
-  if (hasFinalScore(match)) return false;
-  return (match.status ?? "scheduled") !== "finished";
+  return !isMatchFinished(match);
 }
 
 function isInProgressStatus(status?: string): boolean {
@@ -730,10 +745,7 @@ export const getDashboardMatch = query({
         .take(24),
     ]);
     const nextMatches = upcomingMatches
-      .filter(
-        (upcoming) =>
-          !hasFinalScore(upcoming) && upcoming.status !== "finished",
-      )
+      .filter((upcoming) => !isMatchFinished(upcoming))
       .slice(0, 3);
     const ownPrediction =
       userPrediction && userPrediction.userId === user._id
@@ -949,7 +961,7 @@ export const recordUserPrediction = mutation({
     if (!match) throw new ConvexError("Jogo não encontrado");
     if (!canRecordUserPrediction(match)) {
       throw new ConvexError(
-        hasFinalScore(match)
+        isMatchFinished(match)
           ? "Placar final definido. Palpites fechados."
           : "Jogo já começou. Palpites fechados.",
       );
