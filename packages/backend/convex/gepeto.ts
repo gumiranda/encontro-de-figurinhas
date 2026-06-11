@@ -241,6 +241,10 @@ function isOpenMatch(
   return (match.status ?? "scheduled") !== "finished";
 }
 
+function isInProgressStatus(status?: string): boolean {
+  return status === "live" || status === "aet" || status === "penalties";
+}
+
 async function getCurrentMatch(ctx: QueryCtx) {
   const now = Date.now();
   const matches = await ctx.db.query("worldCupMatches").collect();
@@ -885,10 +889,18 @@ export const listMatchesForAdmin = query({
           .withIndex("by_round_kickoff", (q) => q.eq("roundId", roundId))
           .order("desc")
           .take(100)
-      : await ctx.db.query("worldCupMatches").order("desc").take(100);
+      : await ctx.db.query("worldCupMatches").collect();
+
+    const orderedMatches = matches.sort((a, b) => {
+      const aLive = isInProgressStatus(a.status);
+      const bLive = isInProgressStatus(b.status);
+      if (aLive && !bLive) return -1;
+      if (!aLive && bLive) return 1;
+      return b.kickoffAt - a.kickoffAt;
+    });
 
     return Promise.all(
-      matches.map(async (match) => {
+      orderedMatches.map(async (match) => {
         const aiPrediction = await ctx.db
           .query("aiPredictions")
           .withIndex("by_match", (q) => q.eq("matchId", match._id))
